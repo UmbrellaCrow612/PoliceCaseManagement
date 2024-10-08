@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\PoliceCaseManagement.Shared\PoliceCaseManagement.Shared.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Interfaces\" />
+    <ProjectReference Include="..\PoliceCaseManagement.Shared\PoliceCaseManagement.Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

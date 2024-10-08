@@ -1,4 +1,4 @@
-﻿using PoliceCaseManagement.Shared.Interfaces;
+﻿using PoliceCaseManagement.Core.Entities.Interfaces;
 
 namespace PoliceCaseManagement.Core.Entities
 {

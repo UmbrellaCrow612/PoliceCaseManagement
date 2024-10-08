@@ -1,7 +1,7 @@
 ﻿using PoliceCaseManagement.Core.Entities.Enums;
+using PoliceCaseManagement.Core.Entities.Interfaces;
 using PoliceCaseManagement.Core.Entities.Join;
 using PoliceCaseManagement.Core.Services;
-using PoliceCaseManagement.Shared.Interfaces;
 
 namespace PoliceCaseManagement.Core.Entities
 {
@@ -36,5 +36,6 @@ namespace PoliceCaseManagement.Core.Entities
         public Department? Department { get; set; } = null;
         public required User CreatedBy { get; set; }
         public User? LastEditedBy { get; set; } = null;
+        public User? DeletedBy { get; set; } = null;
     }
 }

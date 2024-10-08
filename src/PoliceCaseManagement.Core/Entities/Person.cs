@@ -1,4 +1,4 @@
-﻿using PoliceCaseManagement.Shared.Interfaces;
+﻿using PoliceCaseManagement.Core.Entities.Interfaces;
 
 namespace PoliceCaseManagement.Core.Entities
 {
@@ -7,5 +7,14 @@ namespace PoliceCaseManagement.Core.Entities
     /// </summary>
     public class Person : ISoftDeletable
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public required string FullName { get; set; }
+        public required string ContactInfo { get; set; }
+        public required DateTime DateOfBirth { get; set; }
+
+        public DateTime? DeletedAt { get; set; } = null;
+        public bool IsDeleted { get; set; } = false;
+        public string? DeletedById { get; set; } = null;
+        public User? DeletedBy { get; set; } = null;
     }
 }

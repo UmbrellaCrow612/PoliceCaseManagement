@@ -1,6 +1,4 @@
-﻿using PoliceCaseManagement.Core.Entities;
-
-namespace PoliceCaseManagement.Shared.Interfaces
+﻿namespace PoliceCaseManagement.Core.Entities.Interfaces
 {
     /// <summary>
     /// Mark a entity as Auditable, must implement audit fields defined.
@@ -15,7 +13,7 @@ namespace PoliceCaseManagement.Shared.Interfaces
 
         public string? LastEditedById { get; set; }
 
-        
+
         public User CreatedBy { get; set; }
 
         public User? LastEditedBy { get; set; }

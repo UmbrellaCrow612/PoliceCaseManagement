@@ -1,4 +1,4 @@
-﻿namespace PoliceCaseManagement.Shared.Interfaces
+﻿namespace PoliceCaseManagement.Core.Entities.Interfaces
 {
     /// <summary>
     /// Mark a entity as being only soft deletable.
@@ -10,5 +10,7 @@
         public bool IsDeleted { get; set; }
 
         public string? DeletedById { get; set; }
+
+        public User? DeletedBy { get; set; }
     }
 }
