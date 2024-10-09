@@ -1,7 +1,7 @@
-﻿namespace PoliceCaseManagement.Core.Entities.Join
+﻿namespace PoliceCaseManagement.Core.Entities.Joins
 {
     /// <summary>
-    /// Join entity between a <see cref="Case"/> and a <see cref="User"/> 
+    /// Joins entity between a <see cref="Case"/> and a <see cref="User"/> 
     /// </summary>
     public class CaseUser
     {

@@ -1,4 +1,4 @@
-﻿namespace PoliceCaseManagement.Core.Entities.Join
+﻿namespace PoliceCaseManagement.Core.Entities.Joins
 {
     public class CaseTag
     {

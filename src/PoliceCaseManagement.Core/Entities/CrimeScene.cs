@@ -1,5 +1,5 @@
 ﻿using PoliceCaseManagement.Core.Entities.Interfaces;
-using PoliceCaseManagement.Core.Entities.Join;
+using PoliceCaseManagement.Core.Entities.Joins;
 
 namespace PoliceCaseManagement.Core.Entities
 {

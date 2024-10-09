@@ -1,9 +1,9 @@
 ﻿using PoliceCaseManagement.Core.Entities.Enums;
 
-namespace PoliceCaseManagement.Core.Entities.Join
+namespace PoliceCaseManagement.Core.Entities.Joins
 {
     /// <summary>
-    /// Join entity between a <see cref="Case"/> and a <see cref="Person"/> 
+    /// Joins entity between a <see cref="Case"/> and a <see cref="Person"/> 
     /// </summary>
     public class CasePerson
     {

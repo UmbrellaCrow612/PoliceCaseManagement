@@ -1,6 +1,6 @@
 ﻿using PoliceCaseManagement.Core.Entities.Enums;
 using PoliceCaseManagement.Core.Entities.Interfaces;
-using PoliceCaseManagement.Core.Entities.Join;
+using PoliceCaseManagement.Core.Entities.Joins;
 using PoliceCaseManagement.Core.Services;
 
 namespace PoliceCaseManagement.Core.Entities
