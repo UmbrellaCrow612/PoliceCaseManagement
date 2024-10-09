@@ -5,5 +5,6 @@
     /// </summary>
     public enum CrimeScenePersonRole
     {
+        Witness = 0,
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 
-namespace PoliceCaseManagement.Core.Services
+namespace PoliceCaseManagement.Shared.Utils
 {
-    public static class CaseNumberGeneratorService
+    public static class CaseNumberGenerator
     {
         private static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 

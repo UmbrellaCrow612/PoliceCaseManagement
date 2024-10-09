@@ -2,5 +2,6 @@
 {
     public enum PropertyPersonRole
     {
+        Owner = 0,
     }
 }

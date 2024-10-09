@@ -1,7 +1,7 @@
 ﻿using PoliceCaseManagement.Core.Entities.Enums;
 using PoliceCaseManagement.Core.Entities.Interfaces;
 using PoliceCaseManagement.Core.Entities.Joins;
-using PoliceCaseManagement.Core.Services;
+using PoliceCaseManagement.Shared.Utils;
 
 namespace PoliceCaseManagement.Core.Entities
 {
@@ -11,7 +11,7 @@ namespace PoliceCaseManagement.Core.Entities
     public class Case : ISoftDeletable, IAuditable
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string CaseNumber { get; set; } = CaseNumberGeneratorService.GenerateCaseNumber();
+        public string CaseNumber { get; set; } = CaseNumberGenerator.GenerateCaseNumber();
         public CaseStatus CaseStatus { get; set; } = CaseStatus.Open;
         public required CasePriority CasePriority { get; set; }
         public required string Title { get; set; }
