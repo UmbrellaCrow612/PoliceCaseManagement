@@ -29,12 +29,12 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<CasePerson> CasePersons { get; set; } = [];
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
         public ICollection<CaseTag> CaseTags { get; set; } = [];
-        public ICollection<Evidence> Evidences { get; set; } = [];
-        public ICollection<CrimeScene> CrimeScenes { get; set; } = [];
+        public ICollection<CaseEvidence> CaseEvidences { get; set; } = [];
+        public ICollection<CaseCrimeScene> CaseCrimeScenes { get; set; } = [];
         public ICollection<Report> Reports { get; set; } = [];
         public string? DepartmentId { get; set; } = null;
         public Department? Department { get; set; } = null;
-        public required User CreatedBy { get; set; }
+        public User? CreatedBy { get; set; } = null;
         public User? LastEditedBy { get; set; } = null;
         public User? DeletedBy { get; set; } = null;
     }

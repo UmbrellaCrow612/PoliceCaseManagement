@@ -14,7 +14,7 @@
         public string? LastEditedById { get; set; }
 
 
-        public User CreatedBy { get; set; }
+        public User? CreatedBy { get; set; }`
 
         public User? LastEditedBy { get; set; }
     }
