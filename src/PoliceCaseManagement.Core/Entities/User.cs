@@ -5,6 +5,12 @@ namespace PoliceCaseManagement.Core.Entities
 {
     public class User : IdentityUser, ISoftDeletable
     {
+        public required string Name { get; set; }
+        public required string Rank { get; set; }
+        public required string BadgeNumber { get; set; }
+        public required string DepartmentId { get; set; }
+        public Department? Department { get; set; } = null;
+
         public DateTime? DeletedAt { get; set; } = null;
         public bool IsDeleted { get; set; } = false;
         public string? DeletedById { get; set; } = null;
