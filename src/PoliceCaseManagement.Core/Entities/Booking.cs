@@ -14,6 +14,9 @@ namespace PoliceCaseManagement.Core.Entities
         public required string AssignedCell { get; set; }
         public required string Belongings { get; set; }
         public required string MugShotFileUrl { get; set; }
+        public required string FingerprintFuleUrl { get; set; }
+        public required string ArrestId { get; set; }
+        public Arrest? Arrest { get; set; } = null;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastEditedAt { get; set; } = null;
