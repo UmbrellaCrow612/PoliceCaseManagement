@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PoliceCaseManagement.Core.Entities.Interfaces;
+using PoliceCaseManagement.Core.Entities.Joins;
 
 namespace PoliceCaseManagement.Core.Entities
 {
@@ -22,5 +23,6 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Evidence> CreatedEvidence { get; set; } = [];
         public ICollection<Case> CreatedCases { get; set; } = [];
         public ICollection<Case> DeletedCases { get; set; } = [];
+        public ICollection<CaseUser> CaseUsers { get; set; } = [];
     }
 }
