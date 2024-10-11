@@ -3,7 +3,10 @@ using PoliceCaseManagement.Core.Interfaces;
 
 namespace PoliceCaseManagement.Infrastructure.Data.Repositories
 {
-    public class CaseRepository : ICaseRepository
+    /// <summary>
+    /// Represents a repository for managing cases.
+    /// </summary>
+    public class CaseRepository : ICaseRepository<Case, string>
     {
         public Task AddAsync(Case entity)
         {
@@ -20,7 +23,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<ICollection<Case>> Search()
+        public Task<IEnumerable<Case>> SearchAsync()
         {
             throw new NotImplementedException();
         }

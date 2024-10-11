@@ -1,9 +1,11 @@
-﻿using PoliceCaseManagement.Core.Entities;
-
-namespace PoliceCaseManagement.Core.Interfaces
+﻿namespace PoliceCaseManagement.Core.Interfaces
 {
-    public interface ICaseRepository : IGenericRepository<Case, string>
+    public interface ICaseRepository<T, TId> : IGenericRepository<T, TId> where T : class
     {
-        Task<ICollection<Case>> Search();
+        /// <summary>
+        /// Search for cases based on specified criteria.
+        /// </summary>
+        /// <returns>A collection of cases that match the search criteria.</returns>
+        Task<IEnumerable<T>> SearchAsync();
     }
 }
