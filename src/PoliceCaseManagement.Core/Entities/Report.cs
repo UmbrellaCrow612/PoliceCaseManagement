@@ -7,6 +7,10 @@ namespace PoliceCaseManagement.Core.Entities
     /// </summary>
     public class Report : ISoftDeletable, IAuditable
     {
+        public required string Description { get; set; }
+        public required string CaseId { get; set; }
+        public Case? Case { get; set; } = null;
+
         public DateTime? DeletedAt { get; set; } = null;
         public bool IsDeleted { get; set; } = false;
         public string? DeletedById { get; set; } = null;

@@ -6,9 +6,10 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
     /// <summary>
     /// Represents a repository for managing cases.
     /// </summary>
-    public class CaseRepository : ICaseRepository<Case, string>
+    public class CaseRepository(ApplicationDbContext context) : ICaseRepository<Case, string>
     {
-        public Task AddAsync(Case entity)
+        private readonly ApplicationDbContext _context = context;
+        public async Task AddAsync(Case entity)
         {
             throw new NotImplementedException();
         }
