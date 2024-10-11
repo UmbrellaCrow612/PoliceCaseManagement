@@ -20,5 +20,7 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Charge> CreatedCharges { get; set; } = [];
         public ICollection<Statement> CreatedStatements { get; set; } = [];
         public ICollection<Evidence> CreatedEvidence { get; set; } = [];
+        public ICollection<Case> CreatedCases { get; set; } = [];
+        public ICollection<Case> DeletedCases { get; set; } = [];
     }
 }

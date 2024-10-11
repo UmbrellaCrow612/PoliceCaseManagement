@@ -9,7 +9,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
     public class CaseRepository(ApplicationDbContext context) : ICaseRepository<Case, string>
     {
         private readonly ApplicationDbContext _context = context;
-        public async Task AddAsync(Case entity)
+        public Task AddAsync(Case entity)
         {
             throw new NotImplementedException();
         }
