@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoliceCaseManagement.Shared
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoliceCaseManagement.Web", "src\PoliceCaseManagement.Web\PoliceCaseManagement.Web.csproj", "{4B6A1C85-DAF2-4697-BF21-05E57A145BC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCMS.API", "PCMS.API\PCMS.API.csproj", "{E6BFBABD-81E7-4866-893E-5089E342D2CA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{4B6A1C85-DAF2-4697-BF21-05E57A145BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B6A1C85-DAF2-4697-BF21-05E57A145BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B6A1C85-DAF2-4697-BF21-05E57A145BC6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6BFBABD-81E7-4866-893E-5089E342D2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6BFBABD-81E7-4866-893E-5089E342D2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6BFBABD-81E7-4866-893E-5089E342D2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6BFBABD-81E7-4866-893E-5089E342D2CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,7 +51,6 @@ Global
 		{5B8A14E7-AFB5-4173-A11F-171E526E4D44} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{4A733722-050B-4E15-87CF-5FCD57F888F8} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{4B6A1C85-DAF2-4697-BF21-05E57A145BC6} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
-		{E6BFBABD-81E7-4866-893E-5089E342D2CA} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}
