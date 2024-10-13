@@ -1,7 +1,7 @@
 ﻿namespace PoliceCaseManagement.Core.Entities.Joins
 {
     /// <summary>
-    /// Joins between a <see cref="Case"/> and <see cref="Evidence"/>
+    /// Joins between a <see cref="Entities.Case"/> and <see cref="Entities.Evidence"/>
     /// </summary>
     public class CaseEvidence
     {
