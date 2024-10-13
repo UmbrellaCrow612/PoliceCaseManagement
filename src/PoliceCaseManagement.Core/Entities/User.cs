@@ -24,5 +24,8 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Case> CreatedCases { get; set; } = [];
         public ICollection<Case> DeletedCases { get; set; } = [];
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
+        public ICollection<Report> CreatedReports { get; set; } = [];
+        public ICollection<Report> DeletedReports { get; set; } = [];
+        public ICollection<Report> LastEditedReports { get; set; } = [];
     }
 }
