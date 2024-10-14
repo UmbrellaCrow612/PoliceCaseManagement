@@ -2,7 +2,7 @@
 
 namespace PoliceCaseManagement.Core.Entities
 {
-    public class Release :IAuditable
+    public class Release : IAuditable
     {
         public required string PersonId { get; set; }
         public Person? Person { get; set; } = null;

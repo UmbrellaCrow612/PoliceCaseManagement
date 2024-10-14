@@ -2,6 +2,9 @@
 
 namespace PoliceCaseManagement.Core.Entities
 {
+    /// <summary>
+    /// Entity
+    /// </summary>
     public class Bail : ISoftDeletable, IAuditable
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

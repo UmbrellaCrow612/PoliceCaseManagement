@@ -7,6 +7,8 @@ namespace PoliceCaseManagement.Core.Entities
     /// </summary>
     public class Incident
     {
+        public required string IncidentType { get; set; }
+        public required string Details { get; set; }
         public required string LocationId { get; set; }
         public Location? Location { get; set; } = null;
 
