@@ -10,5 +10,6 @@
         public required string Description { get; set; }
 
         public ICollection<Case> AssignedCases { get; set; } = [];
+        public ICollection<User> AssignedUsers { get; set; } = [];
     }
 }

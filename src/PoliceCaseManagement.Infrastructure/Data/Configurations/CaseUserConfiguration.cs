@@ -10,8 +10,6 @@ namespace PoliceCaseManagement.Infrastructure.Data.Configurations
         {
             builder.HasKey(x => new {x.UserId, x.CaseId });
 
-            builder.HasIndex(x => new {x.UserId, x.CaseId});
-
             builder.HasOne(x => x.User).WithMany(x => x.CaseUsers).HasForeignKey(x => x.UserId);
             builder.HasOne(x => x.Case).WithMany(x => x.CaseUsers).HasForeignKey(x => x.CaseId);
         }

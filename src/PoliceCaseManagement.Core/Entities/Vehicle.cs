@@ -16,5 +16,7 @@ namespace PoliceCaseManagement.Core.Entities
         public required string VIN { get; set; }
 
         public ICollection<VehiclePerson> VehiclePersons { get; set; } = [];
+        public ICollection<CaseVehicle> CaseVehicles { get; set; } = [];
+        public ICollection<CrimeSceneVehicle> CrimeSceneVehicles { get; set; } = [];
     }
 }
