@@ -1,4 +1,5 @@
 ﻿using PoliceCaseManagement.Core.Entities.Interfaces;
+using PoliceCaseManagement.Core.Entities.Joins;
 
 namespace PoliceCaseManagement.Core.Entities
 {
@@ -21,5 +22,7 @@ namespace PoliceCaseManagement.Core.Entities
         public string? LastEditedById { get; set; } = null;
         public User? CreatedBy { get; set; } = null;
         public User? LastEditedBy { get; set; } = null;
+
+        public ICollection<CaseDocument> CaseDocuments { get; set; } = [];
     }
 }
