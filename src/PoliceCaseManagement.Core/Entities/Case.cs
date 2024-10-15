@@ -31,6 +31,7 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<CaseTag> CaseTags { get; set; } = [];
         public ICollection<CaseEvidence> CaseEvidences { get; set; } = [];
         public ICollection<CaseCrimeScene> CaseCrimeScenes { get; set; } = [];
+        public ICollection<CaseDocument> CaseDocuments { get; set; } = [];
         public ICollection<Report> Reports { get; set; } = [];
         public string? DepartmentId { get; set; } = null;
         public Department? Department { get; set; } = null;

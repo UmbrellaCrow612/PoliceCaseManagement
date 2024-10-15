@@ -5,5 +5,10 @@
     /// </summary>
     public class CaseDocument
     {
+        public required string CaseId { get; set; }
+        public required string DocumentId { get; set; }
+
+        public Case? Case { get; set; } = null;
+        public Document? Document { get; set; } = null;
     }
 }

@@ -23,9 +23,11 @@ namespace PoliceCaseManagement.Infrastructure.Data.Configurations
             builder.HasMany(x => x.CaseEvidences).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasMany(x => x.CaseCrimeScenes).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasMany(x => x.Reports).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
+            builder.HasMany(x => x.CaseDocuments).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasOne(x => x.Department).WithMany(x => x.AssignedCases).HasForeignKey(x => x.DepartmentId);
             builder.HasOne(x => x.CreatedBy).WithMany(x => x.CreatedCases).HasForeignKey(x => x.CreatedById);
             builder.HasOne(x => x.DeletedBy).WithMany(x => x.DeletedCases).HasForeignKey(x => x.DeletedById);
+            builder.HasOne(x => x.LastEditedBy).WithMany(x => x.LastEditedCases).HasForeignKey(x => x.LastEditedById);
         }
     }
 }

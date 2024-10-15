@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PoliceCaseManagement.Core.Entities.Joins;
 
-namespace PoliceCaseManagement.Infrastructure.Data.Configurations
+namespace PoliceCaseManagement.Infrastructure.Data.Configurations.Joins
 {
     public class CasePersonConfiguration : IEntityTypeConfiguration<CasePerson>
     {
