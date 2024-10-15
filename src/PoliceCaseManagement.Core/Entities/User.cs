@@ -18,7 +18,7 @@ namespace PoliceCaseManagement.Core.Entities
         public User? DeletedBy { get; set; } = null;
 
         public ICollection<Statement> CreatedStatements { get; set; } = [];
-        public ICollection<Evidence> CreatedEvidence { get; set; } = [];
+        public ICollection<Evidence> CreatedEvidences { get; set; } = [];
         public ICollection<Case> CreatedCases { get; set; } = [];
         public ICollection<Case> DeletedCases { get; set; } = [];
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
@@ -30,5 +30,8 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Document> CreatedDocuments { get; set; } = [];
         public ICollection<Document> LastEditedDocuments { get; set; } = [];
         public ICollection<Document> DeletedDocuments { get; set; } = [];
+        public ICollection<Evidence> LastEditedEvidences { get; set; } = [];
+        public ICollection<Evidence> DeletedEvidences { get; set; } = [];
+        public ICollection<Person> DeletedPersons { get; set; } = [];
     }
 }

@@ -8,7 +8,13 @@ namespace PoliceCaseManagement.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Location> builder)
         {
-            throw new NotImplementedException();
+            builder.HasKey(x => x.Id);
+
+            builder.HasIndex(x => x.Id).IsUnique();
+
+            builder.HasMany(x => x.Properties).WithOne(x => x.Location).HasForeignKey(x => x.LocationId);
+            builder.HasMany(x => x.CrimeScenes).WithOne(x => x.Location).HasForeignKey(x => x.LocationId);
+            builder.HasMany(x => x.Incidents).WithOne(x => x.Location).HasForeignKey(x => x.LocationId);
         }
     }
 }

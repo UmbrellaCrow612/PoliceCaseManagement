@@ -17,6 +17,7 @@
         public string? Description { get; set; } = null;
 
         public ICollection<Property> Properties { get; set; } = [];
-        public ICollection<CrimeScene> CrimeScenes { get; set; } = [];    
+        public ICollection<CrimeScene> CrimeScenes { get; set; } = [];
+        public ICollection<Incident> Incidents { get; set; } = [];
     }
 }

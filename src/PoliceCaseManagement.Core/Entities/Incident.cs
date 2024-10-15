@@ -7,6 +7,7 @@ namespace PoliceCaseManagement.Core.Entities
     /// </summary>
     public class Incident
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string IncidentType { get; set; }
         public required string Details { get; set; }
         public required string LocationId { get; set; }

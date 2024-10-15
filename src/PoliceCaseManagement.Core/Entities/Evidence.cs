@@ -8,6 +8,7 @@ namespace PoliceCaseManagement.Core.Entities
     /// </summary>
     public class Evidence : ISoftDeletable, IAuditable
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string FileUrl { get; set; }
         public required string Name { get; set; }
         public required string Description { get; set; }
