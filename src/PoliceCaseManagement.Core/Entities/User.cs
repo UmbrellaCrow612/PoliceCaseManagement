@@ -33,5 +33,7 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Evidence> LastEditedEvidences { get; set; } = [];
         public ICollection<Evidence> DeletedEvidences { get; set; } = [];
         public ICollection<Person> DeletedPersons { get; set; } = [];
+        public ICollection<User> DeletedUsers { get; set; } = [];
+        public ICollection<Statement> LastEditedStatements { get; set; } = [];
     }
 }
