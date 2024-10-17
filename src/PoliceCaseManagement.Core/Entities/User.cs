@@ -17,6 +17,7 @@ namespace PoliceCaseManagement.Core.Entities
         public string? DeletedById { get; set; } = null;
         public User? DeletedBy { get; set; } = null;
 
+        public ICollection<StatementUser> StatementUsers { get; set; } = [];
         public ICollection<Statement> CreatedStatements { get; set; } = [];
         public ICollection<Evidence> CreatedEvidences { get; set; } = [];
         public ICollection<Case> CreatedCases { get; set; } = [];

@@ -17,5 +17,7 @@ namespace PoliceCaseManagement.Core.Entities
 
         public ICollection<CrimeSceneEvidence> CrimeSceneEvidences { get; set; } = [];
         public ICollection<CaseCrimeScene> CaseCrimeScenes { get; set; } = [];
+        public ICollection<CrimeScenePerson> CrimeScenePersons { get; set; } = [];
+        public ICollection<CrimeSceneVehicle> CrimeSceneVehicles { get; set; } = [];
     }
 }

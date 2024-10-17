@@ -17,6 +17,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Configurations
             builder.HasOne(x => x.DeletedBy).WithMany(x => x.DeletedEvidences).HasForeignKey(x => x.DeletedById);
 
             builder.HasMany(x => x.CaseEvidences).WithOne(x => x.Evidence).HasForeignKey(x => x.EvidenceId);
+            builder.HasMany(x => x.CrimeSceneEvidences).WithOne(x => x.Evidence).HasForeignKey(x => x.EvidenceId);
         }
     }
 }

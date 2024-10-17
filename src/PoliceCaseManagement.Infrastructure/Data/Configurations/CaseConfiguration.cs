@@ -17,6 +17,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Configurations
             builder.Property(x => x.Title).HasMaxLength(120);
             builder.Property(x => x.Description).HasMaxLength(250);
 
+            builder.HasMany(x => x.CaseVehicles).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasMany(x => x.CasePersons).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasMany(x => x.CaseUsers).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);
             builder.HasMany(x => x.CaseTags).WithOne(x => x.Case).HasForeignKey(x => x.CaseId);

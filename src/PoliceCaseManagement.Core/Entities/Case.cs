@@ -26,6 +26,7 @@ namespace PoliceCaseManagement.Core.Entities
         public bool IsDeleted { get; set; } = false;
         public string? DeletedById { get; set; } = null;
 
+        public ICollection<CaseVehicle> CaseVehicles { get; set; } = [];
         public ICollection<CasePerson> CasePersons { get; set; } = [];
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
         public ICollection<CaseTag> CaseTags { get; set; } = [];

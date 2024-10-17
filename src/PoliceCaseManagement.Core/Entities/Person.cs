@@ -23,5 +23,8 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Statement> Statements { get; set; } = [];
         public ICollection<CrimeScenePerson> CrimeScenePersons { get; set; } = [];
         public ICollection<CasePerson> CasePersons { get; set; } = [];
+        public ICollection<IncidentPerson> IncidentPersons { get; set; } = [];
+        public ICollection<PropertyPerson> PropertyPersons { get; set; } = [];
+        public ICollection<VehiclePerson> VehiclePersons { get; set; } = [];
     }
 }
