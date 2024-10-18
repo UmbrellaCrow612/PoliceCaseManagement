@@ -1,37 +1,51 @@
-﻿using PoliceCaseManagement.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PoliceCaseManagement.Core.Entities;
 using PoliceCaseManagement.Core.Interfaces;
 
 namespace PoliceCaseManagement.Infrastructure.Data.Repositories
 {
-    /// <summary>
-    /// Represents a repository for managing cases.
-    /// </summary>
     public class CaseRepository(ApplicationDbContext context) : ICaseRepository<Case, string>
     {
         private readonly ApplicationDbContext _context = context;
-        public Task AddAsync(Case entity)
+
+        public async Task AddAsync(Case entity)
         {
-            throw new NotImplementedException();
+            await _context.Cases.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<bool> DeleteAsync(Case entity)
+        public async Task<bool> DeleteAsync(Case entity)
         {
-            throw new NotImplementedException();
+            var caseToDelete = await _context.Cases.FirstOrDefaultAsync(x => x.Id == entity.Id);
+            if (caseToDelete is null) return false;
+
+            _context.Cases.Remove(caseToDelete);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public Task<Case?> GetByIdAsync(string id)
+        public async Task<Case?> GetByIdAsync(string id)
         {
-            throw new NotImplementedException();
-        }
+            var caseToGet = await _context.Cases.FirstOrDefaultAsync(x => x.Id == id);
+            if (caseToGet is null) return null;
 
+            return caseToGet;
+        }
         public Task<IEnumerable<Case>> SearchAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateAsync(Case entity)
+        public async Task<bool> UpdateAsync(Case entity)
         {
-            throw new NotImplementedException();
+            var caseToUpdate = await _context.Cases.FirstOrDefaultAsync(x => x.Id == entity.Id);
+            if (caseToUpdate is null) return false;
+
+            _context.Entry(caseToUpdate).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
