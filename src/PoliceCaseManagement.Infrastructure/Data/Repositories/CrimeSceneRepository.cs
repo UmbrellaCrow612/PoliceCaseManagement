@@ -14,39 +14,35 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteAsync(CrimeScene entity)
+        public async Task<bool> DeleteAsync(string id)
         {
-            var crimeSceneToDelete = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == entity.Id);
+            var crimeSceneToDelete = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == id);
             if (crimeSceneToDelete is null) return false;
 
-            _context.CrimeScenes.Remove(crimeSceneToDelete);
+            _context.Remove(crimeSceneToDelete);
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<bool> Exists(string id)
+        {
+            var crimeSceneExists = await _context.CrimeScenes.AnyAsync(x => x.Id == id);
+
+            return crimeSceneExists;
         }
 
         public async Task<CrimeScene?> GetByIdAsync(string id)
         {
             var crimeSceneToGet = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == id);
-            if (crimeSceneToGet is null) return null;
 
-            return crimeSceneToGet;
+            return crimeSceneToGet is null ? null : crimeSceneToGet;
         }
 
-        public Task<IEnumerable<CrimeScene>> SearchAsync()
+        public async Task UpdateAsync(CrimeScene updatedEntity)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> UpdateAsync(CrimeScene entity)
-        {
-            var crimeSceneToUpdate = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == entity.Id);
-            if (crimeSceneToUpdate is null) return false;
-
-            _context.Entry(crimeSceneToUpdate).CurrentValues.SetValues(entity);
+             _context.CrimeScenes.Update(updatedEntity);
             await _context.SaveChangesAsync();
-
-            return true;
         }
     }
 }

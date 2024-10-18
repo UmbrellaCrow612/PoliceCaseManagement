@@ -14,38 +14,33 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteAsync(Case entity)
+        public async Task<bool> DeleteAsync(string id)
         {
-            var caseToDelete = await _context.Cases.FirstOrDefaultAsync(x => x.Id == entity.Id);
+            var caseToDelete = await _context.Cases.FirstOrDefaultAsync(c => c.Id == id);
             if (caseToDelete is null) return false;
 
             _context.Cases.Remove(caseToDelete);
-            await _context.SaveChangesAsync();
-
             return true;
+        }
+
+        public async Task<bool> Exists(string id)
+        {
+            var caseExists = await _context.Cases.AnyAsync(x => x.Id == id);
+
+            return caseExists;
         }
 
         public async Task<Case?> GetByIdAsync(string id)
         {
             var caseToGet = await _context.Cases.FirstOrDefaultAsync(x => x.Id == id);
-            if (caseToGet is null) return null;
 
-            return caseToGet;
-        }
-        public Task<IEnumerable<Case>> SearchAsync()
-        {
-            throw new NotImplementedException();
+            return caseToGet is null ? null : caseToGet;
         }
 
-        public async Task<bool> UpdateAsync(Case entity)
+        public async Task UpdateAsync(Case updatedEntity)
         {
-            var caseToUpdate = await _context.Cases.FirstOrDefaultAsync(x => x.Id == entity.Id);
-            if (caseToUpdate is null) return false;
-
-            _context.Entry(caseToUpdate).CurrentValues.SetValues(entity);
+            _context.Cases.Update(updatedEntity);
             await _context.SaveChangesAsync();
-
-            return true;
         }
     }
 }
