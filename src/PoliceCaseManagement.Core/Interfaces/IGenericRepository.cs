@@ -20,7 +20,7 @@
         /// </summary>
         /// <param name="id">The ID of the entity.</param>
         /// <returns><see langword="true"/> if it does <see langword="false"/> id it does not.</returns>
-        Task<bool> Exists(TId id);
+        Task<bool> ExistsAsync(TId id);
 
         /// <summary>
         /// Add an entity to the database.

@@ -25,7 +25,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             return true;
         }
 
-        public async Task<bool> Exists(string id)
+        public async Task<bool> ExistsAsync(string id)
         {
             var crimeSceneExists = await _context.CrimeScenes.AnyAsync(x => x.Id == id);
 
