@@ -3,6 +3,9 @@ using PoliceCaseManagement.Core.Entities.Joins;
 
 namespace PoliceCaseManagement.Core.Entities
 {
+    /// <summary>
+    /// Entity
+    /// </summary>
     public class Document : ISoftDeletable, IAuditable
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
