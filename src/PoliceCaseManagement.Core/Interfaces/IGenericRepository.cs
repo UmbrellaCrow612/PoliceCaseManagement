@@ -40,6 +40,14 @@
         /// Delete an entity
         /// </summary>
         /// <param name="id">The id of the entity to delete.</param>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns><see langword="true"/> if successful or <see langword="false"/> if it could not be found.</returns>
+        Task<bool> DeleteAsync(TId id, string userId);
+
+        /// <summary>
+        /// Delete an entity
+        /// </summary>
+        /// <param name="id">The id of the entity to delete.</param>
         /// <returns><see langword="true"/> if successful or <see langword="false"/> if it could not be found.</returns>
         Task<bool> DeleteAsync(TId id);
     }

@@ -14,15 +14,22 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<bool> DeleteAsync(string id, string userId)
         {
             var crimeSceneToDelete = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == id);
             if (crimeSceneToDelete is null) return false;
 
-            _context.Remove(crimeSceneToDelete);
-            await _context.SaveChangesAsync();
+            crimeSceneToDelete.IsDeleted = true;
+            crimeSceneToDelete.DeletedAt = DateTime.UtcNow;
+            crimeSceneToDelete.DeletedById = userId;
 
+            await _context.SaveChangesAsync();
             return true;
+        }
+
+        public Task<bool> DeleteAsync(string id)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<bool> ExistsAsync(string id)

@@ -25,6 +25,11 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             return true;
         }
 
+        public Task<bool> DeleteAsync(string id, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<bool> ExistsAsync(string id)
         {
             var departmentExists = await _context.Departments.AnyAsync(x => x.Id == id);
