@@ -41,7 +41,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
         {
             var departmentToGet = await _context.Departments.FirstOrDefaultAsync(x => x.Id == id);
 
-            return departmentToGet is null ? null : departmentToGet;
+            return departmentToGet;
         }
 
         public async Task UpdateAsync(Department updatedEntity)

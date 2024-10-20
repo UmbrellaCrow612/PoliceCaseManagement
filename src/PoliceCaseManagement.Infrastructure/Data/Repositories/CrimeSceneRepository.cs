@@ -43,7 +43,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
         {
             var crimeSceneToGet = await _context.CrimeScenes.FirstOrDefaultAsync(x => x.Id == id);
 
-            return crimeSceneToGet is null ? null : crimeSceneToGet;
+            return crimeSceneToGet;
         }
 
         public async Task UpdateAsync(CrimeScene updatedEntity)

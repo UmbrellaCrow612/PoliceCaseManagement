@@ -43,7 +43,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
         {
             var caseToGet = await _context.Cases.FirstOrDefaultAsync(x => x.Id == id);
 
-            return caseToGet is null ? null : caseToGet;
+            return caseToGet;
         }
 
         public async Task UpdateAsync(Case updatedEntity)
