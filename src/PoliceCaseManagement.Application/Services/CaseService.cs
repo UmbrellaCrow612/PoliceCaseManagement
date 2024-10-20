@@ -1,5 +1,6 @@
 ﻿using PoliceCaseManagement.Application.Interfaces;
 using PoliceCaseManagement.Core.Entities;
+using PoliceCaseManagement.Core.Exceptions;
 using PoliceCaseManagement.Core.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
@@ -8,24 +9,33 @@ namespace PoliceCaseManagement.Application.Services
     {
         private readonly ICaseRepository<Case, string> _caseRepository = caseRepository;
 
-        public Task<Case> CreateCaseAsync(Case newCase)
+        public async Task CreateCaseAsync(Case newCase)
         {
-            throw new NotImplementedException();
+            await _caseRepository.AddAsync(newCase);
         }
 
-        public Task DeleteCaseAsync(string caseId)
+        public async Task DeleteCaseAsync(string caseId)
         {
-            throw new NotImplementedException();
+            var caseExists = await _caseRepository.ExistsAsync(caseId);
+            if (!caseExists) throw new BusinessRuleException("Case dose not exist");
+
+            var caseToDelete = await _caseRepository.GetCaseWithDetailsByIdAsync(caseId) ?? throw new BusinessRuleException("Case dose not exist");
+
+            if (caseToDelete.CaseUsers.Count > 0) throw new BusinessRuleException("Users linked to this case.");
+
+            await _caseRepository.DeleteAsync(caseId);
+
         }
 
-        public Task<Case> GetCaseByIdAsync(string caseId)
+        public async Task<Case?> GetCaseByIdAsync(string caseId)
         {
-            throw new NotImplementedException();
+            var caseToGet = await _caseRepository.GetByIdAsync(caseId);
+            return caseToGet;
         }
 
-        public Task UpdateCaseAsync(Case updatedCase)
+        public async Task UpdateCaseAsync(Case updatedCase)
         {
-            throw new NotImplementedException();
+            await _caseRepository.UpdateAsync(updatedCase);
         }
     }
 }

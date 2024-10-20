@@ -46,6 +46,26 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             return caseToGet;
         }
 
+        public async Task<Case?> GetCaseWithDetailsByIdAsync(string id)
+        {
+            var caseToGetWithDetails = await _context.Cases
+                .Include(x => x.CaseVehicles)
+                .Include(x => x.CasePersons)
+                .Include(x => x.CaseUsers)
+                .Include(x => x.CaseTags)
+                .Include(x => x.CaseEvidences)
+                .Include(x => x.CaseCrimeScenes)
+                .Include(x => x.CaseDocuments)
+                .Include(x => x.Reports)
+                .Include(x => x.Department)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.LastEditedBy)
+                .Include(x => x.DeletedBy)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return caseToGetWithDetails;
+        }
+
         public async Task UpdateAsync(Case updatedEntity)
         {
             _context.Cases.Update(updatedEntity);
