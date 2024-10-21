@@ -1,41 +1,49 @@
-﻿using PoliceCaseManagement.Application.Interfaces;
+﻿using AutoMapper;
+using PoliceCaseManagement.Application.DTOs.Cases;
+using PoliceCaseManagement.Application.Interfaces;
 using PoliceCaseManagement.Core.Entities;
-using PoliceCaseManagement.Core.Exceptions;
 using PoliceCaseManagement.Core.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
 {
-    public class CaseService(ICaseRepository<Case,string> caseRepository) : ICaseService
+    public class CaseService(ICaseRepository<Case,string> caseRepository, IMapper mapper) : ICaseService
     {
         private readonly ICaseRepository<Case, string> _caseRepository = caseRepository;
+        private readonly IMapper _mapper = mapper;
 
-        public async Task CreateCaseAsync(Case newCase)
+        public async Task<CaseDto> CreateCaseAsync(CreateCaseDto newCase)
         {
-            await _caseRepository.AddAsync(newCase);
+            var caseToCreate = _mapper.Map<Case>(newCase);
+
+            await _caseRepository.AddAsync(caseToCreate);
+
+            return _mapper.Map<CaseDto>(caseToCreate);
         }
 
-        public async Task DeleteCaseAsync(string caseId)
+        public async Task<bool> DeleteCaseAsync(string caseId)
         {
-            var caseExists = await _caseRepository.ExistsAsync(caseId);
-            if (!caseExists) throw new BusinessRuleException("Case dose not exist");
+            var isDeleted = await _caseRepository.DeleteAsync(caseId);
 
-            var caseToDelete = await _caseRepository.GetCaseWithDetailsByIdAsync(caseId) ?? throw new BusinessRuleException("Case dose not exist");
-
-            if (caseToDelete.CaseUsers.Count > 0) throw new BusinessRuleException("Users linked to this case.");
-
-            await _caseRepository.DeleteAsync(caseId);
-
+            return isDeleted;
         }
 
-        public async Task<Case?> GetCaseByIdAsync(string caseId)
+        public async Task<CaseDto?> GetCaseByIdAsync(string caseId)
         {
             var caseToGet = await _caseRepository.GetByIdAsync(caseId);
-            return caseToGet;
+
+            return _mapper.Map<CaseDto>(caseToGet);
         }
 
-        public async Task UpdateCaseAsync(Case updatedCase)
+        public async Task<bool> UpdateCaseAsync(string caseId, UpdateCaseDto updatedCase)
         {
-            await _caseRepository.UpdateAsync(updatedCase);
+            var caseToUpdate = await _caseRepository.GetByIdAsync(caseId);
+            if (caseToUpdate is null) return false;
+
+            _mapper.Map(updatedCase, caseToUpdate);
+
+            await _caseRepository.UpdateAsync(caseToUpdate);
+
+            return true;
         }
     }
 }
