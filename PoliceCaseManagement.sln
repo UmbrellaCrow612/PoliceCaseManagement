@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoliceCaseManagement.Shared
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoliceCaseManagement.Web", "src\PoliceCaseManagement.Web\PoliceCaseManagement.Web.csproj", "{4B6A1C85-DAF2-4697-BF21-05E57A145BC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoliceCaseManagement.Api", "src\PoliceCaseManagement.Api\PoliceCaseManagement.Api.csproj", "{B53177F8-86DB-4D94-AD35-C857D424E2A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoliceCaseManagement.Api", "src\PoliceCaseManagement.Api\PoliceCaseManagement.Api.csproj", "{B53177F8-86DB-4D94-AD35-C857D424E2A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
