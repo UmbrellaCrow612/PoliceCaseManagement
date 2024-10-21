@@ -11,7 +11,7 @@ using PoliceCaseManagement.Infrastructure.Data;
 namespace PoliceCaseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241021133921_InitialCreate")]
+    [Migration("20241021142401_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
