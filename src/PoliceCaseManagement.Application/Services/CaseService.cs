@@ -11,9 +11,10 @@ namespace PoliceCaseManagement.Application.Services
         private readonly ICaseRepository<Case, string> _caseRepository = caseRepository;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<CaseDto> CreateCaseAsync(CreateCaseDto newCase)
+        public async Task<CaseDto> CreateCaseAsync(string userId, CreateCaseDto newCase)
         {
             var caseToCreate = _mapper.Map<Case>(newCase);
+            newCase.CreatedById = userId;
 
             await _caseRepository.AddAsync(caseToCreate);
 

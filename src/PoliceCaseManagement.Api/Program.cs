@@ -1,4 +1,6 @@
 using PoliceCaseManagement.Application;
+using PoliceCaseManagement.Application.DTOs.Cases;
+using PoliceCaseManagement.Application.Interfaces;
 using PoliceCaseManagement.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,3 +20,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapPost("/cases", async (ICaseService caseService, CreateCaseDto caseDto) =>
+{
+    // Call the service to create a case
+    var result = await caseService.CreateCaseAsync("1", caseDto);
+    return Results.Created($"/cases", result);
+});
+
+app.Run();

@@ -9,7 +9,7 @@ namespace PoliceCaseManagement.Core.Entities
         public required string Name { get; set; }
         public required string Rank { get; set; }
         public required string BadgeNumber { get; set; }
-        public required string DepartmentId { get; set; }
+        public string? DepartmentId { get; set; } = null;
         public Department? Department { get; set; } = null;
 
         public DateTime? DeletedAt { get; set; } = null;
