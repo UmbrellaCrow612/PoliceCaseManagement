@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PoliceCaseManagement.Api.Exceptions;
 using PoliceCaseManagement.Application.DTOs.Cases;
 using PoliceCaseManagement.Application.Interfaces;
 
@@ -14,9 +15,7 @@ namespace PoliceCaseManagement.Api.Controllers
         public async Task<ActionResult<CaseDto>> GetCaseById(string id)
         {
             var caseToGet = await _caseService.GetCaseByIdAsync(id);
-            if(caseToGet is null) return NotFound("Case not found.");
-
-            return caseToGet;
+            return caseToGet is null ? throw new ApiException("Case not found.", StatusCodes.Status404NotFound) : (ActionResult<CaseDto>)caseToGet;
         }
 
         [HttpPost]

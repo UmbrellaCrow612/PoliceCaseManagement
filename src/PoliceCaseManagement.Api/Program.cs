@@ -1,10 +1,14 @@
+using PoliceCaseManagement.Api.Filters;
 using PoliceCaseManagement.Application;
 using PoliceCaseManagement.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionFilter>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -13,7 +17,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
