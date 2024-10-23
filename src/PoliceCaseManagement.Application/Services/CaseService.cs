@@ -2,7 +2,7 @@
 using PoliceCaseManagement.Application.DTOs.Cases;
 using PoliceCaseManagement.Application.Interfaces;
 using PoliceCaseManagement.Core.Entities;
-using PoliceCaseManagement.Core.Interfaces;
+using PoliceCaseManagement.Infrastructure.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
 {
