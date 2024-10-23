@@ -6,9 +6,9 @@ using PoliceCaseManagement.Infrastructure.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
 {
-    public class CaseService(ICaseRepository<Case,string> caseRepository, IMapper mapper) : ICaseService
+    public class CaseService(ICaseRepository caseRepository, IMapper mapper) : ICaseService
     {
-        private readonly ICaseRepository<Case, string> _caseRepository = caseRepository;
+        private readonly ICaseRepository _caseRepository = caseRepository;
         private readonly IMapper _mapper = mapper;
 
         public async Task<CaseDto> CreateCaseAsync(string userId, CreateCaseDto newCase)
@@ -23,9 +23,13 @@ namespace PoliceCaseManagement.Application.Services
 
         public async Task<bool> DeleteCaseAsync(string caseId)
         {
-            var isDeleted = await _caseRepository.DeleteAsync(caseId);
+            var exists = await _caseRepository.ExistsAsync(caseId);
 
-            return isDeleted;
+            if(!exists) return false;
+
+            await _caseRepository.DeleteAsync(caseId);
+
+            return true;
         }
 
         public async Task<CaseDto?> GetCaseByIdAsync(string caseId)
