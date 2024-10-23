@@ -21,7 +21,7 @@ namespace PoliceCaseManagement.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CaseDto>> CreateCase([FromBody] CreateCaseDto request)
         {
-            string userId = "";
+            string userId = "1";
 
             var createdCase = await _caseService.CreateCaseAsync(userId, request);
 
