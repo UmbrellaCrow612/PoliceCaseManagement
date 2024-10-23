@@ -21,13 +21,13 @@ namespace PoliceCaseManagement.Application.Services
             return _mapper.Map<CaseDto>(caseToCreate);
         }
 
-        public async Task<bool> DeleteCaseAsync(string caseId)
+        public async Task<bool> DeleteCaseAsync(string caseId, string userId)
         {
             var exists = await _caseRepository.ExistsAsync(caseId);
 
             if(!exists) return false;
 
-            await _caseRepository.DeleteAsync(caseId);
+            await _caseRepository.DeleteAsync(caseId, userId);
 
             return true;
         }
