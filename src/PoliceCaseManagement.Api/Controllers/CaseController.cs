@@ -15,7 +15,8 @@ namespace PoliceCaseManagement.Api.Controllers
         public async Task<ActionResult<CaseDto>> GetCaseById(string id)
         {
             var caseToGet = await _caseService.GetCaseByIdAsync(id);
-            return caseToGet is null ? throw new ApiException("Case not found.", StatusCodes.Status404NotFound) : (ActionResult<CaseDto>)caseToGet;
+
+            return caseToGet is null ? NotFound() : caseToGet;
         }
 
         [HttpPost]
@@ -32,9 +33,8 @@ namespace PoliceCaseManagement.Api.Controllers
         public async Task<ActionResult> UpdateCase(string id, [FromBody] UpdateCaseDto request)
         {
             var succeeded = await _caseService.UpdateCaseAsync(id, request);
-            if (!succeeded) return NotFound("Case not found.");
 
-            return NoContent();
+            return succeeded ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
@@ -43,9 +43,8 @@ namespace PoliceCaseManagement.Api.Controllers
             string userId = "1";
 
             var succeeded = await _caseService.DeleteCaseAsync(id, userId);
-            if (!succeeded) return NotFound("Case not found ");
 
-            return NoContent();
+            return succeeded ? NoContent() : NotFound();
         }
     }
 }
