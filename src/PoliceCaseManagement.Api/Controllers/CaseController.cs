@@ -40,7 +40,9 @@ namespace PoliceCaseManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCase(string id)
         {
-            var succeeded = await _caseService.DeleteCaseAsync(id);
+            string userId = "1";
+
+            var succeeded = await _caseService.DeleteCaseAsync(id, userId);
             if (!succeeded) return NotFound("Case not found ");
 
             return NoContent();
