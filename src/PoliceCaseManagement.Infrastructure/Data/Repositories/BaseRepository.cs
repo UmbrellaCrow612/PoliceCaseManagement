@@ -38,7 +38,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
 
         public virtual async Task<bool> ExistsAsync(string id)
         {
-            return await _dbSet.FindAsync(id) != null;
+            return await _dbSet.AnyAsync(e => EF.Property<string>(e, "Id") == id);
         }
     }
 }

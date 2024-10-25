@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PoliceCaseManagement.Api.Exceptions;
 using PoliceCaseManagement.Application.DTOs.Cases;
 using PoliceCaseManagement.Application.Interfaces;
 
