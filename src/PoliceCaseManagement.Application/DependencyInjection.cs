@@ -12,7 +12,6 @@ namespace PoliceCaseManagement.Application
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<ICaseService, CaseService>();
-            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }
