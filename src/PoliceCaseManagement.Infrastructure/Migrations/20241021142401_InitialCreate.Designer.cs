@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PoliceCaseManagement.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using PoliceCaseManagement.Infrastructure.Data;
 namespace PoliceCaseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241021142401_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -799,6 +802,7 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DepartmentId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -1349,7 +1353,9 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
 
                     b.HasOne("PoliceCaseManagement.Core.Entities.Department", "Department")
                         .WithMany("AssignedUsers")
-                        .HasForeignKey("DepartmentId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("DeletedBy");
 
