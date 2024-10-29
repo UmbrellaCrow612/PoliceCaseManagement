@@ -15,6 +15,7 @@ namespace PoliceCaseManagement.Infrastructure
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<ICaseRepository, CaseRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

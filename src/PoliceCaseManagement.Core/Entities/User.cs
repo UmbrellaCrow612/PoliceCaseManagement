@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using PoliceCaseManagement.Core.Entities.Interfaces;
+﻿using PoliceCaseManagement.Core.Entities.Interfaces;
 using PoliceCaseManagement.Core.Entities.Joins;
 
 namespace PoliceCaseManagement.Core.Entities
 {
-    public class User : IdentityUser, ISoftDeletable
+    public class User : ISoftDeletable
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public required string Username { get; set; }
+        public required string PasswordHash { get; set; }
+        public required string Email { get; set; }
         public required string Name { get; set; }
         public required string Rank { get; set; }
         public required string BadgeNumber { get; set; }
