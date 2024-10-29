@@ -1,18 +1,19 @@
-﻿using PoliceCaseManagement.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PoliceCaseManagement.Core.Entities;
 using PoliceCaseManagement.Infrastructure.Interfaces;
 
 namespace PoliceCaseManagement.Infrastructure.Data.Repositories
 {
     public class UserRepository(ApplicationDbContext context) : BaseRepository<User>(context), IUserRepository
     {
-        public Task<bool> EmailExists(string email)
+        public async Task<bool> EmailExistsAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.AnyAsync(x => x.Email == email);
         }
 
-        public Task<bool> UsernameExists(string username)
+        public async Task<bool> UsernameExistsAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _context.Users.AnyAsync(x => x.Username == username);
         }
     }
 }

@@ -33,6 +33,8 @@ namespace PoliceCaseManagement.Infrastructure.Data
         public DbSet<PropertyPerson> PropertyPersons { get; set; }
         public DbSet<StatementUser> StatementUsers { get; set; }
         public DbSet<VehiclePerson> VehiclePersons { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
