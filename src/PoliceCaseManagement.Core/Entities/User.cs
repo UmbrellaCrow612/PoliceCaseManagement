@@ -39,5 +39,6 @@ namespace PoliceCaseManagement.Core.Entities
         public ICollection<Person> DeletedPersons { get; set; } = [];
         public ICollection<User> DeletedUsers { get; set; } = [];
         public ICollection<Statement> LastEditedStatements { get; set; } = [];
+        public ICollection<UserRole> UserRoles { get; set; } = [];
     }
 }
