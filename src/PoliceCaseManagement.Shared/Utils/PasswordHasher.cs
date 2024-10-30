@@ -2,6 +2,9 @@
 
 namespace PoliceCaseManagement.Shared.Utils
 {
+    /// <summary>
+    /// PoliceCaseManagement custom password hasher used throughout the app.
+    /// </summary>
     public static class PasswordHasher
     {
         private const int SaltSize = 16; // 128 bits
