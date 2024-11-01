@@ -18,7 +18,7 @@ namespace PoliceCaseManagement.Infrastructure.Data.Seeding
         }
 
         /// <summary>
-        /// Seed initial roles using a foreach loop
+        /// Seed initial roles with duplicate prevention and GUID ID generation
         /// </summary>
         private static void SeedRoles(ModelBuilder modelBuilder)
         {
@@ -26,21 +26,21 @@ namespace PoliceCaseManagement.Infrastructure.Data.Seeding
             var rolesToSeed = RoleConstants.Roles
                 .Select(roleName => new Role
                 {
-                    Name = roleName,
+                    Name = roleName
                 })
                 .ToArray();
 
             // Retrieve existing roles from the database to prevent duplicates
-            var existingRoles = modelBuilder.Entity<Role>()
+            var existingRoleNames = modelBuilder.Entity<Role>()
                 .Metadata
                 .GetSeedData()
                 .OfType<Role>()
                 .Select(r => r.Name)
-                .ToHashSet();
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            // Filter out roles that already exist
+            // Filter out roles that already exist (case-insensitive)
             var uniqueRoles = rolesToSeed
-                .Where(r => !existingRoles.Contains(r.Name))
+                .Where(r => !existingRoleNames.Contains(r.Name, StringComparer.OrdinalIgnoreCase))
                 .ToArray();
 
             // Only seed roles that are not already in the database
