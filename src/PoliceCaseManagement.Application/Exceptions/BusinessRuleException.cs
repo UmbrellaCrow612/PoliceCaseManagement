@@ -1,4 +1,4 @@
-﻿namespace PoliceCaseManagement.Core.Exceptions
+﻿namespace PoliceCaseManagement.Application.Exceptions
 {
     public class BusinessRuleException(string message) : Exception(message)
     {

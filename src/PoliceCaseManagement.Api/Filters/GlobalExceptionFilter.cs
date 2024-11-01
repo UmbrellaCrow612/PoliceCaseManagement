@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PoliceCaseManagement.Application.DTOs.Errors;
 using PoliceCaseManagement.Api.Exceptions;
+using PoliceCaseManagement.Application.Exceptions;
 
 namespace PoliceCaseManagement.Api.Filters
 {
@@ -19,20 +20,28 @@ namespace PoliceCaseManagement.Api.Filters
                 details: _env.IsDevelopment() ? context.Exception.StackTrace : null
             );
 
-            if (context.Exception is ApiException apiException)
+            switch (context.Exception)
             {
-                errorResponse.Message = context.Exception.Message;
-                context.Result = new ObjectResult(errorResponse)
-                {
-                    StatusCode = apiException.StatusCode
-                };
-            }
-            else
-            {
-                context.Result = new ObjectResult(errorResponse)
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                case ApiException apiException:
+                    errorResponse.Message = context.Exception.Message;
+                    context.Result = new ObjectResult(errorResponse)
+                    {
+                        StatusCode = apiException.StatusCode
+                    };
+                    break;
+
+                case BusinessRuleException businessException:
+                    errorResponse.Message = context.Exception.Message;
+                    context.Result = new BadRequestObjectResult(errorResponse);
+                    _logger.LogWarning("Business rule violation: {Message}", businessException.Message);
+                    break;
+
+                default:
+                    context.Result = new ObjectResult(errorResponse)
+                    {
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+                    break;
             }
 
             context.ExceptionHandled = true;

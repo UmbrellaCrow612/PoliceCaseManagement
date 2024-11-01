@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using PoliceCaseManagement.Application.DTOs.Roles;
+using PoliceCaseManagement.Application.Exceptions;
 using PoliceCaseManagement.Application.Interfaces;
 using PoliceCaseManagement.Core.Entities;
-using PoliceCaseManagement.Core.Exceptions;
 using PoliceCaseManagement.Infrastructure.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
