@@ -7,6 +7,13 @@ using PoliceCaseManagement.Infrastructure.Interfaces;
 
 namespace PoliceCaseManagement.Application.Services
 {
+    /// <summary>
+    /// Helper used to add roles to the database and assigned to users.
+    /// </summary>
+    /// <remarks>
+    /// Note do not use in an api endpoint, this is for internal use only in a seeding script for both dev and production 
+    /// databases, we will have a list of pre-defined roles in code and then authorize endpoints with built in Authorize and Role Constants
+    /// </remarks>
     public class RoleService(IRoleRepository roleRepository, IUserRepository userRepository, IMapper mapper) : IRoleService
     {
         private readonly IRoleRepository _roleRepository = roleRepository;
