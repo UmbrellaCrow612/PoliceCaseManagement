@@ -529,7 +529,7 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("PoliceCaseManagement.Core.Entities.Joins.VehiclePerson", b =>
@@ -742,7 +742,29 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "cd1eba12-e0a6-474c-a857-95dbeb46e722",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = "4149ec07-b9eb-4818-b68a-9f4963a52db8",
+                            Name = "Manager"
+                        },
+                        new
+                        {
+                            Id = "3ce616e1-a130-441e-ad6e-0b8a19fbafe5",
+                            Name = "User"
+                        },
+                        new
+                        {
+                            Id = "db16c7ce-39b2-47d7-90fe-d24fcdf114c2",
+                            Name = "Guest"
+                        });
                 });
 
             modelBuilder.Entity("PoliceCaseManagement.Core.Entities.Statement", b =>

@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace PoliceCaseManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class DepartmentIsNullOnUser : Migration
+    public partial class UserRoles : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -42,6 +44,18 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -317,6 +331,30 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                         column: x => x.DeletedById,
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    RoleId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -740,6 +778,17 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { "3ce616e1-a130-441e-ad6e-0b8a19fbafe5", "User" },
+                    { "4149ec07-b9eb-4818-b68a-9f4963a52db8", "Manager" },
+                    { "cd1eba12-e0a6-474c-a857-95dbeb46e722", "Admin" },
+                    { "db16c7ce-39b2-47d7-90fe-d24fcdf114c2", "Guest" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CaseCrimeScenes_CrimeSceneId",
                 table: "CaseCrimeScenes",
@@ -995,6 +1044,12 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                 column: "LastEditedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Roles_Id",
+                table: "Roles",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Statements_CreatedById",
                 table: "Statements",
                 column: "CreatedById");
@@ -1025,6 +1080,11 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                 table: "Tags",
                 column: "Id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleId",
+                table: "UserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_DeletedById",
@@ -1111,6 +1171,9 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
                 name: "StatementUsers");
 
             migrationBuilder.DropTable(
+                name: "UserRoles");
+
+            migrationBuilder.DropTable(
                 name: "VehiclePersons");
 
             migrationBuilder.DropTable(
@@ -1136,6 +1199,9 @@ namespace PoliceCaseManagement.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Statements");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

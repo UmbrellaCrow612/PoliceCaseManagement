@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoliceCaseManagement.Core.Entities;
 using PoliceCaseManagement.Core.Entities.Joins;
+using PoliceCaseManagement.Infrastructure.Data.Seeding;
 using System.Reflection;
 
 namespace PoliceCaseManagement.Infrastructure.Data
@@ -39,7 +40,14 @@ namespace PoliceCaseManagement.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                DatabaseSeeder.SeedData(modelBuilder);
+            }
         }
     }
 }
