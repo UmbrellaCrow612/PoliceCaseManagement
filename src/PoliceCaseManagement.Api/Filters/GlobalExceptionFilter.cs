@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using PoliceCaseManagement.Application.DTOs.Errors;
-using PoliceCaseManagement.Api.Exceptions;
 using PoliceCaseManagement.Application.Exceptions;
 
 namespace PoliceCaseManagement.Api.Filters
@@ -22,14 +21,6 @@ namespace PoliceCaseManagement.Api.Filters
 
             switch (context.Exception)
             {
-                case ApiException apiException:
-                    errorResponse.Message = context.Exception.Message;
-                    context.Result = new ObjectResult(errorResponse)
-                    {
-                        StatusCode = apiException.StatusCode
-                    };
-                    break;
-
                 case BusinessRuleException businessException:
                     errorResponse.Message = context.Exception.Message;
                     context.Result = new BadRequestObjectResult(errorResponse);
