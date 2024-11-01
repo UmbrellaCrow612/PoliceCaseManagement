@@ -13,7 +13,7 @@ namespace PoliceCaseManagement.Application.Services
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IMapper _mapper = mapper;
 
-        public async Task CreateUser(CreateUserDto user)
+        public async Task<UserDto> CreateUserAsync(CreateUserDto user)
         {
             if (await _userRepository.UsernameExistsAsync(user.Username))
             {
@@ -31,6 +31,8 @@ namespace PoliceCaseManagement.Application.Services
             userToCreate.PasswordHash = hashedPassword;
 
             await _userRepository.AddAsync(userToCreate);
+
+            return _mapper.Map<UserDto>(userToCreate);
         }
     }
 }
