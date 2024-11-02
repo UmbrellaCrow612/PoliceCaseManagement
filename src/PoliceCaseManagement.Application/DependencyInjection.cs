@@ -13,7 +13,6 @@ namespace PoliceCaseManagement.Application
 
             services.AddScoped<ICaseService, CaseService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IRoleService, RoleService>();
 
             return services;
         }
