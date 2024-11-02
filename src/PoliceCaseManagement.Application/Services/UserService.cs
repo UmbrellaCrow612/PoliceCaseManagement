@@ -8,9 +8,10 @@ using PoliceCaseManagement.Shared.Utils;
 
 namespace PoliceCaseManagement.Application.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
+    public class UserService(IUserRepository userRepository,IRoleRepository roleRepository, IMapper mapper) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly IRoleRepository _roleRepository = roleRepository;
         private readonly IMapper _mapper = mapper;
 
         public async Task<UserDto> CreateUserAsync(CreateUserDto user)
@@ -33,6 +34,29 @@ namespace PoliceCaseManagement.Application.Services
             await _userRepository.AddAsync(userToCreate);
 
             return _mapper.Map<UserDto>(userToCreate);
+        }
+
+        public async Task LinkUserToRoles(string userId, IEnumerable<string> roles)
+        {
+            if (!await _userRepository.ExistsAsync(userId))
+            {
+                throw new BusinessRuleException("User dose not exists.");
+            }
+
+            foreach (var role in roles)
+            {
+                if (!await _roleRepository.RoleNameExistsAsync(role))
+                {
+                    throw new BusinessRuleException($"{role} does not exist");
+                }
+
+                if (await _roleRepository.UserLinkedToRoleAsync(userId, role))
+                {
+                    throw new BusinessRuleException($"User already linked to this role {role}");
+                }
+
+                await _roleRepository.LinkUserToRoleAsync(userId, role);
+            }
         }
     }
 }
