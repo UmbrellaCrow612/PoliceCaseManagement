@@ -36,6 +36,16 @@ namespace PoliceCaseManagement.Application.Services
             return _mapper.Map<UserDto>(userToCreate);
         }
 
+        public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
+        {
+            if (!await _userRepository.ExistsAsync(userId))
+            {
+                throw new BusinessRuleException("User dose not exist");
+            }
+
+            return await _userRepository.GetRoles(userId);
+        }
+
         public async Task LinkUserToRoles(string userId, IEnumerable<string> roles)
         {
             if (!await _userRepository.ExistsAsync(userId))

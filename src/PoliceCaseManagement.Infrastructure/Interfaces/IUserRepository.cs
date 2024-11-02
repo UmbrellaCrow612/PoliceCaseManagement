@@ -6,5 +6,7 @@ namespace PoliceCaseManagement.Infrastructure.Interfaces
     {
         Task<bool> UsernameExistsAsync(string username); 
         Task<bool> EmailExistsAsync (string email);
+
+        Task<IEnumerable<string>> GetRoles(string id);
     }
 }

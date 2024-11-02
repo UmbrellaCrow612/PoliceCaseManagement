@@ -9,7 +9,9 @@ namespace PoliceCaseManagement.Application.Interfaces
         /// Link a user to a <see cref="IEnumerable{string}"/> of roles
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
-        /// <param name="roles">The name of the role.</param>
+        /// <param name="roles">The name of the roles.</param>
         Task LinkUserToRoles(string userId, IEnumerable<string> roles);
+
+        Task<IEnumerable<string>> GetUserRolesAsync(string userId);
     }
 }

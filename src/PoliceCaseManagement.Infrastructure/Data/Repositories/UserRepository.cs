@@ -11,6 +11,11 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             return await _context.Users.AnyAsync(x => x.Email == email);
         }
 
+        public async Task<IEnumerable<string>> GetRoles(string id)
+        {
+            return await _context.UserRoles.Where(x => x.UserId == id).Select(x => x.Role.Name).ToListAsync();
+        }
+
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await _context.Users.AnyAsync(x => x.Username == username);

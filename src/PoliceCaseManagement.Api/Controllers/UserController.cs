@@ -17,5 +17,13 @@ namespace PoliceCaseManagement.Api.Controllers
 
             return Created(nameof(CreateUser), createdUser);
         }
+
+        [HttpGet("{id}/roles")]
+        public async Task<ActionResult> GetUserRoles(string id)
+        {
+            var roles = await _userService.GetUserRolesAsync(id);
+
+            return Ok(roles);
+        }
     }
 }
