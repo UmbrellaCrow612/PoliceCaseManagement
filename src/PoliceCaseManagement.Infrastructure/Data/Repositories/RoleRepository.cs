@@ -26,9 +26,53 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task LinkUserToRolesAsync(string userId, IEnumerable<string> roles)
+        {
+            var user = await _context.Users
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new ApplicationException("User not found.");
+
+            var roleIds = await _context.Roles
+                .Where(r => roles.Contains(r.Name))
+                .Select(r => r.Id)
+                .ToListAsync();
+
+
+            var existingRoleIds = user.UserRoles
+                .Select(ur => ur.RoleId)
+                .ToHashSet();
+
+
+            var newUserRoles = roleIds
+                .Where(roleId => !existingRoleIds.Contains(roleId))
+                .Select(roleId => new UserRole
+                {
+                    UserId = userId,
+                    RoleId = roleId
+                })
+                .ToList();
+
+            if (newUserRoles.Count != 0)
+            {
+                await _context.UserRoles.AddRangeAsync(newUserRoles);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<bool> RoleNameExistsAsync(string roleName)
         {
             return await _context.Roles.AnyAsync(x => x.Name == roleName);
+        }
+
+        public async Task<bool> RoleNamesExistsAsync(IEnumerable<string> roles)
+        {
+            var rolesToCheck = roles.ToHashSet();
+
+            var matchingRolesCount = await _context.Roles
+                   .Where(r => rolesToCheck.Contains(r.Name))
+                   .CountAsync();
+
+            return matchingRolesCount == rolesToCheck.Count;
         }
 
         public async Task UnLinkUserFromRoleAsync(string userId, string roleName)

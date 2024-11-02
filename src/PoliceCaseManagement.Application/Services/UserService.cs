@@ -70,13 +70,13 @@ namespace PoliceCaseManagement.Application.Services
                 throw new BusinessRuleException("User dose not exists.");
             }
 
+            if (!await _roleRepository.RoleNamesExistsAsync(roles))
+            {
+                throw new BusinessRuleException("One or more roles dose exist.");
+            }
+
             foreach (var role in roles)
             {
-                if (!await _roleRepository.RoleNameExistsAsync(role))
-                {
-                    throw new BusinessRuleException($"{role} does not exist");
-                }
-
                 if (await _roleRepository.UserLinkedToRoleAsync(userId, role))
                 {
                     throw new BusinessRuleException($"User already linked to this role {role}");
