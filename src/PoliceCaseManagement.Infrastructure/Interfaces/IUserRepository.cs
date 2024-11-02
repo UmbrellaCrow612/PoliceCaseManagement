@@ -8,5 +8,7 @@ namespace PoliceCaseManagement.Infrastructure.Interfaces
         Task<bool> EmailExistsAsync (string email);
 
         Task<IEnumerable<string>> GetRoles(string id);
+
+        Task DeleteAsync(string userIdToDelete, string userIdOfDeleter);
     }
 }

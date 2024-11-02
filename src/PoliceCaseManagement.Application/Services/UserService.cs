@@ -36,6 +36,21 @@ namespace PoliceCaseManagement.Application.Services
             return _mapper.Map<UserDto>(userToCreate);
         }
 
+        public async Task DeleteUserById(string userIdToDelete, string userIdOfDeleter)
+        {
+            if (!await _userRepository.ExistsAsync(userIdToDelete) || !await _userRepository.ExistsAsync(userIdOfDeleter))
+            {
+                throw new BusinessRuleException("The ID of the user to delete or deletor dose not exist");
+            }
+
+            await _userRepository.DeleteAsync(userIdToDelete, userIdOfDeleter);
+        }
+
+        public Task<UserDto?> GetUserById(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
         {
             if (!await _userRepository.ExistsAsync(userId))
@@ -67,6 +82,16 @@ namespace PoliceCaseManagement.Application.Services
 
                 await _roleRepository.LinkUserToRoleAsync(userId, role);
             }
+        }
+
+        public Task UnLinkUserFromRoles(string userId, IEnumerable<string> roles)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateUserById(string userId, UpdateUserDto request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,17 @@ namespace PoliceCaseManagement.Infrastructure.Data.Repositories
 {
     public class UserRepository(ApplicationDbContext context) : BaseRepository<User>(context), IUserRepository
     {
+        public async Task DeleteAsync(string userIdToDelete, string userIdOfDeleter)
+        {
+            var userToDelete = await _context.Users.FindAsync(userIdToDelete) ?? throw new ApplicationException("User dose not exist");
+
+            userToDelete.IsDeleted = true;
+            userToDelete.DeletedAt = DateTime.UtcNow;
+            userToDelete.DeletedById = userIdOfDeleter;
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await _context.Users.AnyAsync(x => x.Email == email);
