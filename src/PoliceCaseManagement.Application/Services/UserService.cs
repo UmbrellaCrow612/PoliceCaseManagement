@@ -46,9 +46,11 @@ namespace PoliceCaseManagement.Application.Services
             await _userRepository.DeleteAsync(userIdToDelete, userIdOfDeleter);
         }
 
-        public Task<UserDto?> GetUserById(string userId)
+        public async Task<UserDto?> GetUserById(string userId)
         {
-            throw new NotImplementedException();
+            var userToGet = await _userRepository.GetByIdAsync(userId);
+
+            return _mapper.Map<UserDto>(userToGet);
         }
 
         public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
@@ -84,14 +86,39 @@ namespace PoliceCaseManagement.Application.Services
             }
         }
 
-        public Task UnLinkUserFromRoles(string userId, IEnumerable<string> roles)
+        public async Task UnLinkUserFromRoles(string userId, IEnumerable<string> roles)
         {
-            throw new NotImplementedException();
+            if (!await _userRepository.ExistsAsync(userId))
+            {
+                throw new BusinessRuleException("User dose not exist");
+            }
+
+            foreach(var role in roles)
+            {
+                if (!await _roleRepository.RoleNameExistsAsync(role))
+                {
+                    throw new BusinessRuleException($"{role} does not exist");
+                }
+
+                if (!await _roleRepository.UserLinkedToRoleAsync(userId, role))
+                {
+                    throw new BusinessRuleException($"user is not linked to role {role}");
+                }
+
+                await _roleRepository.UnLinkUserFromRoleAsync(userId, role);
+            }
         }
 
-        public Task<bool> UpdateUserById(string userId, UpdateUserDto request)
+        public async Task<bool> UpdateUserById(string userId, UpdateUserDto request)
         {
-            throw new NotImplementedException();
+            var userToUpdate = await _userRepository.GetByIdAsync(userId);
+            if (userToUpdate is null) return false;
+
+            _mapper.Map(request, userToUpdate);
+
+            await _userRepository.UpdateAsync(userToUpdate);
+
+            return true;
         }
     }
 }

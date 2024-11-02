@@ -13,5 +13,9 @@ namespace PoliceCaseManagement.Infrastructure.Interfaces
         /// <returns> <see langword="true"/> if they are linked or <see langword="false"/> if they are not </returns>
         Task<bool> UserLinkedToRoleAsync (string userId, string roleName);
         Task LinkUserToRoleAsync (string userId, string roleName);
+
+        Task UnLinkUserFromRoleAsync(string userId, string roleName);
+
+        Task<string> GetRoleId(string roleName);
     }
 }
