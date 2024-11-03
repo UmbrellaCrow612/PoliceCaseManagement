@@ -32,15 +32,15 @@ namespace PoliceCaseManagement.Application.Interfaces
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <returns>The dto user or null if they do not exist.</returns>
-        Task<UserDto?> GetUserById(string userId);
+        Task<UserDto?> GetUserByIdAsync(string userId);
 
-        Task<bool> UpdateUserById(string userId, UpdateUserDto request);
+        Task<bool> UpdateUserByIdAsync(string userId, UpdateUserDto request);
 
         /// <summary>
         /// Delete a user by there ID
         /// </summary>
         /// <param name="userIdToDelete">The ID of the user who is going to be deleted.</param>
         /// <param name="userIdOfDeleter">The ID of the user who is deleting the user.</param>
-        Task DeleteUserById(string userIdToDelete, string userIdOfDeleter);
+        Task DeleteUserByIdAsync(string userIdToDelete, string userIdOfDeleter);
     }
 }

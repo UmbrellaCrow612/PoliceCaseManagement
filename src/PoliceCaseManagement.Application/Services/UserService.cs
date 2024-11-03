@@ -36,7 +36,7 @@ namespace PoliceCaseManagement.Application.Services
             return _mapper.Map<UserDto>(userToCreate);
         }
 
-        public async Task DeleteUserById(string userIdToDelete, string userIdOfDeleter)
+        public async Task DeleteUserByIdAsync(string userIdToDelete, string userIdOfDeleter)
         {
             if (!await _userRepository.ExistsAsync(userIdToDelete) || !await _userRepository.ExistsAsync(userIdOfDeleter))
             {
@@ -46,7 +46,7 @@ namespace PoliceCaseManagement.Application.Services
             await _userRepository.DeleteAsync(userIdToDelete, userIdOfDeleter);
         }
 
-        public async Task<UserDto?> GetUserById(string userId)
+        public async Task<UserDto?> GetUserByIdAsync(string userId)
         {
             var userToGet = await _userRepository.GetByIdAsync(userId);
 
@@ -109,7 +109,7 @@ namespace PoliceCaseManagement.Application.Services
             }
         }
 
-        public async Task<bool> UpdateUserById(string userId, UpdateUserDto request)
+        public async Task<bool> UpdateUserByIdAsync(string userId, UpdateUserDto request)
         {
             var userToUpdate = await _userRepository.GetByIdAsync(userId);
             if (userToUpdate is null) return false;

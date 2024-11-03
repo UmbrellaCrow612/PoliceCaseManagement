@@ -25,5 +25,29 @@ namespace PoliceCaseManagement.Api.Controllers
 
             return Ok(roles);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetUserById(string id)
+        {
+            var userToGet = await _userService.GetUserByIdAsync(id);
+
+            return userToGet is null ? NotFound() : Ok(userToGet);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdateUserById(string id, [FromBody] UpdateUserDto request)
+        {
+            return await _userService.UpdateUserByIdAsync(id, request) ? NoContent() : NotFound();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUserById(string id)
+        {
+            var userId = "1";
+
+            await _userService.DeleteUserByIdAsync(id, userId);
+
+            return NoContent();
+        }
     }
 }
