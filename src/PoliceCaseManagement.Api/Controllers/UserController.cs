@@ -18,6 +18,14 @@ namespace PoliceCaseManagement.Api.Controllers
             return Created(nameof(CreateUser), createdUser);
         }
 
+        [HttpPost("{id}/roles")]
+        public async Task<ActionResult> AddRolesToUser(string id, [FromBody] IEnumerable<string> roles)
+        {
+            await _userService.LinkUserToRolesAsync(id, roles);
+
+            return Ok(roles);
+        }
+
         [HttpGet("{id}/roles")]
         public async Task<ActionResult> GetUserRoles(string id)
         {
@@ -49,5 +57,13 @@ namespace PoliceCaseManagement.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id}/roles")]
+        public async Task<ActionResult> DeleteRolesFromUser(string id, [FromBody] IEnumerable<string> roles)
+        {
+            await _userService.UnLinkUserFromRolesAsync(id, roles);
+
+            return NoContent();
+        } 
     }
 }

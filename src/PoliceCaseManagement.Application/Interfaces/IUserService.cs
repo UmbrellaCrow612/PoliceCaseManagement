@@ -11,14 +11,14 @@ namespace PoliceCaseManagement.Application.Interfaces
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="roles">The name of the roles.</param>
-        Task LinkUserToRoles(string userId, IEnumerable<string> roles);
+        Task LinkUserToRolesAsync(string userId, IEnumerable<string> roles);
 
         /// <summary>
         /// Un-Link a user of <see cref="IEnumerable{string}"/> of roles
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="roles">The name of the roles.</param>
-        Task UnLinkUserFromRoles(string userId, IEnumerable<string> roles);
+        Task UnLinkUserFromRolesAsync(string userId, IEnumerable<string> roles);
 
         /// <summary>
         /// Get all roles a user has by thier ID.

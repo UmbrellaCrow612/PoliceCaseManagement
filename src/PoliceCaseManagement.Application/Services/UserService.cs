@@ -63,7 +63,7 @@ namespace PoliceCaseManagement.Application.Services
             return await _userRepository.GetRoles(userId);
         }
 
-        public async Task LinkUserToRoles(string userId, IEnumerable<string> roles)
+        public async Task LinkUserToRolesAsync(string userId, IEnumerable<string> roles)
         {
             if (!await _userRepository.ExistsAsync(userId))
             {
@@ -86,7 +86,7 @@ namespace PoliceCaseManagement.Application.Services
             }
         }
 
-        public async Task UnLinkUserFromRoles(string userId, IEnumerable<string> roles)
+        public async Task UnLinkUserFromRolesAsync(string userId, IEnumerable<string> roles)
         {
             if (!await _userRepository.ExistsAsync(userId))
             {
