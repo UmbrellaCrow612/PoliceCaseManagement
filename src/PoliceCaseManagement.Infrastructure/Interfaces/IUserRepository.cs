@@ -10,5 +10,7 @@ namespace PoliceCaseManagement.Infrastructure.Interfaces
         Task<IEnumerable<string>> GetRoles(string id);
 
         Task DeleteAsync(string userIdToDelete, string userIdOfDeleter);
+
+        Task<User?> GetByUsername(string username);
     }
 }
