@@ -6,11 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Configurations\" />
-    <Folder Include="Data\Seeding\" />
-    <Folder Include="Data\Repositories\" />
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
-
 </Project>
