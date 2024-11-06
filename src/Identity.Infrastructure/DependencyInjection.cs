@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Identity.Infrastructure
 {
+    /// <summary>
+    /// Add Identity Infrastructure
+    /// </summary>
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(
@@ -38,6 +41,7 @@ namespace Identity.Infrastructure
                 options.Password.RequireLowercase = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
             });
 
             return services;
