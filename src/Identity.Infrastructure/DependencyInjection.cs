@@ -5,13 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Identity.Infrastructure
 {
-    public class DependencyInjection
+    public static class DependencyInjection
     {
-        public static void RegisterServices(IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<IdentityApplicationDbContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
+            return services;
         }
     }
 }
