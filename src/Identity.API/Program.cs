@@ -1,6 +1,6 @@
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
-using Identity.Application
+using Identity.Application;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
