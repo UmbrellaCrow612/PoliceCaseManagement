@@ -24,17 +24,14 @@ namespace Identity.Infrastructure
                     "Connection string 'DefaultConnection' not found.");
             }
 
-            // Add the DbContext for Identity
             services.AddDbContext<IdentityApplicationDbContext>(options =>
                 options.UseSqlite(connectionString,
                     b => b.MigrationsAssembly(typeof(IdentityApplicationDbContext).Assembly.FullName)));
 
-            // Register Identity services, including roles, user store, and user manager
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<IdentityApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentityCore<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<IdentityApplicationDbContext>();
 
-            // Optionally, configure Identity options (e.g., password policy)
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -42,6 +39,8 @@ namespace Identity.Infrastructure
                 options.Password.RequiredLength = 6;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = true;
+
+                options.User.RequireUniqueEmail = true;
             });
 
             return services;
