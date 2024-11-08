@@ -1,6 +1,5 @@
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
-using Identity.Application;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -58,7 +57,6 @@ builder.Services.AddAuthorization();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
 
 var app = builder.Build();
 
