@@ -3,6 +3,8 @@ using Identity.Api.Jwt;
 using Identity.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Identity.Api.Controllers
 {
@@ -22,25 +24,41 @@ namespace Identity.Api.Controllers
             if (string.IsNullOrEmpty(loginDto.Email) && string.IsNullOrEmpty(loginDto.Username)) return BadRequest("Must provide either a username or email in login request.");
             if (loginDto.Email is not null && loginDto.Username is not null) return BadRequest("Do not provide both username and email just one.");
 
-            // Flow for email
+            ApplicationUser? user = null;
+
             if (loginDto.Email is not null)
             {
-                var user = await _userManager.FindByEmailAsync(loginDto.Email);
+                user = await _userManager.FindByEmailAsync(loginDto.Email);
                 if (user is null) return NotFound("User not found.");
 
-                // Generate claims and write token out.
+                var isApproved = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+                if (!isApproved) return Unauthorized("Email or password incorrect.");
             }
 
-            // Flow for username
             if (loginDto.Username is not null)
             {
-                var user = await _userStore.FindByNameAsync(loginDto.Username, CancellationToken.None);
+                user = await _userStore.FindByNameAsync(loginDto.Username, CancellationToken.None);
                 if (user is null) return NotFound("User not found.");
 
-                // Generate claims and write token
+                var isApproved = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+                if (!isApproved) return Unauthorized("Username or password incorrect.");
             }
 
-            return Ok();
+            var userRoles = await _userManager.GetRolesAsync(user!);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user?.Id!),
+                new Claim(ClaimTypes.Name, user?.UserName!),
+                new Claim(ClaimTypes.Email, user?.Email!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var token = _jwtService.GenerateToken(claims);
+
+            return Ok(new { acessToken = token });
         }
     }
 }
