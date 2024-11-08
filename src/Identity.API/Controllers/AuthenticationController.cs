@@ -56,9 +56,9 @@ namespace Identity.Api.Controllers
 
             claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var token = _jwtService.GenerateToken(claims);
+            var (AccessToken, RefreshToken) = _jwtService.GenerateTokens(claims);
 
-            return Ok(new { acessToken = token });
+            return Ok(new { acessToken = AccessToken, refreshToken = RefreshToken });
         }
     }
 }
