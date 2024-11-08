@@ -1,9 +1,9 @@
 ﻿namespace Identity.Core.Constants
 {
     /// <summary>
-    /// Core Identity Roles
+    /// Core Identity InternalRoles
     /// </summary>
-    public static class Roles
+    public static class InternalRoles
     {
         public const string Admin = "Admin";
         public const string Manager = "Manager";

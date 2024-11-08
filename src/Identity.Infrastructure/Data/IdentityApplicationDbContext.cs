@@ -2,6 +2,10 @@
 using Identity.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using Identity.Core.Constants;
+
+
 
 namespace Identity.Infrastructure.Data
 {
@@ -12,6 +16,27 @@ namespace Identity.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+
+                new IdentityRole
+                {
+                    Id = "1",
+                    Name = InternalRoles.User
+                },
+                new IdentityRole
+                {
+                    Id = "2",
+                    Name = InternalRoles.Manager
+                },
+                 new IdentityRole
+                 {
+                     Id = "3",
+                     Name = InternalRoles.Admin
+                 }
+            );
+
+
         }
     }
 }

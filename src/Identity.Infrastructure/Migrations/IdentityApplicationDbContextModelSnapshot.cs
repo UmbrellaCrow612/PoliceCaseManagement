@@ -105,6 +105,23 @@ namespace Identity.Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "User"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "Manager"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
