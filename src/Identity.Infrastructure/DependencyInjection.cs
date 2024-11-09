@@ -12,9 +12,7 @@ namespace Identity.Infrastructure
     /// </summary>
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
@@ -25,8 +23,13 @@ namespace Identity.Infrastructure
             }
 
             services.AddDbContext<IdentityApplicationDbContext>(options =>
-                options.UseSqlite(connectionString,
-                    b => b.MigrationsAssembly(typeof(IdentityApplicationDbContext).Assembly.FullName)));
+                options.UseSqlite(connectionString));
+
+            services.AddIdentityCore<ApplicationUser>(options =>
+            {
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<IdentityApplicationDbContext>();
 
             return services;
         }
