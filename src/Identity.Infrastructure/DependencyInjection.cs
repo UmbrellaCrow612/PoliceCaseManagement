@@ -31,6 +31,10 @@ namespace Identity.Infrastructure
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<IdentityApplicationDbContext>();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+            });
+
             return services;
         }
     }

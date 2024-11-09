@@ -7,11 +7,9 @@ namespace Identity.Api.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) : ControllerBase
+    public class AuthenticationController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IUserStore<ApplicationUser> _userStore = userStore;
-        private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
         [HttpPost("register")]
@@ -19,7 +17,6 @@ namespace Identity.Api.Controllers
         {
             if (await _userManager.FindByEmailAsync(registerDto.Email) is not null || await _userManager.FindByNameAsync(registerDto.UserName) is not null)
                 return BadRequest("Username or Email already taken");
-
 
             ApplicationUser userToCreate = new ApplicationUser
             {
