@@ -9,6 +9,9 @@
         public const string Manager = "Manager";
         public const string User = "User";
 
+        /// <summary>
+        /// Access all internal all defined
+        /// </summary>
         public static readonly IReadOnlyCollection<string> All =
         [
             Admin,

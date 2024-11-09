@@ -10,7 +10,7 @@ namespace Identity.Api.DTOs
         [EmailAddress]
         public string? Email { get; set; } = null;
 
-        public string? Username { get; set; } = null;
+        public string? UserName { get; set; } = null;
 
         [Required]
         public required string Password { get; set; }
