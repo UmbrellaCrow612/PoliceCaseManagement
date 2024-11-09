@@ -33,6 +33,7 @@ namespace Identity.Infrastructure
 
             services.Configure<IdentityOptions>(options =>
             {
+                options.User.RequireUniqueEmail = true;
             });
 
             return services;

@@ -15,10 +15,7 @@ namespace Identity.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            if (await _userManager.FindByEmailAsync(registerDto.Email) is not null || await _userManager.FindByNameAsync(registerDto.UserName) is not null)
-                return BadRequest("Username or Email already taken");
-
-            ApplicationUser userToCreate = new ApplicationUser
+            ApplicationUser userToCreate = new()
             {
                 Email = registerDto.Email,
                 UserName = registerDto.UserName,
@@ -27,9 +24,9 @@ namespace Identity.Api.Controllers
 
             var result = await _userManager.CreateAsync(userToCreate, registerDto.Password);
 
-            if (!result.Succeeded) return BadRequest(result);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
-            return Created(nameof(Register), new { id = userToCreate.Id });
+            return CreatedAtAction(nameof(Register), new { id = userToCreate.Id });
         }
     }
 }
