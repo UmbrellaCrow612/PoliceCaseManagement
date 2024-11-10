@@ -47,10 +47,14 @@ namespace Identity.Api.Controllers
                 var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
                 if (!isPasswordCorrect) return Unauthorized("Username or password incorrect");
 
-                return Ok("Token Gen early for username");
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var token = _jwtHelper.GenerateToken(user, roles);
+
+                return Ok(new { accessToken = token });
             }
 
-            return Ok();
+            return BadRequest("Failed Login");
         }
 
         [ProducesResponseType(typeof(object), StatusCodes.Status201Created)] 
