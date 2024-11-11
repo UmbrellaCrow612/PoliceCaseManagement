@@ -11,6 +11,9 @@ namespace Identity.API.Controllers
     [Route("auth")]
     public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager) : ControllerBase
     {
+        private readonly JwtHelper _jwtHelper = jwtHelper;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
@@ -23,15 +26,15 @@ namespace Identity.API.Controllers
 
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
-                user = await userManager.FindByNameAsync(loginRequestDto.UserName);
+                user = await _userManager.FindByNameAsync(loginRequestDto.UserName);
                 if(user is null) return Unauthorized("Username of password incorrect");
 
-                var isPasswordCorrect = await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+                var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
                 if(!isPasswordCorrect) return Unauthorized("Username of password incorrect");
 
-                var roles = await userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
 
-                var token = jwtHelper.GenerateToken(user, roles);
+                var token = _jwtHelper.GenerateToken(user, roles);
 
                 return Ok(new { accessToken = token });
                
@@ -39,15 +42,15 @@ namespace Identity.API.Controllers
 
             if (!string.IsNullOrWhiteSpace(loginRequestDto.Email))
             {
-                user = await userManager.FindByEmailAsync(loginRequestDto.Email);
+                user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
                 if (user is null) return Unauthorized("Email of password incorrect");
 
-                var isPasswordCorrect = await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+                var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
                 if (!isPasswordCorrect) return Unauthorized("Email of password incorrect");
 
-                var roles = await userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
 
-                var token = jwtHelper.GenerateToken(user, roles);
+                var token = _jwtHelper.GenerateToken(user, roles);
 
                 return Ok(new { accessToken = token });
             }
@@ -64,7 +67,7 @@ namespace Identity.API.Controllers
                 PhoneNumber = registerRequestDto.PhoneNumber,
             };
 
-            var result = await userManager.CreateAsync(userToCreate, registerRequestDto.Password);
+            var result = await _userManager.CreateAsync(userToCreate, registerRequestDto.Password);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
