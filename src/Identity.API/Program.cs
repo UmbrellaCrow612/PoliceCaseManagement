@@ -1,3 +1,4 @@
+using Identity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -54,6 +55,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddInfrastructure(builder.Configuration);
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -75,11 +79,5 @@ app.Run();
  
  
  Steps todo:
-
-- Add infrastrcutre 
 - add generation of a valid jwt
-- add consuption of jwt through add auth and authz
-
-two sepertae things valid created and consuption
- 
  */
