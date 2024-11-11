@@ -1,3 +1,4 @@
+using Identity.API.Helpers;
 using Identity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -57,6 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddSingleton<JwtHelper>();
 
 var app = builder.Build();
 
