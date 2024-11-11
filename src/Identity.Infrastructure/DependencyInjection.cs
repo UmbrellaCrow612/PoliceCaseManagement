@@ -19,7 +19,12 @@ namespace Identity.Infrastructure
             services.AddIdentityCore<ApplicationUser>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<IdentityApplicationDbContext>();
-         
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            });
+
             return services;
         }
     }
