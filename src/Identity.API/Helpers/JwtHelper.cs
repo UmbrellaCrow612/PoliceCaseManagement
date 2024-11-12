@@ -16,9 +16,7 @@ namespace Identity.API.Helpers
             var issuer = configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer Not Provided");
             var audience = configuration["Jwt:Audience"] ?? throw new ApplicationException("Jwt Audience Not Provided");
             int expiresInMinutes = int.Parse(configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt ExpiresInMinutes Not Provided"));
-
             var expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
-
             var privateKey = Encoding.UTF8.GetBytes(key);
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
 
@@ -26,8 +24,6 @@ namespace Identity.API.Helpers
 
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
-            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, configuration["Jwt:Issuer"]!));
 
             claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
