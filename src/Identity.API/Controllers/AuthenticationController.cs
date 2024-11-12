@@ -45,7 +45,7 @@ namespace Identity.API.Controllers
                 var token = _jwtHelper.GenerateToken(user, roles);
                 var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                user.RefreshToken = _stringEncryptionHelper.Encrypt(refreshToken);
+                user.RefreshToken = _stringEncryptionHelper.Hash(refreshToken);
                 user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
 
                 await _userManager.UpdateAsync(user);
@@ -67,7 +67,7 @@ namespace Identity.API.Controllers
                 var token = _jwtHelper.GenerateToken(user, roles);
                 var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                user.RefreshToken = _stringEncryptionHelper.Encrypt(refreshToken);
+                user.RefreshToken = _stringEncryptionHelper.Hash(refreshToken);
                 user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
 
                 await _userManager.UpdateAsync(user);
@@ -101,10 +101,35 @@ namespace Identity.API.Controllers
         /// Accepts a refresh token Validates the refresh token Generates a 
         /// new access token Returns the new access token
         /// </summary>
+        [Authorize]
         [HttpPost("refresh-token")]
-        public async Task<ActionResult> RefreshToken()
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
         {
-            return Ok();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null || user.RefreshToken is null || user.RefreshTokenExpiriesAt is null) return Unauthorized();
+
+            if (user.RefreshTokenExpiriesAt <= DateTime.UtcNow || user.RefreshToken != _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken))
+            {
+                user.RefreshToken = null;
+                user.RefreshTokenExpiriesAt = null;
+
+                await _userManager.UpdateAsync(user);
+
+                return Unauthorized();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var token = _jwtHelper.GenerateToken(user, roles);
+
+            return Ok(new { accessToken = token });
         }
 
         /// <summary>

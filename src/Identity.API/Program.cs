@@ -55,7 +55,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer not provided"),
             ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new ApplicationException("Jwt Audience not provided"),
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))) // Must match the key used to create tokens
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))),
+
+            ClockSkew = TimeSpan.Zero
         };
     });
 
