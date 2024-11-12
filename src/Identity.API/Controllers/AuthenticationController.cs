@@ -54,6 +54,7 @@ namespace Identity.API.Controllers
 
                 return Ok(new { accessToken = token });
             }
+
             return BadRequest("Username or email not provided");
         }
 
