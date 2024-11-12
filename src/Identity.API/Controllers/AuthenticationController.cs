@@ -22,7 +22,7 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
-            if (string.IsNullOrWhiteSpace(loginRequestDto.Email) || string.IsNullOrWhiteSpace(loginRequestDto.UserName))
+            if (string.IsNullOrWhiteSpace(loginRequestDto.Email) && string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
                 return BadRequest("Provide a username of email");
             }
@@ -32,10 +32,10 @@ namespace Identity.API.Controllers
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
                 user = await _userManager.FindByNameAsync(loginRequestDto.UserName);
-                if(user is null) return Unauthorized("Username of password incorrect");
+                if(user is null) return Unauthorized("Username or password incorrect");
 
                 var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-                if(!isPasswordCorrect) return Unauthorized("Username of password incorrect");
+                if(!isPasswordCorrect) return Unauthorized("Username or password incorrect");
 
                 var roles = await _userManager.GetRolesAsync(user);
 
@@ -48,10 +48,10 @@ namespace Identity.API.Controllers
             if (!string.IsNullOrWhiteSpace(loginRequestDto.Email))
             {
                 user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
-                if (user is null) return Unauthorized("Email of password incorrect");
+                if (user is null) return Unauthorized("Email or password incorrect");
 
                 var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-                if (!isPasswordCorrect) return Unauthorized("Email of password incorrect");
+                if (!isPasswordCorrect) return Unauthorized("Email or password incorrect");
 
                 var roles = await _userManager.GetRolesAsync(user);
 
