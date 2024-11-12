@@ -135,10 +135,26 @@ namespace Identity.API.Controllers
         /// <summary>
         /// Accepts an access token or refresh token Revokes the token, adding it to a blacklist
         /// </summary>
+        [Authorize]
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
-            return Ok();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiriesAt = null;
+
+            await _userManager.UpdateAsync(user);
+
+            return NoContent();
         }
 
         /// <summary>
@@ -159,15 +175,6 @@ namespace Identity.API.Controllers
             if (user is null) return Unauthorized();
 
             return Ok(new { id = user.Id, userName = user.UserName, email = user.Email, phoneNumber = user.PhoneNumber });
-        }
-
-        /// <summary>
-        /// Accepts an access token or refresh token Revokes the specified token, adding it to a blacklist
-        /// </summary>
-        [HttpPost("revoke-token")]
-        public async Task<ActionResult> RevokeToken()
-        {
-            return Ok();
         }
 
         [Authorize]
