@@ -4,5 +4,6 @@ namespace Identity.Core
 {
     public class ApplicationUser : IdentityUser
     {
+        
     }
 }

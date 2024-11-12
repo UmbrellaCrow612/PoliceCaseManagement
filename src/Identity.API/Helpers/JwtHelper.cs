@@ -48,5 +48,10 @@ namespace Identity.API.Helpers
             var token = handler.CreateToken(tokenDescriptor);
             return handler.WriteToken(token);
         }
+
+        public string GenerateRefreshToken()
+        {
+            return "";
+        }
     }
 }

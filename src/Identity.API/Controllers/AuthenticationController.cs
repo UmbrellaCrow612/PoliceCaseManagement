@@ -4,6 +4,7 @@ using Identity.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Identity.API.Controllers
 {
@@ -103,10 +104,21 @@ namespace Identity.API.Controllers
         /// <summary>
         /// Requires a valid access token Returns information about the currently authenticated user
         /// </summary>
+        [Authorize]
         [HttpGet("me")]
         public async Task<ActionResult> Me()
         {
-            return Ok();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
+
+            return Ok(new { id = user.Id, userName = user.UserName, email = user.Email, phoneNumber = user.PhoneNumber });
         }
 
         /// <summary>
