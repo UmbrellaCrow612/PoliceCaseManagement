@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Identity.API.Helpers
@@ -51,7 +52,13 @@ namespace Identity.API.Helpers
 
         public string GenerateRefreshToken()
         {
-            return "";
+            byte[] randomBytes = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

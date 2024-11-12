@@ -40,8 +40,13 @@ namespace Identity.API.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
 
                 var token = _jwtHelper.GenerateToken(user, roles);
+                var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                return Ok(new { accessToken = token });
+                user.RefreshToken = refreshToken;
+
+                await _userManager.UpdateAsync(user);
+
+                return Ok(new { accessToken = token, refreshToken });
                
             }
 
@@ -56,8 +61,13 @@ namespace Identity.API.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
 
                 var token = _jwtHelper.GenerateToken(user, roles);
+                var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                return Ok(new { accessToken = token });
+                user.RefreshToken = refreshToken;
+
+                await _userManager.UpdateAsync(user);
+
+                return Ok(new { accessToken = token, refreshToken });
             }
 
             return BadRequest("Username or email not provided");

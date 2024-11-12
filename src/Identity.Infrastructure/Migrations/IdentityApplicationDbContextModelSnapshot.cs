@@ -59,6 +59,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 

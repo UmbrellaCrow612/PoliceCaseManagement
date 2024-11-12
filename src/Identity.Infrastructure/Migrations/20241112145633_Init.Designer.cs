@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241111182141_Init")]
+    [Migration("20241112145633_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -61,6 +61,9 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
