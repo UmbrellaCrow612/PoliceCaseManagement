@@ -14,6 +14,10 @@ namespace Identity.API.Controllers
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
+        /// <summary>
+        /// Accepts username and password Authenticates the user Generates an access token and 
+        /// a refresh token Returns the tokens in the response
+        /// </summary>
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
@@ -75,6 +79,43 @@ namespace Identity.API.Controllers
             }
 
             return Ok(new { id = userToCreate.Id });
+        }
+
+        /// <summary>
+        /// Accepts a refresh token Validates the refresh token Generates a 
+        /// new access token Returns the new access token
+        /// </summary>
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult> RefreshToken()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Accepts an access token or refresh token Revokes the token, adding it to a blacklist
+        /// </summary>
+        [HttpPost("logout")]
+        public async Task<ActionResult> Logout()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Requires a valid access token Returns information about the currently authenticated user
+        /// </summary>
+        [HttpGet("me")]
+        public async Task<ActionResult> Me()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Accepts an access token or refresh token Revokes the specified token, adding it to a blacklist
+        /// </summary>
+        [HttpPost("revoke-token")]
+        public async Task<ActionResult> RevokeToken()
+        {
+            return Ok();
         }
 
         [Authorize]
