@@ -62,6 +62,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddSingleton<StringEncryptionHelper>();
 
 var app = builder.Build();
 

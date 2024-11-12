@@ -10,11 +10,12 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IConfiguration _configuration = configuration;
+        private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
        
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -44,7 +45,7 @@ namespace Identity.API.Controllers
                 var token = _jwtHelper.GenerateToken(user, roles);
                 var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                user.RefreshToken = refreshToken;
+                user.RefreshToken = _stringEncryptionHelper.Encrypt(refreshToken);
                 user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
 
                 await _userManager.UpdateAsync(user);
@@ -66,7 +67,7 @@ namespace Identity.API.Controllers
                 var token = _jwtHelper.GenerateToken(user, roles);
                 var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-                user.RefreshToken = refreshToken;
+                user.RefreshToken = _stringEncryptionHelper.Encrypt(refreshToken);
                 user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
 
                 await _userManager.UpdateAsync(user);
