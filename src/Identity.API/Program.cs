@@ -1,6 +1,9 @@
 using Identity.API.Helpers;
+using Identity.Core;
 using Identity.Infrastructure;
+using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -75,11 +78,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-/*
- 
- 
- Steps todo:
-- add generation of a valid jwt
- */
+    var rs = new RoleSeeding(roleManager);
+
+    rs.SeedRoles();
+}
+
+app.Run();
