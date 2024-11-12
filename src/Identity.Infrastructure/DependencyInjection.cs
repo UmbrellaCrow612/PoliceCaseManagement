@@ -1,5 +1,6 @@
 ﻿using Identity.Core;
 using Identity.Infrastructure.Data;
+using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,8 @@ namespace Identity.Infrastructure
             {
                 options.User.RequireUniqueEmail = true;
             });
+
+            services.AddScoped<ITokenStore, TokenStore>();
 
             return services;
         }

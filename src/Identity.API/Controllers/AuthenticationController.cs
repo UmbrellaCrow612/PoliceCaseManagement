@@ -1,6 +1,7 @@
 ﻿using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.Core;
+using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +11,13 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IConfiguration _configuration = configuration;
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
+        private readonly ITokenStore _tokenStore = tokenStore;
        
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
