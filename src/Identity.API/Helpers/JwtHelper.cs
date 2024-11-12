@@ -23,6 +23,13 @@ namespace Identity.API.Helpers
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
 
             var claimsIdentity = new ClaimsIdentity();
+
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, configuration["Jwt:Issuer"]!));
+
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));
 

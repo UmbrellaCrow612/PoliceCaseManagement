@@ -13,7 +13,7 @@ namespace Identity.Infrastructure.Data.Seeding
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    await roleManager.CreateAsync(new IdentityRole { Name = role });
+                    await roleManager.CreateAsync(new IdentityRole { Name = role , ConcurrencyStamp = Guid.NewGuid().ToString()});
                 }
             }
         }
