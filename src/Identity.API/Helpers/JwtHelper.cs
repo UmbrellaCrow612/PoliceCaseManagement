@@ -9,7 +9,13 @@ namespace Identity.API.Helpers
 {
     public class JwtHelper(IConfiguration configuration)
     {
-        public string GenerateToken(ApplicationUser user, IList<string> roles)
+        /// <summary>
+        /// Generate a JWT token with claims
+        /// </summary>
+        /// <returns>
+        /// Access token and it's ID
+        /// </returns>
+        public (string accessToken, string accessTokenId) GenerateToken(ApplicationUser user, IList<string> roles)
         {
             var handler = new JwtSecurityTokenHandler();
 
@@ -20,11 +26,12 @@ namespace Identity.API.Helpers
             var expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
             var privateKey = Encoding.UTF8.GetBytes(key);
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
+            var tokenId = Guid.NewGuid().ToString();
 
             var claimsIdentity = new ClaimsIdentity();
 
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
-            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, tokenId));
 
             claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
@@ -47,7 +54,9 @@ namespace Identity.API.Helpers
             };
 
             var token = handler.CreateToken(tokenDescriptor);
-            return handler.WriteToken(token);
+            var tokenValue = handler.WriteToken(token);
+
+            return (tokenValue, tokenId);
         }
 
         public string GenerateRefreshToken()
