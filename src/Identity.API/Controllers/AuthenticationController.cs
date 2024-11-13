@@ -187,6 +187,45 @@ namespace Identity.API.Controllers
             return Ok(count);
         }
 
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
+            if (user is null) return Ok();
+
+            PasswordResetAttempt passwordResetAttempt = new()
+            {
+                Code = "erwe", // Hash it
+                UserId = user.Id,
+                ValidSessionTime = DateTime.UtcNow.AddMinutes(30),
+            };
+
+            // Add to store 
+
+            // checks from store return params
+
+            // sucesful send email with url/code
+
+
+
+            // Add it to store 
+            // Send the code via email make url /reset-password/{code}
+            // if valid then new password and hit /confirm-reset-password/{code}
+            // validate time and code - if not valid UI error saying session expired
+
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("confirm-password-reset/{code}")]
+        public async Task<ActionResult> ConfirmResetPassword()
+        {
+            return Ok();
+        }
+
+
         [Authorize]
         [HttpGet("sec")]
         public ActionResult Get()
