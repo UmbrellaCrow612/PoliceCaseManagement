@@ -58,7 +58,6 @@ namespace Identity.API.Controllers
 
             Token token = new()
             {
-                AccessToken = accessToken,
                 Id = tokenId,
                 RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
@@ -126,7 +125,6 @@ namespace Identity.API.Controllers
 
             Token token = new()
             {
-                AccessToken = accessToken,
                 Id = accessTokenId,
                 RefreshToken = refreshTokenRequestDto.RefreshToken,
                 RefreshTokenExpiresAt = result.RefreshTokenExpiresAt,
@@ -178,6 +176,15 @@ namespace Identity.API.Controllers
             if (user is null) return Unauthorized();
 
             return Ok(new { id = user.Id, userName = user.UserName, email = user.Email, phoneNumber = user.PhoneNumber });
+        }
+
+        [Authorize]
+        [HttpDelete("clean-expired-tokens")]
+        public async Task<ActionResult> CleanTokens()
+        {
+            var count = await _tokenStore.CleanupExpiredTokensAsync();
+
+            return Ok(count);
         }
 
         [Authorize]
