@@ -192,11 +192,11 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
         {
             var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
-            if (user is null) return Ok();
+            if (user is null) return Ok(); 
 
             PasswordResetAttempt passwordResetAttempt = new()
             {
-                Code = "erwe", // Hash it
+                Code = _stringEncryptionHelper.GenerateRandomString(15),
                 UserId = user.Id,
                 ValidSessionTime = DateTime.UtcNow.AddMinutes(30),
             };

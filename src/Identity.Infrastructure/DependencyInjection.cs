@@ -27,6 +27,7 @@ namespace Identity.Infrastructure
             });
 
             services.AddScoped<ITokenStore, TokenStore>();
+            services.AddScoped<IPasswordResetAttemptStore, PasswordResetAttemptStore>();
 
             return services;
         }
