@@ -12,14 +12,16 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IConfiguration _configuration = configuration;
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
-       
+        private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
+
+
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
         /// a refresh token Returns the tokens in the response
@@ -191,29 +193,32 @@ namespace Identity.API.Controllers
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
         {
+            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+
             var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
-            if (user is null) return Ok(); 
+            if (user is null) return Ok(); // We don't reveal if a user exists
 
             PasswordResetAttempt passwordResetAttempt = new()
             {
                 Code = _stringEncryptionHelper.GenerateRandomString(15),
                 UserId = user.Id,
-                ValidSessionTime = DateTime.UtcNow.AddMinutes(30),
+                ValidSessionTime = DateTime.UtcNow.AddMinutes(resetPasswordSessionTimeInMinutes),
             };
 
-            // Add to store 
+            var (canMakeAttempt, successfullyAdded) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
 
-            // checks from store return params
+            if (!canMakeAttempt)
+            {
+                return BadRequest(); // Already made one in time period
+            }
+
+            if (!successfullyAdded)
+            {
+                return BadRequest();
+            }
 
             // sucesful send email with url/code
-
-
-
-            // Add it to store 
             // Send the code via email make url /reset-password/{code}
-            // if valid then new password and hit /confirm-reset-password/{code}
-            // validate time and code - if not valid UI error saying session expired
-
 
             return Ok();
         }

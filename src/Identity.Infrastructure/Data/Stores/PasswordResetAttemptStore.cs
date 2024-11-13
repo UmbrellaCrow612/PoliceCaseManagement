@@ -10,7 +10,7 @@ namespace Identity.Infrastructure.Data.Stores
 
         public Task<(bool canMakeAttempt, bool successfullyAdded)> AddAttempt(PasswordResetAttempt attempt)
         {
-            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+            
 
 
             throw new NotImplementedException();
