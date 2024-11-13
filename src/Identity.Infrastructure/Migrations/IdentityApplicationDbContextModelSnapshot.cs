@@ -59,12 +59,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("RefreshTokenExpiriesAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
@@ -106,7 +100,7 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("RefreshTokenExpiriesAt")
+                    b.Property<DateTime>("RefreshTokenExpiresAt")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("RevokedAt")

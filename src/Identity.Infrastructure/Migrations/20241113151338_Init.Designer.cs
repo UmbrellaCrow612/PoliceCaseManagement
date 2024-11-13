@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241113143229_Init")]
+    [Migration("20241113151338_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -62,12 +62,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("RefreshTokenExpiriesAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
@@ -109,7 +103,7 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("RefreshTokenExpiriesAt")
+                    b.Property<DateTime>("RefreshTokenExpiresAt")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("RevokedAt")

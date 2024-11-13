@@ -11,7 +11,7 @@ namespace Identity.Infrastructure.Data.Stores
         public async Task<int> CleanupExpiredTokensAsync()
         {
             var tokens = await _dbContext.Tokens
-                .Where(x => x.RefreshTokenExpiriesAt < DateTime.UtcNow)
+                .Where(x => x.RefreshTokenExpiresAt < DateTime.UtcNow)
                 .ToListAsync();
 
             var count = tokens.Count;
@@ -45,7 +45,9 @@ namespace Identity.Infrastructure.Data.Stores
 
             if (token is not null)
             {
-                _dbContext.Tokens.Remove(token);
+                token.IsRevoked = true;
+                token.IsBlackListed = true;
+
                 await _dbContext.SaveChangesAsync();
             }
         }
@@ -56,9 +58,27 @@ namespace Identity.Infrastructure.Data.Stores
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task<TokenValidationResult> ValidateTokenAsync(string tokenId)
+        public async Task<TokenValidationResult> ValidateTokenAsync(string tokenId, string refreshToken)
         {
-            throw new NotImplementedException();
+            var result = new TokenValidationResult();
+
+            var token = await _dbContext.Tokens.FirstOrDefaultAsync(x => x.Id == tokenId);
+            if(
+                token is null 
+                || token.IsRevoked 
+                || token.IsBlackListed 
+                || token.RefreshToken != refreshToken
+                || token.RefreshTokenExpiresAt < DateTime.UtcNow
+                )
+            {
+                result.Succeeded = false;
+                return result;
+            }
+
+            result.Succeeded = true;
+            result.RefreshTokenExpiresAt = token.RefreshTokenExpiresAt;
+
+            return result;
         }
     }
 }

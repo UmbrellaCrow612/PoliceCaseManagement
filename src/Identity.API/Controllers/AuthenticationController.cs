@@ -5,6 +5,7 @@ using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Identity.API.Controllers
@@ -60,7 +61,7 @@ namespace Identity.API.Controllers
                 AccessToken = accessToken,
                 Id = tokenId,
                 RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
-                RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
                 UserId = user.Id,
             };
 
@@ -97,30 +98,44 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized("User ID not found in token.");
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null || user.RefreshToken is null || user.RefreshTokenExpiriesAt is null) return Unauthorized();
-
-            if (user.RefreshTokenExpiriesAt <= DateTime.UtcNow || user.RefreshToken != _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken))
+            if (string.IsNullOrEmpty(tokenId))
             {
-                user.RefreshToken = null;
-                user.RefreshTokenExpiriesAt = null;
+                return Unauthorized("Jti ID not found in token.");
+            }
 
-                await _userManager.UpdateAsync(user);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
 
+            var result = await _tokenStore.ValidateTokenAsync(tokenId, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
+
+            if (!result.Succeeded)
+            {
                 return Unauthorized();
             }
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var token = _jwtHelper.GenerateToken(user, roles);
+            var (accessToken, accessTokenId) = _jwtHelper.GenerateToken(user, roles);
 
-            return Ok(new { token.accessToken });
+            Token token = new()
+            {
+                AccessToken = accessToken,
+                Id = accessTokenId,
+                RefreshToken = refreshTokenRequestDto.RefreshToken,
+                RefreshTokenExpiresAt = result.RefreshTokenExpiresAt,
+                UserId = userId,
+            };
+
+            await _tokenStore.StoreTokenAsync(token);
+
+            return Ok(new { accessToken });
         }
 
         /// <summary>
@@ -140,10 +155,7 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            user.RefreshToken = null;
-            user.RefreshTokenExpiriesAt = null;
-
-            await _userManager.UpdateAsync(user);
+            await _tokenStore.RevokeAllUserTokensAsync(user.Id);
 
             return NoContent();
         }

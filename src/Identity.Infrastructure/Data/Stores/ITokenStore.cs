@@ -10,13 +10,15 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task RevokeAllUserTokensAsync(string userId);
 
-        Task<TokenValidationResult> ValidateTokenAsync(string tokenId);
+        Task<TokenValidationResult> ValidateTokenAsync(string tokenId, string refreshToken);
 
         Task<int> CleanupExpiredTokensAsync();
     }
 
     public class TokenValidationResult
     {
-        public bool Success { get; set; }
+        public bool Succeeded { get; set; }
+
+        public DateTime RefreshTokenExpiresAt { get; set; }
     }
 }
