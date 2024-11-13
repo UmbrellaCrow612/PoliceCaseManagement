@@ -31,53 +31,42 @@ namespace Identity.API.Controllers
                 return BadRequest("Provide a username of email");
             }
 
-            ApplicationUser? user;
             int refreshTokenExpiriesInMinutes = _configuration.GetValue<int>("Jwt:RefreshTokenExpiriesInMinutes");
 
+            ApplicationUser? user;
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
                 user = await _userManager.FindByNameAsync(loginRequestDto.UserName);
-                if(user is null) return Unauthorized("Username or password incorrect");
-
-                var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-                if(!isPasswordCorrect) return Unauthorized("Username or password incorrect");
-
-                var roles = await _userManager.GetRolesAsync(user);
-
-                (string  accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
-                var refreshToken = _jwtHelper.GenerateRefreshToken();
-
-                user.RefreshToken = _stringEncryptionHelper.Hash(refreshToken);
-                user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
-
-                await _userManager.UpdateAsync(user);
-
-                return Ok(new { accessToken , refreshToken });
-               
+                if (user is null) return Unauthorized("Username or password incorrect");
             }
-
-            if (!string.IsNullOrWhiteSpace(loginRequestDto.Email))
+            else
             {
-                user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
+                user = await _userManager.FindByEmailAsync(loginRequestDto.Email ?? string.Empty);
                 if (user is null) return Unauthorized("Email or password incorrect");
-
-                var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-                if (!isPasswordCorrect) return Unauthorized("Email or password incorrect");
-
-                var roles = await _userManager.GetRolesAsync(user);
-
-                (string accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
-                var refreshToken = _jwtHelper.GenerateRefreshToken();
-
-                user.RefreshToken = _stringEncryptionHelper.Hash(refreshToken);
-                user.RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes);
-
-                await _userManager.UpdateAsync(user);
-
-                return Ok(new { accessToken, refreshToken });
             }
 
-            return BadRequest("Username or email not provided");
+            if (user is null) return Unauthorized();
+
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+            if (!isPasswordCorrect) return Unauthorized("Incorrect credentials");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            (string  accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
+            var refreshToken = _jwtHelper.GenerateRefreshToken();
+
+            Token token = new()
+            {
+                AccessToken = accessToken,
+                Id = tokenId,
+                RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
+                RefreshTokenExpiriesAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
+                UserId = user.Id,
+            };
+
+            await _tokenStore.StoreTokenAsync(token);
+
+            return Ok(new { accessToken , refreshToken });
         }
 
         [HttpPost("register")]

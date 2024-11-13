@@ -1,20 +1,22 @@
-﻿namespace Identity.Infrastructure.Data.Stores
+﻿using Identity.Infrastructure.Data.Models;
+
+namespace Identity.Infrastructure.Data.Stores
 {
     public interface ITokenStore
     {
-        Task StoreTokenAsync();
+        Task StoreTokenAsync(Token token);
 
-        Task RevokeTokenAsync();
+        Task RevokeTokenAsync(string tokenId);
 
-        Task RevokeAllUserTokensAsync();
+        Task RevokeAllUserTokensAsync(string userId);
 
-        Task<TokenValidationResult> ValidateTokenAsync();
+        Task<TokenValidationResult> ValidateTokenAsync(string tokenId);
 
         Task<int> CleanupExpiredTokensAsync();
     }
 
     public class TokenValidationResult
     {
-
+        public bool Success { get; set; }
     }
 }
