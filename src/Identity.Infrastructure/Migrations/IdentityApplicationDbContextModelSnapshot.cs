@@ -108,6 +108,8 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("PasswordResetAttempts");

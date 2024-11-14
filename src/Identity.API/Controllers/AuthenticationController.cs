@@ -226,8 +226,25 @@ namespace Identity.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("confirm-password-reset/{code}")]
-        public async Task<ActionResult> ConfirmResetPassword()
+        public async Task<ActionResult> ConfirmResetPassword(string code, [FromBody] ConfirmPasswordResetRequestDto confirmPasswordResetRequestDto)
         {
+            (bool isValid, PasswordResetAttempt? attempt) = await _passwordResetAttemptStore.ValidateAttempt(_stringEncryptionHelper.Hash(code));
+            if (!isValid) return Unauthorized(); // Either session expired or code is wrong for latest attempt
+
+            if (attempt is null) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(attempt.UserId);
+            if (user is null) return BadRequest();
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, confirmPasswordResetRequestDto.NewPassword);
+
+            if(!result.Succeeded) return BadRequest(result.Errors);
+
+            attempt.IsSuccessful = true;
+
+            await _passwordResetAttemptStore.UpdateAttempt(attempt);
+
             return Ok();
         }
 

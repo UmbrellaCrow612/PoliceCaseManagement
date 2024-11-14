@@ -13,5 +13,9 @@ namespace Identity.Infrastructure.Data.Stores
         /// Revokes all password reset attempts for the specified user that are currently not successful, within the time limit, and not currently revoked.
         /// </summary>
         Task<bool> RevokePasswordAttempt(string userId);
+
+        Task<(bool isValid, PasswordResetAttempt? attempt)> ValidateAttempt(string code);
+
+        Task UpdateAttempt(PasswordResetAttempt attempt);
     }
 }

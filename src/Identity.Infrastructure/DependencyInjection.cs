@@ -19,7 +19,8 @@ namespace Identity.Infrastructure
 
             services.AddIdentityCore<ApplicationUser>()
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<IdentityApplicationDbContext>();
+                .AddEntityFrameworkStores<IdentityApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {

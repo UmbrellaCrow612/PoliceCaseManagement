@@ -1,5 +1,8 @@
-﻿namespace Identity.Infrastructure.Data.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Identity.Infrastructure.Data.Models
 {
+    [Index(nameof(Code))]
     public class PasswordResetAttempt
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

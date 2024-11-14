@@ -157,6 +157,29 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PasswordResetAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    ValidSessionTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordResetAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PasswordResetAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tokens",
                 columns: table => new
                 {
@@ -164,7 +187,6 @@ namespace Identity.Infrastructure.Migrations
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     RefreshToken = table.Column<string>(type: "TEXT", nullable: false),
                     RefreshTokenExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AccessToken = table.Column<string>(type: "TEXT", nullable: false),
                     IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false),
                     RevokedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     RevokedReason = table.Column<string>(type: "TEXT", nullable: true),
@@ -219,6 +241,16 @@ namespace Identity.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PasswordResetAttempts_Code",
+                table: "PasswordResetAttempts",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordResetAttempts_UserId",
+                table: "PasswordResetAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tokens_UserId",
                 table: "Tokens",
                 column: "UserId");
@@ -241,6 +273,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "PasswordResetAttempts");
 
             migrationBuilder.DropTable(
                 name: "Tokens");

@@ -33,5 +33,30 @@ namespace Identity.Infrastructure.Data.Stores
         {
             throw new NotImplementedException();
         }
+
+        public async Task UpdateAttempt(PasswordResetAttempt attempt)
+        {
+            _dbcontext.PasswordResetAttempts.Update(attempt);
+            await _dbcontext.SaveChangesAsync();
+        }
+
+        public async Task<(bool isValid, PasswordResetAttempt? attempt)> ValidateAttempt(string code)
+        {
+            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+
+            var _attempt = await _dbcontext.PasswordResetAttempts.FirstOrDefaultAsync(x => x.Code == code);
+            if (_attempt is null) return (false, null);
+
+            if (
+                _attempt.ValidSessionTime < DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes) 
+                && _attempt.IsRevoked == false 
+                && _attempt.IsSuccessful != true 
+                )
+            {
+                return (false, null);
+            }
+
+            return (true, _attempt);
+        }
     }
 }
