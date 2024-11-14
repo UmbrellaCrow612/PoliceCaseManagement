@@ -66,6 +66,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddSingleton<StringEncryptionHelper>();
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

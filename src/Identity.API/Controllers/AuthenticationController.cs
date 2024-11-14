@@ -1,4 +1,5 @@
-﻿using Identity.API.DTOs;
+﻿using AutoMapper;
+using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
@@ -13,7 +14,7 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, IMapper mapper) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,6 +23,7 @@ namespace Identity.API.Controllers
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly IMapper _mapper = mapper;
 
 
         /// <summary>
@@ -272,6 +274,18 @@ namespace Identity.API.Controllers
             }
 
             await _userManager.AddToRolesAsync(user, roles);
+
+            return NoContent();
+        }
+
+        [HttpPatch("users/{id}")]
+        public async Task<ActionResult> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user is null) return NotFound("User not found.");
+
+            _mapper.Map(updateUserDto, user);
+            await _userManager.UpdateAsync(user);
 
             return NoContent();
         }
