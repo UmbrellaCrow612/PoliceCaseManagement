@@ -198,9 +198,11 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
             if (user is null) return Ok(); // We don't reveal if a user exists
 
+            var trueCode = _stringEncryptionHelper.GenerateRandomString(15);
+
             PasswordResetAttempt passwordResetAttempt = new()
             {
-                Code = _stringEncryptionHelper.GenerateRandomString(15),
+                Code = _stringEncryptionHelper.Hash(trueCode), 
                 UserId = user.Id,
                 ValidSessionTime = DateTime.UtcNow.AddMinutes(resetPasswordSessionTimeInMinutes),
             };
@@ -220,7 +222,7 @@ namespace Identity.API.Controllers
             // sucesful send email with url/code
             // Send the code via email make url /reset-password/{code}
 
-            return Ok();
+            return Ok(new { trueCode }); // Later on after email server added remove sending the true code
         }
 
         [AllowAnonymous]
