@@ -12,7 +12,7 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -20,6 +20,7 @@ namespace Identity.API.Controllers
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
+        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
 
         /// <summary>
@@ -249,6 +250,30 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost("users/{id}/roles")]
+        public async Task<ActionResult> AddRolesToUser(string id, [FromBody] IEnumerable<string> roles)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user is null) return NotFound("User not found.");
+
+            foreach (var role in roles)
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    return NotFound("Role not found");
+                }
+
+                if (!await _userManager.IsInRoleAsync(user, role))
+                {
+                    return BadRequest("User already linked to role.");
+                }
+            }
+
+            await _userManager.AddToRolesAsync(user, roles);
+
+            return NoContent();
+        }
 
         [Authorize]
         [HttpGet("sec")]
