@@ -194,11 +194,12 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
         {
             int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+            int resetPasswordCodeLength = int.Parse(_configuration["ResetPasswordCodeLength"] ?? throw new ApplicationException("ResetPasswordCodeLength not provided."));
 
             var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
             if (user is null) return Ok(); // We don't reveal if a user exists
 
-            var trueCode = _stringEncryptionHelper.GenerateRandomString(15);
+            var trueCode = _stringEncryptionHelper.GenerateRandomString(resetPasswordCodeLength);
 
             PasswordResetAttempt passwordResetAttempt = new()
             {
