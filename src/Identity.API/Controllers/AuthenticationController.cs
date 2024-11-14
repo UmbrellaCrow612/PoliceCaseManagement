@@ -5,6 +5,7 @@ using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -273,6 +274,14 @@ namespace Identity.API.Controllers
             await _userManager.AddToRolesAsync(user, roles);
 
             return NoContent();
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult> GetSystemRoles()
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+
+            return Ok(roles);
         }
 
         [Authorize]
