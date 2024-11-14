@@ -29,9 +29,30 @@ namespace Identity.Infrastructure.Data.Stores
             return (true, true);
         }
 
-        public Task<bool> RevokePasswordAttempt(string userId)
+        public async Task<int> RevokeAllValidPasswordAttempts(string userId)
         {
-            throw new NotImplementedException();
+            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+
+            var validRecentAttempts = await _dbcontext.PasswordResetAttempts
+             .Where(
+              x => x.UserId == userId
+              && x.IsSuccessful == false
+              && x.IsRevoked == false
+              && x.ValidSessionTime >= DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes
+              ))
+             .ToListAsync();
+
+            foreach (var attempt in validRecentAttempts)
+            {
+                attempt.IsRevoked = true;
+            }
+
+            var count = validRecentAttempts.Count;
+
+            _dbcontext.PasswordResetAttempts.UpdateRange(validRecentAttempts);
+            await _dbcontext.SaveChangesAsync();
+
+            return count;
         }
 
         public async Task UpdateAttempt(PasswordResetAttempt attempt)
