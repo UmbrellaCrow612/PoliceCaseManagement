@@ -219,10 +219,9 @@ namespace Identity.API.Controllers
                 return BadRequest();
             }
 
-            // sucesful send email with url/code
-            // Send the code via email make url /reset-password/{code}
+           // Send Email link with true code
 
-            return Ok(new { trueCode }); // Later on after email server added remove sending the true code
+            return Ok(new { trueCode });
         }
 
         [AllowAnonymous]

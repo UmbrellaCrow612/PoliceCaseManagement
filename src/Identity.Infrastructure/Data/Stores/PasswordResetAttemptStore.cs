@@ -23,7 +23,10 @@ namespace Identity.Infrastructure.Data.Stores
 
             if (recentAttempt is not null) return (false, false);
 
-            throw new NotImplementedException();
+            await _dbcontext.PasswordResetAttempts.AddAsync(attempt);
+            await _dbcontext.SaveChangesAsync();
+
+            return (true, true);
         }
 
         public Task<bool> RevokePasswordAttempt(string userId)
