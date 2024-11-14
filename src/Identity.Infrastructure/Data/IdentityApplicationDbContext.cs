@@ -7,6 +7,7 @@ namespace Identity.Infrastructure.Data
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<Token> Tokens { get; set; }
+        public DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
