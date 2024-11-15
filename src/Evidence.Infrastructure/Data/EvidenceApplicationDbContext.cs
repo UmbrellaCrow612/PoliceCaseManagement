@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Evidence.Infrastructure.Data
 {
-    public class EvidenceApplicationDbContext : DbContext
+    public class EvidenceApplicationDbContext(DbContextOptions<EvidenceApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<EvidenceItem> Evidences { get; set; }
         public DbSet<CustodyLog> CustodyLogs { get; set; }
