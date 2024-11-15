@@ -1,8 +1,5 @@
 ﻿using Evidence.Infrastructure.Data;
 using Evidence.Infrastructure.Data.Stores;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Evidence.Infrastructure
 {
