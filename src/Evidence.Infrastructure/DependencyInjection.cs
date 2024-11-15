@@ -16,6 +16,10 @@ namespace Evidence.Infrastructure
                 options => options.UseSqlite(connectionString));
 
             services.AddScoped<IEvidenceItemStore, EvidenceItemStore>();
+            services.AddScoped<ICustodyLogStore, CustodyLogStore>();
+            services.AddScoped<ILabResultStore, LabResultStore>();
+            services.AddScoped<INoteStore, NoteStore>();
+            services.AddScoped<IPhotoStore, PhotoStore>();
 
             return services;
         }
