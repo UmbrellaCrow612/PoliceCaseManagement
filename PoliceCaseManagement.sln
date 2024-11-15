@@ -23,11 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Core", "src\Identity.Core\Identity.Core.csproj", "{2DB8F024-2518-4C25-B9FB-2EA583116D65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evidence.API", "src\Evidence.API\Evidence.API.csproj", "{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Evidence.API", "src\Evidence.API\Evidence.API.csproj", "{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evidence.Core", "src\Evidence.Core\Evidence.Core.csproj", "{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evidence.Infrastructure", "src\Evidence.Infrastructure\Evidence.Infrastructure.csproj", "{06A217FF-5CDD-480C-8F04-829C7BF41746}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Evidence.Infrastructure", "src\Evidence.Infrastructure\Evidence.Infrastructure.csproj", "{06A217FF-5CDD-480C-8F04-829C7BF41746}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,10 +73,6 @@ Global
 		{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06A217FF-5CDD-480C-8F04-829C7BF41746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06A217FF-5CDD-480C-8F04-829C7BF41746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06A217FF-5CDD-480C-8F04-829C7BF41746}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -98,7 +92,6 @@ Global
 		{8005B962-CA00-421F-B58A-CAB27BC29C32} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{2DB8F024-2518-4C25-B9FB-2EA583116D65} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{AD21B953-2E25-48DB-8157-DEBDBC0A7D2E} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
-		{F3AFC519-AF16-4BE1-8ADC-53DF41BB8261} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{06A217FF-5CDD-480C-8F04-829C7BF41746} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
