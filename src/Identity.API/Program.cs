@@ -4,6 +4,7 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -51,9 +52,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-            // These values must match the tokens you're receiving
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer not provided"),
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new ApplicationException("Jwt Audience not provided"),
+            ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<string[]>(),
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))),
 

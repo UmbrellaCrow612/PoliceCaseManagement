@@ -21,12 +21,17 @@ namespace Identity.API.Helpers
 
             var key = configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key Not Provided");
             var issuer = configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer Not Provided");
-            var audience = configuration["Jwt:Audience"] ?? throw new ApplicationException("Jwt Audience Not Provided");
+            string[] audiences = configuration.GetSection("Jwt:Audiences").Get<string[]>();
             int expiresInMinutes = int.Parse(configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt ExpiresInMinutes Not Provided"));
             var expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
             var privateKey = Encoding.UTF8.GetBytes(key);
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
             var tokenId = Guid.NewGuid().ToString();
+
+            if (audiences is null || audiences.Length <= 0)
+            {
+                throw new ApplicationException("audiences for jwt not configered.");
+            }
 
             var claimsIdentity = new ClaimsIdentity();
 
@@ -37,6 +42,11 @@ namespace Identity.API.Helpers
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));
 
+            foreach (string aud in audiences)
+            {
+                claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, aud));
+            }
+
             foreach (var role in roles)
             {
                 claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
@@ -45,7 +55,6 @@ namespace Identity.API.Helpers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
-                Audience = audience,
                 SigningCredentials = credentials,
                 Expires = expires,
                 Subject = claimsIdentity,
