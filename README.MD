@@ -1,48 +1,62 @@
-PoliceCaseManagement.sln
-├── src/
-│   ├── PoliceCaseManagement.Web/
-│   │   ├── Controllers/
-│   │   ├── Views/
-│   │   ├── wwwroot/
-│   │   ├── Program.cs
-│   │   └── appsettings.json
-│   ├── PoliceCaseManagement.Core/
-│   │   ├── Entities/
-│   │   ├── Interfaces/
-│   │   └── Services/
-│   ├── PoliceCaseManagement.Infrastructure/
-│   │   ├── Data/
-│   │   │   ├── Configurations/
-│   │   │   └── Repositories/
-│   │   └── ExternalServices/
-│   ├── PoliceCaseManagement.Application/
-│   │   ├── DTOs/
-│   │   ├── Mappings/
-│   │   └── Services/
-│   │       ├── CaseManagement/
-│   │       ├── EvidenceManagement/
-│   │       ├── Reporting/
-│   │       └── Notification/
-│   └── PoliceCaseManagement.Shared/
-│       ├── Constants/
-│       └── Helpers/
-├── tests/
-│   ├── PoliceCaseManagement.UnitTests/
-│   └── PoliceCaseManagement.IntegrationTests/
-├── docs/
-│   ├── api-documentation.md
-│   └── architecture-overview.md
-├── scripts/
-│   ├── build.ps1
-│   └── deploy.ps1
-└── .gitignore
+To minimize the number of spokes while maximizing the entities they hold, we can focus on grouping related entities based on common purposes or domains. Here's a breakdown of how to achieve this:
 
-PoliceCaseManagement.Web: This is the main entry point for the application, containing controllers, views, and static files. It's an ASP.NET Core MVC or Razor Pages project.
+---
 
-PoliceCaseManagement.Core: Contains core business logic, entities, and interfaces.
+### **1. Core Case Management Spoke**
+**Purpose:** Handles the central concept of cases and their direct relationships.  
+**Entities:**
+- `Case`
+- `CasePerson`
+- `CaseUser`
+- `CaseTag`
+- `CaseEvidence`
+- `CaseCrimeScene`
+- `CaseDocument`
+- `Report`
 
-PoliceCaseManagement.Infrastructure: Implements data access, external service integrations, and other infrastructure concerns.
+---
 
-PoliceCaseManagement.Application: Houses application-specific logic, DTOs, and service implementations. The services that were previously separate microservices are now organized as subdirectories within the Services folder.
+### **2. Entity Management Spoke**
+**Purpose:** Groups all tangible and relational entities involved in cases.  
+**Entities:**
+- `Person`
+- `Vehicle`
+- `Property`
+- `Location`
+- `IncidentPerson`
+- `CrimeScenePerson`
+- `PropertyPerson`
+- `VehiclePerson`
 
-PoliceCaseManagement.Shared: Contains shared utilities, constants, and helpers used across the solution.
+---
+
+### **3. Crime Scene and Evidence Management Spoke**
+**Purpose:** Manages data related to crime scenes, evidence, and documentation.  
+**Entities:**
+- `CrimeScene`
+- `CrimeSceneEvidence`
+- `Evidence`
+- `Document`
+- `Statement`
+- `StatementUser`
+
+---
+
+### **4. Administrative Management Spoke**
+**Purpose:** Handles administrative and organizational aspects.  
+**Entities:**
+- `Department`
+- `User`
+- `Role`
+- `UserRole`
+- `Tag`
+
+---
+
+### **Rationale for Grouping**
+- **Core Case Management**: Focuses purely on cases and their direct relationships, ensuring separation of the primary domain from supporting entities.
+- **Entity Management**: Groups all participants and physical objects associated with cases.
+- **Crime Scene and Evidence Management**: Clusters entities specific to investigations and documentation.
+- **Administrative Management**: Keeps organizational and metadata entities separate.
+
+This structure ensures you have **4 spokes** that effectively cover all entities while maintaining clear and logical groupings.
