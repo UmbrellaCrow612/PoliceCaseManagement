@@ -1,0 +1,6 @@
+@Cases.API_HostAddress = http://localhost:5102
+
+GET {{Cases.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
