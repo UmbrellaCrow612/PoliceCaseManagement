@@ -1,9 +1,8 @@
 ﻿namespace Evidence.Infrastructure.Data.Models
 {
-    public class EvidenceItem
+    public class EvidenceItem : ISoftDelete, IAudit
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public required string Number { get; set; }
         public required string Description { get; set; }
         public required string Type { get; set; }
         public required string CollectedBy { get; set; }
@@ -21,5 +20,14 @@
         public IEnumerable<Photo> Photos { get; set; } = [];
         public IEnumerable<LabResult> LabResults { get; set; } = [];
         public IEnumerable<Note> Notes { get; set; } = [];
+
+        public string? DeletedById { get; set; } = null;
+        public DateTime? DeletedAt { get; set; } = null;
+        public bool? IsDeleted { get; set; } = null;
+
+        public required string CreatedById { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string? LastEditedById { get; set; } = null;
+        public DateTime? LastEditedAt { get; set; } = null;
     }
 }

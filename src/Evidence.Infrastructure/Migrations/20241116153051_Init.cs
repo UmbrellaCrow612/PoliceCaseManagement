@@ -16,7 +16,6 @@ namespace Evidence.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Number = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<string>(type: "TEXT", nullable: false),
                     CollectedBy = table.Column<string>(type: "TEXT", nullable: false),
@@ -29,7 +28,14 @@ namespace Evidence.Infrastructure.Migrations
                     BiohazardStatus = table.Column<bool>(type: "INTEGER", nullable: false),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
                     DispositionDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DispositionMethod = table.Column<string>(type: "TEXT", nullable: true)
+                    DispositionMethod = table.Column<string>(type: "TEXT", nullable: true),
+                    DeletedById = table.Column<string>(type: "TEXT", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: true),
+                    CreatedById = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastEditedById = table.Column<string>(type: "TEXT", nullable: true),
+                    LastEditedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

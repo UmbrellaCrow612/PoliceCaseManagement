@@ -75,6 +75,19 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeletedById")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -88,8 +101,13 @@ namespace Evidence.Infrastructure.Migrations
                     b.Property<bool>("HazmatStatus")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Number")
-                        .IsRequired()
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastEditedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastEditedById")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PhysicalDescription")

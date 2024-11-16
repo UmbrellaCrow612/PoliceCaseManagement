@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20241115142953_Init")]
+    [Migration("20241116153051_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -78,6 +78,19 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeletedById")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -91,8 +104,13 @@ namespace Evidence.Infrastructure.Migrations
                     b.Property<bool>("HazmatStatus")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Number")
-                        .IsRequired()
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastEditedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastEditedById")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PhysicalDescription")
