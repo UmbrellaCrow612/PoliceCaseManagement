@@ -36,7 +36,7 @@ namespace Evidence.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetEvidenceId(string id)
+        public async Task<ActionResult> GetEvidenceById(string id)
         {
             var evidence = await _evidenceItemStore.GetEvidenceById(id);
             if (evidence is null) return NotFound();
@@ -47,7 +47,7 @@ namespace Evidence.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult> PatchEvidenceId(string id, [FromBody] UpdateEvidenceItemDto updateEvidenceItemDto)
+        public async Task<ActionResult> PatchEvidenceById(string id, [FromBody] UpdateEvidenceItemDto updateEvidenceItemDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized("User ID not found on JWT");
@@ -58,6 +58,20 @@ namespace Evidence.API.Controllers
             _mapper.Map(updateEvidenceItemDto, evidence);
 
             await _evidenceItemStore.UpdateEvidence(userId, evidence);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteEvidenceById(string id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized("User ID not found on JWT");
+
+            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            if (evidence is null) return NotFound();
+
+            await _evidenceItemStore.DeleteEvidence(userId, evidence);
 
             return NoContent();
         }
