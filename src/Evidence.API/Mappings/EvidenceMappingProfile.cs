@@ -10,6 +10,7 @@ namespace Evidence.API.Mappings
         {
             CreateMap<CreateEvidenceItemDto, EvidenceItem>();
             CreateMap<EvidenceItem, EvidenceItemDto>();
+            CreateMap<UpdateEvidenceItemDto, EvidenceItem>();
         }
     }
 }

@@ -45,5 +45,21 @@ namespace Evidence.API.Controllers
 
             return Ok(dto);
         }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> PatchEvidenceId(string id, [FromBody] UpdateEvidenceItemDto updateEvidenceItemDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized("User ID not found on JWT");
+
+            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            if (evidence is null) return NotFound();
+
+            _mapper.Map(updateEvidenceItemDto, evidence);
+
+            await _evidenceItemStore.UpdateEvidence(userId, evidence);
+
+            return NoContent();
+        }
     }
 }
