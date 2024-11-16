@@ -34,5 +34,16 @@ namespace Evidence.API.Controllers
 
             return Ok(new { id = evidence.Id });
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetEvidenceId(string id)
+        {
+            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            if (evidence is null) return NotFound();
+
+            var dto = _mapper.Map<EvidenceItemDto>(evidence);
+
+            return Ok(dto);
+        }
     }
 }

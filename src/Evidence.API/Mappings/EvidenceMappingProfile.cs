@@ -9,6 +9,7 @@ namespace Evidence.API.Mappings
         public EvidenceMappingProfile()
         {
             CreateMap<CreateEvidenceItemDto, EvidenceItem>();
+            CreateMap<EvidenceItem, EvidenceItemDto>();
         }
     }
 }
