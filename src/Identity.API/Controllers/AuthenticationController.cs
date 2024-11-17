@@ -254,6 +254,27 @@ namespace Identity.API.Controllers
         }
 
         [Authorize]
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordRequestDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return NotFound();
+
+            var result = await _userManager.ChangePasswordAsync(user, changePasswordRequestDto.Password, changePasswordRequestDto.NewPassword);
+
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return NoContent();
+        }
+
+        [Authorize]
         [HttpPost("users/{id}/roles")]
         public async Task<ActionResult> AddRolesToUser(string id, [FromBody] IEnumerable<string> roles)
         {
