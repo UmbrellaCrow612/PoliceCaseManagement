@@ -11,5 +11,6 @@
         public DateTime? RevokedAt { get; set; } = null;
         public string? RevokedReason { get; set; }
         public bool IsBlackListed { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -190,7 +190,8 @@ namespace Identity.Infrastructure.Migrations
                     IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false),
                     RevokedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     RevokedReason = table.Column<string>(type: "TEXT", nullable: true),
-                    IsBlackListed = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsBlackListed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
