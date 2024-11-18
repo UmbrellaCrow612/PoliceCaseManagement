@@ -9,12 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using UAParser;
 
 namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, IMapper mapper) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, IMapper mapper, DeviceInfoHelper deviceInfoHelper) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -24,7 +25,7 @@ namespace Identity.API.Controllers
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IMapper _mapper = mapper;
-
+        private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -33,12 +34,21 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
+            int refreshTokenExpiriesInMinutes = _configuration.GetValue<int>("Jwt:RefreshTokenExpiriesInMinutes");
+
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                                ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                                ?? "Unknown";
+
+            string userAgent = Request.Headers.UserAgent.ToString();
+
+            var uaParser = Parser.GetDefault();
+            var clientInfo = uaParser.Parse(userAgent);
+
             if (string.IsNullOrWhiteSpace(loginRequestDto.Email) && string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
                 return BadRequest("Provide a username of email");
             }
-
-            int refreshTokenExpiriesInMinutes = _configuration.GetValue<int>("Jwt:RefreshTokenExpiriesInMinutes");
 
             ApplicationUser? user;
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
@@ -54,13 +64,43 @@ namespace Identity.API.Controllers
 
             if (user is null) return Unauthorized();
 
+            LoginAttempt loginAttempt = new()
+            {
+                IpAddress = ipAddress ?? "Unkown",
+                UserAgent = userAgent,
+                UserId = user.Id,
+            };
+           
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-            if (!isPasswordCorrect) return Unauthorized("Incorrect credentials");
+            if (!isPasswordCorrect)
+            {
+                loginAttempt.FailureReason = "User credentials";
+
+                await _tokenStore.StoreLoginAttempt(loginAttempt);
+
+                return Unauthorized("Incorrect credentials");
+            }
+
+            loginAttempt.Status = LoginStatus.SUCCESS;
 
             var roles = await _userManager.GetRolesAsync(user);
 
             (string  accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
+
+            DeviceInfo deviceInfo = new()
+            {
+                IpAddress = ipAddress ?? "Not Found",
+                TokenId = tokenId,
+                UserAgent = userAgent,
+                Browser = clientInfo.UA.Family,
+                Os = clientInfo.OS.Family,
+                DeviceType = _deviceInfoHelper.DetermineDeviceType(clientInfo),
+                DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
+            };
+
+            await _tokenStore.SetDeviceInfo(deviceInfo);
+            await _tokenStore.SetLoginAttempt(loginAttempt);
 
             Token token = new()
             {
@@ -68,6 +108,7 @@ namespace Identity.API.Controllers
                 RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
                 UserId = user.Id,
+                DeviceInfoId = deviceInfo.Id,
             };
 
             await _tokenStore.StoreTokenAsync(token);
@@ -105,6 +146,16 @@ namespace Identity.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                              ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                              ?? "Unknown";
+
+            string userAgent = Request.Headers.UserAgent.ToString();
+
+            var uaParser = Parser.GetDefault();
+            var clientInfo = uaParser.Parse(userAgent);
+
+
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized("User ID not found in token.");
@@ -129,12 +180,26 @@ namespace Identity.API.Controllers
 
             var (accessToken, accessTokenId) = _jwtHelper.GenerateToken(user, roles);
 
+            DeviceInfo deviceInfo = new()
+            {
+                IpAddress = ipAddress ?? "Not Found",
+                TokenId = accessTokenId,
+                UserAgent = userAgent,
+                Browser = clientInfo.UA.Family,
+                Os = clientInfo.OS.Family,
+                DeviceType = _deviceInfoHelper.DetermineDeviceType(clientInfo),
+                DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
+            };
+
+            await _tokenStore.SetDeviceInfo(deviceInfo);
+
             Token token = new()
             {
                 Id = accessTokenId,
                 RefreshToken = refreshTokenRequestDto.RefreshToken,
                 RefreshTokenExpiresAt = result.RefreshTokenExpiresAt,
                 UserId = userId,
+                DeviceInfoId = deviceInfo.Id
             };
 
             await _tokenStore.StoreTokenAsync(token);

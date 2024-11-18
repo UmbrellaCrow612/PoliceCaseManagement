@@ -157,6 +157,29 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LoginAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    IpAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    UserAgent = table.Column<string>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    FailureReason = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoginAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoginAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PasswordResetAttempts",
                 columns: table => new
                 {
@@ -191,7 +214,8 @@ namespace Identity.Infrastructure.Migrations
                     RevokedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     RevokedReason = table.Column<string>(type: "TEXT", nullable: true),
                     IsBlackListed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DeviceInfoId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,6 +224,30 @@ namespace Identity.Infrastructure.Migrations
                         name: "FK_Tokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeviceInfos",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    UserAgent = table.Column<string>(type: "TEXT", nullable: false),
+                    IpAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    DeviceId = table.Column<string>(type: "TEXT", nullable: true),
+                    DeviceType = table.Column<string>(type: "TEXT", nullable: true),
+                    Browser = table.Column<string>(type: "TEXT", nullable: true),
+                    Os = table.Column<string>(type: "TEXT", nullable: true),
+                    TokenId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceInfos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DeviceInfos_Tokens_TokenId",
+                        column: x => x.TokenId,
+                        principalTable: "Tokens",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -242,6 +290,17 @@ namespace Identity.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DeviceInfos_TokenId",
+                table: "DeviceInfos",
+                column: "TokenId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoginAttempts_UserId",
+                table: "LoginAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetAttempts_Code",
                 table: "PasswordResetAttempts",
                 column: "Code");
@@ -276,13 +335,19 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "DeviceInfos");
+
+            migrationBuilder.DropTable(
+                name: "LoginAttempts");
+
+            migrationBuilder.DropTable(
                 name: "PasswordResetAttempts");
 
             migrationBuilder.DropTable(
-                name: "Tokens");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Tokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

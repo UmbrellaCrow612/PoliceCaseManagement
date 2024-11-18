@@ -8,6 +8,11 @@ namespace Identity.Infrastructure.Data.Stores
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
+        public async Task SetDeviceInfo(DeviceInfo info)
+        {
+            await _dbContext.DeviceInfos.AddAsync(info);
+        }
+
         public async Task<int> CleanupExpiredTokensAsync()
         {
             var tokens = await _dbContext.Tokens
@@ -79,6 +84,17 @@ namespace Identity.Infrastructure.Data.Stores
             result.RefreshTokenExpiresAt = token.RefreshTokenExpiresAt;
 
             return result;
+        }
+
+        public async Task StoreLoginAttempt(LoginAttempt loginAttempt)
+        {
+            await _dbContext.LoginAttempts.AddAsync(loginAttempt);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task SetLoginAttempt(LoginAttempt loginAttempt)
+        {
+            await _dbContext.LoginAttempts.AddAsync(loginAttempt);
         }
     }
 }

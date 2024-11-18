@@ -13,6 +13,12 @@ namespace Identity.Infrastructure.Data.Stores
         Task<TokenValidationResult> ValidateTokenAsync(string tokenId, string refreshToken);
 
         Task<int> CleanupExpiredTokensAsync();
+
+        Task SetDeviceInfo(DeviceInfo info);
+
+        Task StoreLoginAttempt(LoginAttempt loginAttempt);
+
+        Task SetLoginAttempt(LoginAttempt loginAttempt);
     }
 
     public class TokenValidationResult

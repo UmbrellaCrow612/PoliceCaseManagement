@@ -81,6 +81,76 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.DeviceInfo", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Browser")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Os")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TokenId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenId")
+                        .IsUnique();
+
+                    b.ToTable("DeviceInfos");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.LoginAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LoginAttempts");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.PasswordResetAttempt", b =>
                 {
                     b.Property<string>("Id")
@@ -121,6 +191,10 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeviceInfoId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsBlackListed")
@@ -281,6 +355,28 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.DeviceInfo", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.Token", "Token")
+                        .WithOne("DeviceInfo")
+                        .HasForeignKey("Identity.Infrastructure.Data.Models.DeviceInfo", "TokenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Token");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.LoginAttempt", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("LoginAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.PasswordResetAttempt", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
@@ -356,9 +452,16 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("LoginAttempts");
+
                     b.Navigation("PasswordResetAttempts");
 
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
+                {
+                    b.Navigation("DeviceInfo");
                 });
 #pragma warning restore 612, 618
         }
