@@ -24,7 +24,7 @@ namespace Evidence.API.Controllers
 
             var note = _mapper.Map<Note>(createNoteDto);
 
-            var (Succeeded, Errors) = await _noteStore.CreateNote(evidence, note);
+            (bool Succeeded, IEnumerable<string> Errors) = await _noteStore.CreateNote(evidence, note);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
