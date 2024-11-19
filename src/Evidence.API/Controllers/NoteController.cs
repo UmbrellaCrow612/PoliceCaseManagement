@@ -2,10 +2,12 @@
 using Evidence.API.DTOs;
 using Evidence.Infrastructure.Data.Models;
 using Evidence.Infrastructure.Data.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evidence.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("evidence/{evidenceId}/notes")]
     public class NoteController(INoteStore noteStore, IEvidenceItemStore evidenceItemStore, IMapper mapper) : ControllerBase

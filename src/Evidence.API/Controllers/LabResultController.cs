@@ -2,10 +2,12 @@
 using Evidence.API.DTOs;
 using Evidence.Infrastructure.Data.Models;
 using Evidence.Infrastructure.Data.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evidence.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("evidence/{evidenceId}/lab-results")]
     public class LabResultController(LabResultStore labResultStore, EvidenceItemStore evidenceItemStore, IMapper mapper) : ControllerBase
