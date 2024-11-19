@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Evidence.API.DTOs;
+using Evidence.Infrastructure.Data.Models;
 using Evidence.Infrastructure.Data.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evidence.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("evidence/{evidenceId}/custody-logs")]
     public class CustodyLogController(ICustodyLogStore custodyLogStore , IEvidenceItemStore evidenceItemStore, IMapper mapper) : ControllerBase
@@ -14,10 +17,15 @@ namespace Evidence.API.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpPost]
-        public async Task<ActionResult> CreateCustodyLog(string evidenceId)
+        public async Task<ActionResult> CreateCustodyLog([FromBody] CreateCustodyLogDto createCustodyLogDto, string evidenceId)
         {
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
+
+            var log = _mapper.Map<CustodyLog>(createCustodyLogDto);
+
+            var (Succeeded, Errors) = await _custodyLogStore.CreateCustodyLog(evidence, log);
+            if (!Succeeded) return BadRequest(Errors);
 
             return Created();
         }

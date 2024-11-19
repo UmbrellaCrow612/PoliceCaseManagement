@@ -4,7 +4,7 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface ICustodyLogStore
     {
-        Task<(bool Succeeded, IEnumerable<string> Errors)> CreateCustodyLog(CustodyLog custodyLog, EvidenceItem evidence);
+        Task<(bool Succeeded, IEnumerable<string> Errors)> CreateCustodyLog(EvidenceItem evidence, CustodyLog custodyLog);
         Task DeleteCustodyLog(EvidenceItem evidence, CustodyLog custodyLog);
         Task<CustodyLog?> GetCustodyLogById (EvidenceItem evidence, string id);
         Task<IEnumerable<CustodyLog>> GetCustodyLogs(EvidenceItem evidence);
