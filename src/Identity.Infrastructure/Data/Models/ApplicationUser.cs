@@ -7,5 +7,6 @@ namespace Identity.Infrastructure.Data.Models
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
         public ICollection<Token> Tokens { get; set; } = [];
         public ICollection<PasswordResetAttempt> PasswordResetAttempts { get; set; } = [];
+        public ICollection<SecurityAudit> SecurityAudits { get; set; } = [];
     }
 }

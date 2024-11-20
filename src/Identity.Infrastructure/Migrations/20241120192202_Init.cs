@@ -203,6 +203,32 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SecurityAudits",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Event = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: true),
+                    Details = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Severity = table.Column<int>(type: "INTEGER", nullable: false),
+                    PreviousValue = table.Column<string>(type: "TEXT", nullable: true),
+                    NewValue = table.Column<string>(type: "TEXT", nullable: true),
+                    AffectedResource = table.Column<string>(type: "TEXT", nullable: true),
+                    IPAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    Changes = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SecurityAudits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SecurityAudits_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tokens",
                 columns: table => new
                 {
@@ -311,6 +337,11 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SecurityAudits_UserId",
+                table: "SecurityAudits",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tokens_UserId",
                 table: "Tokens",
                 column: "UserId");
@@ -342,6 +373,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PasswordResetAttempts");
+
+            migrationBuilder.DropTable(
+                name: "SecurityAudits");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

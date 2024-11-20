@@ -185,6 +185,48 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("PasswordResetAttempts");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.SecurityAudit", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AffectedResource")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Changes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Event")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PreviousValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SecurityAudits");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
                 {
                     b.Property<string>("Id")
@@ -388,6 +430,15 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.SecurityAudit", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("SecurityAudits")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
@@ -455,6 +506,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("LoginAttempts");
 
                     b.Navigation("PasswordResetAttempts");
+
+                    b.Navigation("SecurityAudits");
 
                     b.Navigation("Tokens");
                 });

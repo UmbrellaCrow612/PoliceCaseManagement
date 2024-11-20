@@ -11,6 +11,7 @@ namespace Identity.Infrastructure.Data
         public required DbSet<Token> Tokens { get; set; }
         public required DbSet<DeviceInfo> DeviceInfos { get; set; }
         public required DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
+        public required DbSet<SecurityAudit> SecurityAudits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
