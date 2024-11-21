@@ -42,5 +42,12 @@ namespace Identity.API.Controllers
         {
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("{userId}/passwordResetAttempts")]
+        public async Task<ActionResult> GetUserPasswordResetAttempts(string userId)
+        {
+            return Ok();
+        }
     }
 }
