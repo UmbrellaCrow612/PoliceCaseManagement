@@ -1,13 +1,17 @@
 ﻿using Identity.API.DTOs;
+using Identity.Infrastructure.Data.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController : ControllerBase
+    public class UserController(UserManager<ApplicationUser> userManager) : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+
         [Authorize]
         [HttpGet("{userId}")]
         public async Task<ActionResult> GetUserById(string userId)
