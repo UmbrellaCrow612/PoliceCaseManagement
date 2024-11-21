@@ -35,5 +35,12 @@ namespace Identity.API.Controllers
         {
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("{userId}/logins")]
+        public async Task<ActionResult> GetUserLogins(string userId)
+        {
+            return Ok();
+        }
     }
 }

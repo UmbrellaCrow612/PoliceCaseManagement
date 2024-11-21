@@ -32,6 +32,12 @@ namespace Identity.API.Controllers
             // here they blaclist or revoke tokens from specific user id and token id
             return Ok();
         }
-        
+
+        [Authorize]
+        [HttpGet("{tokenId}/deviceInfo")]
+        public async Task<ActionResult> GetDeviceInfoForTokenId(string tokenId)
+        {
+            return Ok();
+        }
     }
 }
