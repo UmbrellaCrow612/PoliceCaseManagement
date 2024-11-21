@@ -1,10 +1,8 @@
 using Identity.API.Helpers;
-using Identity.Core;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
