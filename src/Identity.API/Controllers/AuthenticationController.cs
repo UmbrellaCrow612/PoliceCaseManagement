@@ -306,5 +306,19 @@ namespace Identity.API.Controllers
 
             return NoContent();
         }
+
+        [AllowAnonymous]
+        [HttpGet("confirmEmail")]
+        public async Task<ActionResult> ConfirmEmail()
+        {
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resendConfirmationEmail")]
+        public async Task<ActionResult> ResendConfirmEmail()
+        {
+            return Ok();
+        }
     }
 }
