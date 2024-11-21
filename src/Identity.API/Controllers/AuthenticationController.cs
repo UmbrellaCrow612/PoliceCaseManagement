@@ -1,12 +1,10 @@
-﻿using AutoMapper;
-using Identity.API.DTOs;
+﻿using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UAParser;
@@ -14,8 +12,8 @@ using UAParser;
 namespace Identity.API.Controllers
 {
     [ApiController]
-    [Route("auth")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, IMapper mapper, DeviceInfoHelper deviceInfoHelper) : ControllerBase
+    [Route("authentication")]
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, DeviceInfoHelper deviceInfoHelper) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -24,7 +22,6 @@ namespace Identity.API.Controllers
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-        private readonly IMapper _mapper = mapper;
         private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
 
         /// <summary>
@@ -229,35 +226,6 @@ namespace Identity.API.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Requires a valid access token Returns information about the currently authenticated user
-        /// </summary>
-        [Authorize]
-        [HttpGet("me")]
-        public async Task<ActionResult> Me()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User ID not found in token.");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
-
-            return Ok(new { id = user.Id, userName = user.UserName, email = user.Email, phoneNumber = user.PhoneNumber });
-        }
-
-        [Authorize]
-        [HttpDelete("clean-expired-tokens")]
-        public async Task<ActionResult> CleanTokens()
-        {
-            var count = await _tokenStore.CleanupExpiredTokensAsync();
-
-            return Ok(count);
-        }
-
         [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
@@ -337,58 +305,6 @@ namespace Identity.API.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             return NoContent();
-        }
-
-        [Authorize]
-        [HttpPost("users/{id}/roles")]
-        public async Task<ActionResult> AddRolesToUser(string id, [FromBody] IEnumerable<string> roles)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user is null) return NotFound("User not found.");
-
-            foreach (var role in roles)
-            {
-                if (!await _roleManager.RoleExistsAsync(role))
-                {
-                    return NotFound("Role not found");
-                }
-
-                if (!await _userManager.IsInRoleAsync(user, role))
-                {
-                    return BadRequest("User already linked to role.");
-                }
-            }
-
-            await _userManager.AddToRolesAsync(user, roles);
-
-            return NoContent();
-        }
-
-        [HttpPatch("users/{id}")]
-        public async Task<ActionResult> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user is null) return NotFound("User not found.");
-
-            _mapper.Map(updateUserDto, user);
-            await _userManager.UpdateAsync(user);
-
-            return NoContent();
-        }
-
-        [HttpGet("roles")]
-        public async Task<ActionResult> GetSystemRoles()
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-
-            return Ok(roles);
-        }
-
-        [Authorize]
-        [HttpGet("sec")]
-        public ActionResult Get()
-        {
-            return Ok();
         }
     }
 }
