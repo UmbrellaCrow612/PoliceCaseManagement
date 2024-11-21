@@ -10,7 +10,7 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task RevokeAllUserTokensAsync(string userId);
 
-        Task<TokenValidationResult> ValidateTokenAsync(string tokenId, string refreshToken);
+        Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string refreshToken);
 
         Task<int> CleanupExpiredTokensAsync();
 
@@ -19,12 +19,5 @@ namespace Identity.Infrastructure.Data.Stores
         Task StoreLoginAttempt(LoginAttempt loginAttempt);
 
         Task SetLoginAttempt(LoginAttempt loginAttempt);
-    }
-
-    public class TokenValidationResult
-    {
-        public bool Succeeded { get; set; }
-
-        public DateTime RefreshTokenExpiresAt { get; set; }
     }
 }

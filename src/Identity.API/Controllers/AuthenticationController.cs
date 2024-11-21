@@ -166,12 +166,9 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            var result = await _tokenStore.ValidateTokenAsync(tokenId, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
+            (bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors) = await _tokenStore.ValidateTokenAsync(tokenId, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
 
-            if (!result.Succeeded)
-            {
-                return Unauthorized();
-            }
+            if (!isValid || RefreshTokenExpiresAt is null) return Unauthorized(Errors);
 
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -194,9 +191,9 @@ namespace Identity.API.Controllers
             {
                 Id = accessTokenId,
                 RefreshToken = refreshTokenRequestDto.RefreshToken,
-                RefreshTokenExpiresAt = result.RefreshTokenExpiresAt,
+                RefreshTokenExpiresAt = (DateTime)RefreshTokenExpiresAt,
                 UserId = userId,
-                DeviceInfoId = deviceInfo.Id
+                DeviceInfoId = deviceInfo.Id,
             };
 
             await _tokenStore.StoreTokenAsync(token);

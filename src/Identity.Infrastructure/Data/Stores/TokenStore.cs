@@ -1,12 +1,14 @@
 ﻿
 using Identity.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class TokenStore(IdentityApplicationDbContext dbContext) : ITokenStore
+    public class TokenStore(IdentityApplicationDbContext dbContext, IConfiguration configuration) : ITokenStore
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
+        private readonly IConfiguration _configuration = configuration;
 
         public async Task SetDeviceInfo(DeviceInfo info)
         {
@@ -63,9 +65,11 @@ namespace Identity.Infrastructure.Data.Stores
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<TokenValidationResult> ValidateTokenAsync(string tokenId, string refreshToken)
+        public async Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string refreshToken)
         {
-            var result = new TokenValidationResult();
+            List<string> errors = [];
+            double lifetime =  double.Parse(_configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt:ExpiresInMinutes not provided"));
+            double halfLifeTime = lifetime / 2;
 
             var token = await _dbContext.Tokens.FirstOrDefaultAsync(x => x.Id == tokenId);
             if(
@@ -76,14 +80,17 @@ namespace Identity.Infrastructure.Data.Stores
                 || token.RefreshTokenExpiresAt < DateTime.UtcNow
                 )
             {
-                result.Succeeded = false;
-                return result;
+                errors.Add("Token Invalid");
+                return (false, null, errors);
             }
 
-            result.Succeeded = true;
-            result.RefreshTokenExpiresAt = token.RefreshTokenExpiresAt;
+            if (DateTime.UtcNow < token.CreatedAt.AddMinutes(halfLifeTime))
+            {
+                errors.Add("Token is still valid for over half its lifetime, please request after the half life period.");
+                return (false, null, errors);
+            }
 
-            return result;
+            return (true, token.RefreshTokenExpiresAt, errors);
         }
 
         public async Task StoreLoginAttempt(LoginAttempt loginAttempt)
