@@ -15,6 +15,17 @@ namespace Identity.Infrastructure.Data.Stores
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task AddUsers(Department department, IEnumerable<ApplicationUser> users)
+        {
+            foreach (var user in users)
+            {
+                user.DepartmentId = department.Id;
+            }
+
+            _dbContext.Users.UpdateRange(users);
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task DeleteDepartment(Department department)
         {
             _dbContext.Departments.Remove(department);
@@ -31,11 +42,27 @@ namespace Identity.Infrastructure.Data.Stores
             return await _dbContext.Users.Where(x => x.DepartmentId == department.Id).ToListAsync();
         }
 
+        public async Task<bool> IsUserInDepartment(Department department, ApplicationUser user)
+        {
+            return await _dbContext.Users.AnyAsync(x => x.DepartmentId == department.Id && x.Id == user.Id);
+        }
+
         public async Task RemoveUser(Department department, ApplicationUser user)
         {
             user.DepartmentId = null;
             _dbContext.Users.Update(user);
 
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveUsers(Department department, IEnumerable<ApplicationUser> users)
+        {
+            foreach (var user in users)
+            {
+                user.DepartmentId = null;
+            }
+
+            _dbContext.Users.UpdateRange(users);
             await _dbContext.SaveChangesAsync();
         }
 
