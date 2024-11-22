@@ -30,6 +30,7 @@ namespace Identity.Infrastructure
             services.AddScoped<ITokenStore, TokenStore>();
             services.AddScoped<IPasswordResetAttemptStore, PasswordResetAttemptStore>();
             services.AddScoped<ISecurityAuditStore, SecurityAuditStore>();
+            services.AddScoped<IDepartmentStore, DepartmentStore>();
 
             return services;
         }

@@ -7,6 +7,7 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
+        public required DbSet<Department> Departments { get; set; }
         public required DbSet<LoginAttempt> LoginAttempts { get; set; }
         public required DbSet<Token> Tokens { get; set; }
         public required DbSet<DeviceInfo> DeviceInfos { get; set; }
