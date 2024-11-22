@@ -22,6 +22,7 @@
     public enum SecurityAuditEvent
     {
         None = 0,
+        Authorization = 1
     }
 
     public enum SecurityAuditSeverity

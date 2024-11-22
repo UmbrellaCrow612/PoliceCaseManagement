@@ -13,7 +13,7 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("authentication")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, RoleManager<IdentityRole> roleManager, DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger) : ControllerBase
+    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -21,7 +21,6 @@ namespace Identity.API.Controllers
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
         private readonly ILogger<AuthenticationController> _logger = logger;
 
@@ -32,8 +31,6 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
-            _logger.LogInformation("Auth");
-
             int refreshTokenExpiriesInMinutes = _configuration.GetValue<int>("Jwt:RefreshTokenExpiriesInMinutes");
 
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
