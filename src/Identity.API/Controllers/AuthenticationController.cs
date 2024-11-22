@@ -50,6 +50,9 @@ namespace Identity.API.Controllers
                 return BadRequest("Provide a username of email");
             }
 
+            _logger.LogInformation("Login attempt by user: {Username} from IP: {IpAddress}, User-Agent: {UserAgent}",
+                                    loginRequestDto.UserName ?? loginRequestDto.Email, ipAddress, userAgent);
+
             ApplicationUser? user;
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
@@ -74,6 +77,9 @@ namespace Identity.API.Controllers
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
             if (!isPasswordCorrect)
             {
+                _logger.LogWarning("Failed login attempt for user: {Username} from IP: {IpAddress}, Reason: Incorrect credentials",
+                                    loginRequestDto.UserName ?? loginRequestDto.Email, ipAddress);
+
                 loginAttempt.FailureReason = "User credentials";
 
                 await _tokenStore.StoreLoginAttempt(loginAttempt);
@@ -112,6 +118,9 @@ namespace Identity.API.Controllers
             };
 
             await _tokenStore.StoreTokenAsync(token);
+
+            _logger.LogInformation("Successful login for user: {Username} from IP: {IpAddress}",
+                                    user.UserName, ipAddress);
 
             return Ok(new { accessToken , refreshToken });
         }
