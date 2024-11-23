@@ -9,6 +9,9 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task AddUser(Department department, ApplicationUser user)
         {
+            _ = _dbContext.Users.Local.FirstOrDefault(x => x.Id == user.Id) ?? throw new ApplicationException("User not being tracked");
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             user.DepartmentId = department.Id;
             _dbContext.Users.Update(user);
 
@@ -17,8 +20,12 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task AddUsers(Department department, IEnumerable<ApplicationUser> users)
         {
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             foreach (var user in users)
             {
+                _ = _dbContext.Users.Local.FirstOrDefault(x => x.Id == user.Id) ?? throw new ApplicationException("User not being tracked");
+
                 user.DepartmentId = department.Id;
             }
 
@@ -28,6 +35,8 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task DeleteDepartment(Department department)
         {
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             _dbContext.Departments.Remove(department);
             await _dbContext.SaveChangesAsync();
         }
@@ -49,6 +58,9 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task RemoveUser(Department department, ApplicationUser user)
         {
+            _ = _dbContext.Users.Local.FirstOrDefault(x => x.Id == user.Id) ?? throw new ApplicationException("User not being tracked");
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             user.DepartmentId = null;
             _dbContext.Users.Update(user);
 
@@ -57,8 +69,12 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task RemoveUsers(Department department, IEnumerable<ApplicationUser> users)
         {
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             foreach (var user in users)
             {
+                _ = _dbContext.Users.Local.FirstOrDefault(x => x.Id == user.Id) ?? throw new ApplicationException("User not being tracked");
+
                 user.DepartmentId = null;
             }
 
@@ -79,6 +95,8 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task UpdateDepartment(Department department)
         {
+            _ = _dbContext.Departments.Local.FirstOrDefault(x => x.Id == department.Id) ?? throw new ApplicationException("Department not being tracked");
+
             _dbContext.Departments.Update(department);
             await _dbContext.SaveChangesAsync();
         }
