@@ -113,9 +113,16 @@ namespace Identity.API.Controllers
 
         [Authorize]
         [HttpPatch("{departmentId}")]
-        public async Task<ActionResult> UpdateDepartmentById(string departmentId)
+        public async Task<ActionResult> UpdateDepartmentById(string departmentId, [FromBody] UpdateDepartmentDto updateDepartmentDto)
         {
-            return Ok();
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            _mapper.Map(updateDepartmentDto, department);
+
+            await _departmentStore.UpdateDepartment(department);
+
+            return NoContent();
         }
 
         [Authorize]

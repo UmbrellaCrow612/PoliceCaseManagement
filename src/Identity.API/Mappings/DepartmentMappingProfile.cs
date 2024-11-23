@@ -10,6 +10,7 @@ namespace Identity.API.Mappings
         {
             CreateMap<CreateDepartmentDto, Department>();
             CreateMap<Department, DepartmentDto>();
+            CreateMap<UpdateDepartmentDto, Department>();
         }
     }
 }
