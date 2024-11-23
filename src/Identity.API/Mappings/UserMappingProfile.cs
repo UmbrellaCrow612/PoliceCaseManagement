@@ -9,6 +9,7 @@ namespace Identity.API.Mappings
         public UserMappingProfile()
         {
             CreateMap<UpdateUserDto, ApplicationUser>();
+            CreateMap<ApplicationUser, UserDto>();
         }
     }
 }

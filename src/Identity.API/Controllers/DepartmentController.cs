@@ -1,4 +1,5 @@
-﻿using Identity.API.DTOs;
+﻿using AutoMapper;
+using Identity.API.DTOs;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
@@ -9,17 +10,23 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("departments")]
-    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger) : ControllerBase
+    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IMapper mapper) : ControllerBase
     {
         private readonly IDepartmentStore _departmentStore = departmentStore;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ILogger<DepartmentController> _logger = logger;
+        private readonly IMapper _mapper = mapper;
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> CreateDepartment()
+        public async Task<ActionResult> CreateDepartment([FromBody] CreateDepartmentDto createDepartmentDto)
         {
-            return Ok();
+            var department = _mapper.Map<Department>(createDepartmentDto);
+            await _departmentStore.StoreDepartment(department);
+
+            _logger.LogInformation("Department {id} was created", department.Id);
+
+            return Ok(new { id = department.Id });
         }
 
         [Authorize]
@@ -55,14 +62,26 @@ namespace Identity.API.Controllers
         [HttpGet("{departmentId}")]
         public async Task<ActionResult> GetDepartmentById(string departmentId)
         {
-            return Ok();
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            var dto = _mapper.Map<DepartmentDto>(department);
+
+            return Ok(dto);
         }
 
         [Authorize]
         [HttpGet("{departmentId}/users")]
         public async Task<ActionResult> GetDepartmentUsers(string departmentId)
         {
-            return Ok();
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            var users = await _departmentStore.GetUsers(department);
+
+            var dto = _mapper.Map<IEnumerable<UserDto>>(users);
+
+            return Ok(dto);
         }
 
         [Authorize]
@@ -83,7 +102,20 @@ namespace Identity.API.Controllers
         [HttpDelete("{departmentId}/users/{userId}")]
         public async Task<ActionResult> RemoveUserFromDepartment(string departmentId, string userId)
         {
-            return Ok();
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return NotFound("User not found.");
+
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            if (!await _departmentStore.IsUserInDepartment(department, user))
+            {
+                return BadRequest("User is not in department.");
+            }
+
+            await _departmentStore.RemoveUser(department, user);
+
+            return NoContent();
         }
     }
 }
