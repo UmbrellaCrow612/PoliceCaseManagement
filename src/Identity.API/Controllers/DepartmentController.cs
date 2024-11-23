@@ -52,6 +52,33 @@ namespace Identity.API.Controllers
         }
 
         [Authorize]
+        [HttpPost("{departmentId}/users")]
+        public async Task<ActionResult> AddUsersToDepartment(string departmentId, ICollection<string> userIds)
+        {
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            List<ApplicationUser> usersToAdd = [];
+
+            foreach (var userId in userIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user is null) return NotFound($"User {userId} not found.");
+
+                if (await _departmentStore.IsUserInDepartment(department, user))
+                {
+                    return BadRequest($"User {userId} is already in department {departmentId}");
+                }
+
+                usersToAdd.Add(user);
+            }
+
+            await _departmentStore.AddUsers(department, usersToAdd);
+
+            return NoContent();
+        }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> SearchDepartments([FromQuery] SearchDepartmentQuery query)
         {
@@ -114,6 +141,33 @@ namespace Identity.API.Controllers
             }
 
             await _departmentStore.RemoveUser(department, user);
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpDelete("{departmentId}/users")]
+        public async Task<ActionResult> RemoveUsersFromDepartment(string departmentId, [FromBody] ICollection<string> userIds)
+        {
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            List<ApplicationUser> usersToRemove = [];
+
+            foreach (var userId in userIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user is null) return NotFound($"User {userId} not found.");
+
+                if (!await _departmentStore.IsUserInDepartment(department, user))
+                {
+                    return BadRequest($"User {userId} is not linked to department {departmentId}.");
+                }
+
+                usersToRemove.Add(user);
+            }
+
+            await _departmentStore.RemoveUsers(department, usersToRemove);
 
             return NoContent();
         }
