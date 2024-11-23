@@ -78,6 +78,8 @@ namespace Identity.API.Controllers
 
             await _departmentStore.AddUsers(department, usersToAdd);
 
+            _logger.LogInformation("Users {users} added to department {depId}", usersToAdd, department.Id);
+
             return NoContent();
         }
 
@@ -136,6 +138,8 @@ namespace Identity.API.Controllers
 
             await _departmentStore.UpdateDepartment(department);
 
+            _logger.LogInformation("Department {depId} updated with fields {fields}", department.Id, updateDepartmentDto);
+
             return NoContent();
         }
 
@@ -147,6 +151,8 @@ namespace Identity.API.Controllers
             if (department is null) return NotFound("Department not found.");
 
             await _departmentStore.DeleteDepartment(department);
+
+            _logger.LogInformation("Department {depId} deleted.", department.Id);
 
             return NoContent();
         }
@@ -167,6 +173,8 @@ namespace Identity.API.Controllers
             }
 
             await _departmentStore.RemoveUser(department, user);
+
+            _logger.LogInformation("User {userId} removed from department {depId}.",userId, department.Id);
 
             return NoContent();
         }
@@ -194,6 +202,8 @@ namespace Identity.API.Controllers
             }
 
             await _departmentStore.RemoveUsers(department, usersToRemove);
+
+            _logger.LogInformation("Users {users} removed from department {depId}.", usersToRemove, department.Id);
 
             return NoContent();
         }

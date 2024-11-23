@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Serilog.Events;
 using Serilog;
 using System.Text;
+using Identity.Infrastructure.Data.Models;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -108,7 +109,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
     var rs = new RoleSeeding(roleManager);
 

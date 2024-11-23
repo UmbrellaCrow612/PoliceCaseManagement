@@ -1,12 +1,14 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Identity.Infrastructure.Data
 {
-    public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+    public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
+        public required DbSet<RolePermission> RolePermissions { get; set; }
         public required DbSet<Department> Departments { get; set; }
         public required DbSet<LoginAttempt> LoginAttempts { get; set; }
         public required DbSet<Token> Tokens { get; set; }

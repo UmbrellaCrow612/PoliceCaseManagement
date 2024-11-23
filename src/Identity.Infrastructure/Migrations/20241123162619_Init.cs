@@ -38,6 +38,21 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Permission",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Resource = table.Column<int>(type: "INTEGER", nullable: false),
+                    Action = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permission", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -87,6 +102,30 @@ namespace Identity.Infrastructure.Migrations
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                columns: table => new
+                {
+                    PermissionId = table.Column<string>(type: "TEXT", nullable: false),
+                    RoleId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionId });
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_Permission_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "Permission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -360,6 +399,11 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_PermissionId",
+                table: "RolePermissions",
+                column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SecurityAudits_UserId",
                 table: "SecurityAudits",
                 column: "UserId");
@@ -398,13 +442,19 @@ namespace Identity.Infrastructure.Migrations
                 name: "PasswordResetAttempts");
 
             migrationBuilder.DropTable(
+                name: "RolePermissions");
+
+            migrationBuilder.DropTable(
                 name: "SecurityAudits");
+
+            migrationBuilder.DropTable(
+                name: "Tokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Tokens");
+                name: "Permission");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

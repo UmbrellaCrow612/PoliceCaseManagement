@@ -10,10 +10,10 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("authorization")]
-    public class AuthorizationController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthorizationController> logger, ISecurityAuditStore securityAuditStore) : ControllerBase
+    public class AuthorizationController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, ILogger<AuthorizationController> logger, ISecurityAuditStore securityAuditStore) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
         private readonly ILogger<AuthorizationController> _logger = logger;
         private readonly ISecurityAuditStore _securityAuditStore = securityAuditStore;
 
@@ -25,8 +25,8 @@ namespace Identity.API.Controllers
             if (string.IsNullOrWhiteSpace(userIdOfRequester)) return BadRequest("Jwt Name Identifier is null.");
 
             var user = await _userManager.FindByIdAsync(userId);
-            if(user is null) return NotFound("User not found.");
-            
+            if (user is null) return NotFound("User not found.");
+
             foreach (var role in roles)
             {
                 if (!await _roleManager.RoleExistsAsync(role))
@@ -48,7 +48,7 @@ namespace Identity.API.Controllers
                 Severity = SecurityAuditSeverity.Medium,
             };
 
-            _logger.LogInformation("User {userId} roles are being changed to include {roles} by User {userIdOfChanger}", 
+            _logger.LogInformation("User {userId} roles are being changed to include {roles} by User {userIdOfChanger}",
                 userId, roles, userIdOfRequester);
 
             await _securityAuditStore.SetSecurityAudit(audit);

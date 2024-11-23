@@ -18,7 +18,7 @@ namespace Identity.Infrastructure
                 options => options.UseSqlite(connectionString));
 
             services.AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+                .AddRoles<ApplicationRole>()
                 .AddEntityFrameworkStores<IdentityApplicationDbContext>()
                 .AddDefaultTokenProviders();
 

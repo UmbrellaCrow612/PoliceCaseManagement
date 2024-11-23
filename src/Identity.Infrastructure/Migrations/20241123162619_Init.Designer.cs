@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241122171125_Init")]
+    [Migration("20241123162619_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -19,6 +19,32 @@ namespace Identity.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.ApplicationRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
@@ -207,6 +233,44 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("PasswordResetAttempts");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.Permission", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Action")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Resource")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permission");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.RolePermission", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("RolePermissions");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.SecurityAudit", b =>
                 {
                     b.Property<string>("Id")
@@ -289,32 +353,6 @@ namespace Identity.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Tokens");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -461,6 +499,25 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.RolePermission", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationRole", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.SecurityAudit", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
@@ -483,7 +540,7 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -510,7 +567,7 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -532,6 +589,11 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.ApplicationRole", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("LoginAttempts");
@@ -546,6 +608,11 @@ namespace Identity.Infrastructure.Migrations
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Department", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
