@@ -1,21 +1,24 @@
 ﻿using AutoMapper;
 using Identity.API.DTOs;
+using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("departments")]
-    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IMapper mapper) : ControllerBase
+    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IdentityApplicationDbContext dbContext, IMapper mapper) : ControllerBase
     {
         private readonly IDepartmentStore _departmentStore = departmentStore;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ILogger<DepartmentController> _logger = logger;
         private readonly IMapper _mapper = mapper;
+        private readonly IdentityApplicationDbContext _dbcontext = dbContext;
 
         [Authorize]
         [HttpPost]
@@ -82,7 +85,18 @@ namespace Identity.API.Controllers
         [HttpGet]
         public async Task<ActionResult> SearchDepartments([FromQuery] SearchDepartmentQuery query)
         {
-            return Ok();
+            var departmentQuery = _dbcontext.Departments.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                departmentQuery = departmentQuery.Where(x => x.Name.Contains(query.Name));
+            }
+
+            var departments = await departmentQuery.ToListAsync();
+
+            var dto = _mapper.Map<ICollection<DepartmentDto>>(departments);
+
+            return Ok(dto);
         }
 
         [Authorize]
@@ -129,7 +143,12 @@ namespace Identity.API.Controllers
         [HttpDelete("{departmentId}")]
         public async Task<ActionResult> DeleteDepartmentById(string departmentId)
         {
-            return Ok();
+            var department = await _departmentStore.GetDepartmentById(departmentId);
+            if (department is null) return NotFound("Department not found.");
+
+            await _departmentStore.DeleteDepartment(department);
+
+            return NoContent();
         }
 
         [Authorize]

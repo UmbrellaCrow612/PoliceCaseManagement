@@ -2,5 +2,6 @@
 {
     public class SearchDepartmentQuery
     {
+        public string? Name { get; set; } = null;
     }
 }
