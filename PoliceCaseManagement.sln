@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Email.Service", "src\Email.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "src\Shared\Shared.csproj", "{D9080ECD-93A5-442A-9A96-830A4DBB7534}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "src\Web\Web.csproj", "{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,10 +77,6 @@ Global
 		{D9080ECD-93A5-442A-9A96-830A4DBB7534}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9080ECD-93A5-442A-9A96-830A4DBB7534}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9080ECD-93A5-442A-9A96-830A4DBB7534}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,7 +93,6 @@ Global
 		{98AF19F7-FDB0-4A09-A41A-57C5577A245C} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{39AA5175-3DEB-4D27-9C5A-4FB44BCCDDD9} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{D9080ECD-93A5-442A-9A96-830A4DBB7534} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
-		{E0A3DD23-FF21-444A-8BED-4B47B3B0CB92} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}
