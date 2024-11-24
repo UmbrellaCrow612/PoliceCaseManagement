@@ -4,6 +4,7 @@ namespace Identity.Infrastructure.Data.Stores
 {
     public interface IDepartmentStore
     {
+        IQueryable<Department> Departments { get; }
         Task SetDepartment(Department department);
         Task StoreDepartment(Department department);
         Task<Department?> GetDepartmentById(string id);

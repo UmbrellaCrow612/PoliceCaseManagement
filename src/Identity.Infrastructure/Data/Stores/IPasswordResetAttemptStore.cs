@@ -4,6 +4,8 @@ namespace Identity.Infrastructure.Data.Stores
 {
     public interface IPasswordResetAttemptStore
     {
+        IQueryable<PasswordResetAttempt> PasswordResetAttempts { get; }
+
         /// <returns>
         /// Checks if the user can make a password reset attempt (i.e., they haven't made a request in the last 30 minutes) and if so, adds the attempt to the database.
         /// </returns>

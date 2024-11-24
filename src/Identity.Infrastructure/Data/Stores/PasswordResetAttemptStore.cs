@@ -9,6 +9,8 @@ namespace Identity.Infrastructure.Data.Stores
         private readonly IConfiguration _configuration = configuration;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
 
+        public IQueryable<PasswordResetAttempt> PasswordResetAttempts => throw new NotImplementedException();
+
         public async Task<(bool canMakeAttempt, bool successfullyAdded)> AddAttempt(PasswordResetAttempt attempt)
         {
             int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));

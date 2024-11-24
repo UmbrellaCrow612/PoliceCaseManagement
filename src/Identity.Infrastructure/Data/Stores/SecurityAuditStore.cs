@@ -6,6 +6,8 @@ namespace Identity.Infrastructure.Data.Stores
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
+        public IQueryable<SecurityAudit> SecurityAudits => throw new NotImplementedException();
+
         public async Task SetSecurityAudit(SecurityAudit audit)
         {
             await _dbContext.SecurityAudits.AddAsync(audit);

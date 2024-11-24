@@ -13,6 +13,13 @@ namespace Identity.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [Authorize]
+        [HttpPost("{userId}/lock")]
+        public async Task<ActionResult> LockUserById(string userId)
+        {
+            return Ok();
+        }
+
+        [Authorize]
         [HttpGet("{userId}")]
         public async Task<ActionResult> GetUserById(string userId)
         {

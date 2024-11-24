@@ -7,6 +7,8 @@ namespace Identity.Infrastructure.Data.Stores
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
+        public IQueryable<Department> Departments => throw new NotImplementedException();
+
         public async Task AddUser(Department department, ApplicationUser user)
         {
             _ = _dbContext.Users.Local.FirstOrDefault(x => x.Id == user.Id) ?? throw new ApplicationException("User not being tracked");
