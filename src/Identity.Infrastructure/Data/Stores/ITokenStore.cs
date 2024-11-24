@@ -4,9 +4,11 @@ namespace Identity.Infrastructure.Data.Stores
 {
     public interface ITokenStore
     {
+        IQueryable<Token> Tokens { get; }
+
         Task StoreTokenAsync(Token token);
 
-        Task RevokeTokenAsync(string tokenId);
+        Task RevokeTokenAsync(Token token);
 
         Task RevokeAllUserTokensAsync(string userId);
 
@@ -19,5 +21,7 @@ namespace Identity.Infrastructure.Data.Stores
         Task StoreLoginAttempt(LoginAttempt loginAttempt);
 
         Task SetLoginAttempt(LoginAttempt loginAttempt);
+
+        Task<Token?> GetTokenById(string tokenId);
     }
 }

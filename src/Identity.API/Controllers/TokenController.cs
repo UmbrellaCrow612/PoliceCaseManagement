@@ -83,11 +83,15 @@ namespace Identity.API.Controllers
         }
 
         [Authorize]
-        [HttpPatch("{tokenId}")]
-        public async Task<ActionResult> UpdateTokenById(string tokenId)
+        [HttpDelete("{tokenId}/revoke")]
+        public async Task<ActionResult> RevokeToken(string tokenId)
         {
-            // here they blaclist or revoke tokens from specific user id and token id
-            return Ok();
+            var token = await _tokenStore.GetTokenById(tokenId);
+            if (token is null) return NotFound("Tokem not found");
+
+            await _tokenStore.RevokeTokenAsync(token);
+
+            return NoContent();
         }
 
         [Authorize]

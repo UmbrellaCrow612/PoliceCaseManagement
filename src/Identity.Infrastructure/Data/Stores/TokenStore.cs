@@ -10,6 +10,8 @@ namespace Identity.Infrastructure.Data.Stores
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly IConfiguration _configuration = configuration;
 
+        public IQueryable<Token> Tokens => _dbContext.Tokens.AsNoTracking();
+
         public async Task SetDeviceInfo(DeviceInfo info)
         {
             await _dbContext.DeviceInfos.AddAsync(info);
@@ -102,6 +104,16 @@ namespace Identity.Infrastructure.Data.Stores
         public async Task SetLoginAttempt(LoginAttempt loginAttempt)
         {
             await _dbContext.LoginAttempts.AddAsync(loginAttempt);
+        }
+
+        public Task RevokeTokenAsync(Token token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Token?> GetTokenById(string tokenId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
