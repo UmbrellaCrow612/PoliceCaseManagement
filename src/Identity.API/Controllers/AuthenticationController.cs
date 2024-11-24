@@ -84,6 +84,11 @@ namespace Identity.API.Controllers
                 return Unauthorized("Incorrect credentials");
             }
 
+            if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return Unauthorized("User account locked.");
+            }
+
             loginAttempt.Status = LoginStatus.SUCCESS;
 
             var roles = await _userManager.GetRolesAsync(user);

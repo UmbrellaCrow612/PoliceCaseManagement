@@ -14,8 +14,10 @@ namespace Identity.API.Controllers
 
         [Authorize]
         [HttpPost("{userId}/lock")]
-        public async Task<ActionResult> LockUserById(string userId)
+        public async Task<ActionResult> LockUserById(string userId, [FromBody] DateTime LockoutEnd)
         {
+            // TODO - use the lockout endbaled and lockout end - which will be used in login endpoint
+            // also revoke user tokens
             return Ok();
         }
 

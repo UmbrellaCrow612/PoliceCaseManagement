@@ -4,6 +4,11 @@ namespace Identity.Infrastructure.Data.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        public override bool LockoutEnabled
+        {
+            get => true;
+            set => throw new ApplicationException("Not allowed to change.");    
+        }
 
         public string? DepartmentId { get; set; } = null;
         public Department? Department { get; set; } = null;
