@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241123162619_Init")]
+    [Migration("20241124152515_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -253,7 +253,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permission");
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.RolePermission", b =>

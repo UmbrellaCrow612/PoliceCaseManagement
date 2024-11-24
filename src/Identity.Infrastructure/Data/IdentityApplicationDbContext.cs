@@ -8,6 +8,7 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
+        public required DbSet<Permission> Permissions { get; set; }
         public required DbSet<RolePermission> RolePermissions { get; set; }
         public required DbSet<Department> Departments { get; set; }
         public required DbSet<LoginAttempt> LoginAttempts { get; set; }
