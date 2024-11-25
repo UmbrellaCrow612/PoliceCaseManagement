@@ -115,5 +115,10 @@ namespace Identity.Infrastructure.Data.Stores
         {
             throw new NotImplementedException();
         }
+
+        public Task SetRevokeAllUserTokensAsync(ApplicationUser user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
