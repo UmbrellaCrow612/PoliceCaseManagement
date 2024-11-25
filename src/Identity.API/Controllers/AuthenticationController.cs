@@ -29,7 +29,7 @@ namespace Identity.API.Controllers
         private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
         private readonly ILogger<AuthenticationController> _logger = logger;
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
-        private IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
+        private readonly IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -206,7 +206,7 @@ namespace Identity.API.Controllers
                 DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
             };
 
-            await _tokenStore.SetDeviceInfo(deviceInfo);
+            await _deviceInfoStore.SetDeviceInfo(deviceInfo);
 
             Token token = new()
             {
