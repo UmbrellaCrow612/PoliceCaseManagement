@@ -31,6 +31,7 @@ namespace Identity.Infrastructure
             services.AddScoped<IPasswordResetAttemptStore, PasswordResetAttemptStore>();
             services.AddScoped<ISecurityAuditStore, SecurityAuditStore>();
             services.AddScoped<IDepartmentStore, DepartmentStore>();
+            services.AddScoped<ILoginAttemptStore, LoginAttemptStore>();
 
             return services;
         }

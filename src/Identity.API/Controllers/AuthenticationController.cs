@@ -13,7 +13,11 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("authentication")]
-    public class AuthenticationController(JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration, StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger) : ControllerBase
+    public class AuthenticationController(
+        JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
+        StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
+        DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore
+        ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -23,6 +27,7 @@ namespace Identity.API.Controllers
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
         private readonly ILogger<AuthenticationController> _logger = logger;
+        private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -79,7 +84,7 @@ namespace Identity.API.Controllers
 
                 loginAttempt.FailureReason = "User credentials";
 
-                await _tokenStore.StoreLoginAttempt(loginAttempt);
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
 
                 return Unauthorized("Incorrect credentials");
             }
@@ -108,7 +113,7 @@ namespace Identity.API.Controllers
             };
 
             await _tokenStore.SetDeviceInfo(deviceInfo);
-            await _tokenStore.SetLoginAttempt(loginAttempt);
+            await _loginAttemptStore.SetLoginAttempt(loginAttempt);
 
             Token token = new()
             {
