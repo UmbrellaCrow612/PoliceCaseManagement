@@ -21,12 +21,6 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task<int> CleanupExpiredTokensAsync();
 
-        Task SetDeviceInfo(DeviceInfo info);
-
-        Task StoreLoginAttempt(LoginAttempt loginAttempt);
-
-        Task SetLoginAttempt(LoginAttempt loginAttempt);
-
         Task<Token?> GetTokenById(string tokenId);
     }
 }

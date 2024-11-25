@@ -12,11 +12,6 @@ namespace Identity.Infrastructure.Data.Stores
 
         public IQueryable<Token> Tokens => _dbContext.Tokens.AsNoTracking();
 
-        public async Task SetDeviceInfo(DeviceInfo info)
-        {
-            await _dbContext.DeviceInfos.AddAsync(info);
-        }
-
         public async Task<int> CleanupExpiredTokensAsync()
         {
             var tokens = await _dbContext.Tokens
@@ -93,17 +88,6 @@ namespace Identity.Infrastructure.Data.Stores
             }
 
             return (true, token.RefreshTokenExpiresAt, errors);
-        }
-
-        public async Task StoreLoginAttempt(LoginAttempt loginAttempt)
-        {
-            await _dbContext.LoginAttempts.AddAsync(loginAttempt);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task SetLoginAttempt(LoginAttempt loginAttempt)
-        {
-            await _dbContext.LoginAttempts.AddAsync(loginAttempt);
         }
 
         public Task RevokeTokenAsync(Token token)

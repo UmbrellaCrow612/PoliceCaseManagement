@@ -16,7 +16,8 @@ namespace Identity.API.Controllers
     public class AuthenticationController(
         JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
-        DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore
+        DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
+        IDeviceInfoStore deviceInfoStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -28,6 +29,7 @@ namespace Identity.API.Controllers
         private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
         private readonly ILogger<AuthenticationController> _logger = logger;
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
+        private IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -112,7 +114,7 @@ namespace Identity.API.Controllers
                 DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
             };
 
-            await _tokenStore.SetDeviceInfo(deviceInfo);
+            await _deviceInfoStore.SetDeviceInfo(deviceInfo);
             await _loginAttemptStore.SetLoginAttempt(loginAttempt);
 
             Token token = new()
