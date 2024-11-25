@@ -10,6 +10,11 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task RevokeTokenAsync(Token token);
 
+        /// <summary>
+        /// Revokes user tokens - dose not call save changes - waits for another store call or save changes call.
+        /// </summary>
+        Task SetRevokeAllUserTokensAsync(ApplicationUser user);
+
         Task RevokeAllUserTokensAsync(string userId);
 
         Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string refreshToken);
