@@ -1,29 +1,43 @@
-﻿namespace Evidence.API.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Evidence.API.DTOs.Update
 {
-    public class EvidenceItemDto
+    public class UpdateEvidenceItemDto
     {
-        public required string Id { get; set; }
+        [Required]
         public required string Description { get; set; }
+
+        [Required]
         public required string Type { get; set; }
+
+        [Required]
         public required string CollectedBy { get; set; }
+
+        [Required]
         public required DateTime CollectedAt { get; set; }
+
+        [Required]
         public required string CollecationLocation { get; set; }
+
+        [Required]
         public required string PhysicalDescription { get; set; }
+
+        [Required]
         public required string StorageLocation { get; set; }
+
+        [Required]
         public required string StorageRequirements { get; set; }
+
+        [Required]
         public required bool HazmatStatus { get; set; }
+
+        [Required]
         public required bool BiohazardStatus { get; set; }
+
+        [Required]
         public required string Status { get; set; }
+
         public DateTime? DispositionDate { get; set; } = null;
         public string? DispositionMethod { get; set; } = null;
-
-        public string? DeletedById { get; set; } = null;
-        public DateTime? DeletedAt { get; set; } = null;
-        public bool? IsDeleted { get; set; } = null;
-
-        public required string CreatedById { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? LastEditedById { get; set; } = null;
-        public DateTime? LastEditedAt { get; set; } = null;
     }
 }

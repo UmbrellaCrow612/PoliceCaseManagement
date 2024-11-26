@@ -1,6 +1,10 @@
-﻿namespace Evidence.API.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Evidence.API.Controllers
 {
-    public class StatementController
+    [ApiController]
+    [Route("statements")]
+    public class StatementController : ControllerBase
     {
     }
 }

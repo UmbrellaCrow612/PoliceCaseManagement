@@ -20,6 +20,7 @@ namespace Evidence.Infrastructure
             services.AddScoped<ILabResultStore, LabResultStore>();
             services.AddScoped<INoteStore, NoteStore>();
             services.AddScoped<IPhotoStore, PhotoStore>();
+            services.AddScoped<ICrimeSceneStore, CrimeSceneStore>();
 
             return services;
         }

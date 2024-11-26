@@ -1,4 +1,4 @@
-﻿namespace Evidence.API.DTOs
+﻿namespace Evidence.API.DTOs.Create
 {
     public class CreatePhotoDto
     {

@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Evidence.API.DTOs
+namespace Evidence.API.DTOs.Create
 {
-    public class UpdateEvidenceItemDto
+    public class CreateEvidenceItemDto
     {
+
         [Required]
         public required string Description { get; set; }
 
@@ -36,8 +37,5 @@ namespace Evidence.API.DTOs
 
         [Required]
         public required string Status { get; set; }
-
-        public DateTime? DispositionDate { get; set; } = null;
-        public string? DispositionMethod { get; set; } = null;
     }
 }

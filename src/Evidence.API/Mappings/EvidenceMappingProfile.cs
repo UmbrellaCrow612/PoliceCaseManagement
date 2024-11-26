@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using Evidence.API.DTOs;
+using Evidence.API.DTOs.Create;
+using Evidence.API.DTOs.Read;
+using Evidence.API.DTOs.Update;
 using Evidence.Infrastructure.Data.Models;
 
 namespace Evidence.API.Mappings

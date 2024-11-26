@@ -1,4 +1,4 @@
-﻿namespace Evidence.API.DTOs
+﻿namespace Evidence.API.DTOs.Read
 {
     public class NoteDto
     {

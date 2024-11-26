@@ -1,6 +1,10 @@
-﻿namespace Evidence.API.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Evidence.API.Controllers
 {
-    public class DocumentController
+    [ApiController]
+    [Route("documents")]
+    public class DocumentController : ControllerBase
     {
     }
 }
