@@ -173,10 +173,39 @@ namespace Evidence.Infrastructure.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CrimeScenePhotos",
+                columns: table => new
+                {
+                    CrimeSceneId = table.Column<string>(type: "TEXT", nullable: false),
+                    PhotoId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CrimeScenePhotos", x => new { x.CrimeSceneId, x.PhotoId });
+                    table.ForeignKey(
+                        name: "FK_CrimeScenePhotos_CrimeScenes_CrimeSceneId",
+                        column: x => x.CrimeSceneId,
+                        principalTable: "CrimeScenes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CrimeScenePhotos_Photos_PhotoId",
+                        column: x => x.PhotoId,
+                        principalTable: "Photos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CrimeSceneEvidences_EvidenceItemId",
                 table: "CrimeSceneEvidences",
                 column: "EvidenceItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CrimeScenePhotos_PhotoId",
+                table: "CrimeScenePhotos",
+                column: "PhotoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustodyLogs_EvidenceItemId",
@@ -206,6 +235,9 @@ namespace Evidence.Infrastructure.Migrations
                 name: "CrimeSceneEvidences");
 
             migrationBuilder.DropTable(
+                name: "CrimeScenePhotos");
+
+            migrationBuilder.DropTable(
                 name: "CustodyLogs");
 
             migrationBuilder.DropTable(
@@ -215,10 +247,10 @@ namespace Evidence.Infrastructure.Migrations
                 name: "Notes");
 
             migrationBuilder.DropTable(
-                name: "Photos");
+                name: "CrimeScenes");
 
             migrationBuilder.DropTable(
-                name: "CrimeScenes");
+                name: "Photos");
 
             migrationBuilder.DropTable(
                 name: "Evidences");

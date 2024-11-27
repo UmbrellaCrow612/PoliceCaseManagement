@@ -7,6 +7,7 @@ namespace Evidence.Infrastructure.Data
 {
     public class EvidenceApplicationDbContext(DbContextOptions<EvidenceApplicationDbContext> options) : DbContext(options)
     {
+        public required DbSet<CrimeScenePhoto> CrimeScenePhotos { get; set; }
         public required DbSet<CrimeSceneEvidence> CrimeSceneEvidences { get; set; }
         public required DbSet<CrimeScene> CrimeScenes { get; set; }
         public required DbSet<EvidenceItem> Evidences { get; set; }

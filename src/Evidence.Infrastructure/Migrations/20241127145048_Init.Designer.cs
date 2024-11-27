@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20241127144038_Init")]
+    [Migration("20241127145048_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -178,6 +178,21 @@ namespace Evidence.Infrastructure.Migrations
                     b.ToTable("CrimeSceneEvidences");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.CrimeScenePhoto", b =>
+                {
+                    b.Property<string>("CrimeSceneId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhotoId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CrimeSceneId", "PhotoId");
+
+                    b.HasIndex("PhotoId");
+
+                    b.ToTable("CrimeScenePhotos");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.Property<string>("Id")
@@ -312,6 +327,25 @@ namespace Evidence.Infrastructure.Migrations
                     b.Navigation("EvidenceItem");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.CrimeScenePhoto", b =>
+                {
+                    b.HasOne("Evidence.Infrastructure.Data.Models.CrimeScene", "CrimeScene")
+                        .WithMany("CrimeScenePhotos")
+                        .HasForeignKey("CrimeSceneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Evidence.Infrastructure.Data.Models.Photo", "Photo")
+                        .WithMany("CrimeScenePhotos")
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CrimeScene");
+
+                    b.Navigation("Photo");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
@@ -344,6 +378,8 @@ namespace Evidence.Infrastructure.Migrations
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.CrimeScene", b =>
                 {
                     b.Navigation("CrimeSceneEvidences");
+
+                    b.Navigation("CrimeScenePhotos");
                 });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.EvidenceItem", b =>
@@ -357,6 +393,11 @@ namespace Evidence.Infrastructure.Migrations
                     b.Navigation("Notes");
 
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Photo", b =>
+                {
+                    b.Navigation("CrimeScenePhotos");
                 });
 #pragma warning restore 612, 618
         }

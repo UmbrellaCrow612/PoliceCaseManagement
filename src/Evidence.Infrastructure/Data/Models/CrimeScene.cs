@@ -11,5 +11,6 @@ namespace Evidence.Infrastructure.Data.Models
         public required string Type { get; set; }
 
         public ICollection<CrimeSceneEvidence> CrimeSceneEvidences { get; set; } = [];
+        public ICollection<CrimeScenePhoto> CrimeScenePhotos { get; set; } = [];
     }
 }

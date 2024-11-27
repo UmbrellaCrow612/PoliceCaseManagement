@@ -1,4 +1,6 @@
-﻿namespace Evidence.Infrastructure.Data.Models
+﻿using Evidence.Infrastructure.Data.Models.Joins;
+
+namespace Evidence.Infrastructure.Data.Models
 {
     public class Photo
     {
@@ -10,5 +12,7 @@
         public required DateTime TakenAt { get; set; }
         public required string TakenBy { get; set; }
         public required string Location { get; set; }
+
+        public ICollection<CrimeScenePhoto> CrimeScenePhotos { get; set; } = [];
     }
 }
