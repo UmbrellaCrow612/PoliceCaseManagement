@@ -1,4 +1,6 @@
-﻿namespace Evidence.Infrastructure.Data.Models
+﻿using Evidence.Infrastructure.Data.Models.Joins;
+
+namespace Evidence.Infrastructure.Data.Models
 {
     public class Document
     {
@@ -17,5 +19,7 @@
         public required string Type { get; set; }
 
         public required string Description { get; set; }
+
+        public ICollection<EvidenceItemDocument> EvidenceItemDocuments { get; set; } = [];
     }
 }

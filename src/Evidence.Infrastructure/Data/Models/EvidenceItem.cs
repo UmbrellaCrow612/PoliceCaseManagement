@@ -19,10 +19,11 @@ namespace Evidence.Infrastructure.Data.Models
         public DateTime? DispositionDate { get; set; } = null;
         public string? DispositionMethod { get; set; } = null;
         public ICollection<CustodyLog> CustodyLogs { get; set; } = [];
-        public ICollection<Photo> Photos { get; set; } = [];
         public ICollection<LabResult> LabResults { get; set; } = [];
         public ICollection<Note> Notes { get; set; } = [];
         public ICollection<CrimeSceneEvidence> CrimeSceneEvidences { get; set; } = [];
+        public ICollection<EvidenceItemPhoto> EvidenceItemPhotos { get; set; } = [];
+        public ICollection<EvidenceItemDocument> EvidenceItemDocuments { get; set; } = [];
 
         public string? DeletedById { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;

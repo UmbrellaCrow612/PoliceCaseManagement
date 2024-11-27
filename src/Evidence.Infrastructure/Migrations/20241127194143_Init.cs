@@ -27,6 +27,24 @@ namespace Evidence.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Document",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    FileName = table.Column<string>(type: "TEXT", nullable: false),
+                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
+                    FileSize = table.Column<long>(type: "INTEGER", nullable: false),
+                    FileExtension = table.Column<string>(type: "TEXT", nullable: false),
+                    UploadDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Document", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Evidences",
                 columns: table => new
                 {
@@ -55,6 +73,24 @@ namespace Evidence.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Evidences", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Photos",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    FileName = table.Column<string>(type: "TEXT", nullable: false),
+                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
+                    FileExtension = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    TakenAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TakenBy = table.Column<string>(type: "TEXT", nullable: false),
+                    Location = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Photos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,6 +142,30 @@ namespace Evidence.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EvidenceItemDocuments",
+                columns: table => new
+                {
+                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: false),
+                    DocumentId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvidenceItemDocuments", x => new { x.EvidenceItemId, x.DocumentId });
+                    table.ForeignKey(
+                        name: "FK_EvidenceItemDocuments_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Document",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EvidenceItemDocuments_Evidences_EvidenceItemId",
+                        column: x => x.EvidenceItemId,
+                        principalTable: "Evidences",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LabResults",
                 columns: table => new
                 {
@@ -150,30 +210,6 @@ namespace Evidence.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Photos",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    FileName = table.Column<string>(type: "TEXT", nullable: false),
-                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
-                    FileExtension = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    TakenAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TakenBy = table.Column<string>(type: "TEXT", nullable: false),
-                    Location = table.Column<string>(type: "TEXT", nullable: false),
-                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Photos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Photos_Evidences_EvidenceItemId",
-                        column: x => x.EvidenceItemId,
-                        principalTable: "Evidences",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CrimeScenePhotos",
                 columns: table => new
                 {
@@ -197,6 +233,30 @@ namespace Evidence.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "EvidenceItemPhotos",
+                columns: table => new
+                {
+                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: false),
+                    PhotoId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvidenceItemPhotos", x => new { x.EvidenceItemId, x.PhotoId });
+                    table.ForeignKey(
+                        name: "FK_EvidenceItemPhotos_Evidences_EvidenceItemId",
+                        column: x => x.EvidenceItemId,
+                        principalTable: "Evidences",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EvidenceItemPhotos_Photos_PhotoId",
+                        column: x => x.PhotoId,
+                        principalTable: "Photos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CrimeSceneEvidences_EvidenceItemId",
                 table: "CrimeSceneEvidences",
@@ -213,6 +273,16 @@ namespace Evidence.Infrastructure.Migrations
                 column: "EvidenceItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EvidenceItemDocuments_DocumentId",
+                table: "EvidenceItemDocuments",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvidenceItemPhotos_PhotoId",
+                table: "EvidenceItemPhotos",
+                column: "PhotoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LabResults_EvidenceItemId",
                 table: "LabResults",
                 column: "EvidenceItemId");
@@ -220,11 +290,6 @@ namespace Evidence.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Notes_EvidenceItemId",
                 table: "Notes",
-                column: "EvidenceItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Photos_EvidenceItemId",
-                table: "Photos",
                 column: "EvidenceItemId");
         }
 
@@ -241,6 +306,12 @@ namespace Evidence.Infrastructure.Migrations
                 name: "CustodyLogs");
 
             migrationBuilder.DropTable(
+                name: "EvidenceItemDocuments");
+
+            migrationBuilder.DropTable(
+                name: "EvidenceItemPhotos");
+
+            migrationBuilder.DropTable(
                 name: "LabResults");
 
             migrationBuilder.DropTable(
@@ -248,6 +319,9 @@ namespace Evidence.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "CrimeScenes");
+
+            migrationBuilder.DropTable(
+                name: "Document");
 
             migrationBuilder.DropTable(
                 name: "Photos");

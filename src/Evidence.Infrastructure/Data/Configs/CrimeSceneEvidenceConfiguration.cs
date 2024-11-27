@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Evidence.Infrastructure.Data.Configs
 {
-    public class CrimeSceneEvidenceConfiguration : IEntityTypeConfiguration<CrimeSceneEvidence>
+    internal class CrimeSceneEvidenceConfiguration : IEntityTypeConfiguration<CrimeSceneEvidence>
     {
         public void Configure(EntityTypeBuilder<CrimeSceneEvidence> builder)
         {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20241127145048_Init")]
+    [Migration("20241127194143_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -82,6 +82,42 @@ namespace Evidence.Infrastructure.Migrations
                     b.HasIndex("EvidenceItemId");
 
                     b.ToTable("CustodyLogs");
+                });
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Document", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UploadDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Document");
                 });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.EvidenceItem", b =>
@@ -193,6 +229,36 @@ namespace Evidence.Infrastructure.Migrations
                     b.ToTable("CrimeScenePhotos");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.EvidenceItemDocument", b =>
+                {
+                    b.Property<string>("EvidenceItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("EvidenceItemId", "DocumentId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("EvidenceItemDocuments");
+                });
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.EvidenceItemPhoto", b =>
+                {
+                    b.Property<string>("EvidenceItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhotoId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("EvidenceItemId", "PhotoId");
+
+                    b.HasIndex("PhotoId");
+
+                    b.ToTable("EvidenceItemPhotos");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.Property<string>("Id")
@@ -264,9 +330,6 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EvidenceItemId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("FileExtension")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -291,8 +354,6 @@ namespace Evidence.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EvidenceItemId");
 
                     b.ToTable("Photos");
                 });
@@ -346,6 +407,44 @@ namespace Evidence.Infrastructure.Migrations
                     b.Navigation("Photo");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.EvidenceItemDocument", b =>
+                {
+                    b.HasOne("Evidence.Infrastructure.Data.Models.Document", "Document")
+                        .WithMany("EvidenceItemDocuments")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
+                        .WithMany("EvidenceItemDocuments")
+                        .HasForeignKey("EvidenceItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Evidence");
+                });
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.EvidenceItemPhoto", b =>
+                {
+                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
+                        .WithMany("EvidenceItemPhotos")
+                        .HasForeignKey("EvidenceItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Evidence.Infrastructure.Data.Models.Photo", "Photo")
+                        .WithMany("EvidenceItemPhotos")
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Evidence");
+
+                    b.Navigation("Photo");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
@@ -368,18 +467,16 @@ namespace Evidence.Infrastructure.Migrations
                     b.Navigation("Evidence");
                 });
 
-            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Photo", b =>
-                {
-                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", null)
-                        .WithMany("Photos")
-                        .HasForeignKey("EvidenceItemId");
-                });
-
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.CrimeScene", b =>
                 {
                     b.Navigation("CrimeSceneEvidences");
 
                     b.Navigation("CrimeScenePhotos");
+                });
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Document", b =>
+                {
+                    b.Navigation("EvidenceItemDocuments");
                 });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.EvidenceItem", b =>
@@ -388,16 +485,20 @@ namespace Evidence.Infrastructure.Migrations
 
                     b.Navigation("CustodyLogs");
 
+                    b.Navigation("EvidenceItemDocuments");
+
+                    b.Navigation("EvidenceItemPhotos");
+
                     b.Navigation("LabResults");
 
                     b.Navigation("Notes");
-
-                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Photo", b =>
                 {
                     b.Navigation("CrimeScenePhotos");
+
+                    b.Navigation("EvidenceItemPhotos");
                 });
 #pragma warning restore 612, 618
         }
