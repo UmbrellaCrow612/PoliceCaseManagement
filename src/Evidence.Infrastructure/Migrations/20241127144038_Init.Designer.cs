@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20241116153051_Init")]
+    [Migration("20241127144038_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -19,6 +19,31 @@ namespace Evidence.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.CrimeScene", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateReported")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CrimeScenes");
+                });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.CustodyLog", b =>
                 {
@@ -138,6 +163,21 @@ namespace Evidence.Infrastructure.Migrations
                     b.ToTable("Evidences");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.CrimeSceneEvidence", b =>
+                {
+                    b.Property<string>("CrimeSceneId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EvidenceItemId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CrimeSceneId", "EvidenceItemId");
+
+                    b.HasIndex("EvidenceItemId");
+
+                    b.ToTable("CrimeSceneEvidences");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.Property<string>("Id")
@@ -210,7 +250,6 @@ namespace Evidence.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("EvidenceItemId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileExtension")
@@ -254,6 +293,25 @@ namespace Evidence.Infrastructure.Migrations
                     b.Navigation("Evidence");
                 });
 
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Joins.CrimeSceneEvidence", b =>
+                {
+                    b.HasOne("Evidence.Infrastructure.Data.Models.CrimeScene", "CrimeScene")
+                        .WithMany("CrimeSceneEvidences")
+                        .HasForeignKey("CrimeSceneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "EvidenceItem")
+                        .WithMany("CrimeSceneEvidences")
+                        .HasForeignKey("EvidenceItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CrimeScene");
+
+                    b.Navigation("EvidenceItem");
+                });
+
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.LabResult", b =>
                 {
                     b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
@@ -278,17 +336,20 @@ namespace Evidence.Infrastructure.Migrations
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.Photo", b =>
                 {
-                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", "Evidence")
+                    b.HasOne("Evidence.Infrastructure.Data.Models.EvidenceItem", null)
                         .WithMany("Photos")
-                        .HasForeignKey("EvidenceItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EvidenceItemId");
+                });
 
-                    b.Navigation("Evidence");
+            modelBuilder.Entity("Evidence.Infrastructure.Data.Models.CrimeScene", b =>
+                {
+                    b.Navigation("CrimeSceneEvidences");
                 });
 
             modelBuilder.Entity("Evidence.Infrastructure.Data.Models.EvidenceItem", b =>
                 {
+                    b.Navigation("CrimeSceneEvidences");
+
                     b.Navigation("CustodyLogs");
 
                     b.Navigation("LabResults");

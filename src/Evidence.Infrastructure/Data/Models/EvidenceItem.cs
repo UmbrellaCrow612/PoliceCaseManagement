@@ -1,4 +1,6 @@
-﻿namespace Evidence.Infrastructure.Data.Models
+﻿using Evidence.Infrastructure.Data.Models.Joins;
+
+namespace Evidence.Infrastructure.Data.Models
 {
     public class EvidenceItem : ISoftDelete, IAudit
     {
@@ -16,10 +18,11 @@
         public required string Status { get; set; }
         public DateTime? DispositionDate { get; set; } = null;
         public string? DispositionMethod { get; set; } = null;
-        public IEnumerable<CustodyLog> CustodyLogs { get; set; } = [];
-        public IEnumerable<Photo> Photos { get; set; } = [];
-        public IEnumerable<LabResult> LabResults { get; set; } = [];
-        public IEnumerable<Note> Notes { get; set; } = [];
+        public ICollection<CustodyLog> CustodyLogs { get; set; } = [];
+        public ICollection<Photo> Photos { get; set; } = [];
+        public ICollection<LabResult> LabResults { get; set; } = [];
+        public ICollection<Note> Notes { get; set; } = [];
+        public ICollection<CrimeSceneEvidence> CrimeSceneEvidences { get; set; } = [];
 
         public string? DeletedById { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;

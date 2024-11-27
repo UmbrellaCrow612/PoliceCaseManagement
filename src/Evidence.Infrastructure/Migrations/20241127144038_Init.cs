@@ -12,6 +12,21 @@ namespace Evidence.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "CrimeScenes",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    DateReported = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Location = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CrimeScenes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Evidences",
                 columns: table => new
                 {
@@ -40,6 +55,30 @@ namespace Evidence.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Evidences", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CrimeSceneEvidences",
+                columns: table => new
+                {
+                    CrimeSceneId = table.Column<string>(type: "TEXT", nullable: false),
+                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CrimeSceneEvidences", x => new { x.CrimeSceneId, x.EvidenceItemId });
+                    table.ForeignKey(
+                        name: "FK_CrimeSceneEvidences_CrimeScenes_CrimeSceneId",
+                        column: x => x.CrimeSceneId,
+                        principalTable: "CrimeScenes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CrimeSceneEvidences_Evidences_EvidenceItemId",
+                        column: x => x.EvidenceItemId,
+                        principalTable: "Evidences",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,14 +154,14 @@ namespace Evidence.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: false),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FilePath = table.Column<string>(type: "TEXT", nullable: false),
                     FileExtension = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     TakenAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     TakenBy = table.Column<string>(type: "TEXT", nullable: false),
-                    Location = table.Column<string>(type: "TEXT", nullable: false)
+                    Location = table.Column<string>(type: "TEXT", nullable: false),
+                    EvidenceItemId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -131,9 +170,13 @@ namespace Evidence.Infrastructure.Migrations
                         name: "FK_Photos_Evidences_EvidenceItemId",
                         column: x => x.EvidenceItemId,
                         principalTable: "Evidences",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CrimeSceneEvidences_EvidenceItemId",
+                table: "CrimeSceneEvidences",
+                column: "EvidenceItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustodyLogs_EvidenceItemId",
@@ -160,6 +203,9 @@ namespace Evidence.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CrimeSceneEvidences");
+
+            migrationBuilder.DropTable(
                 name: "CustodyLogs");
 
             migrationBuilder.DropTable(
@@ -170,6 +216,9 @@ namespace Evidence.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Photos");
+
+            migrationBuilder.DropTable(
+                name: "CrimeScenes");
 
             migrationBuilder.DropTable(
                 name: "Evidences");
