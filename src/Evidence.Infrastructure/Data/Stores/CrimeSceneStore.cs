@@ -1,29 +1,41 @@
 ﻿using Evidence.Infrastructure.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evidence.Infrastructure.Data.Stores
 {
-    public class CrimeSceneStore : ICrimeSceneStore
+    public class CrimeSceneStore(EvidenceApplicationDbContext dbContext) : ICrimeSceneStore
     {
-        public IQueryable<CrimeScene> CrimeScenes => throw new NotImplementedException();
+        private readonly EvidenceApplicationDbContext _dbContext = dbContext;
 
-        public Task<(bool Succeeded, ICollection<string> Errors)> CreateCrimeScene(CrimeScene crimeScene)
+        public IQueryable<CrimeScene> CrimeScenes => _dbContext.CrimeScenes.AsQueryable();
+
+        public async Task<(bool Succeeded, ICollection<string> Errors)> CreateCrimeScene(CrimeScene crimeScene)
         {
-            throw new NotImplementedException();
+            await _dbContext.CrimeScenes.AddAsync(crimeScene);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, []);
         }
 
-        public Task DeleteCrimeScene(CrimeScene crimeScene)
+        public async Task DeleteCrimeScene(CrimeScene crimeScene)
         {
-            throw new NotImplementedException();
+            _ = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id) ?? throw new ApplicationException("Crime scene not in context.");
+
+            _dbContext.CrimeScenes.Remove(crimeScene);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task<CrimeScene?> GetCrimeSceneById(string crimeSceneId)
+        public async Task<CrimeScene?> GetCrimeSceneById(string crimeSceneId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.CrimeScenes.FirstOrDefaultAsync(x => x.Id == crimeSceneId);
         }
 
-        public Task UpdateCrimeScene(CrimeScene crimeScene)
+        public async Task UpdateCrimeScene(CrimeScene crimeScene)
         {
-            throw new NotImplementedException();
+            _ = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id) ?? throw new ApplicationException("Crime scene not in context.");
+
+            _dbContext.CrimeScenes.Update(crimeScene);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
