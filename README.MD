@@ -76,3 +76,21 @@ This structure ensures you have **4 spokes** that effectively cover all entities
 ## Return types
 
 - For methods that need validation use Class or tuple to encapsulate the return possibles like success and errors etc
+
+
+## API
+
+Methods:
+
+- `POST` - return `Created()`
+- `GET`  - return `Ok(json)`
+- `PATCH` - return `NoContent()`
+- `DELETE` - return `NoContent()`
+
+Fetching data from DB:
+
+- Dose not exist - `NotFound()`
+
+Updating an entry
+
+- Invalid data or shape - `BadRequest(Errors)`

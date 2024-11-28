@@ -11,7 +11,7 @@ namespace Evidence.API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("evidence/{evidenceId}/photos")]
+    [Route("photos")]
     public class PhotoController (IPhotoStore photoStore, IEvidenceItemStore evidenceItemStore, IMapper mapper): ControllerBase
     {
         private readonly IPhotoStore _photoStore = photoStore;
@@ -21,70 +21,47 @@ namespace Evidence.API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreatePhoto(string evidenceId, [FromBody] CreatePhotoDto createPhotoDto)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
-            if (evidence is null) return NotFound("Evidence not found.");
-
             var photo = _mapper.Map<Photo>(createPhotoDto);
 
-            var (Succeeded, Errors) = await _photoStore.CreatePhotoAsync(evidence, photo);
+            (bool Succeeded, ICollection<string> Errors) = await _photoStore.CreatePhotoAsync(photo);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetPhotos(string evidenceId)
+        [HttpGet("{photoId}")]
+        public async Task<ActionResult> GetPhotoById(string photoId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
-            if (evidence is null) return NotFound("Evidence not found.");
-
-            var photos = await _photoStore.GetPhotosAsync(evidence);
-
-            var dto = _mapper.Map<IEnumerable<PhotoDto>>(photos);
-
-            return Ok(dto);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetPhotoById(string id, string evidenceId)
-        {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
-            if (evidence is null) return NotFound("Evidence not found.");
-
-            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
-            if (photo is null) return NotFound("Photo not found");
+            var photo = await _photoStore.GetPhotoByIdAsync(photoId);
+            if(photo is null) return NotFound();
 
             var dto = _mapper.Map<PhotoDto>(photo);
 
             return Ok(dto);
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> UpdatePhotoById(string id, string evidenceId, [FromBody] UpdatePhotoDto updatePhotoDto)
+        [HttpPatch("{photoId}")]
+        public async Task<ActionResult> UpdatePhotoById([FromBody] UpdatePhotoDto updatePhotoDto, string photoId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
-            if (evidence is null) return NotFound("Evidence not found.");
-
-            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
-            if (photo is null) return NotFound("Photo not found");
+            var photo = await _photoStore.GetPhotoByIdAsync(photoId);
+            if (photo is null) return NotFound();
 
             _mapper.Map(updatePhotoDto, photo);
 
-            await _photoStore.UpdatePhotoAsync(evidence, photo);
+            (bool Succeeded, ICollection<string> Errors) = await _photoStore.UpdatePhotoAsync(photo);
+            if(!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePhotoById(string id, string evidenceId)
+        [HttpDelete("{photoId}")]
+        public async Task<ActionResult> DeletePhotoById(string photoId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
-            if (evidence is null) return NotFound("Evidence not found.");
+            var photo = await _photoStore.GetPhotoByIdAsync(photoId);
+            if (photo is null) return NotFound();
 
-            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
-            if (photo is null) return NotFound("Photo not found");
-
-            await _photoStore.DeletePhotoAsync(evidence,photo);
+            (bool Succeeded, ICollection<string> Errors) = await _photoStore.DeletePhotoAsync(photo);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
