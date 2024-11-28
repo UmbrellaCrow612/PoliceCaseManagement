@@ -19,8 +19,8 @@ namespace Identity.Infrastructure.Data.Stores
                 .Where(x => x.UserId == attempt.UserId
                  && x.IsSuccessful == false
                  && x.IsRevoked == false
-                 && x.ValidSessionTime >= DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes))
-                .OrderByDescending(x => x.ValidSessionTime)
+                 && x.CreatedAt > DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes))
+                .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
 
             if (recentAttempt is not null) return (false, false);
@@ -40,7 +40,7 @@ namespace Identity.Infrastructure.Data.Stores
               x => x.UserId == userId
               && x.IsSuccessful == false
               && x.IsRevoked == false
-              && x.ValidSessionTime >= DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes
+              && x.CreatedAt > DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes
               ))
              .ToListAsync();
 
@@ -57,10 +57,9 @@ namespace Identity.Infrastructure.Data.Stores
             return count;
         }
 
-        public async Task UpdateAttempt(PasswordResetAttempt attempt)
+        public void SetToUpdateAttempt(PasswordResetAttempt attempt)
         {
             _dbcontext.PasswordResetAttempts.Update(attempt);
-            await _dbcontext.SaveChangesAsync();
         }
 
         public async Task<(bool isValid, PasswordResetAttempt? attempt)> ValidateAttempt(string code)
@@ -68,16 +67,13 @@ namespace Identity.Infrastructure.Data.Stores
             int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
 
             var _attempt = await _dbcontext.PasswordResetAttempts.FirstOrDefaultAsync(x => x.Code == code);
-            if (_attempt is null) return (false, null);
 
-            if (
-                _attempt.ValidSessionTime < DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes) 
-                && _attempt.IsRevoked == false 
-                && _attempt.IsSuccessful != true 
-                )
-            {
-                return (false, null);
-            }
+            if (_attempt is null 
+                || _attempt.IsSuccessful is true 
+                || _attempt.CreatedAt < DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes)
+                || _attempt.IsRevoked is true
+                ) return (false, null);
+
 
             return (true, _attempt);
         }

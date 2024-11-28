@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241124152515_Init")]
+    [Migration("20241128203431_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -219,9 +219,6 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ValidSessionTime")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

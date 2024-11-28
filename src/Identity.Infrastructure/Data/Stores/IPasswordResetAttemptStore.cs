@@ -18,6 +18,9 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task<(bool isValid, PasswordResetAttempt? attempt)> ValidateAttempt(string code);
 
-        Task UpdateAttempt(PasswordResetAttempt attempt);
+        /// <summary>
+        /// Changes the entity in the context and waits for a save changes call
+        /// </summary>
+        void SetToUpdateAttempt(PasswordResetAttempt attempt);
     }
 }

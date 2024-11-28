@@ -248,19 +248,15 @@ namespace Identity.API.Controllers
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
         {
-            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
-            int resetPasswordCodeLength = int.Parse(_configuration["ResetPasswordCodeLength"] ?? throw new ApplicationException("ResetPasswordCodeLength not provided."));
-
             var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
             if (user is null) return Ok(); // We don't reveal if a user exists
 
-            var trueCode = _stringEncryptionHelper.GenerateRandomString(resetPasswordCodeLength);
+            var trueCode = Guid.NewGuid().ToString();
 
             PasswordResetAttempt passwordResetAttempt = new()
             {
-                Code = _stringEncryptionHelper.Hash(trueCode), 
+                Code = trueCode, 
                 UserId = user.Id,
-                ValidSessionTime = DateTime.UtcNow.AddMinutes(resetPasswordSessionTimeInMinutes),
             };
 
             var (canMakeAttempt, successfullyAdded) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
@@ -284,22 +280,22 @@ namespace Identity.API.Controllers
         [HttpPost("confirm-password-reset/{code}")]
         public async Task<ActionResult> ConfirmResetPassword(string code, [FromBody] ConfirmPasswordResetRequestDto confirmPasswordResetRequestDto)
         {
-            (bool isValid, PasswordResetAttempt? attempt) = await _passwordResetAttemptStore.ValidateAttempt(_stringEncryptionHelper.Hash(code));
-            if (!isValid) return Unauthorized(); // Either session expired or code is wrong for latest attempt
+            (bool isValid, PasswordResetAttempt? attempt) = await _passwordResetAttemptStore.ValidateAttempt(code);
+            if (!isValid) return Unauthorized(); // Either session expired or code is wrong for latest attempt or already used
 
             if (attempt is null) return Unauthorized();
 
             var user = await _userManager.FindByIdAsync(attempt.UserId);
             if (user is null) return BadRequest();
 
+            attempt.IsSuccessful = true;
+
+            _passwordResetAttemptStore.SetToUpdateAttempt(attempt);
+
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, confirmPasswordResetRequestDto.NewPassword);
 
             if(!result.Succeeded) return BadRequest(result.Errors);
-
-            attempt.IsSuccessful = true;
-
-            await _passwordResetAttemptStore.UpdateAttempt(attempt);
 
             return Ok();
         }
