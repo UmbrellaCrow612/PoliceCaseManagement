@@ -214,6 +214,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("IsSuccessful")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");

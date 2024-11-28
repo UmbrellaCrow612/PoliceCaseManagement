@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241128203431_Init")]
+    [Migration("20241128205705_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -216,6 +216,9 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<bool>("IsSuccessful")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()

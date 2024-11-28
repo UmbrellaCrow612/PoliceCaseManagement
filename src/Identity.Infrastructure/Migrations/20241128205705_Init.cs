@@ -244,6 +244,7 @@ namespace Identity.Infrastructure.Migrations
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false)
                 },

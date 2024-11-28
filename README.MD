@@ -94,3 +94,7 @@ Fetching data from DB:
 Updating an entry
 
 - Invalid data or shape - `BadRequest(Errors)`
+
+## Date
+
+- throughout the app use `UTC now` time

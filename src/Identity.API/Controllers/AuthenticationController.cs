@@ -289,6 +289,7 @@ namespace Identity.API.Controllers
             if (user is null) return BadRequest();
 
             attempt.IsSuccessful = true;
+            attempt.SuccessfulAt = DateTime.UtcNow;
 
             _passwordResetAttemptStore.SetToUpdateAttempt(attempt);
 
