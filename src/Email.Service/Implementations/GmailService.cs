@@ -1,18 +1,47 @@
 ﻿using Email.Service.Interfaces;
 using Email.Service.Models;
+using Email.Service.Settings;
+using System.Net;
+using System.Net.Mail;
 
 namespace Email.Service.Implamentations
 {
-    public class GmailService : IEmailService
+    public class GmailService(EmailSettings emailSettings) : IEmailService
     {
-        public Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
+        private readonly EmailSettings _emailSettings = emailSettings;
+
+        public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            using var client = CreateSmtpClient();
+            var mailMessage = CreateMailMessage(message);
+
+            await client.SendMailAsync(mailMessage, cancellationToken);
         }
 
-        public Task SendBulkAsync(IEnumerable<EmailMessage> messages, CancellationToken cancellationToken = default)
+        private SmtpClient CreateSmtpClient()
         {
-            throw new NotImplementedException();
+            return new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
+            {
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword)
+            };
+        }
+
+        private MailMessage CreateMailMessage(EmailMessage message)
+        {
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_emailSettings.SenderEmail),
+                Subject = message.Subject,
+                Body = message.Body,
+                IsBodyHtml = message.IsHtml
+            };
+
+            mailMessage.To.Add(message.To);
+
+            return mailMessage;
         }
     }
 }
