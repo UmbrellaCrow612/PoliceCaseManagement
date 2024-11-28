@@ -4,10 +4,10 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface IPhotoStore
     {
-        Task<IQueryable<Photo>> Photos { get; }
+        IQueryable<Photo> Photos { get; }
 
         Task<(bool Succeeded, ICollection<string> Errors)> CreatePhotoAsync(Photo photo);
-        Task<Photo> GetPhotoByIdAsync(string photoId);
+        Task<Photo?> GetPhotoByIdAsync(string photoId);
         Task<bool> IsPhotoInEvidenceAsync(string photoId, EvidenceItem evidence);
         Task<bool> IsPhotoInCrimeSceneAsync(string photoId, CrimeScene crimeScene);
         Task<ICollection<EvidenceItem>> GetEvidencesAsync(Photo photo);

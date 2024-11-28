@@ -60,3 +60,19 @@ To minimize the number of spokes while maximizing the entities they hold, we can
 - **Administrative Management**: Keeps organizational and metadata entities separate.
 
 This structure ensures you have **4 spokes** that effectively cover all entities while maintaining clear and logical groupings.
+
+
+
+# Standards 
+
+## Params
+
+- Don't use `Id` Naming - instead name the specific Id it is like `userId` in any param as it can cause confusion down the road.
+
+## Methods
+
+- Async methods always append with `async` so `SendEmail` becomes -> `SendEmailAsync` to distinguish between async and sync operations
+
+## Return types
+
+- For methods that need validation use Class or tuple to encapsulate the return possibles like success and errors etc

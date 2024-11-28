@@ -7,7 +7,7 @@ namespace Evidence.Infrastructure.Data.Stores
     {
         private readonly EvidenceApplicationDbContext _dbContext = dbContext;
 
-        public Task<IQueryable<Photo>> Photos => Task.FromResult(_dbContext.Photos.AsQueryable());
+        public IQueryable<Photo> Photos => _dbContext.Photos.AsQueryable();
 
         public async Task<(bool Succeeded, ICollection<string> Errors)> CreatePhotoAsync(Photo photo)
         {
@@ -19,61 +19,78 @@ namespace Evidence.Infrastructure.Data.Stores
 
         public async Task<(bool Succeeded, ICollection<string> Errors)> DeletePhotoAsync(Photo photo)
         {
-            List<string> Errors = [];
+            List<string> errors = [];
 
-            // check if it was queryed from db and in context
             var inContext = _dbContext.Photos.Local.FirstOrDefault(x => x.Id == photo.Id);
             if(inContext is null)
             {
-                Errors.Add("Photo not found.");
-
-                return (false, Errors);
+                errors.Add("Photo not in context.");
+                return (false,  errors);
             }
 
-            // linked to evidence 
-            var linkedToEvidence = await _dbContext.EvidenceItemPhotos.AnyAsync(x => x.PhotoId == photo.Id);
-            if (linkedToEvidence) Errors.Add("Photo is linked to a Evidence");
+            var isLinkedToEvidence = await _dbContext.EvidenceItemPhotos.AnyAsync(x => x.PhotoId == photo.Id);
+            if (isLinkedToEvidence) errors.Add("Photo is linked to evidence");
 
-            // linked to crime scene 
-            var linkedToCrimeScene = await _dbContext.CrimeScenePhotos.AnyAsync(x => x.PhotoId == photo.Id);
-            if (linkedToCrimeScene) Errors.Add("Photo is linked to a Crime Scene.");
+            var isLinkedToCrimeScene = await _dbContext.CrimeScenePhotos.AnyAsync(x => x.PhotoId == photo.Id);
+            if (isLinkedToCrimeScene) errors.Add("Photo is linked to at least one crime scene.");
 
+            if (errors.Count != 0) return (false, errors);
 
             _dbContext.Photos.Remove(photo);
-
             await _dbContext.SaveChangesAsync();
 
-            return (true, Errors);
+            return (true, errors);
         }
 
-        public Task<ICollection<CrimeScene>> GetCrimeScenesAsync(Photo photo)
+        public async Task<ICollection<CrimeScene>> GetCrimeScenesAsync(Photo photo)
         {
-            throw new NotImplementedException();
+            return await _dbContext.CrimeScenePhotos
+                .Where(x => x.PhotoId == photo.Id)
+                .Include(x => x.CrimeScene)
+                .Select(x => x.CrimeScene)
+                .ToListAsync();
         }
 
-        public Task<ICollection<EvidenceItem>> GetEvidencesAsync(Photo photo)
+        public async Task<ICollection<EvidenceItem>> GetEvidencesAsync(Photo photo)
         {
-            throw new NotImplementedException();
+            return await _dbContext.EvidenceItemPhotos
+                .Where(x => x.PhotoId == photo.Id)
+                .Include(x => x.Evidence)
+                .Select(x => x.Evidence)
+                .ToListAsync();
+
         }
 
-        public Task<Photo> GetPhotoByIdAsync(string photoId)
+        public async Task<Photo?> GetPhotoByIdAsync(string photoId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Photos.FirstOrDefaultAsync(x => x.Id == photoId);
         }
 
-        public Task<bool> IsPhotoInCrimeSceneAsync(string photoId, CrimeScene crimeScene)
+        public async Task<bool> IsPhotoInCrimeSceneAsync(string photoId, CrimeScene crimeScene)
         {
-            throw new NotImplementedException();
+            return await _dbContext.CrimeScenePhotos.AnyAsync(x => x.PhotoId == photoId && x.CrimeSceneId == crimeScene.Id);
         }
 
-        public Task<bool> IsPhotoInEvidenceAsync(string photoId, EvidenceItem evidence)
+        public async Task<bool> IsPhotoInEvidenceAsync(string photoId, EvidenceItem evidence)
         {
-            throw new NotImplementedException();
+            return await _dbContext.EvidenceItemPhotos.AnyAsync(x => x.PhotoId == photoId && x.EvidenceItemId == evidence.Id);
         }
 
-        public Task<(bool Succeeded, ICollection<string> Errors)> UpdatePhotoAsync(Photo photo)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> UpdatePhotoAsync(Photo photo)
         {
-            throw new NotImplementedException();
+            List<string> errors = [];
+
+            var inContext = _dbContext.Photos.Local.FirstOrDefault(x => x.Id == photo.Id);
+            if (inContext is null)
+            {
+                errors.Add("Photo not in context.");
+                return (false, errors);
+            }
+
+            _dbContext.Photos.Update(photo);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
     }
 }
