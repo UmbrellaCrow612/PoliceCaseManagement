@@ -4,10 +4,12 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface INoteStore
     {
-        Task<(bool Succeeded, IEnumerable<string> Errors)> CreateNote(EvidenceItem evidence, Note note);
-        Task<IEnumerable<Note>> GetNotes(EvidenceItem evidence);
-        Task<Note> GetNoteById(EvidenceItem evidence, string id);
-        Task UpdateNote(EvidenceItem evidence, Note note);
-        Task DeleteNote(EvidenceItem evidence, Note note);
+        Task<IQueryable<Note>> Notes { get; }
+
+        Task<(bool Succeeded, IEnumerable<string> Errors)> CreateNoteAsync(EvidenceItem evidence, Note note);
+        Task<ICollection<Note>> GetNotesAsync(EvidenceItem evidence);
+        Task<Note?> GetNoteByIdAsync(EvidenceItem evidence, string noteId);
+        Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateNoteAsync(EvidenceItem evidence, Note note);
+        Task<(bool Succeeded, IEnumerable<string> Errors)> DeleteNoteAsync(EvidenceItem evidence, Note note);
     }
 }

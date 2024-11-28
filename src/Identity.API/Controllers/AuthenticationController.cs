@@ -1,4 +1,5 @@
-﻿using Identity.API.DTOs;
+﻿using Email.Service.Settings;
+using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;

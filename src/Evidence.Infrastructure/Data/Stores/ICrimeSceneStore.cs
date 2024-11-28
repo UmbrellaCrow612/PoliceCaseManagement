@@ -4,7 +4,7 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface ICrimeSceneStore
     {
-        public IQueryable<CrimeScene> CrimeScenes { get; }
+        Task<IQueryable<CrimeScene>> CrimeScenes { get; }
 
         Task<(bool Succeeded, ICollection<string> Errors)> CreateCrimeScene(CrimeScene crimeScene);
         Task<CrimeScene?> GetCrimeSceneById(string crimeSceneId);

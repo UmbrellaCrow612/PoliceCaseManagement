@@ -7,6 +7,8 @@ namespace Evidence.Infrastructure.Data.Stores
     {
         private readonly EvidenceApplicationDbContext _dbContext = dbContext;
 
+        public IQueryable<EvidenceItem> Evidences => _dbContext.Evidences.AsQueryable();
+
         public async Task<(bool Succeeded, IEnumerable<string> Errors)> CreateEvidence(EvidenceItem evidence)
         {
             IEnumerable<string> errors = [];

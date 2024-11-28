@@ -26,7 +26,7 @@ namespace Evidence.API.Controllers
 
             var note = _mapper.Map<Note>(createNoteDto);
 
-            (bool Succeeded, IEnumerable<string> Errors) = await _noteStore.CreateNote(evidence, note);
+            (bool Succeeded, IEnumerable<string> Errors) = await _noteStore.CreateNoteAsync(evidence, note);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
@@ -38,7 +38,7 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var notes = await _noteStore.GetNotes(evidence);
+            var notes = await _noteStore.GetNotesAsync(evidence);
 
             var dto = _mapper.Map<IEnumerable<NoteDto>>(notes);
 
@@ -51,7 +51,7 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var note = await _noteStore.GetNoteById(evidence, id);
+            var note = await _noteStore.GetNoteByIdAsync(evidence, id);
 
             var dto = _mapper.Map<NoteDto>(note);
 
@@ -64,11 +64,11 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var note = await _noteStore.GetNoteById(evidence, id);
+            var note = await _noteStore.GetNoteByIdAsync(evidence, id);
 
             _mapper.Map(updateNoteDto, note);
 
-            await _noteStore.UpdateNote(evidence, note);
+            await _noteStore.UpdateNoteAsync(evidence, note);
 
             return NoContent();
         }
@@ -79,9 +79,9 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var note = await _noteStore.GetNoteById(evidence, id);
+            var note = await _noteStore.GetNoteByIdAsync(evidence, id);
 
-            await _noteStore.DeleteNote(evidence, note);
+            await _noteStore.DeleteNoteAsync(evidence, note);
 
             return NoContent();
         }

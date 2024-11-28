@@ -1,4 +1,4 @@
-﻿using Email.Service.Interfaces;
+﻿using Email.Service.Implamentations;
 using Email.Service.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,9 @@ namespace Email.Service
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.Configure<EmailOptions>(configuration.GetSection("EmailOptions") ?? throw new ApplicationException("Email settings not set in settings json"));
+            services.AddSingleton<EmailSettings>(configuration.GetSection("EmailSettings").Get<EmailSettings>() ?? throw new ApplicationException("EmailSettings not present."));
+
+            services.AddScoped<GmailService>();
 
             return services;
         }

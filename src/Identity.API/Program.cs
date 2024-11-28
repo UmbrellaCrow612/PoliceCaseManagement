@@ -1,4 +1,5 @@
 using Identity.API.Helpers;
+using Email.Service;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -86,6 +87,8 @@ builder.Services.AddSingleton<StringEncryptionHelper>();
 builder.Services.AddSingleton<DeviceInfoHelper>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+builder.Services.AddEmailService(builder.Configuration);
 
 var app = builder.Build();
 

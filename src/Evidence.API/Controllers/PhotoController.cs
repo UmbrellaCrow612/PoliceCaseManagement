@@ -26,7 +26,7 @@ namespace Evidence.API.Controllers
 
             var photo = _mapper.Map<Photo>(createPhotoDto);
 
-            var (Succeeded, Errors) = await _photoStore.CreatePhoto(evidence, photo);
+            var (Succeeded, Errors) = await _photoStore.CreatePhotoAsync(evidence, photo);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
@@ -38,7 +38,7 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var photos = await _photoStore.GetPhotos(evidence);
+            var photos = await _photoStore.GetPhotosAsync(evidence);
 
             var dto = _mapper.Map<IEnumerable<PhotoDto>>(photos);
 
@@ -51,7 +51,7 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var photo = await _photoStore.GetPhotoById(evidence, id);
+            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
             if (photo is null) return NotFound("Photo not found");
 
             var dto = _mapper.Map<PhotoDto>(photo);
@@ -65,12 +65,12 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var photo = await _photoStore.GetPhotoById(evidence, id);
+            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
             if (photo is null) return NotFound("Photo not found");
 
             _mapper.Map(updatePhotoDto, photo);
 
-            await _photoStore.UpdatePhoto(evidence, photo);
+            await _photoStore.UpdatePhotoAsync(evidence, photo);
 
             return NoContent();
         }
@@ -81,10 +81,10 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var photo = await _photoStore.GetPhotoById(evidence, id);
+            var photo = await _photoStore.GetPhotoByIdAsync(evidence, id);
             if (photo is null) return NotFound("Photo not found");
 
-            await _photoStore.DeletePhoto(evidence,photo);
+            await _photoStore.DeletePhotoAsync(evidence,photo);
 
             return NoContent();
         }

@@ -21,6 +21,7 @@ namespace Evidence.Infrastructure.Data.Models
         public ICollection<CustodyLog> CustodyLogs { get; set; } = [];
         public ICollection<LabResult> LabResults { get; set; } = [];
         public ICollection<Note> Notes { get; set; } = [];
+
         public ICollection<CrimeSceneEvidence> CrimeSceneEvidences { get; set; } = [];
         public ICollection<EvidenceItemPhoto> EvidenceItemPhotos { get; set; } = [];
         public ICollection<EvidenceItemDocument> EvidenceItemDocuments { get; set; } = [];

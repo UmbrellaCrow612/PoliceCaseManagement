@@ -4,6 +4,8 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface IEvidenceItemStore
     {
+        Task<IQueryable<EvidenceItem>> Evidences { get; }
+
         Task<(bool Succeeded, IEnumerable<string> Errors)> CreateEvidence(EvidenceItem evidence);
         Task UpdateEvidence(string userId, EvidenceItem evidence);
         Task<EvidenceItem?> GetEvidenceById (string id);
