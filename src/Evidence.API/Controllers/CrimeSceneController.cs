@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Evidence.API.Controllers
 {
     [ApiController]
-    [Route("crimeScenes")]
+    [Route("crime-scenes")]
     public class CrimeSceneController(ICrimeSceneStore crimeSceneStore, IMapper mapper) : ControllerBase
     {
         private readonly ICrimeSceneStore _crimeSceneStore = crimeSceneStore;

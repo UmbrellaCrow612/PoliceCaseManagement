@@ -108,3 +108,7 @@ Posting data:
 - Follow JWT
 - Use role based Authentication
 - Mark controllers with authorize and methods with roles when needed and anonyms when needed 
+
+## Url format
+
+use dashed case - `labResults` into -> `lab-results`
