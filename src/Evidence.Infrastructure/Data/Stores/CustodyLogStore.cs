@@ -8,56 +8,71 @@ namespace Evidence.Infrastructure.Data.Stores
         private readonly EvidenceApplicationDbContext _dbcontext = dbContext;
         public IQueryable<CustodyLog> CustodyLogs => _dbcontext.CustodyLogs.AsQueryable();
 
-        public async Task<(bool Succeeded, ICollection<string> Errors)> CreateCustodyLog(EvidenceItem evidence, CustodyLog custodyLog)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> CreateCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog)
         {
-            _ = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id) ?? throw new ApplicationException("Evidence not in context");
-            _ = _dbcontext.CustodyLogs.Local.FirstOrDefault(x => x.Id == custodyLog.Id) ?? throw new ApplicationException("Custody log not in context");
+            List<string> errors = [];
 
-            if (custodyLog.EvidenceItemId != evidence.Id) throw new ApplicationException("Custody log not linked to evidence.");
+            var evidenceInContext = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if(evidenceInContext is null) errors.Add("Evidence not in context.");
+
+            if(custodyLog.EvidenceItemId != evidence.Id) errors.Add("CustodyLog is not linked to evidence.");
+
+            if (errors.Count != 0) return (false, errors);
 
             await _dbcontext.CustodyLogs.AddAsync(custodyLog);
-
             await _dbcontext.SaveChangesAsync();
 
-            return (true, []);
+            return (true, errors);
         }
 
-        public async Task DeleteCustodyLog(EvidenceItem evidence, CustodyLog custodyLog)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> DeleteCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog)
         {
-            _ = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id) ?? throw new ApplicationException("Evidence not in context");
-            _ = _dbcontext.CustodyLogs.Local.FirstOrDefault(x => x.Id == custodyLog.Id) ?? throw new ApplicationException("Custody log not in context");
+            List<string> errors = [];
 
-            if (custodyLog.EvidenceItemId != evidence.Id) throw new ApplicationException("Custody log and evidence not linked.");
+            var evidenceInContext = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if (evidenceInContext is null) errors.Add("Evidence not in context.");
+            
+            var custodyLogInContext = _dbcontext.CustodyLogs.Local.FirstOrDefault(x => x.Id == custodyLog.Id);
+            if (custodyLogInContext is null) errors.Add("CustodyLog not in context.");
+
+            if (custodyLog.EvidenceItemId != evidence.Id) errors.Add("CustodyLog is not linked to evidence.");
+
+            if(errors.Count != 0) return (false, errors);
 
             _dbcontext.CustodyLogs.Remove(custodyLog);
-
             await _dbcontext.SaveChangesAsync();
+
+            return (true, errors);
         }
 
-        public async Task<CustodyLog?> GetCustodyLogById(EvidenceItem evidence, string custodyLogId)
+        public async Task<CustodyLog?> GetCustodyLogByIdAsync(EvidenceItem evidence, string custodyLogId)
         {
-            return await _dbcontext.CustodyLogs.FirstOrDefaultAsync(x => x.Id == custodyLogId && x.EvidenceItemId == evidence.Id);
+            return await _dbcontext.CustodyLogs.Where(x => x.Id == custodyLogId && x.EvidenceItemId == evidence.Id).FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<CustodyLog>> GetCustodyLogs(EvidenceItem evidence)
+        public async Task<ICollection<CustodyLog>> GetCustodyLogsAsync(EvidenceItem evidence)
         {
-            _ = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id) ?? throw new ApplicationException("Evidence is not in context.");
-
-            var logs = await _dbcontext.CustodyLogs.Where(x => x.EvidenceItemId == evidence.Id).ToListAsync();
-
-            return logs;
+            return await _dbcontext.CustodyLogs.Where(x => x.EvidenceItemId == evidence.Id).ToListAsync();
         }
 
-        public async Task UpdateCustodyLog(EvidenceItem evidence, CustodyLog custodyLog)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> UpdateCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog)
         {
-            _ = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id) ?? throw new ApplicationException("evidence is not context.");
-            _ = _dbcontext.CustodyLogs.Local.FirstOrDefault(x => x.Id == custodyLog.Id) ?? throw new ApplicationException("custody log is not context.");
+            List<string> errors = [];
 
-            if (custodyLog.EvidenceItemId != evidence.Id) throw new ApplicationException("Custody log is not linked to evidence.");
+            var evidenceInContext = _dbcontext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if (evidenceInContext is null) errors.Add("Evidence not in context.");
+
+            var custodyLogInContext = _dbcontext.CustodyLogs.Local.FirstOrDefault(x => x.Id == custodyLog.Id);
+            if (custodyLogInContext is null) errors.Add("CustodyLog not in context.");
+
+            if (custodyLog.EvidenceItemId != evidence.Id) errors.Add("CustodyLog is not linked to evidence.");
+
+            if (errors.Count != 0) return (false, errors);
 
             _dbcontext.CustodyLogs.Update(custodyLog);
-
             await _dbcontext.SaveChangesAsync();
+
+            return (true, errors);
         }
     }
 }

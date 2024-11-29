@@ -6,10 +6,11 @@ namespace Evidence.Infrastructure.Data.Stores
     {
         IQueryable<CustodyLog> CustodyLogs { get; }
 
-        Task<(bool Succeeded, ICollection<string> Errors)> CreateCustodyLog(EvidenceItem evidence, CustodyLog custodyLog);
-        Task DeleteCustodyLog(EvidenceItem evidence, CustodyLog custodyLog);
-        Task<CustodyLog?> GetCustodyLogById (EvidenceItem evidence, string custodyLogId);
-        Task<ICollection<CustodyLog>> GetCustodyLogs(EvidenceItem evidence);
-        Task UpdateCustodyLog(EvidenceItem evidence, CustodyLog custodyLog);
+        Task<(bool Succeeded, ICollection<string> Errors)> CreateCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog);
+        Task<CustodyLog?> GetCustodyLogByIdAsync(EvidenceItem evidence, string custodyLogId);
+        Task<(bool Succeeded, ICollection<string> Errors)> UpdateCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog);
+        Task<(bool Succeeded, ICollection<string> Errors)> DeleteCustodyLogAsync(EvidenceItem evidence, CustodyLog custodyLog);
+        Task<ICollection<CustodyLog>> GetCustodyLogsAsync(EvidenceItem evidence);
+       
     }
 }

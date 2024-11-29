@@ -25,11 +25,12 @@ namespace Evidence.API.Controllers
             if (evidence is null) return NotFound("Evidence not found");
 
             var log = _mapper.Map<CustodyLog>(createCustodyLogDto);
+            log.EvidenceItemId = evidenceId;
 
-            (bool Succeeded,ICollection<string> Errors) = await _custodyLogStore.CreateCustodyLog(evidence, log);
+            (bool Succeeded,ICollection<string> Errors) = await _custodyLogStore.CreateCustodyLogAsync(evidence, log);
             if (!Succeeded) return BadRequest(Errors);
 
-            return Created();
+            return Created(nameof(CreateCustodyLog), new { id = log.Id });
         }
 
         [HttpGet]
@@ -38,9 +39,9 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
-            var logs = await _custodyLogStore.GetCustodyLogs(evidence);
+            var logs = await _custodyLogStore.GetCustodyLogsAsync(evidence);
 
-            var dto = _mapper.Map<IEnumerable<CustodyLogDto>>(logs);
+            var dto = _mapper.Map<ICollection<CustodyLogDto>>(logs);
 
             return Ok(dto);
         }
@@ -51,7 +52,7 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
-            var log = await _custodyLogStore.GetCustodyLogById(evidence, id);
+            var log = await _custodyLogStore.GetCustodyLogByIdAsync(evidence, id);
             if(log is null) return NotFound("Custody log not found.");
 
             var dto = _mapper.Map<CustodyLogDto>(log);
@@ -65,12 +66,13 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
-            var log = await _custodyLogStore.GetCustodyLogById(evidence, id);
+            var log = await _custodyLogStore.GetCustodyLogByIdAsync(evidence, id);
             if (log is null) return NotFound("Custody log not found.");
 
             _mapper.Map(updateCustodyLogDto, log);
 
-            await _custodyLogStore.UpdateCustodyLog(evidence, log);
+            (bool Succeeded, ICollection<string> Errors) = await _custodyLogStore.UpdateCustodyLogAsync(evidence, log);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
@@ -81,10 +83,11 @@ namespace Evidence.API.Controllers
             var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
-            var log = await _custodyLogStore.GetCustodyLogById(evidence, id);
+            var log = await _custodyLogStore.GetCustodyLogByIdAsync(evidence, id);
             if (log is null) return NotFound("Custody log not found.");
 
-            await _custodyLogStore.DeleteCustodyLog(evidence, log);
+            (bool Succeeded, ICollection<string> Errors) = await _custodyLogStore.DeleteCustodyLogAsync(evidence, log);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
