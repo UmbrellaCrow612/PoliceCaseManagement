@@ -1,5 +1,4 @@
 ﻿using Evidence.Infrastructure.Data.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Evidence.Infrastructure.Data.Stores
 {
@@ -17,25 +16,40 @@ namespace Evidence.Infrastructure.Data.Stores
             return (true, []);
         }
 
-        public async Task DeleteCrimeScene(CrimeScene crimeScene)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> DeleteCrimeScene(CrimeScene crimeScene)
         {
-            _ = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id) ?? throw new ApplicationException("Crime scene not in context.");
+            List<string> errors = [];
+
+            var crimeSceneInContext = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id);
+            if (crimeSceneInContext is null) errors.Add("CrimeScene is not in context.");
+
+            if (errors.Count != 0) return (false, errors);
 
             _dbContext.CrimeScenes.Remove(crimeScene);
             await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
 
         public async Task<CrimeScene?> GetCrimeSceneById(string crimeSceneId)
         {
-            return await _dbContext.CrimeScenes.FirstOrDefaultAsync(x => x.Id == crimeSceneId);
+            
+            return await _dbContext.CrimeScenes.FindAsync(crimeSceneId);
         }
 
-        public async Task UpdateCrimeScene(CrimeScene crimeScene)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> UpdateCrimeScene(CrimeScene crimeScene)
         {
-            _ = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id) ?? throw new ApplicationException("Crime scene not in context.");
+            List<string> errors = [];
+
+            var crimeSceneInContext = _dbContext.CrimeScenes.Local.FirstOrDefault(x => x.Id == crimeScene.Id);
+            if (crimeSceneInContext is null) errors.Add("CrimeScene is not in context.");
+
+            if (errors.Count != 0) return (false, errors);
 
             _dbContext.CrimeScenes.Update(crimeScene);
             await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
     }
 }

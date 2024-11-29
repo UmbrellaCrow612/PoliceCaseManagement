@@ -24,7 +24,6 @@ namespace Evidence.API.Controllers
             var crimeScene = _mapper.Map<CrimeScene>(createCrimeSceneDto);
 
             (bool Succeeded, ICollection<string> Errors) = await _crimeSceneStore.CreateCrimeScene(crimeScene);
-
             if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
@@ -58,7 +57,8 @@ namespace Evidence.API.Controllers
 
             _mapper.Map(updateCrimeSceneDto, crimeScene);
 
-            await _crimeSceneStore.UpdateCrimeScene(crimeScene);
+            (bool Succeeded, ICollection<string> Errors) = await _crimeSceneStore.UpdateCrimeScene(crimeScene);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
@@ -70,7 +70,8 @@ namespace Evidence.API.Controllers
             var crimeScene = await _crimeSceneStore.GetCrimeSceneById(crimeSceneId);
             if (crimeScene is null) return NotFound("Crime Scene not found.");
 
-            await _crimeSceneStore.DeleteCrimeScene(crimeScene);
+            (bool Succeeded, ICollection<string> Errors) = await _crimeSceneStore.DeleteCrimeScene(crimeScene);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }

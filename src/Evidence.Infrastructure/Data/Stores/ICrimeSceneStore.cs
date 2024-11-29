@@ -8,7 +8,7 @@ namespace Evidence.Infrastructure.Data.Stores
 
         Task<(bool Succeeded, ICollection<string> Errors)> CreateCrimeScene(CrimeScene crimeScene);
         Task<CrimeScene?> GetCrimeSceneById(string crimeSceneId);
-        Task UpdateCrimeScene(CrimeScene crimeScene);
-        Task DeleteCrimeScene(CrimeScene crimeScene);
+        Task<(bool Succeeded, ICollection<string> Errors)> UpdateCrimeScene(CrimeScene crimeScene);
+        Task<(bool Succeeded, ICollection<string> Errors)> DeleteCrimeScene(CrimeScene crimeScene);
     }
 }
