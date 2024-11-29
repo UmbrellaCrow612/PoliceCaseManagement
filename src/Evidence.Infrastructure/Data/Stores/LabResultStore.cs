@@ -14,16 +14,11 @@ namespace Evidence.Infrastructure.Data.Stores
             List<string> errors = [];
 
             var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
-            if(evidenceInContext is null)
-            {
-                errors.Add("Evidence not in context.");
-                return (false, errors);
-            }
+            if(evidenceInContext is null) errors.Add("Evidence not in context.");
 
-            if(result.EvidenceItemId != evidence.Id)
-            {
-                errors.Add("LabResult not linked to evidence.");
-            }
+            if(result.EvidenceItemId != evidence.Id) errors.Add("LabResult not linked to evidence.");
+
+            if(errors.Count != 0) return (false, errors);
 
             await _dbContext.LabResults.AddAsync(result);
             await _dbContext.SaveChangesAsync();
@@ -36,24 +31,14 @@ namespace Evidence.Infrastructure.Data.Stores
             List<string> errors = [];
 
             var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
-            if (evidenceInContext is null)
-            {
-                errors.Add("Evidence not in context.");
-                return (false, errors);
-            }
+            if (evidenceInContext is null) errors.Add("Evidence not in context.");
 
             var labResultInContext = _dbContext.LabResults.Local.FirstOrDefault(x => x.Id == result.Id);
-            if (labResultInContext is null)
-            {
-                errors.Add("LabResult not in context.");
-                return (false, errors);
-            }
+            if (labResultInContext is null) errors.Add("LabResult not in context.");
 
-            if(result.EvidenceItemId != evidence.Id)
-            {
-                errors.Add("LabResult not linked to evidence");
-                return (false, errors);
-            }
+            if(result.EvidenceItemId != evidence.Id) errors.Add("LabResult not linked to evidence");
+
+            if (errors.Count != 0) return (false, errors);
 
             _dbContext.LabResults.Remove(result);
             await _dbContext.SaveChangesAsync();
@@ -76,24 +61,14 @@ namespace Evidence.Infrastructure.Data.Stores
             List<string> errors = [];
 
             var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
-            if (evidenceInContext is null)
-            {
-                errors.Add("Evidence not in context.");
-                return (false, errors);
-            }
+            if (evidenceInContext is null) errors.Add("Evidence not in context.");
 
             var labResultInContext = _dbContext.LabResults.Local.FirstOrDefault(x => x.Id == result.Id);
-            if (labResultInContext is null)
-            {
-                errors.Add("LabResult not in context.");
-                return (false, errors);
-            }
+            if (labResultInContext is null) errors.Add("LabResult not in context.");
 
-            if (result.EvidenceItemId != evidence.Id)
-            {
-                errors.Add("LabResult not linked to evidence");
-                return (false, errors);
-            }
+            if (result.EvidenceItemId != evidence.Id) errors.Add("LabResult not linked to evidence");
+
+            if (errors.Count != 0) return (false, errors);
 
             _dbContext.LabResults.Update(result);
             await _dbContext.SaveChangesAsync();
