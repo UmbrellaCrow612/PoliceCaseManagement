@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20241127194143_Init")]
+    [Migration("20241129182937_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -338,7 +338,7 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("FilePath")
+                    b.Property<string>("FilePathUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

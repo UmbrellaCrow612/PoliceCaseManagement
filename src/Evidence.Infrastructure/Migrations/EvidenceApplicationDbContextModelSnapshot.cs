@@ -335,7 +335,7 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("FilePath")
+                    b.Property<string>("FilePathUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

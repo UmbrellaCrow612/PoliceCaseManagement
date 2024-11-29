@@ -81,7 +81,7 @@ namespace Evidence.Infrastructure.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
-                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
+                    FilePathUrl = table.Column<string>(type: "TEXT", nullable: false),
                     FileExtension = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     TakenAt = table.Column<DateTime>(type: "TEXT", nullable: false),

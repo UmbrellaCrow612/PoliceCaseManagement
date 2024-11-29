@@ -12,6 +12,12 @@ namespace Evidence.Infrastructure.Data.Stores
 
         public async Task<(bool Succeeded, ICollection<string> Errors)> CreatePhotoAsync(Photo photo)
         {
+            List<string> errors = [];
+
+            if (!Uri.IsWellFormedUriString(photo.FilePathUrl, UriKind.Absolute)) errors.Add("File path uri is not well formatted.");
+
+            if (errors.Count != 0) return (false, errors);
+
             await _dbContext.Photos.AddAsync(photo);
             await _dbContext.SaveChangesAsync();
 
@@ -78,12 +84,12 @@ namespace Evidence.Infrastructure.Data.Stores
         {
             List<string> errors = [];
 
-            var inContext = _dbContext.Photos.Local.FirstOrDefault(x => x.Id == photo.Id);
-            if (inContext is null)
-            {
-                errors.Add("Photo not in context.");
-                return (false, errors);
-            }
+            if (!Uri.IsWellFormedUriString(photo.FilePathUrl, UriKind.Absolute)) errors.Add("File path uri is not well formatted.");
+
+            var exists = EfHelper.ExistsInContext(_dbContext, photo);
+            if (!exists) errors.Add("Photo not in context.");
+
+            if(errors.Count != 0) return (false, errors);
 
             _dbContext.Photos.Update(photo);
             await _dbContext.SaveChangesAsync();
