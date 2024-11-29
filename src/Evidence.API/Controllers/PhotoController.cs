@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evidence.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("photos")]
     public class PhotoController (IPhotoStore photoStore, IMapper mapper): ControllerBase
@@ -18,14 +17,14 @@ namespace Evidence.API.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpPost]
-        public async Task<ActionResult> CreatePhoto(string evidenceId, [FromBody] CreatePhotoDto createPhotoDto)
+        public async Task<ActionResult> CreatePhoto([FromBody] CreatePhotoDto createPhotoDto)
         {
             var photo = _mapper.Map<Photo>(createPhotoDto);
 
             (bool Succeeded, ICollection<string> Errors) = await _photoStore.CreatePhotoAsync(photo);
             if (!Succeeded) return BadRequest(Errors);
 
-            return Created();
+            return Created(nameof(CreatePhoto), new { id = photo.Id });
         }
 
         [HttpGet("{photoId}")]

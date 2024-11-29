@@ -1,5 +1,6 @@
 ﻿using Evidence.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Utils;
 
 namespace Evidence.Infrastructure.Data.Stores
 {
@@ -21,12 +22,9 @@ namespace Evidence.Infrastructure.Data.Stores
         {
             List<string> errors = [];
 
-            var inContext = _dbContext.Photos.Local.FirstOrDefault(x => x.Id == photo.Id);
-            if(inContext is null)
-            {
-                errors.Add("Photo not in context.");
-                return (false,  errors);
-            }
+            var exists = EfHelper.ExistsInContext(_dbContext, photo);
+
+            if(!exists) errors.Add("Photo not in context.");
 
             var isLinkedToEvidence = await _dbContext.EvidenceItemPhotos.AnyAsync(x => x.PhotoId == photo.Id);
             if (isLinkedToEvidence) errors.Add("Photo is linked to evidence");
