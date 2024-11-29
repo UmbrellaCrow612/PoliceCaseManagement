@@ -89,7 +89,7 @@ Methods:
 
 Fetching data from DB:
 
-- Dose not exist - `NotFound()`
+- Dose not exist - `NotFound(Item not found)` - Item replace with the resource that is not found
 
 Updating an entry
 

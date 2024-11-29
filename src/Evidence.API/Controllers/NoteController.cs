@@ -25,6 +25,7 @@ namespace Evidence.API.Controllers
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = _mapper.Map<Note>(createNoteDto);
+            note.EvidenceItemId = evidenceId;
 
             (bool Succeeded, IEnumerable<string> Errors) = await _noteStore.CreateNoteAsync(evidence, note);
             if (!Succeeded) return BadRequest(Errors);
@@ -65,10 +66,12 @@ namespace Evidence.API.Controllers
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = await _noteStore.GetNoteByIdAsync(evidence, id);
+            if (note is null) return NotFound("Note not found.");
 
             _mapper.Map(updateNoteDto, note);
 
-            await _noteStore.UpdateNoteAsync(evidence, note);
+            (bool Succeeded, ICollection<string> Errors) = await _noteStore.UpdateNoteAsync(evidence, note);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
@@ -80,8 +83,10 @@ namespace Evidence.API.Controllers
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = await _noteStore.GetNoteByIdAsync(evidence, id);
+            if (note is null) return NotFound("Note not found.");
 
-            await _noteStore.DeleteNoteAsync(evidence, note);
+            (bool Succeeded,ICollection<string> Errors) = await _noteStore.DeleteNoteAsync(evidence, note);
+            if(!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
