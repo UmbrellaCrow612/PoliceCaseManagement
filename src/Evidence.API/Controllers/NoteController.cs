@@ -27,7 +27,7 @@ namespace Evidence.API.Controllers
             var note = _mapper.Map<Note>(createNoteDto);
             note.EvidenceItemId = evidenceId;
 
-            (bool Succeeded, IEnumerable<string> Errors) = await _noteStore.CreateNoteAsync(evidence, note);
+            (bool Succeeded, ICollection<string> Errors) = await _noteStore.CreateNoteAsync(evidence, note);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
@@ -41,7 +41,7 @@ namespace Evidence.API.Controllers
 
             var notes = await _noteStore.GetNotesAsync(evidence);
 
-            var dto = _mapper.Map<IEnumerable<NoteDto>>(notes);
+            var dto = _mapper.Map<ICollection<NoteDto>>(notes);
 
             return Ok(dto);
         }

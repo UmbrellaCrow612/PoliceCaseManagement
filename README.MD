@@ -98,3 +98,9 @@ Updating an entry
 ## Date
 
 - throughout the app use `UTC now` time
+
+## Authentication
+
+- Follow JWT
+- Use role based Authentication
+- Mark controllers with authorize and methods with roles when needed and anonyms when needed 
