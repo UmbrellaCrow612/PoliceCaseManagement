@@ -4,11 +4,11 @@ namespace Evidence.Infrastructure.Data.Stores
 {
     public interface IEvidenceItemStore
     {
-        Task<IQueryable<EvidenceItem>> Evidences { get; }
+        IQueryable<EvidenceItem> Evidences { get; }
 
-        Task<(bool Succeeded, IEnumerable<string> Errors)> CreateEvidence(EvidenceItem evidence);
-        Task UpdateEvidence(string userId, EvidenceItem evidence);
-        Task<EvidenceItem?> GetEvidenceById (string id);
-        Task DeleteEvidence(string userId, EvidenceItem evidence);
+        Task<(bool Succeeded, ICollection<string> Errors)> CreateEvidenceAsync(EvidenceItem evidence);
+        Task<EvidenceItem?> GetEvidenceByIdAsync(string evidenceId);
+        Task<(bool Succeeded, ICollection<string> Errors)> UpdateEvidenceAsync(string userId, EvidenceItem evidence);
+        Task<(bool Succeeded, ICollection<string> Errors)> DeleteEvidenceAsync(string userId, EvidenceItem evidence);
     }
 }

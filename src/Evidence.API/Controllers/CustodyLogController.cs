@@ -21,12 +21,12 @@ namespace Evidence.API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateCustodyLog([FromBody] CreateCustodyLogDto createCustodyLogDto, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
             var log = _mapper.Map<CustodyLog>(createCustodyLogDto);
 
-            var (Succeeded, Errors) = await _custodyLogStore.CreateCustodyLog(evidence, log);
+            (bool Succeeded,ICollection<string> Errors) = await _custodyLogStore.CreateCustodyLog(evidence, log);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
@@ -35,7 +35,7 @@ namespace Evidence.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetCustodyLogs(string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
             var logs = await _custodyLogStore.GetCustodyLogs(evidence);
@@ -48,7 +48,7 @@ namespace Evidence.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetCustodyLogById(string evidenceId, string id)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
             var log = await _custodyLogStore.GetCustodyLogById(evidence, id);
@@ -62,7 +62,7 @@ namespace Evidence.API.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> UpdateCustodyLogById([FromBody] UpdateCustodyLogDto updateCustodyLogDto, string id, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
             var log = await _custodyLogStore.GetCustodyLogById(evidence, id);
@@ -78,7 +78,7 @@ namespace Evidence.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCustodyLogById(string id, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found");
 
             var log = await _custodyLogStore.GetCustodyLogById(evidence, id);

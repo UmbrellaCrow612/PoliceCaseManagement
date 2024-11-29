@@ -1,32 +1,104 @@
 ﻿using Evidence.Infrastructure.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evidence.Infrastructure.Data.Stores
 {
-    public class LabResultStore : ILabResultStore
+    public class LabResultStore(EvidenceApplicationDbContext dbContext) : ILabResultStore
     {
-        public Task<(bool Succeeded, IEnumerable<string> Errors)> CreateLabResult(EvidenceItem evidence, LabResult result)
+        private readonly EvidenceApplicationDbContext _dbContext = dbContext;
+
+        public IQueryable<LabResult> LabResults => _dbContext.LabResults.AsQueryable();
+
+        public async Task<(bool Succeeded, ICollection<string> Errors)> CreateLabResultAsync(EvidenceItem evidence, LabResult result)
         {
-            throw new NotImplementedException();
+            List<string> errors = [];
+
+            var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if(evidenceInContext is null)
+            {
+                errors.Add("Evidence not in context.");
+                return (false, errors);
+            }
+
+            if(result.EvidenceItemId != evidence.Id)
+            {
+                errors.Add("LabResult not linked to evidence.");
+            }
+
+            await _dbContext.LabResults.AddAsync(result);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
 
-        public Task DeleteLabResult(EvidenceItem evidence, LabResult result)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> DeleteLabResultAsync(EvidenceItem evidence, LabResult result)
         {
-            throw new NotImplementedException();
+            List<string> errors = [];
+
+            var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if (evidenceInContext is null)
+            {
+                errors.Add("Evidence not in context.");
+                return (false, errors);
+            }
+
+            var labResultInContext = _dbContext.LabResults.Local.FirstOrDefault(x => x.Id == result.Id);
+            if (labResultInContext is null)
+            {
+                errors.Add("LabResult not in context.");
+                return (false, errors);
+            }
+
+            if(result.EvidenceItemId != evidence.Id)
+            {
+                errors.Add("LabResult not linked to evidence");
+                return (false, errors);
+            }
+
+            _dbContext.LabResults.Remove(result);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
 
-        public Task<LabResult> GetLabResultById(EvidenceItem evidence, string id)
+        public async Task<LabResult?> GetLabResultByIdAsync(EvidenceItem evidence, string labResultId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.LabResults.Where(x => x.Id == labResultId && x.EvidenceItemId == evidence.Id).FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<LabResult>> GetLabResults(EvidenceItem evidence)
+        public async Task<ICollection<LabResult>> GetLabResultsAsync(EvidenceItem evidence)
         {
-            throw new NotImplementedException();
+            return await _dbContext.LabResults.Where(x => x.EvidenceItemId == evidence.Id).ToListAsync();
         }
 
-        public Task UpdateLabResult(EvidenceItem evidence, LabResult result)
+        public async Task<(bool Succeeded, ICollection<string> Errors)> UpdateLabResultAsync(EvidenceItem evidence, LabResult result)
         {
-            throw new NotImplementedException();
+            List<string> errors = [];
+
+            var evidenceInContext = _dbContext.Evidences.Local.FirstOrDefault(x => x.Id == evidence.Id);
+            if (evidenceInContext is null)
+            {
+                errors.Add("Evidence not in context.");
+                return (false, errors);
+            }
+
+            var labResultInContext = _dbContext.LabResults.Local.FirstOrDefault(x => x.Id == result.Id);
+            if (labResultInContext is null)
+            {
+                errors.Add("LabResult not in context.");
+                return (false, errors);
+            }
+
+            if (result.EvidenceItemId != evidence.Id)
+            {
+                errors.Add("LabResult not linked to evidence");
+                return (false, errors);
+            }
+
+            _dbContext.LabResults.Update(result);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
     }
 }

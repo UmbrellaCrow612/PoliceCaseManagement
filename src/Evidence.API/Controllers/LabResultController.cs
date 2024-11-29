@@ -22,12 +22,13 @@ namespace Evidence.API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateLabResult(string evidenceId, [FromBody] CreateLabResultDto createLabResultDto)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if(evidence is null) return NotFound("Evidence not found.");
 
             var labResult = _mapper.Map<LabResult>(createLabResultDto);
+            labResult.EvidenceItemId = evidenceId;
 
-            var (Succeeded, Errors) = await _labResultStore.CreateLabResult(evidence, labResult);
+            (bool Succeeded,ICollection<string> Errors) = await _labResultStore.CreateLabResultAsync(evidence, labResult);
             if (!Succeeded) return BadRequest(Errors);
 
             return Created();
@@ -36,55 +37,58 @@ namespace Evidence.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetLabResults(string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var results = await _labResultStore.GetLabResults(evidence);
+            var results = await _labResultStore.GetLabResultsAsync(evidence);
 
             var dto = _mapper.Map<IEnumerable<LabResultDto>>(results);
 
             return Ok(dto);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetLabResultById(string evidenceId, string id)
+        [HttpGet("{labResultId}")]
+        public async Task<ActionResult> GetLabResultById(string evidenceId, string labResultId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var result = await _labResultStore.GetLabResultById(evidence, id);
+            var result = await _labResultStore.GetLabResultByIdAsync(evidence, labResultId);
+            if (result is null) return NotFound("Lab Result not found.");
 
             var dto = _mapper.Map<LabResultDto>(result);
 
             return Ok(dto);
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> UpdateLabResultById(string id, string evidenceId, [FromBody] UpdateLabResultDto updateLabResultDto)
+        [HttpPatch("{labResultId}")]
+        public async Task<ActionResult> UpdateLabResultById(string labResultId, string evidenceId, [FromBody] UpdateLabResultDto updateLabResultDto)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var labResult = await _labResultStore.GetLabResultById(evidence, id);
+            var labResult = await _labResultStore.GetLabResultByIdAsync(evidence, labResultId);
             if (labResult is null) return NotFound("Lab result not found.");
 
             _mapper.Map(updateLabResultDto, labResult);
 
-            await _labResultStore.UpdateLabResult(evidence, labResult);
+            (bool Succeeded,ICollection<string> Errors) = await _labResultStore.UpdateLabResultAsync(evidence, labResult);
+            if (!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteLabResultById(string id, string evidenceId)
+        [HttpDelete("{labResultId}")]
+        public async Task<ActionResult> DeleteLabResultById(string labResultId, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
-            var labResult = await _labResultStore.GetLabResultById(evidence, id);
+            var labResult = await _labResultStore.GetLabResultByIdAsync(evidence, labResultId);
             if (labResult is null) return NotFound("Lab result not found.");
 
-            await _labResultStore.DeleteLabResult(evidence, labResult);
+            (bool Succeeded,ICollection<string> Errors) = await _labResultStore.DeleteLabResultAsync(evidence, labResult);
+            if(!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }

@@ -12,10 +12,9 @@ namespace Evidence.API.Controllers
     [Authorize]
     [ApiController]
     [Route("photos")]
-    public class PhotoController (IPhotoStore photoStore, IEvidenceItemStore evidenceItemStore, IMapper mapper): ControllerBase
+    public class PhotoController (IPhotoStore photoStore, IMapper mapper): ControllerBase
     {
         private readonly IPhotoStore _photoStore = photoStore;
-        private readonly IEvidenceItemStore _evidenceItemStore = evidenceItemStore;
         private readonly IMapper _mapper = mapper;
 
         [HttpPost]

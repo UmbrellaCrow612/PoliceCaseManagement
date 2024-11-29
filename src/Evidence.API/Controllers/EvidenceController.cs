@@ -27,20 +27,20 @@ namespace Evidence.API.Controllers
             var evidence = _mapper.Map<EvidenceItem>(createEvidenceDto);
             evidence.CreatedById = userId;
 
-            var (Succeeded, Errors) = await _evidenceItemStore.CreateEvidence(evidence);
+            var (Succeeded, Errors) = await _evidenceItemStore.CreateEvidenceAsync(evidence);
 
             if (!Succeeded)
             {
                 return BadRequest(Errors);
             }
 
-            return Ok(new { id = evidence.Id });
+            return Created(nameof(CreateEvidence), new { id = evidence.Id });
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetEvidenceById(string id)
+        [HttpGet("{evidenceId}")]
+        public async Task<ActionResult> GetEvidenceById(string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound();
 
             var dto = _mapper.Map<EvidenceItemDto>(evidence);
@@ -48,32 +48,34 @@ namespace Evidence.API.Controllers
             return Ok(dto);
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> PatchEvidenceById(string id, [FromBody] UpdateEvidenceItemDto updateEvidenceItemDto)
+        [HttpPatch("{evidenceId}")]
+        public async Task<ActionResult> PatchEvidenceById(string evidenceId, [FromBody] UpdateEvidenceItemDto updateEvidenceItemDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized("User ID not found on JWT");
 
-            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound();
 
             _mapper.Map(updateEvidenceItemDto, evidence);
 
-            await _evidenceItemStore.UpdateEvidence(userId, evidence);
+            (bool Succeeded,ICollection<string> Errors) = await _evidenceItemStore.UpdateEvidenceAsync(userId, evidence);
+            if(!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteEvidenceById(string id)
+        [HttpDelete("{evidenceId}")]
+        public async Task<ActionResult> DeleteEvidenceById(string evidenceId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized("User ID not found on JWT");
 
-            var evidence = await _evidenceItemStore.GetEvidenceById(id);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound();
 
-            await _evidenceItemStore.DeleteEvidence(userId, evidence);
+            (bool Succeeded,ICollection<string> Errors) = await _evidenceItemStore.DeleteEvidenceAsync(userId, evidence);
+            if(!Succeeded) return BadRequest(Errors);
 
             return NoContent();
         }

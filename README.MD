@@ -95,6 +95,10 @@ Updating an entry
 
 - Invalid data or shape - `BadRequest(Errors)`
 
+Posting data:
+
+- return thr ID of the created item -> `Created({id = id})`
+
 ## Date
 
 - throughout the app use `UTC now` time

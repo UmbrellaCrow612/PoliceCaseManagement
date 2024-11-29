@@ -21,7 +21,7 @@ namespace Evidence.API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateNote(string evidenceId, [FromBody] CreateNoteDto createNoteDto)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = _mapper.Map<Note>(createNoteDto);
@@ -36,7 +36,7 @@ namespace Evidence.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetNotes(string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
             var notes = await _noteStore.GetNotesAsync(evidence);
@@ -49,7 +49,7 @@ namespace Evidence.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetNoteById(string id, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = await _noteStore.GetNoteByIdAsync(evidence, id);
@@ -62,7 +62,7 @@ namespace Evidence.API.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> UpdateNoteById(string id, string evidenceId, [FromBody] UpdateNoteDto updateNoteDto)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = await _noteStore.GetNoteByIdAsync(evidence, id);
@@ -79,7 +79,7 @@ namespace Evidence.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteNoteById(string id, string evidenceId)
         {
-            var evidence = await _evidenceItemStore.GetEvidenceById(evidenceId);
+            var evidence = await _evidenceItemStore.GetEvidenceByIdAsync(evidenceId);
             if (evidence is null) return NotFound("Evidence not found.");
 
             var note = await _noteStore.GetNoteByIdAsync(evidence, id);
