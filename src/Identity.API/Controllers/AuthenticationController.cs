@@ -91,6 +91,12 @@ namespace Identity.API.Controllers
                 return Unauthorized("Incorrect credentials");
             }
 
+            if(user.EmailConfirmed is false)
+            {
+                // send confim code - they will then hit confim email endpoint
+                // also can use resend confim email
+            }
+
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
                 return Unauthorized("User account locked.");
@@ -326,6 +332,8 @@ namespace Identity.API.Controllers
         [HttpGet("confirmEmail")]
         public async Task<ActionResult> ConfirmEmail()
         {
+            // recieve code and email 
+            // validate time and code
             return Ok();
         }
 
@@ -333,6 +341,7 @@ namespace Identity.API.Controllers
         [HttpPost("resendConfirmationEmail")]
         public async Task<ActionResult> ResendConfirmEmail()
         {
+            // hit and sends a new email with code and invalides the previous code
             return Ok();
         }
     }
