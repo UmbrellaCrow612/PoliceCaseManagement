@@ -17,7 +17,7 @@ namespace Identity.API.Controllers
         JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
-        IDeviceInfoStore deviceInfoStore
+        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -30,6 +30,7 @@ namespace Identity.API.Controllers
         private readonly ILogger<AuthenticationController> _logger = logger;
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
         private readonly IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
+        private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -91,10 +92,14 @@ namespace Identity.API.Controllers
                 return Unauthorized("Incorrect credentials");
             }
 
-            if(user.EmailConfirmed is false)
+            if(!user.EmailConfirmed)
             {
-                // send confim code - they will then hit confim email endpoint
-                // also can use resend confim email
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/emailConfirm",
+                    message = "Email needs confirmation"
+                });
+
             }
 
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
@@ -329,20 +334,49 @@ namespace Identity.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("confirmEmail")]
-        public async Task<ActionResult> ConfirmEmail()
+        [HttpPost("confirmEmail")]
+        public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
         {
-            // recieve code and email 
-            // validate time and code
-            return Ok();
+            (bool isValid, EmailVerificationAttempt? attempt, ApplicationUser? user, ICollection<string> errors) = await _emailVerificationAttemptStore
+                .ValidateAttemptAsync(confirmEmailDto.Email, confirmEmailDto.Code);
+
+            if (!isValid) return BadRequest(errors);
+
+            if (attempt is null || user is null) return Unauthorized();
+
+            user.EmailConfirmed = true;
+
+            attempt.MarkUsed();
+
+            _emailVerificationAttemptStore.SetToUpdateAttempt(attempt);
+
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return BadRequest(res.Errors);
+
+            return NoContent();
         }
 
         [AllowAnonymous]
         [HttpPost("resendConfirmationEmail")]
-        public async Task<ActionResult> ResendConfirmEmail()
+        public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto resendConfirmationEmailDto)
         {
-            // hit and sends a new email with code and invalides the previous code
-            return Ok();
+            var user = await _userManager.FindByEmailAsync(resendConfirmationEmailDto.Email);
+            if (user is null) return Unauthorized();
+
+            var attempt = new EmailVerificationAttempt()
+            {
+                Email = resendConfirmationEmailDto.Email,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                Code = Guid.NewGuid().ToString(),
+                UserId = user.Id
+            };
+
+            (bool canMakeAttempt,bool successfullyAdded) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
+            if (!canMakeAttempt || !successfullyAdded) return BadRequest();
+
+            // send code in email
+
+            return Ok(attempt.Code);
         }
     }
 }

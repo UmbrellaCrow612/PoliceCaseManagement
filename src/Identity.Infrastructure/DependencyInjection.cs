@@ -33,6 +33,7 @@ namespace Identity.Infrastructure
             services.AddScoped<IDepartmentStore, DepartmentStore>();
             services.AddScoped<ILoginAttemptStore, LoginAttemptStore>();
             services.AddScoped<IDeviceInfoStore, DeviceInfoStore>();
+            services.AddScoped<IEmailVerificationAttemptStore, EmailVerificationAttemptStore>();
 
             return services;
         }

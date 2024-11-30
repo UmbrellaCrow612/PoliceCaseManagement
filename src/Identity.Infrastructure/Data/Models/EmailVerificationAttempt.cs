@@ -10,7 +10,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public required DateTime ExpiresAt {  get; set; }
         public DateTime? UsedAt { get; set; }
-        public required bool IsUsed { get; set; } = false;
+        public bool IsUsed { get; set; } = false;
 
         /// <summary>
         /// Returns true if, it is not used or elapsed the allowed time.
