@@ -101,6 +101,18 @@ namespace Identity.API.Controllers
                 });
 
             }
+            /*
+             flow:
+
+            log in attempt 
+            check if the current device info is those flagged for this user as allowed 
+            if so continue 
+            else 
+            send a challegene code
+            on sucess add it to allowed devices or connexted devices
+            else deny attempts from unauthed deices until challegne code is set or user marks it as flagged
+            and then you auto block and get info from the requester
+             */
 
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {

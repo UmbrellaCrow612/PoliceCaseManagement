@@ -8,5 +8,6 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task SetDeviceInfo(DeviceInfo deviceInfo);
         Task StoreDeviceInfo(DeviceInfo deviceInfo);
+        Task<DeviceInfo?> GetDeviceInfoByIdAsync(string deviceInfoId);
     }
 }
