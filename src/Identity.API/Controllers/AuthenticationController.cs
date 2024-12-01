@@ -334,7 +334,7 @@ namespace Identity.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("confirmEmail")]
+        [HttpPost("confirm-email")]
         public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
         {
             (bool isValid, EmailVerificationAttempt? attempt, ApplicationUser? user, ICollection<string> errors) = await _emailVerificationAttemptStore
@@ -357,7 +357,7 @@ namespace Identity.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("resendConfirmationEmail")]
+        [HttpPost("resend-confirmation-email")]
         public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto resendConfirmationEmailDto)
         {
             var user = await _userManager.FindByEmailAsync(resendConfirmationEmailDto.Email);
@@ -377,6 +377,23 @@ namespace Identity.API.Controllers
             // send code in email
 
             return Ok(attempt.Code);
+        }
+
+
+        [AllowAnonymous]
+        [HttpPost("challenge")]
+        public async Task<ActionResult> Challenge([FromBody] ChallengeDto challengeDto)
+        {
+            // on a suspoicous login througjh tracking whre the device info last used to login the accoutn is difrent do a challenge
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resend-challenge")]
+        public async Task<ActionResult> ReSendChallenge([FromBody] ReSendChallengeDto challengeDto)
+        {
+            // if you can resend  new code to challegmnge email 
+            return Ok();
         }
     }
 }
