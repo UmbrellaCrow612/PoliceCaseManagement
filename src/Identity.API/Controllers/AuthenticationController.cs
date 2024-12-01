@@ -17,7 +17,7 @@ namespace Identity.API.Controllers
         JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
-        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore
+        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -31,6 +31,7 @@ namespace Identity.API.Controllers
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
         private readonly IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
+        private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -101,18 +102,13 @@ namespace Identity.API.Controllers
                 });
 
             }
-            /*
-             flow:
 
-            log in attempt 
-            check if the current device info is those flagged for this user as allowed 
-            if so continue 
-            else 
-            send a challegene code
-            on sucess add it to allowed devices or connexted devices
-            else deny attempts from unauthed deices until challegne code is set or user marks it as flagged
-            and then you auto block and get info from the requester
-             */
+            var userDevice = await _userDeviceStore.GetUserDeviceByIdAsync(user, _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown"));
+            if(userDevice is null || !userDevice.IsTrusted)
+            {
+                // new device or not trausted so send challegnge code in email
+                return BadRequest("Challenge made.");
+            }
 
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
@@ -401,7 +397,7 @@ namespace Identity.API.Controllers
         [HttpPost("challenge")]
         public async Task<ActionResult> Challenge([FromBody] ChallengeDto challengeDto)
         {
-            // on a suspoicous login througjh tracking whre the device info last used to login the accoutn is difrent do a challenge
+            // on sucess add the device to the sotre lse fail response
             return Ok();
         }
 
@@ -409,7 +405,7 @@ namespace Identity.API.Controllers
         [HttpPost("resend-challenge")]
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendChallengeDto challengeDto)
         {
-            // if you can resend  new code to challegmnge email 
+            // check for if there is a valid attempt out if not then send a new one.
             return Ok();
         }
     }

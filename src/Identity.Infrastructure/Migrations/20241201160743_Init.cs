@@ -337,6 +337,28 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserDevices",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    DeviceName = table.Column<string>(type: "TEXT", nullable: false),
+                    DeviceIdentifier = table.Column<string>(type: "TEXT", nullable: false),
+                    IsTrusted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserDevices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserDevices_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DeviceInfos",
                 columns: table => new
                 {
@@ -442,6 +464,11 @@ namespace Identity.Infrastructure.Migrations
                 name: "IX_Tokens_UserId",
                 table: "Tokens",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDevices_UserId",
+                table: "UserDevices",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -479,6 +506,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SecurityAudits");
+
+            migrationBuilder.DropTable(
+                name: "UserDevices");
 
             migrationBuilder.DropTable(
                 name: "Tokens");

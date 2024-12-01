@@ -8,6 +8,11 @@ namespace Identity.Infrastructure.Data.Stores
 
         public IQueryable<DeviceInfo> DeviceInfos => _dbcontext.DeviceInfos.AsQueryable();
 
+        public Task<DeviceInfo?> GetDeviceInfoByIdAsync(string deviceInfoId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task SetDeviceInfo(DeviceInfo deviceInfo)
         {
             await _dbcontext.DeviceInfos.AddAsync(deviceInfo);

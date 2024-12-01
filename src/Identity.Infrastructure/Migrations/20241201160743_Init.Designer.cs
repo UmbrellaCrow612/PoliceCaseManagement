@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241201124430_Init")]
+    [Migration("20241201160743_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -394,6 +394,36 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("Tokens");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeviceIdentifier")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsTrusted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDevices");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -588,6 +618,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("UserDevices")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationRole", null)
@@ -655,6 +696,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("SecurityAudits");
 
                     b.Navigation("Tokens");
+
+                    b.Navigation("UserDevices");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Department", b =>
