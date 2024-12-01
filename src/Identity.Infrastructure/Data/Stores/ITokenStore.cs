@@ -6,6 +6,7 @@ namespace Identity.Infrastructure.Data.Stores
     {
         IQueryable<Token> Tokens { get; }
 
+        Task SetToken(Token token);
         Task StoreTokenAsync(Token token);
 
         Task RevokeTokenAsync(Token token);

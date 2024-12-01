@@ -137,7 +137,12 @@ namespace Identity.API.Controllers
                 DeviceInfoId = deviceInfo.Id,
             };
 
-            await _tokenStore.StoreTokenAsync(token);
+            await _tokenStore.SetToken(token);
+
+            user.LastLoginDeviceId = deviceInfo.Id;
+
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             _logger.LogInformation("Successful login for user: {Username} from IP: {IpAddress}",
                                     user.UserName, ipAddress);

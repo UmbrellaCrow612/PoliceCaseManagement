@@ -56,6 +56,13 @@ namespace Identity.Infrastructure.Data.Stores
             }
         }
 
+        /// <summary>
+        /// Adds it to context and waits for a save changes call to add it to db 
+        /// </summary>
+        public async Task SetToken(Token token)
+        {
+            await _dbContext.Tokens.AddAsync(token);
+        }
         public async Task StoreTokenAsync(Token token)
         {
             await _dbContext.Tokens.AddAsync(token);
