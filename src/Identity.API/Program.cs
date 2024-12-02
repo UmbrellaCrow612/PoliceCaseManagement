@@ -88,7 +88,7 @@ builder.Services.AddSingleton<StringEncryptionHelper>();
 builder.Services.AddSingleton<DeviceInfoHelper>();
 
 builder.Services.AddSingleton<Parser>(Provider => Parser.GetDefault());
-builder.Services.AddTransient<IDeviceIdentificationService, DeviceIdentificationHelper>();
+builder.Services.AddTransient<IDeviceIdentification, DeviceIdentification>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

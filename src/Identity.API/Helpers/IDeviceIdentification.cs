@@ -1,6 +1,6 @@
 ﻿namespace Identity.API.Helpers
 {
-    public interface IDeviceIdentificationService
+    public interface IDeviceIdentification
     {
         string GenerateDeviceId(string ipAddress, string userAgent);
     }

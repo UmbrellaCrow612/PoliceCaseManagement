@@ -4,9 +4,9 @@ using UAParser;
 
 namespace Identity.API.Helpers
 {
-    public class DeviceIdentificationHelper(ILogger<DeviceIdentificationHelper> logger, Parser userAgentParser) : IDeviceIdentificationService
+    public class DeviceIdentification(ILogger<DeviceIdentification> logger, Parser userAgentParser) : IDeviceIdentification
     {
-        private readonly ILogger<DeviceIdentificationHelper> _logger = logger;
+        private readonly ILogger<DeviceIdentification> _logger = logger;
         private readonly Parser _userAgentParser = userAgentParser ?? Parser.GetDefault();
 
         /// <summary>
