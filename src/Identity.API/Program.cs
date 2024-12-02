@@ -10,6 +10,7 @@ using Serilog.Events;
 using Serilog;
 using System.Text;
 using Identity.Infrastructure.Data.Models;
+using UAParser;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -85,6 +86,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddSingleton<StringEncryptionHelper>();
 builder.Services.AddSingleton<DeviceInfoHelper>();
+
+builder.Services.AddSingleton<Parser>(Provider => Parser.GetDefault());
+builder.Services.AddTransient<IDeviceIdentificationService, DeviceIdentificationHelper>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

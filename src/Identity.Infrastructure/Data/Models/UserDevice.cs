@@ -9,5 +9,7 @@
         public required string DeviceIdentifier { get; set; } // put an index on this - make way for no conflicts
         public required bool IsTrusted { get; set; } // flag and block those not trusted - send alerts or this
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
     }
 }

@@ -17,5 +17,6 @@ namespace Identity.Infrastructure.Data.Models
         public ICollection<SecurityAudit> SecurityAudits { get; set; } = [];
         public ICollection<EmailVerificationAttempt> EmailVerificationAttempts { get; set; } = [];
         public ICollection<UserDevice> UserDevices { get; set; } = [];
+        public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
     }
 }

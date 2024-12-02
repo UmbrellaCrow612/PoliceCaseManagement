@@ -17,7 +17,8 @@ namespace Identity.API.Controllers
         JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
-        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore
+        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
+        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -32,6 +33,7 @@ namespace Identity.API.Controllers
         private readonly IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
+        private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -106,8 +108,11 @@ namespace Identity.API.Controllers
             var userDevice = await _userDeviceStore.GetUserDeviceByIdAsync(user, _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown"));
             if(userDevice is null || !userDevice.IsTrusted)
             {
-                // new device or not trausted so send challegnge code in email
-                return BadRequest("Challenge made.");
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/confim-device",
+                    message = "Device needs confirmation"
+                });
             }
 
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
@@ -394,19 +399,56 @@ namespace Identity.API.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("challenge")]
-        public async Task<ActionResult> Challenge([FromBody] ChallengeDto challengeDto)
+        [HttpPost("user-device-challenge")]
+        public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto challengeDto)
         {
             // on sucess add the device to the sotre lse fail response
             return Ok();
         }
 
         [AllowAnonymous]
-        [HttpPost("resend-challenge")]
-        public async Task<ActionResult> ReSendChallenge([FromBody] ReSendChallengeDto challengeDto)
+        [HttpPost("resend-user-device-challenge")]
+        public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
-            // check for if there is a valid attempt out if not then send a new one.
-            return Ok();
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                            ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                            ?? "Unknown";
+
+            string userAgent = Request.Headers.UserAgent.ToString();
+
+            var uaParser = Parser.GetDefault();
+            var clientInfo = uaParser.Parse(userAgent);
+
+            var user = await _userManager.FindByEmailAsync(challengeDto.Email);
+            if (user is null) return Ok("User dose not exist - would not show in prod"); // dont reveal user
+
+            var code = Guid.NewGuid().ToString();
+
+            var deviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown");
+            UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceId);
+
+            device ??= new UserDevice()
+                {
+                    DeviceName = "Name",
+                    UserId = user.Id,
+                    DeviceIdentifier = deviceId,
+                    IsTrusted = false,
+                };
+
+            await _userDeviceStore.SetUserDevice(user, device);
+
+            var attempt = new UserDeviceChallengeAttempt()
+            {
+                Code = code,
+                Email = challengeDto.Email,
+                UserDeviceId = device.DeviceIdentifier,
+                UserId = user.Id
+            };
+
+            (bool canMakeAttempt,ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
+            if (!canMakeAttempt) return BadRequest(Errors);
+
+            return Ok(code);
         }
     }
 }

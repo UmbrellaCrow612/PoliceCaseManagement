@@ -4,6 +4,7 @@ namespace Identity.API.Helpers
 {
     public class DeviceInfoHelper
     {
+        [Obsolete("This method is old and new IDeviceIdentificationService is the way to go future me.")]
         public string GenerateDeviceId(ClientInfo clientInfo, string ipAddress)
         {
             // Create a unique device identifier based on available information
@@ -18,6 +19,7 @@ namespace Identity.API.Helpers
             return string.Join("-", components.Where(c => !string.IsNullOrEmpty(c)));
         }
 
+        [Obsolete("This method is old and new IDeviceIdentificationService is the way to go future me.")]
         public string DetermineDeviceType(ClientInfo clientInfo)
         {
             // Basic device type detection logic

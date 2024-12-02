@@ -2,10 +2,13 @@
 
 namespace Identity.API.DTOs
 {
-    public class ReSendChallengeDto
+    public class UserDeviceChallengeDto
     {
         [EmailAddress]
         [Required]
         public required string Email { get; set; }
+
+        [Required]
+        public required string Code { get; set; }
     }
 }

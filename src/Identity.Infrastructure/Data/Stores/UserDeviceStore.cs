@@ -14,9 +14,13 @@ namespace Identity.Infrastructure.Data.Stores
             throw new NotImplementedException();
         }
 
-        public Task SetUserDevice(ApplicationUser user, UserDevice userDevice)
+        public async Task SetUserDevice(ApplicationUser user, UserDevice userDevice)
         {
-            throw new NotImplementedException();
+            var inContext = EfHelper.ExistsInContext(_dbcontext,userDevice); // fetched from the user device store so it dose exist
+            if (!inContext)
+            {
+                await _dbcontext.UserDevices.AddAsync(userDevice);
+            }
         }
 
         public Task<(bool Succeed, ICollection<string> errors)> StoreUserDevice(ApplicationUser user, UserDevice userDevice)
