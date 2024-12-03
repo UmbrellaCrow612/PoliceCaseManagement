@@ -323,7 +323,7 @@ namespace Identity.Infrastructure.Migrations
                     RevokedReason = table.Column<string>(type: "TEXT", nullable: true),
                     IsBlackListed = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    DeviceInfoId = table.Column<string>(type: "TEXT", nullable: false)
+                    UserDeviceId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -353,30 +353,6 @@ namespace Identity.Infrastructure.Migrations
                         name: "FK_UserDevices_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DeviceInfos",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    UserAgent = table.Column<string>(type: "TEXT", nullable: false),
-                    IpAddress = table.Column<string>(type: "TEXT", nullable: false),
-                    DeviceId = table.Column<string>(type: "TEXT", nullable: true),
-                    DeviceType = table.Column<string>(type: "TEXT", nullable: true),
-                    Browser = table.Column<string>(type: "TEXT", nullable: true),
-                    Os = table.Column<string>(type: "TEXT", nullable: true),
-                    TokenId = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DeviceInfos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DeviceInfos_Tokens_TokenId",
-                        column: x => x.TokenId,
-                        principalTable: "Tokens",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -454,12 +430,6 @@ namespace Identity.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DeviceInfos_TokenId",
-                table: "DeviceInfos",
-                column: "TokenId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_EmailVerificationAttempts_UserId",
                 table: "EmailVerificationAttempts",
                 column: "UserId");
@@ -529,9 +499,6 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DeviceInfos");
-
-            migrationBuilder.DropTable(
                 name: "EmailVerificationAttempts");
 
             migrationBuilder.DropTable(
@@ -547,10 +514,10 @@ namespace Identity.Infrastructure.Migrations
                 name: "SecurityAudits");
 
             migrationBuilder.DropTable(
-                name: "UserDeviceChallengeAttempts");
+                name: "Tokens");
 
             migrationBuilder.DropTable(
-                name: "Tokens");
+                name: "UserDeviceChallengeAttempts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

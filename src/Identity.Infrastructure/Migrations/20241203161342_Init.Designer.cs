@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241203160202_Init")]
+    [Migration("20241203161342_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -130,43 +130,6 @@ namespace Identity.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("Identity.Infrastructure.Data.Models.DeviceInfo", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Browser")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DeviceId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DeviceType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Os")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TokenId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenId")
-                        .IsUnique();
-
-                    b.ToTable("DeviceInfos");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.EmailVerificationAttempt", b =>
@@ -360,10 +323,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DeviceInfoId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsBlackListed")
                         .HasColumnType("INTEGER");
 
@@ -381,6 +340,10 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RevokedReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserDeviceId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -570,17 +533,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Data.Models.DeviceInfo", b =>
-                {
-                    b.HasOne("Identity.Infrastructure.Data.Models.Token", "Token")
-                        .WithOne("DeviceInfo")
-                        .HasForeignKey("Identity.Infrastructure.Data.Models.DeviceInfo", "TokenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Token");
-                });
-
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.EmailVerificationAttempt", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
@@ -764,11 +716,6 @@ namespace Identity.Infrastructure.Migrations
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
-                {
-                    b.Navigation("DeviceInfo");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>

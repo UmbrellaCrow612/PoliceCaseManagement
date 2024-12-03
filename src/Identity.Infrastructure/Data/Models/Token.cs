@@ -12,7 +12,6 @@
         public string? RevokedReason { get; set; } = null;
         public bool IsBlackListed { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public required string DeviceInfoId { get; set; } 
-        public DeviceInfo? DeviceInfo { get; set; } = null;
+        public required string UserDeviceId { get; set; } 
     }
 }

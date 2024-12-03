@@ -32,7 +32,6 @@ namespace Identity.Infrastructure
             services.AddScoped<ISecurityAuditStore, SecurityAuditStore>();
             services.AddScoped<IDepartmentStore, DepartmentStore>();
             services.AddScoped<ILoginAttemptStore, LoginAttemptStore>();
-            services.AddScoped<IDeviceInfoStore, DeviceInfoStore>();
             services.AddScoped<IEmailVerificationAttemptStore, EmailVerificationAttemptStore>();
             services.AddScoped<IUserDeviceStore, UserDeviceStore>();
             services.AddScoped<IUserDeviceChallengeAttemptStore, UserDeviceChallengeAttemptStore>();

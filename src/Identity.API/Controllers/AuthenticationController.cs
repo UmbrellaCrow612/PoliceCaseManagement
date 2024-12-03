@@ -16,8 +16,8 @@ namespace Identity.API.Controllers
     public class AuthenticationController(
         JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
-        DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
-        IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
+        ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
+        IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification
         ) : ControllerBase
     {
@@ -27,10 +27,8 @@ namespace Identity.API.Controllers
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
-        private readonly DeviceInfoHelper _deviceInfoHelper = deviceInfoHelper;
         private readonly ILogger<AuthenticationController> _logger = logger;
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
-        private readonly IDeviceInfoStore _deviceInfoStore = deviceInfoStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
@@ -132,18 +130,6 @@ namespace Identity.API.Controllers
             (string  accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-            DeviceInfo deviceInfo = new()
-            {
-                IpAddress = ipAddress ?? "Not Found",
-                TokenId = tokenId,
-                UserAgent = userAgent,
-                Browser = "",
-                Os = "",
-                DeviceType = "",
-                DeviceId = ""
-            };
-
-            await _deviceInfoStore.SetDeviceInfo(deviceInfo);
             await _loginAttemptStore.SetLoginAttempt(loginAttempt);
 
             Token token = new()
@@ -152,18 +138,15 @@ namespace Identity.API.Controllers
                 RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
                 UserId = user.Id,
-                DeviceInfoId = deviceInfo.Id,
+                UserDeviceId = device.Id
             };
 
             await _tokenStore.SetToken(token);
 
-            user.LastLoginDeviceId = deviceInfo.Id;
+            user.LastLoginDeviceId = device.Id;
 
             var res = await _userManager.UpdateAsync(user);
             if (!res.Succeeded) return BadRequest(res.Errors);
-
-            _logger.LogInformation("Successful login for user: {Username} from IP: {IpAddress}",
-                                    user.UserName, ipAddress);
 
             return Ok(new { accessToken , refreshToken });
         }
@@ -204,10 +187,6 @@ namespace Identity.API.Controllers
 
             string userAgent = Request.Headers.UserAgent.ToString();
 
-            var uaParser = Parser.GetDefault();
-            var clientInfo = uaParser.Parse(userAgent);
-
-
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized("User ID not found in token.");
@@ -221,6 +200,10 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
+            var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
+            if(device is null) return Unauthorized("Device not registered.");
+
             (bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors) = await _tokenStore.ValidateTokenAsync(tokenId, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
 
             if (!isValid || RefreshTokenExpiresAt is null) return Unauthorized(Errors);
@@ -229,26 +212,13 @@ namespace Identity.API.Controllers
 
             var (accessToken, accessTokenId) = _jwtHelper.GenerateToken(user, roles);
 
-            DeviceInfo deviceInfo = new()
-            {
-                IpAddress = ipAddress ?? "Not Found",
-                TokenId = accessTokenId,
-                UserAgent = userAgent,
-                Browser = clientInfo.UA.Family,
-                Os = clientInfo.OS.Family,
-                DeviceType = _deviceInfoHelper.DetermineDeviceType(clientInfo),
-                DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
-            };
-
-            await _deviceInfoStore.SetDeviceInfo(deviceInfo);
-
             Token token = new()
             {
                 Id = accessTokenId,
                 RefreshToken = refreshTokenRequestDto.RefreshToken,
                 RefreshTokenExpiresAt = (DateTime)RefreshTokenExpiresAt,
                 UserId = userId,
-                DeviceInfoId = deviceInfo.Id,
+                UserDeviceId = device.Id
             };
 
             await _tokenStore.StoreTokenAsync(token);

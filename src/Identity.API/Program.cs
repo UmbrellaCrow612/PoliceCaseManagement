@@ -84,7 +84,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddSingleton<StringEncryptionHelper>();
-builder.Services.AddSingleton<DeviceInfoHelper>();
 
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 
