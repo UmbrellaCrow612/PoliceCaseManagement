@@ -54,9 +54,6 @@ namespace Identity.API.Controllers
                 return BadRequest("Provide a username of email");
             }
 
-            _logger.LogInformation("Login attempt by user: {Username} from IP: {IpAddress}, User-Agent: {UserAgent}",
-                                    loginRequestDto.UserName ?? loginRequestDto.Email, ipAddress, userAgent);
-
             ApplicationUser? user;
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
@@ -120,7 +117,18 @@ namespace Identity.API.Controllers
                     redirectUrl = "/deviceConfirm",
                     message = "Device needs confirmation"
                 });
+            }
 
+            if (!device.IsTrusted)
+            {
+                loginAttempt.FailureReason = "Untrusted Device being used.";
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
+
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm?untrusted-device-used=true",
+                    message = "Device needs confirmation"
+                });
             }
 
             loginAttempt.Status = LoginStatus.SUCCESS;
