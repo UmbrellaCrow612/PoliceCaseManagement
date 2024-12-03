@@ -415,39 +415,34 @@ namespace Identity.API.Controllers
         [HttpPost("resend-user-device-challenge")]
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
-            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
-                            ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                            ?? "Unknown";
-
             string userAgent = Request.Headers.UserAgent.ToString();
 
-            var uaParser = Parser.GetDefault();
-            var clientInfo = uaParser.Parse(userAgent);
-
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
-            if (user is null) return Ok("User dose not exist - would not show in prod"); // dont reveal user
+            if (user is null) return Ok("User dose not exist - would not show in prod");
 
             var code = Guid.NewGuid().ToString();
 
-            var deviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown");
-            UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceId);
+            var deviceIdOfRequesttor = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
 
-            device ??= new UserDevice()
-                {
-                    DeviceName = "Name",
-                    UserId = user.Id,
-                    DeviceIdentifier = deviceId,
-                    IsTrusted = false,
-                };
+            UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceIdOfRequesttor);
+            if (device is not null && device.IsTrusted is true) return BadRequest("Device is already trusted - no need to send a challenge.");
+
+            device ??= new UserDevice
+            {
+                DeviceIdentifier = deviceIdOfRequesttor,
+                DeviceName = "Test name",
+                IsTrusted = false,
+                UserId = user.Id,
+            };
 
             await _userDeviceStore.SetUserDevice(user, device);
 
-            var attempt = new UserDeviceChallengeAttempt()
+            var attempt = new UserDeviceChallengeAttempt
             {
                 Code = code,
                 Email = challengeDto.Email,
-                UserDeviceId = device.DeviceIdentifier,
-                UserId = user.Id
+                UserDeviceId = device.Id,
+                UserId = user.Id,
             };
 
             (bool canMakeAttempt,ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);

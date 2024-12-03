@@ -421,6 +421,45 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("UserDevices");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDeviceChallengeAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserDeviceId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserDeviceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDeviceChallengeAttempts");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -626,6 +665,25 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDeviceChallengeAttempt", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.UserDevice", "UserDevice")
+                        .WithMany("UserDeviceChallengeAttempts")
+                        .HasForeignKey("UserDeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("UserDeviceChallengeAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserDevice");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationRole", null)
@@ -694,6 +752,8 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("Tokens");
 
+                    b.Navigation("UserDeviceChallengeAttempts");
+
                     b.Navigation("UserDevices");
                 });
 
@@ -710,6 +770,11 @@ namespace Identity.Infrastructure.Migrations
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Token", b =>
                 {
                     b.Navigation("DeviceInfo");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>
+                {
+                    b.Navigation("UserDeviceChallengeAttempts");
                 });
 #pragma warning restore 612, 618
         }

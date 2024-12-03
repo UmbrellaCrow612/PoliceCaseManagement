@@ -12,9 +12,6 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task<UserDevice?> GetUserDeviceByIdAsync(ApplicationUser user, string userDeviceId)
         {
-            var inContext = EfHelper.ExistsInContext(_dbcontext, user);
-            if (!inContext) throw new Exception("User not in context.");
-
             return  await _dbcontext.UserDevices.FirstOrDefaultAsync(x => x.DeviceIdentifier == userDeviceId && x.UserId == user.Id);
         }
 

@@ -382,6 +382,36 @@ namespace Identity.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserDeviceChallengeAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    UserDeviceId = table.Column<string>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserDeviceChallengeAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserDeviceChallengeAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserDeviceChallengeAttempts_UserDevices_UserDeviceId",
+                        column: x => x.UserDeviceId,
+                        principalTable: "UserDevices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -466,6 +496,16 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserDeviceChallengeAttempts_UserDeviceId",
+                table: "UserDeviceChallengeAttempts",
+                column: "UserDeviceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDeviceChallengeAttempts_UserId",
+                table: "UserDeviceChallengeAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserDevices_UserId",
                 table: "UserDevices",
                 column: "UserId");
@@ -508,7 +548,7 @@ namespace Identity.Infrastructure.Migrations
                 name: "SecurityAudits");
 
             migrationBuilder.DropTable(
-                name: "UserDevices");
+                name: "UserDeviceChallengeAttempts");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
@@ -518,6 +558,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Permissions");
+
+            migrationBuilder.DropTable(
+                name: "UserDevices");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
