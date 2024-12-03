@@ -1,5 +1,6 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
@@ -32,9 +33,32 @@ namespace Identity.Infrastructure.Data.Stores
             return (true, errors);
         }
 
-        public Task<(bool isValid, UserDeviceChallengeAttempt? attempt)> ValidateAttempt(string email, string code)
+        public void SetToUpdateAttempt(UserDeviceChallengeAttempt attempt)
         {
-            throw new NotImplementedException();
+            if (!EfHelper.ExistsInContext(_dbcontext, attempt)) throw new Exception("Attempt not in context.");
+
+            _dbcontext.UserDeviceChallengeAttempts.Update(attempt);
+        }
+
+        public async Task UpdateAttemptAsync(UserDeviceChallengeAttempt attempt)
+        {
+            if (!EfHelper.ExistsInContext(_dbcontext, attempt)) throw new Exception("Attempt not in context");
+
+            _dbcontext.UserDeviceChallengeAttempts.Update(attempt);
+
+            await _dbcontext.SaveChangesAsync();
+        }
+
+        public async Task<(bool isValid, UserDeviceChallengeAttempt? attempt)> ValidateAttemptAsync(string email, string code)
+        {
+            var attempt = await _dbcontext.UserDeviceChallengeAttempts
+                .Where(x => x.Email == email && x.Code == code && x.IsSuccessful == false && x.SuccessfulAt == null).FirstOrDefaultAsync();
+
+            if (attempt is null) return (false, null);
+
+            if(!attempt.IsValid()) return (false, null);
+
+            return (true, attempt);
         }
     }
 }

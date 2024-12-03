@@ -399,10 +399,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DeviceIdentifier")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("DeviceName")
                         .IsRequired()
                         .HasColumnType("TEXT");

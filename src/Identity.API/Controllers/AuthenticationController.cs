@@ -407,7 +407,22 @@ namespace Identity.API.Controllers
         [HttpPost("user-device-challenge")]
         public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto challengeDto)
         {
-            // on sucess add the device to the sotre lse fail response
+            var user = await _userManager.FindByEmailAsync(challengeDto.Email);
+            if (user is null) return Ok("User dose not exist - would not show in prod");
+
+            (bool isValid,UserDeviceChallengeAttempt? attempt) = await _userDeviceChallengeAttemptStore.ValidateAttemptAsync(challengeDto.Email, challengeDto.Code);
+            if (!isValid || attempt is null) return BadRequest("Attempt is invalid or attempt not found.");
+
+            attempt.MarkUsed();
+            _userDeviceChallengeAttemptStore.SetToUpdateAttempt(attempt);
+
+            var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, attempt.UserDeviceId);
+            if (device is null) return NotFound("Device not found.");
+
+            device.IsTrusted = true;
+
+            await _userDeviceStore.UpdateAsync(device);
+
             return Ok();
         }
 
@@ -422,14 +437,14 @@ namespace Identity.API.Controllers
 
             var code = Guid.NewGuid().ToString();
 
-            var deviceIdOfRequesttor = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
+            var deviceIdentifierId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
 
-            UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceIdOfRequesttor);
+            UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceIdentifierId);
             if (device is not null && device.IsTrusted is true) return BadRequest("Device is already trusted - no need to send a challenge.");
 
             device ??= new UserDevice
             {
-                DeviceIdentifier = deviceIdOfRequesttor,
+                Id = deviceIdentifierId,
                 DeviceName = "Test name",
                 IsTrusted = false,
                 UserId = user.Id,
@@ -441,7 +456,7 @@ namespace Identity.API.Controllers
             {
                 Code = code,
                 Email = challengeDto.Email,
-                UserDeviceId = device.Id,
+                UserDeviceId = deviceIdentifierId,
                 UserId = user.Id,
             };
 

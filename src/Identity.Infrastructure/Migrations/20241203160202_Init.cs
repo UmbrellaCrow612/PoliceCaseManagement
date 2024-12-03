@@ -343,7 +343,6 @@ namespace Identity.Infrastructure.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     DeviceName = table.Column<string>(type: "TEXT", nullable: false),
-                    DeviceIdentifier = table.Column<string>(type: "TEXT", nullable: false),
                     IsTrusted = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },

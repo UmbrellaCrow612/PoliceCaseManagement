@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241203133251_Init")]
+    [Migration("20241203160202_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -400,10 +400,6 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DeviceIdentifier")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DeviceName")
