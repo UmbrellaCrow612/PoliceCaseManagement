@@ -1,5 +1,6 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
@@ -25,7 +26,11 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task StoreLoginAttempt(LoginAttempt loginAttempt)
         {
-            await _dbcontext.LoginAttempts.AddAsync(loginAttempt);
+            if(!EfHelper.ExistsInContext(_dbcontext, loginAttempt))
+            {
+                await _dbcontext.LoginAttempts.AddAsync(loginAttempt);
+            }
+
             await _dbcontext.SaveChangesAsync();
         }
     }

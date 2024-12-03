@@ -83,11 +83,7 @@ namespace Identity.API.Controllers
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
             if (!isPasswordCorrect)
             {
-                _logger.LogWarning("Failed login attempt for user: {Username} from IP: {IpAddress}, Reason: Incorrect credentials",
-                                    loginRequestDto.UserName ?? loginRequestDto.Email, ipAddress);
-
                 loginAttempt.FailureReason = "User credentials";
-
                 await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
 
                 return Unauthorized("Incorrect credentials");
@@ -95,11 +91,17 @@ namespace Identity.API.Controllers
 
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
+                loginAttempt.FailureReason = "User account locked.";
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
+
                 return Unauthorized("User account locked.");
             }
 
             if (!user.EmailConfirmed)
             {
+                loginAttempt.FailureReason = "Email not confirmed.";
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
+
                 return StatusCode(403, new
                 {
                     redirectUrl = "/emailConfirm",
@@ -110,7 +112,18 @@ namespace Identity.API.Controllers
             var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
 
             var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
-            if (device is null) return BadRequest("Here the device is new so we would send a challegene code email - on sucess it would register the device and allow them to go past this point.");
+            if (device is null)
+            {
+                loginAttempt.FailureReason = "New Device being used.";
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
+
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm",
+                    message = "Device needs confirmation"
+                });
+
+            }
 
             loginAttempt.Status = LoginStatus.SUCCESS;
 
