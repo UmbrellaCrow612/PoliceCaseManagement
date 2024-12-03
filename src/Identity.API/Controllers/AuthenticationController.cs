@@ -104,6 +104,18 @@ namespace Identity.API.Controllers
                 });
             }
 
+            if (!user.PhoneNumberConfirmed)
+            {
+                loginAttempt.FailureReason = "Phone not confirmed.";
+                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
+
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/phoneConfirme",
+                    message = "Phone needs confirmation"
+                });
+            }
+
             var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
 
             var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
@@ -440,6 +452,36 @@ namespace Identity.API.Controllers
 
             (bool canMakeAttempt,ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
             if (!canMakeAttempt) return BadRequest(Errors);
+
+            return Ok(code);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("phone-confirmation")]
+        public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto phoneConfirmationDto)
+        {
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resend-phone-confirmation")]
+        public async Task<ActionResult> ReSendPhoneConfirmation([FromBody] ReSendPhoneConfirmationDto reSendPhoneConfirmation)
+        {
+            var user = await _userManager.FindByEmailAsync(reSendPhoneConfirmation.Email);
+            if (user is null) return NotFound("User not found.");
+
+            var code = Guid.NewGuid().ToString();
+
+            var attempt = new PhoneConfirmationAttempt
+            {
+                Code= code,
+                PhoneNumber = user.PhoneNumber!,
+                UserId= user.Id,
+            };
+
+            // todo - add it to store similar to others
+
+            // send code in sms message
 
             return Ok(code);
         }

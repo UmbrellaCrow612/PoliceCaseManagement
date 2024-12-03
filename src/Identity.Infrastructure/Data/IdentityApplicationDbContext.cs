@@ -7,6 +7,7 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
+        public required DbSet<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; }
         public required DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
         public required DbSet<UserDevice> UserDevices { get; set; }
         public required DbSet<EmailVerificationAttempt> EmailVerificationAttempts { get; set; }

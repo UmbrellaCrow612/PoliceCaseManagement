@@ -255,6 +255,39 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("Permissions");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.PhoneConfirmationAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PhoneConfirmationAttempts");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.RolePermission", b =>
                 {
                     b.Property<string>("RoleId")
@@ -563,6 +596,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.PhoneConfirmationAttempt", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("PhoneConfirmationAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.RolePermission", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.Permission", "Permission")
@@ -695,6 +739,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("LoginAttempts");
 
                     b.Navigation("PasswordResetAttempts");
+
+                    b.Navigation("PhoneConfirmationAttempts");
 
                     b.Navigation("SecurityAudits");
 
