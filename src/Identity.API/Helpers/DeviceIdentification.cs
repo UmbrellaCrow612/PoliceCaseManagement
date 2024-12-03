@@ -4,10 +4,9 @@ using UAParser;
 
 namespace Identity.API.Helpers
 {
-    public class DeviceIdentification(ILogger<DeviceIdentification> logger, Parser userAgentParser) : IDeviceIdentification
+    public class DeviceIdentification(ILogger<DeviceIdentification> logger) : IDeviceIdentification
     {
         private readonly ILogger<DeviceIdentification> _logger = logger;
-        private readonly Parser _userAgentParser = userAgentParser ?? Parser.GetDefault();
 
         /// <summary>
         /// Generates a unique device identifier based on user and device information.
@@ -27,7 +26,9 @@ namespace Identity.API.Helpers
         /// </remarks>
         public string GenerateDeviceId(string userId, string userAgent)
         {
-            if(string.IsNullOrWhiteSpace(userId))
+            var parser = Parser.GetDefault();
+
+            if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
 
             if (string.IsNullOrWhiteSpace(userAgent))
@@ -36,7 +37,7 @@ namespace Identity.API.Helpers
             try
             {
                 // Parse the user agent
-                var clientInfo = _userAgentParser.Parse(userAgent);
+                var clientInfo = parser.Parse(userAgent);
 
                 // Create components for device ID
                 var components = new[]

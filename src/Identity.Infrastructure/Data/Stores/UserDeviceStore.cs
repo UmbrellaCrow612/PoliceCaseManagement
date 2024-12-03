@@ -1,4 +1,5 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
@@ -9,9 +10,12 @@ namespace Identity.Infrastructure.Data.Stores
 
         public IQueryable<UserDevice> UserDevices => throw new NotImplementedException();
 
-        public Task<UserDevice?> GetUserDeviceByIdAsync(ApplicationUser user, string userDeviceId)
+        public async Task<UserDevice?> GetUserDeviceByIdAsync(ApplicationUser user, string userDeviceId)
         {
-            throw new NotImplementedException();
+            var inContext = EfHelper.ExistsInContext(_dbcontext, user);
+            if (!inContext) throw new Exception("User not in context.");
+
+            return  await _dbcontext.UserDevices.FirstOrDefaultAsync(x => x.DeviceIdentifier == userDeviceId && x.UserId == user.Id);
         }
 
         public async Task SetUserDevice(ApplicationUser user, UserDevice userDevice)

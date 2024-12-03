@@ -18,7 +18,7 @@ namespace Identity.API.Controllers
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         DeviceInfoHelper deviceInfoHelper, ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IDeviceInfoStore deviceInfoStore, IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
-        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore
+        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -34,6 +34,7 @@ namespace Identity.API.Controllers
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
+        private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -49,9 +50,6 @@ namespace Identity.API.Controllers
                                 ?? "Unknown";
 
             string userAgent = Request.Headers.UserAgent.ToString();
-
-            var uaParser = Parser.GetDefault();
-            var clientInfo = uaParser.Parse(userAgent);
 
             if (string.IsNullOrWhiteSpace(loginRequestDto.Email) && string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
@@ -77,7 +75,7 @@ namespace Identity.API.Controllers
 
             LoginAttempt loginAttempt = new()
             {
-                IpAddress = ipAddress ?? "Unkown",
+                IpAddress = ipAddress,
                 UserAgent = userAgent,
                 UserId = user.Id,
             };
@@ -95,30 +93,24 @@ namespace Identity.API.Controllers
                 return Unauthorized("Incorrect credentials");
             }
 
-            if(!user.EmailConfirmed)
+            if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return Unauthorized("User account locked.");
+            }
+
+            if (!user.EmailConfirmed)
             {
                 return StatusCode(403, new
                 {
                     redirectUrl = "/emailConfirm",
                     message = "Email needs confirmation"
                 });
-
             }
 
-            var userDevice = await _userDeviceStore.GetUserDeviceByIdAsync(user, _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown"));
-            if(userDevice is null || !userDevice.IsTrusted)
-            {
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/confim-device",
-                    message = "Device needs confirmation"
-                });
-            }
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
 
-            if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
-            {
-                return Unauthorized("User account locked.");
-            }
+            var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
+            if (device is null) return BadRequest("Here the device is new so we would send a challegene code email - on sucess it would register the device and allow them to go past this point.");
 
             loginAttempt.Status = LoginStatus.SUCCESS;
 
@@ -132,10 +124,10 @@ namespace Identity.API.Controllers
                 IpAddress = ipAddress ?? "Not Found",
                 TokenId = tokenId,
                 UserAgent = userAgent,
-                Browser = clientInfo.UA.Family,
-                Os = clientInfo.OS.Family,
-                DeviceType = _deviceInfoHelper.DetermineDeviceType(clientInfo),
-                DeviceId = _deviceInfoHelper.GenerateDeviceId(clientInfo, ipAddress ?? "Unkown")
+                Browser = "",
+                Os = "",
+                DeviceType = "",
+                DeviceId = ""
             };
 
             await _deviceInfoStore.SetDeviceInfo(deviceInfo);
