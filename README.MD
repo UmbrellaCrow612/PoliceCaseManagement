@@ -99,16 +99,23 @@ Posting data:
 
 - return thr ID of the created item -> `Created({id = id})`
 
-## Date
+### Date
 
 - throughout the app use `UTC now` time
 
-## Authentication
+### Authentication
 
 - Follow JWT
 - Use role based Authentication
 - Mark controllers with authorize and methods with roles when needed and anonyms when needed 
 
-## Url format
+### Url format
 
 use dashed case - `labResults` into -> `lab-results`
+
+### Error / Bad request responses
+
+Use a standard response format across all bad request responses and error responses so api is easy to use and understand 
+as an expected error response format will be expected
+
+These are `ApiErrorResponse` and `ErrorDetail`.
