@@ -2,10 +2,12 @@
 {
     internal class Runner
     {
-        private readonly string baseSolutionPath = "../";
         public void Run()
         {
-            Console.WriteLine(baseSolutionPath);
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            string temp = "";
+
         }
     }
 }

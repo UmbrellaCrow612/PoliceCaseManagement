@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241203212439_Init")]
+    [Migration("20241205191436_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -285,6 +285,8 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("UserId");
 

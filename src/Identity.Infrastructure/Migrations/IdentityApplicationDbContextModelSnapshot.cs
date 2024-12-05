@@ -283,6 +283,8 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PhoneNumber");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("PhoneConfirmationAttempts");

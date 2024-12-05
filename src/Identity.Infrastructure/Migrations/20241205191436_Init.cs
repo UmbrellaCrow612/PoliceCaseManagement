@@ -473,6 +473,11 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PhoneConfirmationAttempts_PhoneNumber",
+                table: "PhoneConfirmationAttempts",
+                column: "PhoneNumber");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PhoneConfirmationAttempts_UserId",
                 table: "PhoneConfirmationAttempts",
                 column: "UserId");

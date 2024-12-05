@@ -1,5 +1,9 @@
-﻿namespace Identity.Infrastructure.Data.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Identity.Infrastructure.Data.Models
 {
+    [Index(nameof(UserId))]
+    [Index(nameof(PhoneNumber))]
     public class PhoneConfirmationAttempt
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

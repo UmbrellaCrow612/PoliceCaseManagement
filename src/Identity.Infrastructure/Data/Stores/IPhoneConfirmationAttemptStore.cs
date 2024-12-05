@@ -1,0 +1,14 @@
+﻿using Identity.Infrastructure.Data.Models;
+using Shared.DTOs;
+
+namespace Identity.Infrastructure.Data.Stores
+{
+    public interface IPhoneConfirmationAttemptStore
+    {
+        IQueryable<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; }
+
+        Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(PhoneConfirmationAttempt attempt);
+        Task<(bool isValid, PhoneConfirmationAttempt? attempt, ICollection<ErrorDetail> errors)> ValidateAttempt(string phoneNumber, string code);
+        Task UpdateAsync(PhoneConfirmationAttempt attempt);
+    }
+}
