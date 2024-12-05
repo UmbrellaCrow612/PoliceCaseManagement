@@ -223,7 +223,7 @@ namespace Identity.API.Controllers
             var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
             if(device is null || !device.IsTrusted) return Unauthorized("Device not registered or trusted.");
 
-            (bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors) = await _tokenStore.ValidateTokenAsync(tokenId, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
+            (bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors) = await _tokenStore.ValidateTokenAsync(tokenId, device.Id, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
 
             if (!isValid || RefreshTokenExpiresAt is null) return Unauthorized(Errors);
 

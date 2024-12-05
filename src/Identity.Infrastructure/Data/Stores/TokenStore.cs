@@ -69,7 +69,7 @@ namespace Identity.Infrastructure.Data.Stores
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string refreshToken)
+        public async Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string deviceId, string refreshToken)
         {
             List<string> errors = [];
             double lifetime =  double.Parse(_configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt:ExpiresInMinutes not provided"));
@@ -82,6 +82,7 @@ namespace Identity.Infrastructure.Data.Stores
                 || token.IsBlackListed 
                 || token.RefreshToken != refreshToken
                 || token.RefreshTokenExpiresAt < DateTime.UtcNow
+                || token.UserDeviceId != deviceId
                 )
             {
                 errors.Add("Token Invalid");
