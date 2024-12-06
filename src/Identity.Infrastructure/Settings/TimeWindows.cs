@@ -1,4 +1,4 @@
-﻿namespace Identity.API.Settings
+﻿namespace Identity.Infrastructure.Settings
 {
     /// <summary>
     /// Configures time windows for critical identity-related actions, 
