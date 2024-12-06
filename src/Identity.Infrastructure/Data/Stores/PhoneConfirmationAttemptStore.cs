@@ -35,6 +35,11 @@ namespace Identity.Infrastructure.Data.Stores
             return (true, errors);
         }
 
+        public void SetToUpdate(PhoneConfirmationAttempt attempt)
+        {
+            _dbcontext.PhoneConfirmationAttempts.Update(attempt);
+        }
+
         public async Task UpdateAsync(PhoneConfirmationAttempt attempt)
         {
             if(EfHelper.ExistsInContext(_dbcontext, attempt))
@@ -48,7 +53,7 @@ namespace Identity.Infrastructure.Data.Stores
         {
             List<ErrorDetail> errors = [];
 
-            var _attempt = await _dbcontext.PhoneConfirmationAttempts.Where(x => x.PhoneNumber == phoneNumber && x.Code == code).FirstOrDefaultAsync();
+            var _attempt = await _dbcontext.PhoneConfirmationAttempts.Where(x => x.PhoneNumber == phoneNumber && x.Code == code && x.IsSuccessful == false).FirstOrDefaultAsync();
             if(_attempt is null)
             {
                 errors.Add(new ErrorDetail { Reason = "Phone confirmation not found for phone number and code.", Field = "Phone confirmation attempt." });

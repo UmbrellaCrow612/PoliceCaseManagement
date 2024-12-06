@@ -5,6 +5,7 @@ using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -17,7 +18,7 @@ namespace Identity.API.Controllers
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
-        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification
+        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -32,6 +33,7 @@ namespace Identity.API.Controllers
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
+        private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
 
         /// <summary>
         /// Accepts username and password Authenticates the user Generates an access token and 
@@ -459,7 +461,25 @@ namespace Identity.API.Controllers
         [HttpPost("phone-confirmation")]
         public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto phoneConfirmationDto)
         {
-            return Ok();
+            (bool isValid, PhoneConfirmationAttempt? attempt,ICollection<ErrorDetail> errors) = 
+                await _phoneConfirmationAttemptStore.ValidateAttempt(phoneConfirmationDto.PhoneNumber, phoneConfirmationDto.Code);
+
+            if (!isValid) return BadRequest(errors);
+
+            if(attempt is null) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(attempt.UserId);
+            if (user is null) return Unauthorized();
+
+            attempt.MarkUsed();
+            _phoneConfirmationAttemptStore.SetToUpdate(attempt);
+
+            user.PhoneNumberConfirmed = true;
+
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return BadRequest(res.Errors);
+
+            return NoContent();
         }
 
         [AllowAnonymous]
@@ -468,6 +488,9 @@ namespace Identity.API.Controllers
         {
             var user = await _userManager.FindByEmailAsync(reSendPhoneConfirmation.Email);
             if (user is null) return NotFound("User not found.");
+
+            if (user.PhoneNumberConfirmed) return BadRequest(new ErrorDetail 
+            { Field = "Phone Confirmation", Reason = "Users phone number already confirmed."});
 
             var code = Guid.NewGuid().ToString();
 
@@ -478,7 +501,8 @@ namespace Identity.API.Controllers
                 UserId= user.Id,
             };
 
-            // todo - add it to store similar to others
+            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _phoneConfirmationAttemptStore.AddAttempt(attempt);
+            if (!canMakeAttempt) return BadRequest(errors);
 
             // send code in sms message
 
