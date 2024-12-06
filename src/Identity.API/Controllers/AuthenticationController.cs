@@ -284,16 +284,11 @@ namespace Identity.API.Controllers
                 UserId = user.Id,
             };
 
-            var (canMakeAttempt, successfullyAdded) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
+            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
 
             if (!canMakeAttempt)
             {
-                return BadRequest(); // Already made one in time period
-            }
-
-            if (!successfullyAdded)
-            {
-                return BadRequest();
+                return BadRequest(errors);
             }
 
            // Send Email link with true code
@@ -308,13 +303,12 @@ namespace Identity.API.Controllers
             (bool isValid, PasswordResetAttempt? attempt) = await _passwordResetAttemptStore.ValidateAttempt(code);
             if (!isValid) return Unauthorized(); // Either session expired or code is wrong for latest attempt or already used
 
-            if (attempt is null) return Unauthorized();
+            if (attempt is null) return Unauthorized(); // attempt is either not found or time elapsed and is no longer valid
 
             var user = await _userManager.FindByIdAsync(attempt.UserId);
             if (user is null) return BadRequest();
 
-            attempt.IsSuccessful = true;
-            attempt.SuccessfulAt = DateTime.UtcNow;
+            attempt.MarkUsed();
 
             _passwordResetAttemptStore.SetToUpdateAttempt(attempt);
 

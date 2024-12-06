@@ -1,52 +1,63 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class PasswordResetAttemptStore(IConfiguration configuration, IdentityApplicationDbContext dbContext) : IPasswordResetAttemptStore
+    public class PasswordResetAttemptStore(IdentityApplicationDbContext dbContext, TimeWindows timeWindows) : IPasswordResetAttemptStore
     {
-        private readonly IConfiguration _configuration = configuration;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
+        private readonly TimeWindows _timeWindows = timeWindows;
+        public IQueryable<PasswordResetAttempt> PasswordResetAttempts => _dbcontext.PasswordResetAttempts.AsQueryable();
 
-        public IQueryable<PasswordResetAttempt> PasswordResetAttempts => throw new NotImplementedException();
-
-        public async Task<(bool canMakeAttempt, bool successfullyAdded)> AddAttempt(PasswordResetAttempt attempt)
+        public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(PasswordResetAttempt attempt)
         {
-            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+            List<ErrorDetail> errors = [];
 
-            var recentAttempt = await _dbcontext.PasswordResetAttempts
+            var validTime = _timeWindows.ResetPasswordTime;
+
+            var validRecentAttempt = await _dbcontext.PasswordResetAttempts
                 .Where(x => x.UserId == attempt.UserId
                  && x.IsSuccessful == false
                  && x.IsRevoked == false
-                 && x.CreatedAt > DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes))
+                 && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
 
-            if (recentAttempt is not null) return (false, false);
+            if (validRecentAttempt is not null)
+            {
+                errors.Add(new ErrorDetail
+                {
+                    Field = "Password reset attempt",
+                    Reason = "There is at least one valid recent password attempt"
+                });
+
+                return (false, errors);
+            }
 
             await _dbcontext.PasswordResetAttempts.AddAsync(attempt);
             await _dbcontext.SaveChangesAsync();
 
-            return (true, true);
+            return (true, errors);
         }
 
         public async Task<int> RevokeAllValidPasswordAttempts(string userId)
         {
-            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+            var validTime = _timeWindows.ResetPasswordTime;
 
             var validRecentAttempts = await _dbcontext.PasswordResetAttempts
              .Where(
               x => x.UserId == userId
               && x.IsSuccessful == false
               && x.IsRevoked == false
-              && x.CreatedAt > DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes
-              ))
+              && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow
+              )
              .ToListAsync();
 
             foreach (var attempt in validRecentAttempts)
             {
-                attempt.IsRevoked = true;
+                attempt.Revoke();
             }
 
             var count = validRecentAttempts.Count;
@@ -64,16 +75,12 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task<(bool isValid, PasswordResetAttempt? attempt)> ValidateAttempt(string code)
         {
-            int resetPasswordSessionTimeInMinutes = int.Parse(_configuration["ResetPasswordSessionTimeInMinutes"] ?? throw new ApplicationException("ResetPasswordSessionTimeInMinutes not provided."));
+            var validTime = _timeWindows.ResetPasswordTime;
 
             var _attempt = await _dbcontext.PasswordResetAttempts.FirstOrDefaultAsync(x => x.Code == code);
+            if (_attempt is null) return (false, null);
 
-            if (_attempt is null 
-                || _attempt.IsSuccessful is true 
-                || _attempt.CreatedAt < DateTime.UtcNow.AddMinutes(-resetPasswordSessionTimeInMinutes)
-                || _attempt.IsRevoked is true
-                ) return (false, null);
-
+            if (!_attempt.IsValid(validTime)) return (false, null);
 
             return (true, _attempt);
         }
