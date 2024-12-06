@@ -10,6 +10,8 @@ using Serilog.Events;
 using Serilog;
 using System.Text;
 using Identity.Infrastructure.Data.Models;
+using Identity.API.Settings;
+using Microsoft.Extensions.Options;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -90,6 +92,22 @@ builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddEmailService(builder.Configuration);
+
+builder.Services.Configure<TimeWindows>(options =>
+{
+    builder.Configuration.GetSection("TimeWindows").Bind(options);
+
+    // Validate configuration and throw if null or invalid
+    if (options.ResetPasswordTime <= 0 ||
+        options.EmailConfirmationTime <= 0 ||
+        options.DeviceChallengeTime <= 0 ||
+        options.PhoneConfirmationTime <= 0)
+    {
+        throw new ArgumentException("Invalid TimeWindows configuration. All time values must be greater than zero.");
+    }
+});
+builder.Services.AddSingleton(resolver =>
+    resolver.GetRequiredService<IOptions<TimeWindows>>().Value);
 
 var app = builder.Build();
 
