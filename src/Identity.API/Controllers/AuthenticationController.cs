@@ -371,16 +371,21 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByEmailAsync(resendConfirmationEmailDto.Email);
             if (user is null) return Unauthorized();
 
+            if (user.EmailConfirmed) return BadRequest(new ErrorDetail
+            {
+                Field = "Email confirmation.",
+                Reason = "User email already comfirmed."
+            });
+
             var attempt = new EmailVerificationAttempt()
             {
                 Email = resendConfirmationEmailDto.Email,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(30),
                 Code = Guid.NewGuid().ToString(),
                 UserId = user.Id
             };
 
-            (bool canMakeAttempt,bool successfullyAdded) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
-            if (!canMakeAttempt || !successfullyAdded) return BadRequest();
+            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
+            if (!canMakeAttempt) return BadRequest(errors);
 
             // send code in email
 

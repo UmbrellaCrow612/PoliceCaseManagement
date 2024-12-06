@@ -1,32 +1,47 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    internal class EmailVerificationAttemptStore(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IEmailVerificationAttemptStore
+    internal class EmailVerificationAttemptStore(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, TimeWindows timeWindows) : IEmailVerificationAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly TimeWindows _timeWindows = timeWindows;
 
-        public async Task<(bool canMakeAttempt, bool successfullyAdded)> AddAttemptAsync(EmailVerificationAttempt attempt)
+        public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttemptAsync(EmailVerificationAttempt attempt)
         {
+            List<ErrorDetail> errors = [];
+
+            var validTime = _timeWindows.EmailConfirmationTime;
+
             var recentValidAttempt = await _dbcontext.EmailVerificationAttempts
                 .Where(x => 
                 x.IsUsed == false && 
-                x.ExpiresAt > DateTime.UtcNow.AddMinutes(-30) &&
+                x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow &&
                 x.UsedAt == null &&
                 x.UserId == attempt.UserId
                 )
-                .OrderByDescending(x => x.ExpiresAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
 
-            if (recentValidAttempt is not null) return (false, false);
+            if (recentValidAttempt is not null)
+            {
+                errors.Add(new ErrorDetail
+                {
+                    Field = "Email confirmation.",
+                    Reason = "There is at already a valid issued attempt."
+                });
+                return (false, errors);
+            }
 
             await _dbcontext.EmailVerificationAttempts.AddAsync(attempt);
             await _dbcontext.SaveChangesAsync();
 
-            return (true, true);
+            return (true, errors);
         }
 
         public void SetToUpdateAttempt(EmailVerificationAttempt attempt)
@@ -37,6 +52,8 @@ namespace Identity.Infrastructure.Data.Stores
         public async Task<(bool isValid, EmailVerificationAttempt? attempt, ApplicationUser? user, ICollection<string> errors)> ValidateAttemptAsync(string email, string code)
         {
             List<string> errors = [];
+
+            var validTime = _timeWindows.EmailConfirmationTime;
 
             var user = await _userManager.FindByEmailAsync(email);
             if(user is null)
@@ -53,7 +70,7 @@ namespace Identity.Infrastructure.Data.Stores
                 return (false, null,null, errors);
             }
 
-            if(!_attempt.IsValid())
+            if(!_attempt.IsValid(validTime))
             {
                 errors.Add("Attempt invalid.");
                 return (false, null, null, errors);

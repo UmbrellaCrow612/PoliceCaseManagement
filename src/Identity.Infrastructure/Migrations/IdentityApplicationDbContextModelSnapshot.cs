@@ -145,9 +145,6 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsUsed")
                         .HasColumnType("INTEGER");
 

@@ -223,7 +223,6 @@ namespace Identity.Infrastructure.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     IsUsed = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
