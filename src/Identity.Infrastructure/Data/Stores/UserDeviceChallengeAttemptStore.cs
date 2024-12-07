@@ -1,29 +1,33 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class UserDeviceChallengeAttemptStore(IdentityApplicationDbContext dbContext) : IUserDeviceChallengeAttemptStore
+    public class UserDeviceChallengeAttemptStore(IdentityApplicationDbContext dbContext, TimeWindows timeWindows) : IUserDeviceChallengeAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
+        private readonly TimeWindows _timeWindows = timeWindows;
 
         public IQueryable<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts => _dbcontext.UserDeviceChallengeAttempts.AsQueryable();
 
         public async Task<(bool canMakeAttempt, ICollection<string> Errors)> AddAttempt(UserDeviceChallengeAttempt attempt)
         {
             List<string> errors = [];
+            var validTime = _timeWindows.DeviceChallengeTime;
 
             var validRecentAttempt = await _dbcontext.UserDeviceChallengeAttempts
                 .Where(x => x.UserId == attempt.UserId && x.IsSuccessful == false 
                 && x.SuccessfulAt == null 
-                && x.CreatedAt.AddMinutes(30) > DateTime.UtcNow)
+                && x.UserDeviceId == attempt.UserDeviceId
+                && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow)
                 .OrderBy(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
 
             if(validRecentAttempt is not null)
             {
-                errors.Add("Valid recent attempt already issued out.");
+                errors.Add("Valid recent attempt already issued out for this device.");
                 return (false, errors);
             } 
 
@@ -51,12 +55,14 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task<(bool isValid, UserDeviceChallengeAttempt? attempt)> ValidateAttemptAsync(string email, string code)
         {
+            var validTime = _timeWindows.DeviceChallengeTime;
+
             var attempt = await _dbcontext.UserDeviceChallengeAttempts
-                .Where(x => x.Email == email && x.Code == code && x.IsSuccessful == false && x.SuccessfulAt == null).FirstOrDefaultAsync();
+                .Where(x => x.Email == email && x.Code == code && x.IsSuccessful == false).FirstOrDefaultAsync();
 
             if (attempt is null) return (false, null);
 
-            if(!attempt.IsValid()) return (false, null);
+            if(!attempt.IsValid(validTime)) return (false, null);
 
             return (true, attempt);
         }
