@@ -10,6 +10,7 @@ using Serilog.Events;
 using Serilog;
 using System.Text;
 using Identity.Infrastructure.Data.Models;
+using Identity.API.Settings;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -29,6 +30,11 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
+
+builder.Services.AddOptions<JWTOptions>()
+    .Bind(builder.Configuration.GetSection("Jwt"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -90,8 +96,6 @@ builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddEmailService(builder.Configuration);
-
-
 
 var app = builder.Build();
 

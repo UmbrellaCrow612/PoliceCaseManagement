@@ -1,10 +1,12 @@
 ﻿using Identity.API.DTOs;
 using Identity.API.Helpers;
+using Identity.API.Settings;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,7 +16,7 @@ namespace Identity.API.Controllers
     [ApiController]
     [Route("authentication")]
     public class AuthenticationController(
-        JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
+        JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IOptions<JWTOptions> JWTOptions,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
@@ -23,7 +25,7 @@ namespace Identity.API.Controllers
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IConfiguration _configuration = configuration;
+        private readonly JWTOptions _JWTOptions = JWTOptions.Value;
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
@@ -42,8 +44,6 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
-            int refreshTokenExpiriesInMinutes = _configuration.GetValue<int>("Jwt:RefreshTokenExpiriesInMinutes");
-
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
                                 ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
                                 ?? "Unknown";
@@ -157,7 +157,7 @@ namespace Identity.API.Controllers
             {
                 Id = tokenId,
                 RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(refreshTokenExpiriesInMinutes),
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes),
                 UserId = user.Id,
                 UserDeviceId = device.Id
             };

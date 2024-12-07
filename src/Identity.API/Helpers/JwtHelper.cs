@@ -1,4 +1,6 @@
-﻿using Identity.Infrastructure.Data.Models;
+﻿using Identity.API.Settings;
+using Identity.Infrastructure.Data.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,8 +9,10 @@ using System.Text;
 
 namespace Identity.API.Helpers
 {
-    public class JwtHelper(IConfiguration configuration)
+    public class JwtHelper(IOptions<JWTOptions> JWTOptions)
     {
+        private readonly JWTOptions _JWTOptions = JWTOptions.Value;
+
         /// <summary>
         /// Generate a JWT token with claims
         /// </summary>
@@ -19,10 +23,10 @@ namespace Identity.API.Helpers
         {
             var handler = new JwtSecurityTokenHandler();
 
-            var key = configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key Not Provided");
-            var issuer = configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer Not Provided");
-            string[] audiences = configuration.GetSection("Jwt:Audiences").Get<string[]>();
-            int expiresInMinutes = int.Parse(configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt ExpiresInMinutes Not Provided"));
+            var key = _JWTOptions.Key;
+            var issuer = _JWTOptions.Issuer;
+            string[] audiences = _JWTOptions.Audiences;
+            int expiresInMinutes = _JWTOptions.ExpiresInMinutes;
             var expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
             var privateKey = Encoding.UTF8.GetBytes(key);
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
