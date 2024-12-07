@@ -32,11 +32,6 @@ namespace Identity.API.Helpers
             var credentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256);
             var tokenId = Guid.NewGuid().ToString();
 
-            if (audiences is null || audiences.Length <= 0)
-            {
-                throw new ApplicationException("audiences for jwt not configered.");
-            }
-
             var claimsIdentity = new ClaimsIdentity();
 
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));

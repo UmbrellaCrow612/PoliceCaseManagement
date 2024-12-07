@@ -491,11 +491,9 @@ namespace Identity.API.Controllers
             if (user.PhoneNumberConfirmed) return BadRequest(new ErrorDetail 
             { Field = "Phone Confirmation", Reason = "Users phone number already confirmed."});
 
-            var code = Guid.NewGuid().ToString();
-
             var attempt = new PhoneConfirmationAttempt
             {
-                Code= code,
+                Code= Guid.NewGuid().ToString(),
                 PhoneNumber = user.PhoneNumber!,
                 UserId= user.Id,
             };
@@ -505,7 +503,7 @@ namespace Identity.API.Controllers
 
             // send code in sms message
 
-            return Ok(code);
+            return Ok(attempt.Code);
         }
     }
 }
