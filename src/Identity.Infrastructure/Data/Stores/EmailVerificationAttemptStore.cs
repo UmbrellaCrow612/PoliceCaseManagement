@@ -2,15 +2,16 @@
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    internal class EmailVerificationAttemptStore(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, TimeWindows timeWindows) : IEmailVerificationAttemptStore
+    internal class EmailVerificationAttemptStore(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IOptions<TimeWindows> timeWindows) : IEmailVerificationAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly TimeWindows _timeWindows = timeWindows;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
 
         public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttemptAsync(EmailVerificationAttempt attempt)
         {

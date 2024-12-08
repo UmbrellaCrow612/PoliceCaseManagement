@@ -1,14 +1,15 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class UserDeviceChallengeAttemptStore(IdentityApplicationDbContext dbContext, TimeWindows timeWindows) : IUserDeviceChallengeAttemptStore
+    public class UserDeviceChallengeAttemptStore(IdentityApplicationDbContext dbContext, IOptions<TimeWindows> timeWindows) : IUserDeviceChallengeAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-        private readonly TimeWindows _timeWindows = timeWindows;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
 
         public IQueryable<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts => _dbcontext.UserDeviceChallengeAttempts.AsQueryable();
 

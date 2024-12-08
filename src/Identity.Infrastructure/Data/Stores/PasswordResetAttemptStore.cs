@@ -1,14 +1,15 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class PasswordResetAttemptStore(IdentityApplicationDbContext dbContext, TimeWindows timeWindows) : IPasswordResetAttemptStore
+    public class PasswordResetAttemptStore(IdentityApplicationDbContext dbContext, IOptions<TimeWindows> timeWindows) : IPasswordResetAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-        private readonly TimeWindows _timeWindows = timeWindows;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
         public IQueryable<PasswordResetAttempt> PasswordResetAttempts => _dbcontext.PasswordResetAttempts.AsQueryable();
 
         public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(PasswordResetAttempt attempt)

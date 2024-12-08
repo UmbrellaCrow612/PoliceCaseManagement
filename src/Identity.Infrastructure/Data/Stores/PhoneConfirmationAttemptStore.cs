@@ -1,15 +1,16 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Shared.DTOs;
 using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class PhoneConfirmationAttemptStore(IdentityApplicationDbContext dbContext, TimeWindows timeWindows) : IPhoneConfirmationAttemptStore
+    public class PhoneConfirmationAttemptStore(IdentityApplicationDbContext dbContext, IOptions<TimeWindows> timeWindows) : IPhoneConfirmationAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-        private readonly TimeWindows _timeWindows = timeWindows;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
 
         public IQueryable<PhoneConfirmationAttempt> PhoneConfirmationAttempts => _dbcontext.PhoneConfirmationAttempts.AsQueryable();
 

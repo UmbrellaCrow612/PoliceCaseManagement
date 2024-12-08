@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Identity.Infrastructure
 {
@@ -29,22 +28,10 @@ namespace Identity.Infrastructure
                 options.User.RequireUniqueEmail = true;
             });
 
-            services.Configure<TimeWindows>(options =>
-            {
-                configuration.GetSection("TimeWindows").Bind(options);
-
-                // Validate configuration and throw if invalid
-                if (options.ResetPasswordTime <= 0 ||
-                    options.EmailConfirmationTime <= 0 ||
-                    options.DeviceChallengeTime <= 0 ||
-                    options.PhoneConfirmationTime <= 0)
-                {
-                    throw new ArgumentException("Invalid TimeWindows configuration. All time values must be greater than zero.");
-                }
-            });
-
-            services.AddSingleton(resolver =>
-                resolver.GetRequiredService<IOptions<TimeWindows>>().Value);
+            services.AddOptions<TimeWindows>()
+                .Bind(configuration.GetSection("TimeWindows"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             services.AddScoped<ITokenStore, TokenStore>();
             services.AddScoped<IPasswordResetAttemptStore, PasswordResetAttemptStore>();

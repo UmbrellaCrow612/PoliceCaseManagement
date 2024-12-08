@@ -119,3 +119,35 @@ Use a standard response format across all bad request responses and error respon
 as an expected error response format will be expected
 
 These are `ApiErrorResponse` and `ErrorDetail`.
+
+### App settings 
+
+In the application never read directly from IConfig, instead make a class that describes it - and use data annotations for validation on start. 
+
+```cs
+public class JWTOptions
+{
+    [Required]
+    public string Issuer { get; set; } = default!;
+
+    [Required]
+    [MinLength(1)]
+    public string[] Audiences { get; set; } = default!;
+
+    [Required]
+    public string Key { get; set; } = default!;
+
+    [Range(1, int.MaxValue, ErrorMessage = "ExpiresInMinutes must be greater than 0.")]
+    public int ExpiresInMinutes { get; set; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "RefreshTokenExpiriesInMinutes must be greater than 0.")]
+    public int RefreshTokenExpiriesInMinutes { get; set; }
+}
+
+builder.Services.AddOptions<JWTOptions>()
+    .Bind(builder.Configuration.GetSection("Jwt"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+    IOptions<JWTOptions> JWTOptions private readonly JWTOptions _JWTOptions = JWTOptions.Value;
+```
