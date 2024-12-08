@@ -25,9 +25,8 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> CreateDepartment([FromBody] CreateDepartmentDto createDepartmentDto)
         {
             var department = _mapper.Map<Department>(createDepartmentDto);
-            await _departmentStore.StoreDepartment(department);
-
-            _logger.LogInformation("Department {id} was created", department.Id);
+            var (successful, errors) = await _departmentStore.CreateDepartment(department);
+            if (!successful) return BadRequest(errors);
 
             return Ok(new { id = department.Id });
         }

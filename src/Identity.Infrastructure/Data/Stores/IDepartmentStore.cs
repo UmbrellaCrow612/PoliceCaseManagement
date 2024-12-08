@@ -1,4 +1,5 @@
 ﻿using Identity.Infrastructure.Data.Models;
+using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
@@ -6,7 +7,7 @@ namespace Identity.Infrastructure.Data.Stores
     {
         IQueryable<Department> Departments { get; }
         Task SetDepartment(Department department);
-        Task StoreDepartment(Department department);
+        Task<(bool successful, ICollection<ErrorDetail> errors)> CreateDepartment(Department department);
         Task<Department?> GetDepartmentById(string id);
         Task UpdateDepartment(Department department);
         Task DeleteDepartment(Department department);

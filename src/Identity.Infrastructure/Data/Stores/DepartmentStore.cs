@@ -1,5 +1,7 @@
 ﻿using Identity.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.DTOs;
+using Shared.Utils;
 
 namespace Identity.Infrastructure.Data.Stores
 {
@@ -33,6 +35,27 @@ namespace Identity.Infrastructure.Data.Stores
 
             _dbContext.Users.UpdateRange(users);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<(bool successful, ICollection<ErrorDetail> errors)> CreateDepartment(Department department)
+        {
+            List<ErrorDetail> errors = [];
+
+            var nameAlreadyUsed = await _dbContext.Departments.AnyAsync(x => x.Name == department.Name);
+            if(nameAlreadyUsed)
+            {
+                errors.Add(new ErrorDetail
+                {
+                    Field = "Departments",
+                    Reason = "There is already a department with this name."
+                });
+                return (false, errors);
+            }
+
+            await _dbContext.Departments.AddAsync(department);
+            await _dbContext.SaveChangesAsync();
+
+            return (true, errors);
         }
 
         public async Task DeleteDepartment(Department department)
@@ -87,12 +110,6 @@ namespace Identity.Infrastructure.Data.Stores
         public async Task SetDepartment(Department department)
         {
             await _dbContext.Departments.AddAsync(department);
-        }
-
-        public async Task StoreDepartment(Department department)
-        {
-            await _dbContext.Departments.AddAsync(department);
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateDepartment(Department department)

@@ -118,7 +118,7 @@ use dashed case - `labResults` into -> `lab-results`
 Use a standard response format across all bad request responses and error responses so api is easy to use and understand 
 as an expected error response format will be expected
 
-These are `ApiErrorResponse` and `ErrorDetail`.
+These `ErrorDetail` array to explain what went wrong or is wrong with either the request or endpoint, this would be sent across with a status code response.
 
 ### App settings 
 
