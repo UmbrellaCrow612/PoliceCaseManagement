@@ -1,4 +1,4 @@
-To minimize the number of spokes while maximizing the entities they hold, we can focus on grouping related entities based on common purposes or domains. Here's a breakdown of how to achieve this:
+Hub and Spoke pattern
 
 ---
 
