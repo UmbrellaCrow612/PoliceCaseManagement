@@ -29,6 +29,9 @@ export function GetFingerPrint() {
     navigator.platform,
     gPUVendor,
     gPURenderer,
+    navigator.doNotTrack,
+    nav.connection.effectiveType || 'Unknown',
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
   ];
 
   var joinedComponents = components.join('-');
