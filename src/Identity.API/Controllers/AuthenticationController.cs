@@ -192,6 +192,12 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt not found."
             });
 
+            if(loginAttempt.Status != LoginStatus.TwoFactorAuthenticationSent) return Unauthorized(new ErrorDetail
+            {
+                Field = "Two factor auth.",
+                Reason = "Login attempt has already been used."
+            });
+
             var (isValid, attempt, user, errors) = await _twoFactorCodeAttempt.ValidateAttempt(loginAttempt.Id, validateTwoFactorCodeDto.Code);
             if (!isValid) return Unauthorized(errors);
 
@@ -266,6 +272,12 @@ namespace Identity.API.Controllers
             {
                 Field = "Two factor auth.",
                 Reason = "Login attempt not found or already sucessfull."
+            });
+
+            if (loginAttempt.Status != LoginStatus.TwoFactorAuthenticationSent) return Unauthorized(new ErrorDetail
+            {
+                Field = "Two factor auth.",
+                Reason = "Login attempt has already been used."
             });
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
