@@ -51,5 +51,12 @@ namespace Identity.Infrastructure.Settings
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "TwoFactorCodeTime must be greater than 0.")]
         public required int TwoFactorCodeTime { get; set; }
+
+        /// <summary>
+        /// How long a login attempt is alive for it to be used to issue 2FA codes for.
+        /// </summary>
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "LoginLifetime must be greater than 0.")]
+        public required int LoginLifetime { get; set; }
     }
 }

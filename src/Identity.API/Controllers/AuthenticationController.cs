@@ -3,6 +3,7 @@ using Identity.API.Helpers;
 using Identity.API.Settings;
 using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
+using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,6 @@ using Microsoft.Extensions.Options;
 using Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using UAParser;
 
 namespace Identity.API.Controllers
 {
@@ -22,7 +22,7 @@ namespace Identity.API.Controllers
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
-        ITwoFactorCodeAttemptStore twoFactorCodeAttemptStore
+        ITwoFactorCodeAttemptStore twoFactorCodeAttemptStore, IOptions<TimeWindows> timeWindows
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -39,6 +39,7 @@ namespace Identity.API.Controllers
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
         private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
         private readonly ITwoFactorCodeAttemptStore _twoFactorCodeAttempt = twoFactorCodeAttemptStore;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
 
         /// <summary>
         /// Accepts username and password sends a two fa code.
@@ -192,11 +193,9 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt not found."
             });
 
-            if(loginAttempt.Status != LoginStatus.TwoFactorAuthenticationSent) return Unauthorized(new ErrorDetail
-            {
-                Field = "Two factor auth.",
-                Reason = "Login attempt has already been used."
-            });
+            var errs = loginAttempt.Validate(_timeWindows.LoginLifetime);
+
+            if (errs.Count != 0) return BadRequest(errs);
 
             var (isValid, attempt, user, errors) = await _twoFactorCodeAttempt.ValidateAttempt(loginAttempt.Id, validateTwoFactorCodeDto.Code);
             if (!isValid) return Unauthorized(errors);
@@ -274,11 +273,9 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt not found or already sucessfull."
             });
 
-            if (loginAttempt.Status != LoginStatus.TwoFactorAuthenticationSent) return Unauthorized(new ErrorDetail
-            {
-                Field = "Two factor auth.",
-                Reason = "Login attempt has already been used."
-            });
+            var errs = loginAttempt.Validate(_timeWindows.LoginLifetime);
+
+            if (errs.Count != 0) return BadRequest(errs);
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null) return Unauthorized(new ErrorDetail
