@@ -69,12 +69,12 @@ namespace Identity.API.Controllers
             if (!string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
                 user = await _userManager.FindByNameAsync(loginRequestDto.UserName);
-                if (user is null) return Unauthorized("Username or password incorrect");
+                if (user is null) return Unauthorized("Incorrect credentials");
             }
             else
             {
                 user = await _userManager.FindByEmailAsync(loginRequestDto.Email ?? string.Empty);
-                if (user is null) return Unauthorized("Email or password incorrect");
+                if (user is null) return Unauthorized("Incorrect credentials");
             }
 
             if (user is null) return Unauthorized();
