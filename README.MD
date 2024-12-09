@@ -151,3 +151,8 @@ builder.Services.AddOptions<JWTOptions>()
 
     IOptions<JWTOptions> JWTOptions private readonly JWTOptions _JWTOptions = JWTOptions.Value;
 ```
+
+### Todo when you don't have problems to solve:
+refactor to use Error Detail throughout the API 
+- First do it in the stores
+- Refactor the endpoint return types to return those

@@ -380,6 +380,36 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TwoFactorCodeAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    LoginAttemptId = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TwoFactorCodeAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TwoFactorCodeAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TwoFactorCodeAttempts_LoginAttempts_LoginAttemptId",
+                        column: x => x.LoginAttemptId,
+                        principalTable: "LoginAttempts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserDeviceChallengeAttempts",
                 columns: table => new
                 {
@@ -497,6 +527,21 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TwoFactorCodeAttempts_LoginAttemptId",
+                table: "TwoFactorCodeAttempts",
+                column: "LoginAttemptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TwoFactorCodeAttempts_PhoneNumber_Code",
+                table: "TwoFactorCodeAttempts",
+                columns: new[] { "PhoneNumber", "Code" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TwoFactorCodeAttempts_UserId",
+                table: "TwoFactorCodeAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserDeviceChallengeAttempts_UserDeviceId",
                 table: "UserDeviceChallengeAttempts",
                 column: "UserDeviceId");
@@ -534,9 +579,6 @@ namespace Identity.Infrastructure.Migrations
                 name: "EmailVerificationAttempts");
 
             migrationBuilder.DropTable(
-                name: "LoginAttempts");
-
-            migrationBuilder.DropTable(
                 name: "PasswordResetAttempts");
 
             migrationBuilder.DropTable(
@@ -552,6 +594,9 @@ namespace Identity.Infrastructure.Migrations
                 name: "Tokens");
 
             migrationBuilder.DropTable(
+                name: "TwoFactorCodeAttempts");
+
+            migrationBuilder.DropTable(
                 name: "UserDeviceChallengeAttempts");
 
             migrationBuilder.DropTable(
@@ -559,6 +604,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Permissions");
+
+            migrationBuilder.DropTable(
+                name: "LoginAttempts");
 
             migrationBuilder.DropTable(
                 name: "UserDevices");

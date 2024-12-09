@@ -44,5 +44,12 @@ namespace Identity.Infrastructure.Settings
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "PhoneConfirmationTime must be greater than 0.")]
         public required int PhoneConfirmationTime { get; set; }
+
+        /// <summary>
+        /// Time allowed for a two factor code to be valid for.
+        /// </summary>
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "TwoFactorCodeTime must be greater than 0.")]
+        public required int TwoFactorCodeTime { get; set; }
     }
 }

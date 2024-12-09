@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using UAParser;
 
 namespace Identity.API.Controllers
 {
@@ -20,7 +21,8 @@ namespace Identity.API.Controllers
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
-        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore
+        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
+        ITwoFactorCodeAttemptStore twoFactorCodeAttemptStore
         ) : ControllerBase
     {
         private readonly JwtHelper _jwtHelper = jwtHelper;
@@ -36,10 +38,10 @@ namespace Identity.API.Controllers
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
         private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
+        private readonly ITwoFactorCodeAttemptStore _twoFactorCodeAttempt = twoFactorCodeAttemptStore;
 
         /// <summary>
-        /// Accepts username and password Authenticates the user Generates an access token and 
-        /// a refresh token Returns the tokens in the response
+        /// Accepts username and password sends a two fa code.
         /// </summary>
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
@@ -49,6 +51,13 @@ namespace Identity.API.Controllers
                                 ?? "Unknown";
 
             string userAgent = Request.Headers.UserAgent.ToString();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+
+            if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
+            {
+                Field = "Authentication",
+                Reason = "User agent is malformed and or device finger print is null or white-space."
+            });
 
             if (string.IsNullOrWhiteSpace(loginRequestDto.Email) && string.IsNullOrWhiteSpace(loginRequestDto.UserName))
             {
@@ -117,7 +126,7 @@ namespace Identity.API.Controllers
                 });
             }
 
-            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent, deviceFingerprint);
 
             var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
             if (device is null)
@@ -144,14 +153,81 @@ namespace Identity.API.Controllers
                 });
             }
 
+            loginAttempt.Status = LoginStatus.TwoFactorAuthenticationSent;
+            await _loginAttemptStore.SetLoginAttempt(loginAttempt);
+
+            TwoFactorCodeAttempt attempt = new()
+            {
+                Code = Guid.NewGuid().ToString(),
+                LoginAttemptId = loginAttempt.Id,
+                PhoneNumber = user.PhoneNumber!,
+                UserId = user.Id,
+            };
+
+            var (canMakeAttempt, errors) = await _twoFactorCodeAttempt.AddAttempt(attempt);
+            if (!canMakeAttempt) return BadRequest(errors);
+
+            // send a redirect to /tfa?loginAttempt=id and the sms code
+
+            return Ok(new {attempt.Code, loginAttempt.Id});
+        }
+
+        [AllowAnonymous]
+        [HttpPost("validate-two-factor-authentication")]
+        public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorCodeDto validateTwoFactorCodeDto)
+        {
+            string userAgent = Request.Headers.UserAgent.ToString();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+
+            if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
+            {
+                Field = "Authentication",
+                Reason = "User agent is malformed and or device finger print is null or white-space."
+            });
+
+            var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(validateTwoFactorCodeDto.LoginAttemptId);
+            if (loginAttempt is null) return Unauthorized(new ErrorDetail
+            {
+                Field = "Two factor auth.",
+                Reason = "Login attempt not found."
+            });
+
+            var (isValid, attempt, user, errors) = await _twoFactorCodeAttempt.ValidateAttempt(loginAttempt.Id, validateTwoFactorCodeDto.Code);
+            if (!isValid) return Unauthorized(errors);
+
+            if (attempt is null || user is null) return Unauthorized();
+
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent, deviceFingerprint);
+
+            var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
+            if (device is null)
+            {
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm",
+                    message = "Device needs confirmation"
+                });
+            }
+
+            if (!device.IsTrusted)
+            {
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm?untrusted-device-used=true",
+                    message = "Device needs confirmation"
+                });
+            }
+
             loginAttempt.Status = LoginStatus.SUCCESS;
+            _loginAttemptStore.SetToUpdateAttempt(loginAttempt);
+
+            attempt.MarkUsed();
+            _twoFactorCodeAttempt.SetToUpdateAttempt(attempt);
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            (string  accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
+            (string accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
-
-            await _loginAttemptStore.SetLoginAttempt(loginAttempt);
 
             Token token = new()
             {
@@ -169,7 +245,71 @@ namespace Identity.API.Controllers
             var res = await _userManager.UpdateAsync(user);
             if (!res.Succeeded) return BadRequest(res.Errors);
 
-            return Ok(new { accessToken , refreshToken });
+            return Ok(new { accessToken, refreshToken });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resend-two-factor-authentication")]
+        public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode reSendTwoFactorCode)
+        {
+            string userAgent = Request.Headers.UserAgent.ToString();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+
+            if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
+            {
+                Field = "Authentication",
+                Reason = "User agent is malformed and or device finger print is null or white-space."
+            });
+
+            var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(reSendTwoFactorCode.LoginAttemptId);
+            if (loginAttempt is null) return Unauthorized(new ErrorDetail
+            {
+                Field = "Two factor auth.",
+                Reason = "Login attempt not found or already sucessfull."
+            });
+
+            var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
+            if (user is null) return Unauthorized(new ErrorDetail
+            {
+                Field = "Authentication",
+                Reason = "User dose not exist."
+            });
+
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent, deviceFingerprint);
+
+            var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
+            if (device is null)
+            {
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm",
+                    message = "Device needs confirmation"
+                });
+            }
+
+            if (!device.IsTrusted)
+            {
+                return StatusCode(403, new
+                {
+                    redirectUrl = "/deviceConfirm?untrusted-device-used=true",
+                    message = "Device needs confirmation"
+                });
+            }
+
+            TwoFactorCodeAttempt attempt = new()
+            {
+                Code = Guid.NewGuid().ToString(),
+                LoginAttemptId = loginAttempt.Id,
+                UserId = user.Id,
+                PhoneNumber = user.PhoneNumber!
+            };
+
+            var (canMakeAttempt, errors) = await _twoFactorCodeAttempt.AddAttempt(attempt);
+            if (!canMakeAttempt) return BadRequest(errors);
+
+            // send sms for this login attempt
+
+            return Ok(attempt.Code);
         }
 
         [HttpPost("register")]
@@ -202,11 +342,14 @@ namespace Identity.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
-            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
-                              ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                              ?? "Unknown";
-
             string userAgent = Request.Headers.UserAgent.ToString();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+
+            if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
+            {
+                Field = "Authtication",
+                Reason = "User agent is malformed and or device finger print is null or white-space."
+            });
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -221,7 +364,7 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
+            var requestDeviceId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent, deviceFingerprint);
             var device = await _userDeviceStore.GetUserDeviceByIdAsync(user, requestDeviceId);
             if(device is null || !device.IsTrusted) return Unauthorized("Device not registered or trusted.");
 
@@ -421,13 +564,20 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
             string userAgent = Request.Headers.UserAgent.ToString();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+
+            if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
+            {
+                Field = "Authtication",
+                Reason = "User agent is malformed and or device finger print is null or white-space."
+            });
 
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
             if (user is null) return Ok("User dose not exist - would not show in prod");
 
             var code = Guid.NewGuid().ToString();
 
-            var deviceIdentifierId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent);
+            var deviceIdentifierId = _deviceIdentification.GenerateDeviceId(user.Id, userAgent, deviceFingerprint);
 
             UserDevice? device = await _userDeviceStore.GetUserDeviceByIdAsync(user, deviceIdentifierId);
             if (device is not null && device.IsTrusted is true) return BadRequest("Device is already trusted - no need to send a challenge.");

@@ -12,6 +12,7 @@ namespace Identity.Infrastructure.Data.Models
 
         public string? LastLoginDeviceId { get; set; } = null;
 
+        public ICollection<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; } = [];
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
         public ICollection<Token> Tokens { get; set; } = [];
         public ICollection<PasswordResetAttempt> PasswordResetAttempts { get; set; } = [];

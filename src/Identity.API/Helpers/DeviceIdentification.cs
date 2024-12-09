@@ -8,7 +8,30 @@ namespace Identity.API.Helpers
     {
         private readonly ILogger<DeviceIdentification> _logger = logger;
 
-        public string GenerateDeviceId(string userId, string userAgent)
+        public bool ValidateUserAgent(string userAgent)
+        {
+            if (string.IsNullOrWhiteSpace(userAgent))
+                return false;
+
+            try
+            {
+                var parser = Parser.GetDefault();
+                var clientInfo = parser.Parse(userAgent);
+
+                // Check if required properties exist and are not null/empty
+                return !string.IsNullOrWhiteSpace(clientInfo.UA?.Family) &&
+                       !string.IsNullOrWhiteSpace(clientInfo.OS?.Family) &&
+                       !string.IsNullOrWhiteSpace(clientInfo.Device?.Family);
+            }
+            catch
+            {
+                // Return false if any exception occurs during parsing
+                return false;
+            }
+        }
+
+
+        public string GenerateDeviceId(string userId, string userAgent, string deviceFingerPrint)
         {
             var parser = Parser.GetDefault();
 
@@ -17,6 +40,9 @@ namespace Identity.API.Helpers
 
             if (string.IsNullOrWhiteSpace(userAgent))
                 throw new ArgumentException("User agent cannot be null or empty.", nameof(userAgent));
+
+            if (string.IsNullOrWhiteSpace(deviceFingerPrint))
+                throw new ArgumentException("Finger print cannot be null or empty.", nameof(deviceFingerPrint));
 
             try
             {
@@ -31,7 +57,8 @@ namespace Identity.API.Helpers
                     clientInfo.OS.Family,
                     clientInfo.OS.Major,
                     clientInfo.Device.Family,
-                    userId
+                    userId,
+                    deviceFingerPrint
                 };
 
                 // Join components and create a hash

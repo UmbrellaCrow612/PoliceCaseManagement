@@ -11,6 +11,8 @@ namespace Identity.Infrastructure.Data.Stores
         /// </summary>
         Task SetLoginAttempt(LoginAttempt loginAttempt);
         Task StoreLoginAttempt(LoginAttempt loginAttempt);
+        Task<LoginAttempt?> GetLoginAttemptById(string loginAttemptId);
         Task<ICollection<LoginAttempt>> GetUserLoginAttempts(ApplicationUser user);
+        void SetToUpdateAttempt(LoginAttempt loginAttempt);
     }
 }

@@ -42,6 +42,7 @@ namespace Identity.Infrastructure
             services.AddScoped<IUserDeviceStore, UserDeviceStore>();
             services.AddScoped<IUserDeviceChallengeAttemptStore, UserDeviceChallengeAttemptStore>();
             services.AddScoped<IPhoneConfirmationAttemptStore, PhoneConfirmationAttemptStore>();
+            services.AddScoped<ITwoFactorCodeAttemptStore, TwoFactorCodeAttemptStore>();
 
             return services;
         }

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241206204324_Init")]
+    [Migration("20241208155513_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -389,6 +389,47 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("Tokens");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.TwoFactorCodeAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LoginAttemptId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoginAttemptId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PhoneNumber", "Code");
+
+                    b.ToTable("TwoFactorCodeAttempts");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>
                 {
                     b.Property<string>("Id")
@@ -648,6 +689,25 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.TwoFactorCodeAttempt", b =>
+                {
+                    b.HasOne("Identity.Infrastructure.Data.Models.LoginAttempt", "LoginAttempt")
+                        .WithMany("TwoFactorCodeAttempts")
+                        .HasForeignKey("LoginAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("TwoFactorCodeAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoginAttempt");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.UserDevice", b =>
                 {
                     b.HasOne("Identity.Infrastructure.Data.Models.ApplicationUser", "User")
@@ -748,6 +808,8 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("Tokens");
 
+                    b.Navigation("TwoFactorCodeAttempts");
+
                     b.Navigation("UserDeviceChallengeAttempts");
 
                     b.Navigation("UserDevices");
@@ -756,6 +818,11 @@ namespace Identity.Infrastructure.Migrations
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Department", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Identity.Infrastructure.Data.Models.LoginAttempt", b =>
+                {
+                    b.Navigation("TwoFactorCodeAttempts");
                 });
 
             modelBuilder.Entity("Identity.Infrastructure.Data.Models.Permission", b =>
