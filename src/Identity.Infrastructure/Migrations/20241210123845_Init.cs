@@ -80,6 +80,7 @@ namespace Identity.Infrastructure.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    WebAuthnEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     DepartmentId = table.Column<string>(type: "TEXT", nullable: true),
                     LastLoginDeviceId = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),

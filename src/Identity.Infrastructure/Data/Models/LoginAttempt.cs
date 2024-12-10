@@ -45,6 +45,7 @@ namespace Identity.Infrastructure.Data.Models
         SUCCESS = 0,
         FAILED = 1,
         BLOCKED = 2,
-        TwoFactorAuthenticationSent = 3
+        TwoFactorAuthenticationSent = 3,
+        WebAuthnSent = 4,
     }
 }

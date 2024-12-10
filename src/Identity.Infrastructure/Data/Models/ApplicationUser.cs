@@ -6,6 +6,7 @@ namespace Identity.Infrastructure.Data.Models
     {
         public override bool LockoutEnabled { get; set; } = true;
         public override bool TwoFactorEnabled { get; set; } = true;
+        public bool WebAuthnEnabled { get; set; } = false;
 
         public string? DepartmentId { get; set; } = null;
         public Department? Department { get; set; } = null;

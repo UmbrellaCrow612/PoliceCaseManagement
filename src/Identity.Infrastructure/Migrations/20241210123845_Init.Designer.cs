@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241208155513_Init")]
+    [Migration("20241210123845_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -103,6 +103,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("WebAuthnEnabled")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
