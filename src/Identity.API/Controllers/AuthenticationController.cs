@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 using Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Identity.API.Controllers
 {
@@ -155,16 +154,6 @@ namespace Identity.API.Controllers
                 });
             }
 
-            if (user.WebAuthnEnabled)
-            {
-                loginAttempt.Status = LoginStatus.WebAuthnSent;
-                // await _loginAttemptStore.SetLoginAttempt(loginAttempt);
-
-                // do webauthn flow
-
-                return StatusCode(209);
-            }
-
             loginAttempt.Status = LoginStatus.TwoFactorAuthenticationSent;
             await _loginAttemptStore.SetLoginAttempt(loginAttempt);
 
@@ -182,60 +171,6 @@ namespace Identity.API.Controllers
             // send a redirect to /tfa?loginAttempt=id and the sms code
 
             return Ok(new {attempt.Code, loginAttempt.Id});
-        }
-
-        [Authorize]
-        [HttpPost("me/mfa/web-authn-on")]
-        public async Task<ActionResult> ToggleWebAuthnMFAOn()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return BadRequest(new ErrorDetail
-            {
-                Field ="JWT Token",
-                Reason = "There is no NameIdentifier field on the token for userId."
-            });
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return NotFound(new ErrorDetail
-            {
-                Field = "Users",
-                Reason = "User not found."
-            });
-
-            user.WebAuthnEnabled = true;
-
-            var res = await _userManager.UpdateAsync(user);
-            List<ErrorDetail> errs = (List<ErrorDetail>)res.Errors.Select(x => new ErrorDetail { Field = x.Code, Reason = x.Description });
-            if (!res.Succeeded) return BadRequest(errs);
-
-            return NoContent();
-        }
-
-        [Authorize]
-        [HttpPost("me/mfa/web-authn-off")]
-        public async Task<ActionResult> ToggleWebAuthnMFAOff()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return BadRequest(new ErrorDetail
-            {
-                Field = "JWT Token",
-                Reason = "There is no NameIdentifier field on the token for userId."
-            });
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return NotFound(new ErrorDetail
-            {
-                Field = "User",
-                Reason = "User not found."
-            });
-
-            user.WebAuthnEnabled = false;
-
-            var res = await _userManager.UpdateAsync(user);
-            List<ErrorDetail> errors = (List<ErrorDetail>)res.Errors.Select(x => new ErrorDetail { Field = x.Code, Reason = x.Description });
-            if (!res.Succeeded) return BadRequest(errors);
-
-            return NoContent();
         }
 
         [AllowAnonymous]
