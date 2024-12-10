@@ -11,7 +11,10 @@ namespace SMS.Service
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSingleton<SmsSettings>(configuration.GetSection("SmsSettings").Get<SmsSettings>() ?? throw new ApplicationException("SmsSettings not present."));
+            services.AddOptions<SmsSettings>()
+                .Bind(configuration.GetSection("SmsSettings"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             services.AddSingleton<TwilioSmsService>();
 
