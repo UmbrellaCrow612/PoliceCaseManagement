@@ -13,7 +13,7 @@ using Style.Styles;
 var styleChecker = new CSharpStyleChecker();
 
 // Add predefined rules
-styleChecker.AddRule(CSharpDefinitions.MethodNameStartsWithCapital);
+styleChecker.AddRule(CSharpDefinitions.ParameterNamingConvention);
 
 // Check a directory
 styleChecker.CheckDirectory(@"C:\dev\PCMS\src\Style");
