@@ -6,8 +6,17 @@ This project is run and will produce a report of all violations of rules and sty
  
  */
 
-using Style;
 
-var runner = new Runner();
+using Style.StyleRuleDefinitions;
+using Style.Styles;
 
-runner.Run();
+var styleChecker = new CSharpStyleChecker();
+
+// Add predefined rules
+styleChecker.AddRule(CSharpDefinitions.MethodNameStartsWithCapital);
+
+// Check a directory
+styleChecker.CheckDirectory(@"C:\dev\PCMS\src\Style");
+
+// Print out violations
+styleChecker.PrintViolations();
