@@ -594,7 +594,7 @@ namespace Identity.API.Controllers
             device ??= new UserDevice
             {
                 Id = deviceIdentifierId,
-                DeviceName = "Test name",
+                DeviceName = userAgent,
                 IsTrusted = false,
                 UserId = user.Id,
             };
