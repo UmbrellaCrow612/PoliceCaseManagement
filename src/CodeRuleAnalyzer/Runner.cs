@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeRuleAnalyzer
 {
@@ -97,7 +98,7 @@ namespace CodeRuleAnalyzer
 
                 foreach (var node in nodes)
                 {
-                    AnalyzeNodeWithRules(node);
+                    Analyzers.AnalyzeNodeWithRules(node, filePath);
                 }
             }
         }
@@ -144,11 +145,6 @@ namespace CodeRuleAnalyzer
             {
                 CollectNodes(childNode, nodeList);
             }
-        }
-
-        private void AnalyzeNodeWithRules(SyntaxNode node)
-        {
-
         }
     }
 }
