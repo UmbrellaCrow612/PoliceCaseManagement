@@ -2,9 +2,9 @@
 
 namespace CodeRuleAnalyzer.Rules
 {
-    internal class VariableRules
+    internal class VariableRuleManager
     {
-        public static void Apply(VariableDeclarationSyntax node, string filePath)
+        public static void ApplyAll(VariableDeclarationSyntax node, string filePath)
         {
             Console.WriteLine($"Analyzing variable {node.GetText()} in file {filePath}");
         }

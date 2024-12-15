@@ -98,7 +98,7 @@ namespace CodeRuleAnalyzer
 
                 foreach (var node in nodes)
                 {
-                    Analyzers.AnalyzeNodeWithRules(node, filePath);
+                    Analyzers.AnalyzeNode(node, filePath);
                 }
             }
         }

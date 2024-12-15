@@ -2,9 +2,9 @@
 
 namespace CodeRuleAnalyzer.Rules
 {
-    internal class FieldRules
+    internal class FieldRuleManager
     {
-        public static void Apply(FieldDeclarationSyntax node, string filePath)
+        public static void ApplyAll(FieldDeclarationSyntax node, string filePath)
         {
             Console.WriteLine($"Analyzing field in file {filePath}");
         }

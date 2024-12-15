@@ -6,7 +6,7 @@ namespace CodeRuleAnalyzer
 {
     internal class Analyzers
     {
-        public static void AnalyzeNodeWithRules(SyntaxNode node, string filePath)
+        public static void AnalyzeNode(SyntaxNode node, string filePath)
         {
             switch (node)
             {
@@ -42,32 +42,32 @@ namespace CodeRuleAnalyzer
 
         private static void AnalyzeMethod(MethodDeclarationSyntax methodNode, string filePath)
         {
-            MethodRules.Apply(methodNode, filePath);
+            MethodRuleManager.ApplyAll(methodNode, filePath);
         }
 
         private static void AnalyzeVariable(VariableDeclarationSyntax variableNode, string filePath)
         {
-            VariableRules.Apply(variableNode, filePath);
+            VariableRuleManager.ApplyAll(variableNode, filePath);
         }
 
         private static void AnalyzeClass(ClassDeclarationSyntax classNode, string filePath)
         {
-            ClassRules.Apply(classNode, filePath);
+            ClassRuleManager.ApplyAll(classNode, filePath);
         }
 
         private static void AnalyzeProperty(PropertyDeclarationSyntax propertyNode, string filePath)
         {
-            PropertyRules.Apply(propertyNode, filePath);
+            PropertyRuleManager.ApplyAll(propertyNode, filePath);
         }
 
         private static void AnalyzeField(FieldDeclarationSyntax fieldNode, string filePath)
         {
-            FieldRules.Apply(fieldNode, filePath);
+            FieldRuleManager.ApplyAll(fieldNode, filePath);
         }
 
         private static void AnalyzeIfStatement(IfStatementSyntax ifStatementNode, string filePath)
         {
-            IfStatementRules.Apply(ifStatementNode, filePath);
+            IfStatementRuleManager.ApplyAll(ifStatementNode, filePath);
         }
 
         private static void AnalyzeUnknownNode(SyntaxNode node, string filePath)

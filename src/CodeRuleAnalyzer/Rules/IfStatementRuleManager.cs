@@ -2,9 +2,9 @@
 
 namespace CodeRuleAnalyzer.Rules
 {
-    internal class IfStatementRules
+    internal class IfStatementRuleManager
     {
-        public static void Apply(IfStatementSyntax node, string filePath)
+        public static void ApplyAll(IfStatementSyntax node, string filePath)
         {
             Console.WriteLine($"Analyzing if statement in file {filePath}");
         }
