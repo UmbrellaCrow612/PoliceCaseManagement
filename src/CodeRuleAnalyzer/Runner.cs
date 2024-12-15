@@ -103,7 +103,7 @@ namespace CodeRuleAnalyzer
             }
         }
 
-        private ICollection<string> GetAllFilePathsFromProject(string projectPath)
+        private static ICollection<string> GetAllFilePathsFromProject(string projectPath)
         {
             if (!Directory.Exists(projectPath))
             {
