@@ -1,92 +1,47 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Build.Construction;
 
 namespace CodeRuleAnalyzer
 {
     public class Runner
     {
-        private string SolutionPath { get; set; } = string.Empty;
+        private string SolutionFilePath { get; set; } = string.Empty;
 
-        private static ICollection<string> GetProjectDirectoryPathsFromSolutionFile(string solutionFilePath)
+        public void AddSolutionFilePath(string solutionPath)
         {
-            var projectDirectories = new HashSet<string>();
-
-            if (!File.Exists(solutionFilePath))
-            {
-                throw new FileNotFoundException($"Solution file not found at {solutionFilePath}");
-            }
-
-            var lines = File.ReadAllLines(solutionFilePath);
-
-            foreach (var line in lines)
-            {
-                if (line.StartsWith("Project("))
-                {
-                    var parts = line.Split(',');
-                    if (parts.Length > 1)
-                    {
-                        var projectPath = parts[1].Trim().Trim('"');
-                        var fullProjectPath = Path.Combine(Path.GetDirectoryName(solutionFilePath)!, projectPath);
-
-                        if (File.Exists(fullProjectPath))
-                        {
-                            var projectDirectory = Path.GetDirectoryName(fullProjectPath);
-                            if (projectDirectory != null)
-                            {
-                                projectDirectories.Add(projectDirectory);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return projectDirectories;
+            SolutionFilePath = solutionPath;
         }
 
-        private static (bool isFound, string? fileName, string? filePath) GetSolutionFile(string solutionPath)
+        public string GetSolutionFilePath()
         {
-            if (Directory.Exists(solutionPath))
-            {
-                var solutionFiles = Directory.GetFiles(solutionPath, "*.sln", SearchOption.TopDirectoryOnly);
-
-                if (solutionFiles.Length > 0)
-                {
-                    string fullPath = solutionFiles[0];
-                    string fileName = Path.GetFileName(fullPath);
-                    return (true, fileName, fullPath);
-                }
-            }
-
-            return (false, null, null);
-        }
-
-        public void AddSolutionPath(string solutionPath)
-        {
-            SolutionPath = solutionPath;
-        }
-
-        public string GetSolutionPath()
-        {
-            return SolutionPath;
+            return SolutionFilePath;
         }
 
         public void Run()
         {
-            if (string.IsNullOrWhiteSpace(SolutionPath) || !Directory.Exists(SolutionPath)) throw new ArgumentException("No valid solution path was provided to run against.");
+            if (string.IsNullOrWhiteSpace(SolutionFilePath) || !File.Exists(SolutionFilePath)) throw new ArgumentException("No valid solution file path was provided to run against.");
 
-            var (isFound, fileName, filePath) = GetSolutionFile(SolutionPath);
-            if (!isFound || string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Solution path dose not contain a solution file.");
+            var allProjects = SolutionFile.Parse(SolutionFilePath);
 
-            ICollection<string> projectPaths = GetProjectDirectoryPathsFromSolutionFile(filePath);
+            List<string> filteredProjectDirectoryPaths = [];
 
-            foreach ( var projectPath in projectPaths )
+            foreach (var pair in allProjects.ProjectsByGuid)
+            {
+                var projType = pair.Value.ProjectType;
+
+                if (projType is not SolutionProjectType.SolutionFolder) // we dont want to add solution folders as these contain all projects already
+                {
+                    string parentDirectory = Path.GetDirectoryName(pair.Value.AbsolutePath)!;
+                    filteredProjectDirectoryPaths.Add(parentDirectory);
+                }
+            }
+
+            foreach (var projectPath in filteredProjectDirectoryPaths)
             {
                 Analyze(projectPath);
             }
         }
-
-
 
         private void Analyze(string projectPath)
         {

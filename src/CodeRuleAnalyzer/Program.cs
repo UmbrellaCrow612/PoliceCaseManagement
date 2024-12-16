@@ -1,9 +1,9 @@
 ﻿using CodeRuleAnalyzer;
 
-string solutionPath = @"C:\dev\PCMS";
+string solutionFilePath = @"C:\dev\PCMS\PoliceCaseManagement.sln";
 
 var runner = new Runner();
 
-runner.AddSolutionPath(solutionPath);
+runner.AddSolutionFilePath(solutionFilePath);
 
 runner.Run();
