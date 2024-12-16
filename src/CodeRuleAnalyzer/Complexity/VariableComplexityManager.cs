@@ -1,12 +1,12 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CodeRuleAnalyzer.Rules
+namespace CodeRuleAnalyzer.Complexity
 {
-    internal class VariableRuleManager
+    internal class VariableComplexityManager
     {
         public static void ApplyAll(VariableDeclarationSyntax node, string filePath)
         {
-            
+
         }
     }
 }

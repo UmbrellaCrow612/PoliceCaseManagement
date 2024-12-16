@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using CodeRuleAnalyzer.Rules;
+using CodeRuleAnalyzer.Security;
+using CodeRuleAnalyzer.Complexity;
 
 namespace CodeRuleAnalyzer
 {
@@ -48,6 +50,8 @@ namespace CodeRuleAnalyzer
         private static void AnalyzeVariable(VariableDeclarationSyntax variableNode, string filePath)
         {
             VariableRuleManager.ApplyAll(variableNode, filePath);
+            VariableSecurityManager.ApplyAll(variableNode, filePath);
+            VariableComplexityManager.ApplyAll(variableNode, filePath);
         }
 
         private static void AnalyzeClass(ClassDeclarationSyntax classNode, string filePath)
