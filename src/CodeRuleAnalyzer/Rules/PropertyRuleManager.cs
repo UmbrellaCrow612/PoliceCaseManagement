@@ -6,7 +6,6 @@ namespace CodeRuleAnalyzer.Rules
     {
         public static void ApplyAll(PropertyDeclarationSyntax node, string filePath)
         {
-            Console.WriteLine($"Analyzing property '{node.Identifier.Text}' in file {filePath}");
         }
     }
 }

@@ -6,7 +6,6 @@ namespace CodeRuleAnalyzer.Rules
     {
         public static void ApplyAll(IfStatementSyntax node, string filePath)
         {
-            Console.WriteLine($"Analyzing if statement in file {filePath}");
         }
     }
 }

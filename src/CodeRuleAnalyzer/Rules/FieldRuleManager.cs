@@ -6,7 +6,6 @@ namespace CodeRuleAnalyzer.Rules
     {
         public static void ApplyAll(FieldDeclarationSyntax node, string filePath)
         {
-            Console.WriteLine($"Analyzing field in file {filePath}");
         }
     }
 }
