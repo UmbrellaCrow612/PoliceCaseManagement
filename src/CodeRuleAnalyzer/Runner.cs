@@ -92,7 +92,7 @@ namespace CodeRuleAnalyzer
             }
         }
 
-        private void CollectNodes(SyntaxNode node, List<SyntaxNode> nodeList)
+        private static void CollectNodes(SyntaxNode node, List<SyntaxNode> nodeList)
         {
             nodeList.Add(node);
 
