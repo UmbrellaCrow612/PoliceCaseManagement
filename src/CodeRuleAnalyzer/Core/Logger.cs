@@ -1,4 +1,4 @@
-﻿namespace CodeRuleAnalyzer
+﻿namespace CodeRuleAnalyzer.Core
 {
     internal static class Logger
     {

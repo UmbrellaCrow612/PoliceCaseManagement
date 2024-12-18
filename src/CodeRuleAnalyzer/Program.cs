@@ -1,5 +1,5 @@
 ﻿
-using CodeRuleAnalyzer;
+using CodeRuleAnalyzer.Core;
 
 var runner = new Runner();
 

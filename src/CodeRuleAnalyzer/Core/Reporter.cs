@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace CodeRuleAnalyzer.Helpers
+namespace CodeRuleAnalyzer.Core
 {
     internal static class Reporter
     {

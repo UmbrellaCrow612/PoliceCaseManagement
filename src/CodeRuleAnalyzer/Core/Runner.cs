@@ -1,10 +1,9 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
-using CodeRuleAnalyzer.Core;
 using System.Data;
 
-namespace CodeRuleAnalyzer
+namespace CodeRuleAnalyzer.Core
 {
     public class Runner
     {
