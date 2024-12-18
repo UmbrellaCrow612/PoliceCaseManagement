@@ -25,9 +25,17 @@ namespace CodeRule.Core
 
         private static void WriteViolationToCsv(string csvFilePath, string filePath, string parameterName, string violationDescription, string severity)
         {
-            string violation = $"{filePath},{parameterName},\"{violationDescription}\",{severity}";
+            using StreamWriter writer = new(csvFilePath, append: true)
+            {
+                AutoFlush = true 
+            };
 
-            using StreamWriter writer = new(csvFilePath, append: true);
+            if (new FileInfo(csvFilePath).Length == 0)
+            {
+                writer.WriteLine("FilePath,ParameterName,ViolationDescription,Severity");
+            }
+
+            string violation = $"{filePath},{parameterName},\"{violationDescription}\",{severity}";
             writer.WriteLine(violation);
         }
     }
