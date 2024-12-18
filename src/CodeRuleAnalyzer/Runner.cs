@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
+using CodeRuleAnalyzer.Core;
+using System.Data;
 
 namespace CodeRuleAnalyzer
 {
@@ -37,13 +39,15 @@ namespace CodeRuleAnalyzer
                 }
             }
 
+            var rules = ReflectionHelper.FindAllCodeRules();
+
             foreach (var projectPath in filteredProjectDirectoryPaths)
             {
-                Analyze(projectPath);
+                Analyze(projectPath, rules);
             }
         }
 
-        private void Analyze(string projectPath)
+        private void Analyze(string projectPath, List<CodeRule> rules)
         {
             var allFilePathsInProject = GetAllFilePathsFromProject(projectPath);
 
@@ -53,7 +57,10 @@ namespace CodeRuleAnalyzer
 
                 foreach (var node in nodes)
                 {
-                    Analyzers.AnalyzeNode(node, filePath);
+                    foreach (var rule in rules)
+                    {
+                        rule.Analyze(node);
+                    }
                 }
             }
         }
