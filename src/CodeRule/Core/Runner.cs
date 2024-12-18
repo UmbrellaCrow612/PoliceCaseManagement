@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
+using System.Data;
 
 namespace CodeRule.Core
 {
@@ -39,10 +40,12 @@ namespace CodeRule.Core
 
             var rules = ReflectionHelper.FindAllCodeRules();
 
-            foreach (var projectPath in filteredProjectDirectoryPaths)
+            Parallel.ForEach(filteredProjectDirectoryPaths, projectPath =>
             {
                 Analyze(projectPath, rules);
-            }
+            });
+
+            GenerateViolationsCsv(rules);
         }
 
         private void Analyze(string projectPath, List<CodeRule> rules)
@@ -73,7 +76,7 @@ namespace CodeRule.Core
             return new List<string>(Directory.GetFiles(projectPath, "*.cs", SearchOption.AllDirectories));
         }
 
-        public List<SyntaxNode> ReadFileAndConvertToNodes(string filePath)
+        public static List<SyntaxNode> ReadFileAndConvertToNodes(string filePath)
         {
             try
             {
@@ -106,5 +109,50 @@ namespace CodeRule.Core
                 CollectNodes(childNode, nodeList);
             }
         }
+
+        private static void GenerateViolationsCsv(List<CodeRule> rules)
+        {
+            var allViolations = new List<Violation>();
+            foreach (var rule in rules)
+            {
+                allViolations.AddRange(rule.GetViolations());
+            }
+
+            var csvLines = new List<string>
+                {
+                    "Rule Class Name,File Path,Violating Token,Line Number, Column Number, Severity,Violation Description"
+                };
+
+            var violationsByRule = allViolations
+                .GroupBy(v => rules.First(r => r.GetViolations().Contains(v)).GetRuleClassName())
+                .ToList();
+
+            foreach (var ruleViolations in violationsByRule)
+            {
+                foreach (var violation in ruleViolations)
+                {
+                    string csvLine = $"{ruleViolations.Key}," +
+                                     $"\"{violation.FilePath}\"," +
+                                     $"\"{violation.ViolatingToken}\"," +
+                                     $"\"{violation.LineNumber}\"," +
+                                     $"\"{violation.ColumnNumber}\"," +
+                                     $"{violation.Severity}," +
+                                     $"\"{violation.ViolationDescription}\"";
+                    csvLines.Add(csvLine);
+                }
+            }
+
+            string filePath = "test.csv";
+            if (File.Exists(filePath))
+            {
+                File.AppendAllLines(filePath, csvLines.Skip(1));
+            }
+            else
+            {
+                File.WriteAllLines(filePath, csvLines);
+            }
+        }
+
+
     }
 }

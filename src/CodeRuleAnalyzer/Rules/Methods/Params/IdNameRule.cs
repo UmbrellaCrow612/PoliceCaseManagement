@@ -14,13 +14,12 @@ namespace CodeRuleAnalyzer.Rules.Methods.Params
                 {
                     if (parameter.Identifier.Text.Equals("id", StringComparison.OrdinalIgnoreCase))
                     {
-                        Reporter.ReportViolation(
-                            parameter.Identifier,
-                            filePath,
-                            $"Parameter '{parameter.Identifier.Text}' is too generic. Consider using a more descriptive name like 'userId', 'productId', etc.",
-                            Logger.LogLevel.Warning,
-                            "A-Method.csv"
-                        );
+                        AddViolation(
+                          filePath,
+                          parameter.Identifier,
+                          "Avoid using 'id' as a parameter name. Use a more descriptive name.",
+                          "Warning"
+                      );
                     }
                 }
             }

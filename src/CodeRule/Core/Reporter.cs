@@ -32,7 +32,7 @@ namespace CodeRule.Core
 
             if (new FileInfo(csvFilePath).Length == 0)
             {
-                writer.WriteLine("FilePath,ParameterName,ViolationDescription,Severity");
+                writer.WriteLine("FilePath,ViolatingToken,ViolationDescription,Severity");
             }
 
             string violation = $"{filePath},{parameterName},\"{violationDescription}\",{severity}";
