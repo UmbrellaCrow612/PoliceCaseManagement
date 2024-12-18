@@ -57,7 +57,7 @@ namespace CodeRule.Core
                 {
                     foreach (var rule in rules)
                     {
-                        rule.Analyze(node);
+                        rule.Analyze(node, filePath);
                     }
                 }
             }
