@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace CodeRuleAnalyzer.Core
+namespace CodeRule.Core
 {
-    internal static class Reporter
+    public static class Reporter
     {
         public static void ReportViolation(SyntaxToken violatingToken, string filePath, string message, Logger.LogLevel level)
         {

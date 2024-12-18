@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace CodeRuleAnalyzer.Core
+namespace CodeRule.Core
 {
     public abstract class CodeRule
     {

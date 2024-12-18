@@ -1,6 +1,6 @@
-﻿namespace CodeRuleAnalyzer.Core
+﻿namespace CodeRule.Core
 {
-    internal static class Logger
+    public static class Logger
     {
         public enum LogLevel
         {
