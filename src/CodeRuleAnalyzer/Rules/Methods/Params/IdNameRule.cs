@@ -18,7 +18,8 @@ namespace CodeRuleAnalyzer.Rules.Methods.Params
                             parameter.Identifier,
                             filePath,
                             $"Parameter '{parameter.Identifier.Text}' is too generic. Consider using a more descriptive name like 'userId', 'productId', etc.",
-                            Logger.LogLevel.Warning
+                            Logger.LogLevel.Warning,
+                            "A-Method.csv"
                         );
                     }
                 }

@@ -4,21 +4,31 @@ namespace CodeRule.Core
 {
     public static class Reporter
     {
-        public static void ReportViolation(SyntaxToken violatingToken, string filePath, string message, Logger.LogLevel level)
+        public static void ReportViolation(SyntaxToken violatingToken, string filePath, string message, Logger.LogLevel level, string? csvFilePath = null)
         {
-            // Extract line and column information from the token
             var lineSpan = violatingToken.GetLocation().GetLineSpan();
-            var lineNumber = lineSpan.StartLinePosition.Line + 1; // Line numbers are 0-based
-            var columnNumber = lineSpan.StartLinePosition.Character + 1; // Columns are 0-based
+            var lineNumber = lineSpan.StartLinePosition.Line + 1; 
+            var columnNumber = lineSpan.StartLinePosition.Character + 1; 
 
-            // Highlight the specific text of the violating token
             var highlightedCode = violatingToken.Text;
 
-            // Log the violation with detailed information
             Logger.Log(
                 $"{message} (File: {filePath}, Line: {lineNumber}, Column: {columnNumber}, Code: '{highlightedCode}')",
                 level
             );
+
+            if (!string.IsNullOrWhiteSpace(csvFilePath))
+            {
+                WriteViolationToCsv(csvFilePath, filePath, violatingToken.Text, message, level.ToString());
+            }
+        }
+
+        private static void WriteViolationToCsv(string csvFilePath, string filePath, string parameterName, string violationDescription, string severity)
+        {
+            string violation = $"{filePath},{parameterName},\"{violationDescription}\",{severity}";
+
+            using StreamWriter writer = new(csvFilePath, append: true);
+            writer.WriteLine(violation);
         }
     }
 }
