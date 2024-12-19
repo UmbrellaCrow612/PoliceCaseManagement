@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CodeRule.Core;
 
 namespace CodeRuleAnalyzer.Rules.Methods.Params
 {

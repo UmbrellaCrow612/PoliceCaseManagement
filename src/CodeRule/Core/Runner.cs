@@ -8,6 +8,12 @@ namespace CodeRule.Core
     public class Runner
     {
         private string SolutionFilePath { get; set; } = string.Empty;
+        private List<string> ExcludeProjectNames { get; set; } = [];
+
+        public void AddExcludedProjectNames(string projectName)
+        {
+            ExcludeProjectNames.Add(projectName);
+        }
 
         public void AddSolutionFilePath(string solutionPath)
         {
@@ -30,12 +36,13 @@ namespace CodeRule.Core
             foreach (var pair in allProjects.ProjectsByGuid)
             {
                 var projType = pair.Value.ProjectType;
+                var projectName = pair.Value.ProjectName;
 
-                if (projType is not SolutionProjectType.SolutionFolder) // we dont want to add solution folders as these contain all projects already
-                {
-                    string parentDirectory = Path.GetDirectoryName(pair.Value.AbsolutePath)!;
-                    filteredProjectDirectoryPaths.Add(parentDirectory);
-                }
+                if (projType is SolutionProjectType.SolutionFolder) continue;
+                if (ExcludeProjectNames.Contains(projectName)) continue;
+
+                string parentDirectory = Path.GetDirectoryName(pair.Value.AbsolutePath)!;
+                filteredProjectDirectoryPaths.Add(parentDirectory);
             }
 
             var rules = ReflectionHelper.FindAllCodeRules();
@@ -48,7 +55,7 @@ namespace CodeRule.Core
             GenerateViolationsCsv(rules);
         }
 
-        private void Analyze(string projectPath, List<CodeRule> rules)
+        private static void Analyze(string projectPath, List<CodeRule> rules)
         {
             var allFilePathsInProject = GetAllFilePathsFromProject(projectPath);
 
