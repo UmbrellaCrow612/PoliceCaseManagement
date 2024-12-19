@@ -114,77 +114,58 @@ namespace CodeRule.Core
 
             foreach (var filePath in allFilePathsInProject)
             {
-                (List<SyntaxNode> nodes, SyntaxTree treeCopy) = ReadFileAndConvertToNodes(filePath);
-                var rootNode = treeCopy.GetRoot();
+                var rootNode = GetFileRootNode(filePath);
 
-                foreach (var node in nodes)
+                foreach (var rule in rules)
                 {
-                    foreach (var rule in rules)
-                    {
-                        rule.Analyze(node, filePath);
-                    }
-                }
-
-                foreach (var fix in codeFixes)
-                {
-                    var newRootNode = fix.ApplyFix(rootNode);
-                    if (newRootNode != rootNode)
-                    {
-                        rootNode = newRootNode;  
-                    }
-                }
-
-                if (rootNode.ToFullString() != File.ReadAllText(filePath))
-                {
-                    File.WriteAllText(filePath, rootNode.ToFullString());
+                    rule.Analyze(rootNode, filePath);
                 }
             }
         }
 
-
-        private static ICollection<string> GetAllFilePathsFromProject(string projectPath)
+        private static List<string> GetAllFilePathsFromProject(string projectPath)
         {
             if (!Directory.Exists(projectPath))
             {
                 throw new DirectoryNotFoundException($"The specified directory does not exist: {projectPath}");
             }
 
-            return new List<string>(Directory.GetFiles(projectPath, "*.cs", SearchOption.AllDirectories));
+            string[] excludedDirectories =
+            [
+                "bin",
+                "obj",
+                "Debug",
+                "Release",
+                "packages",
+                ".vs",
+                "node_modules",
+                "TestResults",
+                ".git"
+            ];
+
+            var files = Directory.EnumerateFiles(projectPath, "*.cs", SearchOption.AllDirectories)
+                .Where(file => !excludedDirectories.Any(dir =>
+                    file.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
+                    file.Contains($"/{dir}/") || 
+                    file.Contains($"\\{dir}\\")))
+                .ToList();
+
+            return files;
         }
 
-        public static (List<SyntaxNode> nodes, SyntaxTree treeCopy) ReadFileAndConvertToNodes(string filePath)
+        public static SyntaxNode GetFileRootNode(string filePath)
         {
-            try
-            {
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(fileStream);
-                string fileContent = reader.ReadToEnd();
+            string sourceText = File.ReadAllText(filePath);
 
-                SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
-                var copy = syntaxTree;
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
+                sourceText,
+                path: filePath,
+                options: new CSharpParseOptions(LanguageVersion.Latest)
+            );
 
-                SyntaxNode rootNode = syntaxTree.GetRoot();
+            var rootNode = syntaxTree.GetRoot();
 
-                var nodes = new List<SyntaxNode>();
-                CollectNodes(rootNode, nodes);
-
-                return (nodes, copy);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading file: {ex.Message}");
-                throw;
-            }
-        }
-
-        private static void CollectNodes(SyntaxNode node, List<SyntaxNode> nodeList)
-        {
-            nodeList.Add(node);
-
-            foreach (var childNode in node.ChildNodes())
-            {
-                CollectNodes(childNode, nodeList);
-            }
+            return rootNode;
         }
 
         private void GenerateViolationsCsv(List<CodeRule> rules)

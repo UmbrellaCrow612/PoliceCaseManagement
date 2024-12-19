@@ -1,28 +1,25 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
 
-namespace CodeRuleAnalyzer.Rules.Methods.Params
+internal class IdNameRule : CodeRule.Core.CodeRule
 {
-    internal class IdNameRule : CodeRule.Core.CodeRule
+    public override void Analyze(SyntaxNode rootNode, string filePath)
     {
-        public override void Analyze(SyntaxNode node, string filePath)
+        var methodDeclarations = rootNode.DescendantNodes().OfType<MethodDeclarationSyntax>();
+        foreach (var method in methodDeclarations)
         {
-            if (node is MethodDeclarationSyntax methodDeclaration)
+            foreach (var param in method.ParameterList.Parameters)
             {
-                foreach (var parameter in methodDeclaration.ParameterList.Parameters)
+                if (param.Identifier.ValueText.Equals("id", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (parameter.Identifier.Text.Equals("id", StringComparison.OrdinalIgnoreCase))
-                    {
-                        AddViolation(
-                          filePath,
-                          parameter.Identifier,
-                          "Avoid using 'id' as a parameter name. Use a more descriptive name.",
-                          "Warning"
-                      );
-                    }
+                    AddViolation(
+                        filePath,
+                        param.Identifier,
+                        "Parameter name should not be 'ID'",
+                        "Warning"
+                    );
                 }
             }
         }
     }
-
 }

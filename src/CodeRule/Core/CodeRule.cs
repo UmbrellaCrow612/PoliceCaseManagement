@@ -6,7 +6,7 @@ namespace CodeRule.Core
     {
         private List<Violation> Violations { get; } = [];
 
-        public abstract void Analyze(SyntaxNode node, string filePath);
+        public abstract void Analyze(SyntaxNode rootNode, string filePath);
 
         public virtual string GetRuleClassName()
         {
