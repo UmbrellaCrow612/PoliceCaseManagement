@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
 
@@ -56,10 +56,11 @@ namespace CodeRule.Core
             }
 
             var rules = ReflectionHelper.FindAllCodeRules();
+            var fixes = ReflectionHelper.FindAllCodeFixes();
 
             Parallel.ForEach(filteredProjectDirectoryPaths, projectPath =>
             {
-                Analyze(projectPath, rules);
+                Analyze(projectPath, rules, fixes);
             });
 
             GenerateViolationsCsv(rules);
@@ -107,13 +108,14 @@ namespace CodeRule.Core
             }
         }
 
-        private static void Analyze(string projectPath, List<CodeRule> rules)
+        public static void Analyze(string projectPath, List<CodeRule> rules, List<CodeFix> codeFixes)
         {
             var allFilePathsInProject = GetAllFilePathsFromProject(projectPath);
 
             foreach (var filePath in allFilePathsInProject)
             {
-                var nodes = ReadFileAndConvertToNodes(filePath);
+                (List<SyntaxNode> nodes, SyntaxTree treeCopy) = ReadFileAndConvertToNodes(filePath);
+                var rootNode = treeCopy.GetRoot();
 
                 foreach (var node in nodes)
                 {
@@ -122,8 +124,23 @@ namespace CodeRule.Core
                         rule.Analyze(node, filePath);
                     }
                 }
+
+                foreach (var fix in codeFixes)
+                {
+                    var newRootNode = fix.ApplyFix(rootNode);
+                    if (newRootNode != rootNode)
+                    {
+                        rootNode = newRootNode;  
+                    }
+                }
+
+                if (rootNode.ToFullString() != File.ReadAllText(filePath))
+                {
+                    File.WriteAllText(filePath, rootNode.ToFullString());
+                }
             }
         }
+
 
         private static ICollection<string> GetAllFilePathsFromProject(string projectPath)
         {
@@ -135,7 +152,7 @@ namespace CodeRule.Core
             return new List<string>(Directory.GetFiles(projectPath, "*.cs", SearchOption.AllDirectories));
         }
 
-        public static List<SyntaxNode> ReadFileAndConvertToNodes(string filePath)
+        public static (List<SyntaxNode> nodes, SyntaxTree treeCopy) ReadFileAndConvertToNodes(string filePath)
         {
             try
             {
@@ -144,18 +161,19 @@ namespace CodeRule.Core
                 string fileContent = reader.ReadToEnd();
 
                 SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
+                var copy = syntaxTree;
 
                 SyntaxNode rootNode = syntaxTree.GetRoot();
 
                 var nodes = new List<SyntaxNode>();
                 CollectNodes(rootNode, nodes);
 
-                return nodes;
+                return (nodes, copy);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error reading file: {ex.Message}");
-                return []; // Return an empty list if there's an error
+                throw;
             }
         }
 
