@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
-using System.Data;
 
 namespace CodeRule.Core
 {
@@ -9,6 +8,18 @@ namespace CodeRule.Core
     {
         private string SolutionFilePath { get; set; } = string.Empty;
         private List<string> ExcludeProjectNames { get; set; } = [];
+        private string OutPutFileName { get; set; } = "violations.csv";
+        private string OutPutDirectory { get; set; } = Directory.GetCurrentDirectory();
+
+        public void AddOutputFileName(string outputFileName)
+        {
+            OutPutFileName = outputFileName;
+        }
+
+        public void AddOutputDirectory(string outputDirectory)
+        {
+            OutPutDirectory = outputDirectory;
+        }
 
         public void AddExcludedProjectNames(string projectName)
         {
@@ -20,14 +31,13 @@ namespace CodeRule.Core
             SolutionFilePath = solutionPath;
         }
 
-        public string GetSolutionFilePath()
+        public void Run(string[] args)
         {
-            return SolutionFilePath;
-        }
+            if(args.Length > 0) ConfigureOptionsWithArgs(args);
 
-        public void Run()
-        {
             if (string.IsNullOrWhiteSpace(SolutionFilePath) || !File.Exists(SolutionFilePath)) throw new ArgumentException("No valid solution file path was provided to run against.");
+            if (!OutPutFileName.EndsWith(".csv")) throw new ArgumentException("Output file name must have a .csv extension.");
+            if(!Directory.Exists(OutPutDirectory)) throw new ArgumentException("Output file directory dose not exist.");
 
             var allProjects = SolutionFile.Parse(SolutionFilePath);
 
@@ -53,6 +63,48 @@ namespace CodeRule.Core
             });
 
             GenerateViolationsCsv(rules);
+        }
+
+
+        private void ConfigureOptionsWithArgs(string[] args)
+        {
+            foreach (var arg in args)
+            {
+                var argumentParts = arg.Split('=', 2);
+
+                if (argumentParts.Length != 2 || string.IsNullOrWhiteSpace(argumentParts[1]))
+                {
+                    throw new ArgumentException($"Invalid argument format: {arg}");
+                }
+
+                var key = argumentParts[0];
+                var value = argumentParts[1];
+
+                switch (key)
+                {
+                    case "--solutionFilePath":
+                        SolutionFilePath = value;
+                        break;
+
+                    case "--excludeProjects":
+                        ExcludeProjectNames = value
+                            .Split(',')
+                            .Select(project => project.Trim())
+                            .ToList();
+                        break;
+
+                    case "--outputFileName":
+                        OutPutFileName = value;
+                        break;
+
+                    case "--outputDirectory":
+                        OutPutDirectory = value;
+                        break;
+
+                    default:
+                        throw new ArgumentException($"Unsupported argument: {key}");
+                }
+            }
         }
 
         private static void Analyze(string projectPath, List<CodeRule> rules)
