@@ -169,7 +169,7 @@ namespace CodeRule.Core
             }
         }
 
-        private static void GenerateViolationsCsv(List<CodeRule> rules)
+        private void GenerateViolationsCsv(List<CodeRule> rules)
         {
             var allViolations = new List<Violation>();
             foreach (var rule in rules)
@@ -201,17 +201,15 @@ namespace CodeRule.Core
                 }
             }
 
-            string filePath = "test.csv";
+            string filePath = Path.Combine(OutPutDirectory, OutPutFileName);
             if (File.Exists(filePath))
             {
-                File.AppendAllLines(filePath, csvLines.Skip(1));
+                File.AppendAllLines(filePath, csvLines.Skip(1)); 
             }
             else
             {
-                File.WriteAllLines(filePath, csvLines);
+                File.WriteAllLines(filePath, csvLines); 
             }
         }
-
-
     }
 }
