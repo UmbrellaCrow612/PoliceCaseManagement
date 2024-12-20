@@ -120,6 +120,13 @@ namespace CodeRule.Core
                 {
                     rule.Analyze(rootNode, filePath);
                 }
+
+                foreach (var fix in codeFixes)
+                {
+                    rootNode = fix.ApplyFix(rootNode);
+                }
+
+                File.WriteAllText(filePath, rootNode.ToFullString());
             }
         }
 
