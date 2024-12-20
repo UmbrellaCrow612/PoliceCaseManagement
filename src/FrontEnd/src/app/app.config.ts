@@ -5,6 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DeviceFingerPrintInterceptor } from '../core/device/interceptors/device.interceptor';
 import { JwtInterceptor } from '../core/authentication/interceptors/jwt.interceptor';
+import { RedirectInterceptor } from '../core/authentication/interceptors/redirect.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(
-      withInterceptors([DeviceFingerPrintInterceptor, JwtInterceptor]),
+      withInterceptors([DeviceFingerPrintInterceptor, JwtInterceptor, RedirectInterceptor]),
     )
   ],
 };
