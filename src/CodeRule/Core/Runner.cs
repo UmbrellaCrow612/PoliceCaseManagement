@@ -13,6 +13,31 @@ namespace CodeRule.Core
         private string OutPutDirectory { get; set; } = Directory.GetCurrentDirectory();
         private bool RunCodeFixes { get; set; } = false;
 
+        public string CurrentWorkingSolutionFile()
+        {
+            return SolutionFilePath;
+        }
+
+        public string[] CurrentExcludeProjectNames()
+        {
+            return [.. ExcludeProjectNames];
+        }
+
+        public string CurrentOutputFileName()
+        {
+            return OutPutFileName;
+        }
+
+        public string CurrentOutputDirectory()
+        {
+            return OutPutDirectory;
+        }
+
+        public bool CurrentRunCodeFixesMode()
+        {
+            return RunCodeFixes;
+        }
+
         public void AddRunCodeFixes(bool runCodeFixes)
         {
             RunCodeFixes = runCodeFixes;
@@ -30,6 +55,7 @@ namespace CodeRule.Core
 
         public void AddExcludedProjectName(string projectName)
         {
+            if (ExcludeProjectNames.Contains(projectName)) throw new ArgumentException("Project name already exists in the exclusion list.");
             ExcludeProjectNames.Add(projectName);
         }
 
