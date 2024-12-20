@@ -89,6 +89,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevelopmentCorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // Specify your frontend's URL
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Allow cookies and credentials if necessary
+    });
+});
+
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -125,6 +137,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors("DevelopmentCorsPolicy");
 }
 
 app.UseHttpsRedirection();
