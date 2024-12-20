@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Construction;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace CodeRule.Core
 {
@@ -10,6 +11,12 @@ namespace CodeRule.Core
         private List<string> ExcludeProjectNames { get; set; } = [];
         private string OutPutFileName { get; set; } = "violations.csv";
         private string OutPutDirectory { get; set; } = Directory.GetCurrentDirectory();
+        private bool RunCodeFixes { get; set; } = false;
+
+        public void AddRunCodeFixes(bool runCodeFixes)
+        {
+            RunCodeFixes = runCodeFixes;
+        }
 
         public void AddOutputFileName(string outputFileName)
         {
@@ -102,13 +109,17 @@ namespace CodeRule.Core
                         OutPutDirectory = value;
                         break;
 
+                    case "--runCodeFixes":
+                        RunCodeFixes = bool.Parse(value);
+                        break;
+
                     default:
                         throw new ArgumentException($"Unsupported argument: {key}");
                 }
             }
         }
 
-        public static void Analyze(string projectPath, List<CodeRule> rules, List<CodeFix> codeFixes)
+        public void Analyze(string projectPath, List<CodeRule> rules, List<CodeFix> codeFixes)
         {
             var allFilePathsInProject = GetAllFilePathsFromProject(projectPath);
 
@@ -121,13 +132,23 @@ namespace CodeRule.Core
                     rule.Analyze(rootNode, filePath);
                 }
 
-                foreach (var fix in codeFixes)
+                if (RunCodeFixes)
                 {
-                    rootNode = fix.ApplyFix(rootNode);
-                }
+                    foreach (var fix in codeFixes)
+                    {
+                        rootNode = fix.ApplyFix(rootNode);
+                    }
 
-                File.WriteAllText(filePath, rootNode.ToFullString());
+                    rootNode = NormalizeNode(rootNode);
+
+                    File.WriteAllText(filePath, rootNode.ToFullString());
+                }
             }
+        }
+
+        private static SyntaxNode NormalizeNode(SyntaxNode rootNode)
+        {
+            return Formatter.Format(rootNode, new AdhocWorkspace());
         }
 
         private static List<string> GetAllFilePathsFromProject(string projectPath)

@@ -17,4 +17,8 @@
     <ProjectReference Include="..\CodeRule\CodeRule.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Fixes\Methods\Paramas\" />
+  </ItemGroup>
+
 </Project>

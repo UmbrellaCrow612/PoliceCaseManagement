@@ -2,7 +2,7 @@
   "profiles": {
     "CodeRuleAnalyzer": {
       "commandName": "Project",
-      "commandLineArgs": "--solutionFilePath=C:\\dev\\PCMS\\PoliceCaseManagement.sln"
+      "commandLineArgs": "--solutionFilePath=C:\\dev\\PCMS\\PoliceCaseManagement.sln --runCodeFixes=false"
     }
   }
 }
