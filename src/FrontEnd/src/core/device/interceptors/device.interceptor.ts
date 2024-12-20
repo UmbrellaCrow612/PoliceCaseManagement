@@ -1,12 +1,16 @@
 import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GetFingerPrint } from '../../../utils/device/FingerPrint';
+import { inject } from '@angular/core';
+import { DeviceService } from '../services/device.service';
 
-export function DeviceFingerPrintInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+export function DeviceFingerPrintInterceptor(
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> {
 
-  console.debug("Device fingerprint interceptor ran on this request.");
+  var deviceService = inject(DeviceService);
 
-  var fingerPrint = GetFingerPrint();
+  var fingerPrint = deviceService.GetDeviceFingerPrint();
 
   const reqWithHeader = req.clone({
     headers: req.headers.set('X-Device-Fingerprint', fingerPrint),
