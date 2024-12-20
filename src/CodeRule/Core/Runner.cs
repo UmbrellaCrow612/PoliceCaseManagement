@@ -28,7 +28,7 @@ namespace CodeRule.Core
             OutPutDirectory = outputDirectory;
         }
 
-        public void AddExcludedProjectNames(string projectName)
+        public void AddExcludedProjectName(string projectName)
         {
             ExcludeProjectNames.Add(projectName);
         }
@@ -38,9 +38,9 @@ namespace CodeRule.Core
             SolutionFilePath = solutionPath;
         }
 
-        public void Run(string[] args)
+        public void Run(string[] args = null!)
         {
-            if(args.Length > 0) ConfigureOptionsWithArgs(args);
+            if(args is not null && args.Length > 0) ConfigureOptionsWithArgs(args);
 
             if (string.IsNullOrWhiteSpace(SolutionFilePath) || !File.Exists(SolutionFilePath)) throw new ArgumentException("No valid solution file path was provided to run against.");
             if (!OutPutFileName.EndsWith(".csv")) throw new ArgumentException("Output file name must have a .csv extension.");

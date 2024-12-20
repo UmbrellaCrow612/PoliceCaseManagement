@@ -2,15 +2,15 @@
 
 var runner = new Runner();
 
-runner.AddExcludedProjectNames("Cases.API");
-runner.AddExcludedProjectNames("Cases.Infrastructure");
-runner.AddExcludedProjectNames("SMS.Service");
-runner.AddExcludedProjectNames("Shared");
-runner.AddExcludedProjectNames("Identity.API");
-runner.AddExcludedProjectNames("Evidence.Infrastructure");
-runner.AddExcludedProjectNames("Email.Service");
-runner.AddExcludedProjectNames("Entity.API");
-runner.AddExcludedProjectNames("Entity.Infrastructure");
-runner.AddExcludedProjectNames("Evidence.API");
+runner.AddExcludedProjectName("Cases.API");
+runner.AddExcludedProjectName("Cases.Infrastructure");
+runner.AddExcludedProjectName("SMS.Service");
+runner.AddExcludedProjectName("Shared");
+runner.AddExcludedProjectName("Identity.API");
+runner.AddExcludedProjectName("Evidence.Infrastructure");
+runner.AddExcludedProjectName("Email.Service");
+runner.AddExcludedProjectName("Entity.API");
+runner.AddExcludedProjectName("Entity.Infrastructure");
+runner.AddExcludedProjectName("Evidence.API");
 
 runner.Run(args);
