@@ -1,6 +1,6 @@
 const DevelopmentConfig = {
     EncryptionKey : 'development',
-    EncryptionAlgorithm : 'aes-256-cbc',
+    EncryptionAlgorithm : 'SHA-256',
 } as const
 
 

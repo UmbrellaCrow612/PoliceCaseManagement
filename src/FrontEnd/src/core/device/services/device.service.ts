@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
 import { ComputeFingerPrint } from "../utils/FingerPrint";
 import { CookieService } from "../../cookie/services/cookie.service";
+import CookieNames from "../../cookie/constants/names";
 
 @Injectable({
   providedIn: "root",
 })
 export class DeviceService {
-  private readonly COOKIE_NAME = "df";
+  private readonly COOKIE_NAME = CookieNames.DEVICE_FINGERPRINT;
   private readonly EXPIRATION_DAYS = 2;
 
   constructor(private cookieService: CookieService) {} 

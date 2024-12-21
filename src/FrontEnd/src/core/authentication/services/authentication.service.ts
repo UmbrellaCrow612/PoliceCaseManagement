@@ -3,13 +3,14 @@ import { Injectable } from "@angular/core";
 import { LoginCredentials } from "../types";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { CookieService } from "../../cookie/services/cookie.service";
+import CookieNames from "../../cookie/constants/names";
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService {
     
-  private readonly COOKIE_NAME = "jt";
+  private readonly COOKIE_NAME = CookieNames.JWT;
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
@@ -18,12 +19,10 @@ export class AuthenticationService {
   }
 
   Logout() {
-    console.log("Logout ran");
-    this.cookieService.deleteCookie(this.COOKIE_NAME); 
+    // Implement login functionality here
   }
 
   async RefreshToken() {
-    console.log("Refreshing token ran");
     // Implement token refresh functionality here
   }
 
@@ -35,23 +34,8 @@ export class AuthenticationService {
     return this.cookieService.getCookie(this.COOKIE_NAME);
   }
 
-  private IsTokenValid() {
-    console.log("Token valid ran");
-    // Implement token validation functionality here
-  }
 
   public SetJwtToken(token: string, expirationMinutes: number): void {
-    const expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + expirationMinutes * 60 * 1000);
-    
-    const cookieOptions = {
-      expires: expirationDate,
-      path: '/',
-      secure: true,
-      sameSite: 'Strict' as 'Strict', 
-    };
-  
-    this.cookieService.setCookie('jwt', token, cookieOptions);  
+    // Implement login functionality here
   }
-  
 }
