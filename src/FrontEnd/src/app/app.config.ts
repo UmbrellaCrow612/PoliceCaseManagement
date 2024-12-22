@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { DeviceFingerPrintInterceptor } from '../core/device/interceptors/device.interceptor';
+import { DeviceFingerPrintInterceptor } from '../core/user/device/interceptors/device.interceptor';
 import { JwtInterceptor } from '../core/authentication/interceptors/jwt.interceptor';
 import { RedirectInterceptor } from '../core/authentication/interceptors/redirect.interceptor';
 
