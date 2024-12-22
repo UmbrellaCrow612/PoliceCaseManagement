@@ -5,7 +5,7 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { StatusCodes } from '../../codes/status-codes';
+import { StatusCodes } from '../../http/codes/status-codes';
 
 export function RedirectInterceptor(
   req: HttpRequest<unknown>,

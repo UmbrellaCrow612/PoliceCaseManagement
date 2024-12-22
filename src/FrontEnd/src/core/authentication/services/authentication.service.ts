@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { LoginCredentials } from "../types";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { CookieService } from "../../cookie/services/cookie.service";
-import CookieNames from "../../cookie/constants/names";
+import CookieNames from "../../browser/cookie/constants/names";
+import { CookieService } from "../../browser/cookie/services/cookie.service";
 
 @Injectable({
   providedIn: 'root',

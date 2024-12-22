@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { ComputeFingerPrint } from "../utils/FingerPrint";
-import { CookieService } from "../../cookie/services/cookie.service";
-import CookieNames from "../../cookie/constants/names";
+import { CookieService } from "../../../browser/cookie/services/cookie.service";
+import CookieNames from "../../../browser/cookie/constants/names";
+
 
 @Injectable({
   providedIn: "root",
