@@ -57,3 +57,19 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+## Run and add docker img
+
+
+```docker
+docker build -t pcms-frontend .
+docker run -d -p 80:80 --name pcms-frontend-container pcms-frontend
+```
+
+delete old img
+
+```docker
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+```
