@@ -9,13 +9,5 @@ export function DeviceFingerPrintInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
 
-  var deviceService = inject(DeviceService);
-
-  var fingerPrint = deviceService.GetDeviceFingerPrint();
-
-  const reqWithHeader = req.clone({
-    headers: req.headers.set(CustomHeaderNames.DEVICE_FINGERPRINT, fingerPrint),
-  });
-
-  return next(reqWithHeader);
+  return next(req);
 }
