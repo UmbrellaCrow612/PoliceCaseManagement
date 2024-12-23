@@ -1,7 +1,7 @@
 /**
  * Represents the standard login credentials needed to authenticate a user
  */
-export interface LoginCredentials{
+export interface LoginCredentials {
     userName: string | null,
     email: string | null,
     password: string
@@ -30,4 +30,10 @@ export interface JwtPayload {
   email?: string;
   /** User roles/permissions (common custom claim) */
   roles?: string[];
+}
+
+
+export interface JwtResponse {
+  accessToken: string;
+  refreshToken : string;
 }

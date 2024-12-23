@@ -52,7 +52,7 @@ namespace Identity.API.Controllers
                                 ?? "Unknown";
 
             string userAgent = Request.Headers.UserAgent.ToString();
-            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
             {
@@ -178,7 +178,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorCodeDto validateTwoFactorCodeDto)
         {
             string userAgent = Request.Headers.UserAgent.ToString();
-            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
             {
@@ -258,7 +258,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode reSendTwoFactorCode)
         {
             string userAgent = Request.Headers.UserAgent.ToString();
-            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
             {
@@ -352,7 +352,7 @@ namespace Identity.API.Controllers
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
             string userAgent = Request.Headers.UserAgent.ToString();
-            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
             {
@@ -573,7 +573,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
             string userAgent = Request.Headers.UserAgent.ToString();
-            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerPrint].FirstOrDefault();
+            var deviceFingerprint = HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!_deviceIdentification.ValidateUserAgent(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint)) return BadRequest(new ErrorDetail
             {

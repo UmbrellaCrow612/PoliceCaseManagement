@@ -84,7 +84,6 @@ export class BaseService {
    * @param error The error response
    */
   private handleError(error: any): Observable<never> {
-    console.error('An error occurred:', error);
     return throwError(() => error);
   }
 }

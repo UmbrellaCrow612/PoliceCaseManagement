@@ -2,6 +2,6 @@
 {
     public static class CustomHeaderOptions
     {
-        public static readonly string XDeviceFingerPrint = "X-Device-Finger-Print";
+        public static readonly string XDeviceFingerprint = "X-Device-Fingerprint";
     }
 }

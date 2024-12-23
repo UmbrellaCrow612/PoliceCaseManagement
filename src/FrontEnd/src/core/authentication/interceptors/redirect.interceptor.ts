@@ -1,26 +1,22 @@
-import {
-  HttpEvent,
-  HttpEventType,
-  HttpHandlerFn,
-  HttpRequest,
-} from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { StatusCodes } from '../../http/codes/status-codes';
+import { HttpErrorResponse, HttpEvent, HttpEventType, HttpHandlerFn, HttpRequest } from "@angular/common/http";
+import { catchError, Observable, tap, throwError } from "rxjs";
+import { StatusCodes } from "../../http/codes/status-codes";
 
-export function RedirectInterceptor(
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn
-): Observable<HttpEvent<unknown>> {
+export function authRedirectsInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   return next(req).pipe(
-    tap((event) => {
-      if (event.type === HttpEventType.Response) {
-        console.log(req.url, 'returned a response with status', event.status);
+    catchError((error: HttpErrorResponse) => {
 
-        if(event.status === StatusCodes.FORBIDDEN){
-            console.log('Redirecting to the given url sent with the response from dotnet server');
-            // Redirect to page defined
-        }
+      if (error.status === StatusCodes.UNAUTHORIZED) {
+        console.log(`Redirecting to lo9gin page`);
+        return throwError(() => error);
       }
+
+      if (error.status === StatusCodes.FORBIDDEN) {
+        console.log(`Redirecting to ${error.error.redirectUrl}`);
+        return throwError(() => error);
+      }
+
+      return throwError(() => error);
     })
-  );
+  );;
 }

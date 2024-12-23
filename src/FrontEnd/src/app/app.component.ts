@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MediaDevicesService } from '../core/browser/media/services/mediaDevices.service';
-import { WebGLService } from '../core/browser/webGL/services/webGL.service';
-import { ScreenService } from '../core/browser/window/services/screen.service';
+import { AuthenticationService } from '../core/authentication/services/authentication.service';
+import { LoginCredentials } from '../core/authentication/types';
 
 @Component({
   selector: 'app-root',
@@ -12,8 +11,12 @@ import { ScreenService } from '../core/browser/window/services/screen.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  val:any = null
-  constructor(private ss : ScreenService){
-    this.val = ss.getScreenInfo()
+  res:any = null;
+  cred : LoginCredentials = {userName: 'ererervrevev', email: "userververver@example.com", password: "Password@123"};
+
+  constructor(private authService : AuthenticationService) {
+    this.authService.Login(this.cred).subscribe((res) => {
+      this.res = res;
+    });
   }
 }

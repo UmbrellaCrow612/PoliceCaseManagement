@@ -73,3 +73,7 @@ delete old img
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 ```
+
+## Making requests 
+
+- Use rxjs `observable` pattern instead of `async` when you can.
