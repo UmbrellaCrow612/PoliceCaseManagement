@@ -5,16 +5,22 @@ import { CookieService } from '../../browser/cookie/services/cookie.service';
 import CookieNames from '../../browser/cookie/constants/names';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class JwtService {
-
   /**
    * The name of the cookie where the JWT token is stored.
    * @private
    * @readonly
    */
   private readonly COOKIE_NAME = CookieNames.JWT;
+
+  /**
+   * The name of the cookie where the JWT token is stored.
+   * @private
+   * @readonly
+   */
+  private readonly REFRESH_NAME = CookieNames.REFRESH_TOKEN;
 
   constructor(private cookieService: CookieService) {}
 
@@ -39,8 +45,24 @@ export class JwtService {
    * Retrieves the JWT token stored in the cookie.
    * @returns {string | null} The JWT token if it exists; otherwise, null.
    */
-  getJwtToken(): string | null {
+  getRawJwtToken(): string | null {
     return this.cookieService.getCookie(this.COOKIE_NAME);
+  }
+
+  /**
+   * Retrieves the Refresh token stored in the cookie.
+   * @returns {string | null} The Refresh token if it exists; otherwise, null.
+   */
+  getRawRefreshToken(): string | null {
+    return this.cookieService.getCookie(this.REFRESH_NAME);
+  }
+
+  refreshToken(refreshToken: string) {
+    // do refresh logic and set the new tokens in the store , non blocking extra task
+  }
+
+  setTokens() {
+    // override the values of access token and refresh token in cookies
   }
 
   /**
@@ -54,7 +76,9 @@ export class JwtService {
     try {
       return jwtDecode<T>(token);
     } catch (error) {
-      throw new Error('Failed to decode JWT token: ' + (error as Error).message);
+      throw new Error(
+        'Failed to decode JWT token: ' + (error as Error).message
+      );
     }
   }
 }

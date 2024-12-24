@@ -18,5 +18,5 @@ export function authRedirectsInterceptor(req: HttpRequest<unknown>, next: HttpHa
 
       return throwError(() => error);
     })
-  );;
+  );
 }

@@ -23,5 +23,26 @@ export class AuthenticationService extends BaseService {
     return this.post(`${this.BASE_URL}/authentication/login`, credentials);
   }
 
+  // need to be implemented but would be called on mount of the app - if no token then don't start the logic to check etc
+  StartTokenValidationThroughoutLifetime(){
+    // idea
+    // interval(this.tokenCheckInterval)
+    // .pipe(
+    //   switchMap(() => {
+    //     const token = this.getToken();
+    //     if (token && this.isTokenExpired(token)) {
+    //       return this.refreshToken();
+    //     }
+    //     return of(null); // No request if the token is valid
+    //   }),
+    //   catchError((err) => {
+    //     console.error('Token validation/refresh failed', err);
+    //     this.logout();
+    //     return of(null); // Handle errors gracefully
+    //   })
+    // )
+    // .subscribe();
+  }
+
 
 }
