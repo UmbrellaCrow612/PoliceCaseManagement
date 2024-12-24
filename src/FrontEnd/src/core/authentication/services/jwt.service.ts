@@ -11,7 +11,11 @@ import DevelopmentConfig from '../../../environments/development';
   providedIn: 'root',
 })
 export class JwtService extends BaseService {
-
+  /**
+   * The base url this service will use to make requests.
+   * @private
+   * @readonly
+   */
   private readonly BASE_URL = DevelopmentConfig.BaseUrls.authenticationBaseUrl;
 
   /**
@@ -28,22 +32,32 @@ export class JwtService extends BaseService {
    */
   private readonly REFRESH_NAME = CookieNames.REFRESH_TOKEN;
 
-  constructor(protected override http : HttpClient, private cookieService: CookieService) {
+  constructor(
+    protected override http: HttpClient,
+    private cookieService: CookieService
+  ) {
     super(http);
   }
 
   /**
    * Validates whether a given JWT token is still valid based on its expiration time.
-   * @param {string} token The JWT token to validate.
-   * @returns {boolean} True if the token is valid; otherwise, false.
+   * The type `T` passed in should match the shape of the token you are passing in.
+   * For example, if your token includes custom claims, extend `JwtPayload` with those claims.
+   * @param {string} token The raw JWT token to validate.
+   * @returns {boolean} True if the token is valid (not expired); otherwise, false.
    */
-  IsJwtTokenValid(token: string): boolean {
-    const claims = this.decodeToken<JwtPayload>(token);
+  IsJwtTokenValid<T extends JwtPayload>(rawToken: string): boolean {
+    try {
+      const claims = this.decodeToken<T>(rawToken);
 
-    if (claims.exp) {
-      const expiryDate = new Date(claims.exp * 1000);
-      const currentDate = new Date();
-      return expiryDate > currentDate;
+      if (claims.exp) {
+        const expiryDate = new Date(claims.exp * 1000);
+        const currentDate = new Date();
+        return expiryDate > currentDate;
+      }
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return false;
     }
 
     return false;
@@ -67,8 +81,11 @@ export class JwtService extends BaseService {
 
   refreshToken(refreshToken: string) {
     const body = { refreshToken };
-  
-    this.post<{ accessToken: string; refreshToken: string }>(`${this.BASE_URL}/authentication/refresh-token`, body).subscribe({
+
+    this.post<{ accessToken: string; refreshToken: string }>(
+      `${this.BASE_URL}/authentication/refresh-token`,
+      body
+    ).subscribe({
       next: (response) => {
         this.setTokens(response.accessToken, response.refreshToken);
       },
@@ -78,10 +95,10 @@ export class JwtService extends BaseService {
     });
   }
 
-   /**
+  /**
    * Set the access and refresh tokens in the cookie.
    */
-  setTokens(rawAccessToken : string, rawRefreshToken : string) {
+  setTokens(rawAccessToken: string, rawRefreshToken: string) {
     this.cookieService.deleteCookie(this.JWT_NAME);
     this.cookieService.deleteCookie(this.REFRESH_NAME);
 

@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +24,6 @@ export class BaseService {
         params: params,
         headers: headers,
       })
-      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -41,7 +39,6 @@ export class BaseService {
   ): Observable<T> {
     return this.http
       .post<T>(url, body, { headers })
-      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -57,7 +54,6 @@ export class BaseService {
   ): Observable<T> {
     return this.http
       .put<T>(url, body, { headers })
-      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -76,14 +72,5 @@ export class BaseService {
         params: params,
         headers: headers,
       })
-      .pipe(catchError(this.handleError));
-  }
-
-  /**
-   * Handle HTTP errors
-   * @param error The error response
-   */
-  private handleError(error: any): Observable<never> {
-    return throwError(() => error);
   }
 }

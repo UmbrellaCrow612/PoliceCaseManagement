@@ -32,7 +32,9 @@ export interface JwtPayload {
   roles?: string[];
 }
 
-
+/**
+ * Represents the standard response you receive after a successful login
+ */
 export interface JwtResponse {
   accessToken: string;
   refreshToken : string;

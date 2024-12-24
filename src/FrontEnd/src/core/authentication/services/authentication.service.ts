@@ -12,7 +12,7 @@ import { JwtService } from "./jwt.service";
 export class AuthenticationService extends BaseService {
     
   private readonly BASE_URL = DevelopmentConfig.BaseUrls.authenticationBaseUrl;
-  private readonly tokenCheckInterval = 5000; 
+  private readonly tokenCheckInterval = DevelopmentConfig.TokenCheckInterval; 
   private subscription: Subscription | null = null;
 
   constructor(protected override http: HttpClient, private jwtService : JwtService) {
