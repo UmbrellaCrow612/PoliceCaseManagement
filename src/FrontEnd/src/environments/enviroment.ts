@@ -1,6 +1,6 @@
-import { LogLevel } from "../core/app/services/loggingService.service";
+import { LogLevel } from '../core/app/services/loggingService.service';
 
-const DevelopmentConfig = {
+const env = {
   EncryptionKey: 'development',
   EncryptionAlgorithm: 'SHA-256',
   BaseUrls: {
@@ -10,4 +10,4 @@ const DevelopmentConfig = {
   LogLevel: LogLevel.Error,
 } as const;
 
-export default DevelopmentConfig;
+export default env;

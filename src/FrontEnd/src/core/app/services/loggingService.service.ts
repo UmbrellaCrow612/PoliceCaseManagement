@@ -1,19 +1,19 @@
 // logging.service.ts
 import { Injectable } from '@angular/core';
-import DevelopmentConfig from '../../../environments/development';
+import env from '../../../environments/enviroment';
 
 export enum LogLevel {
   Debug,
   Info,
   Warn,
-  Error
+  Error,
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoggingService {
-  private level = DevelopmentConfig.LogLevel
+  private level = env.LogLevel;
 
   debug(message: string, ...args: any[]): void {
     this.log(LogLevel.Debug, message, args);
@@ -35,7 +35,7 @@ export class LoggingService {
     if (level >= this.level) {
       const timestamp = new Date().toISOString();
       const logMessage = `[${timestamp}] ${LogLevel[level]}: ${message}`;
-      
+
       switch (level) {
         case LogLevel.Debug:
           console.debug(logMessage, ...args);

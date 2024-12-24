@@ -5,7 +5,7 @@ import { CookieService } from '../../browser/cookie/services/cookie.service';
 import CookieNames from '../../browser/cookie/constants/names';
 import { BaseService } from '../../http/services/BaseService.service';
 import { HttpClient } from '@angular/common/http';
-import DevelopmentConfig from '../../../environments/development';
+import env from '../../../environments/enviroment';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,7 @@ export class JwtService extends BaseService {
    * @private
    * @readonly
    */
-  private readonly BASE_URL = DevelopmentConfig.BaseUrls.authenticationBaseUrl;
+  private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
 
   /**
    * The name of the cookie where the JWT token is stored.

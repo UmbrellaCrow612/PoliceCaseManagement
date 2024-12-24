@@ -1,25 +1,34 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { BaseService } from "../../http/services/BaseService.service";
-import { JwtResponse, LoginCredentials } from "../types";
-import DevelopmentConfig from "../../../environments/development";
-import { catchError, interval, Observable, of, Subscription, switchMap } from "rxjs";
-import { JwtService } from "./jwt.service";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BaseService } from '../../http/services/BaseService.service';
+import { JwtResponse, LoginCredentials } from '../types';
+import env from '../../../environments/enviroment';
+import {
+  catchError,
+  interval,
+  Observable,
+  of,
+  Subscription,
+  switchMap,
+} from 'rxjs';
+import { JwtService } from './jwt.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService extends BaseService {
-    
-  private readonly BASE_URL = DevelopmentConfig.BaseUrls.authenticationBaseUrl;
-  private readonly tokenCheckInterval = DevelopmentConfig.TokenCheckInterval; 
+  private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
+  private readonly tokenCheckInterval = env.TokenCheckInterval;
   private subscription: Subscription | null = null;
 
-  constructor(protected override http: HttpClient, private jwtService : JwtService) {
+  constructor(
+    protected override http: HttpClient,
+    private jwtService: JwtService
+  ) {
     super(http);
   }
 
-  Login(credentials : LoginCredentials) : Observable<JwtResponse> {
+  Login(credentials: LoginCredentials): Observable<JwtResponse> {
     return this.post(`${this.BASE_URL}/authentication/login`, credentials);
   }
 
@@ -35,20 +44,24 @@ export class AuthenticationService extends BaseService {
 
           const rawToken = this.jwtService.getRawJwtToken();
           console.log('rawToken', rawToken);
-          
+
           const rawRefreshToken = this.jwtService.getRawRefreshToken();
           console.log('rawRefreshToken', rawRefreshToken);
 
-          if (rawToken && rawRefreshToken && this.jwtService.IsJwtTokenValid(rawToken)) {
+          if (
+            rawToken &&
+            rawRefreshToken &&
+            this.jwtService.IsJwtTokenValid(rawToken)
+          ) {
             console.log('Sent request for new tokens');
             this.jwtService.refreshToken(rawRefreshToken);
           }
 
-          return of(null); 
+          return of(null);
         }),
         catchError((err) => {
           console.error('Token validation/refresh failed', err);
-          return of(null); 
+          return of(null);
         })
       )
       .subscribe();
