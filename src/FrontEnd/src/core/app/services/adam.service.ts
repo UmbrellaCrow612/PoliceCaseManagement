@@ -19,4 +19,11 @@ export class AdamService {
   initialize() {
     this.authService.StartTokenValidationThroughoutLifetime();
   }
+
+  /**
+   * Destroy the application-wide logic or state.
+   */
+  destroy(){
+    this.authService.StopTokenValidation();
+  }
 }

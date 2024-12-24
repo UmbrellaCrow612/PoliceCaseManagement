@@ -3,7 +3,8 @@ import { Injectable } from "@angular/core";
 import { BaseService } from "../../http/services/BaseService.service";
 import { JwtResponse, LoginCredentials } from "../types";
 import DevelopmentConfig from "../../../environments/development";
-import { Observable } from "rxjs";
+import { catchError, interval, Observable, of, Subscription, switchMap } from "rxjs";
+import { JwtService } from "./jwt.service";
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +12,10 @@ import { Observable } from "rxjs";
 export class AuthenticationService extends BaseService {
     
   private readonly BASE_URL = DevelopmentConfig.BaseUrls.authenticationBaseUrl;
+  private readonly tokenCheckInterval = 5000; 
+  private subscription: Subscription | null = null;
 
-  constructor(protected override http: HttpClient) {
+  constructor(protected override http: HttpClient, private jwtService : JwtService) {
     super(http);
   }
 
@@ -20,26 +23,41 @@ export class AuthenticationService extends BaseService {
     return this.post(`${this.BASE_URL}/authentication/login`, credentials);
   }
 
-  // need to be implemented but would be called on mount of the app - if no token then don't start the logic to check etc
-  StartTokenValidationThroughoutLifetime(){
-    // idea
-    // interval(this.tokenCheckInterval)
-    // .pipe(
-    //   switchMap(() => {
-    //     const token = this.getToken();
-    //     if (token && this.isTokenExpired(token)) {
-    //       return this.refreshToken();
-    //     }
-    //     return of(null); // No request if the token is valid
-    //   }),
-    //   catchError((err) => {
-    //     console.error('Token validation/refresh failed', err);
-    //     this.logout();
-    //     return of(null); // Handle errors gracefully
-    //   })
-    // )
-    // .subscribe();
+  StartTokenValidationThroughoutLifetime(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
+    this.subscription = interval(this.tokenCheckInterval)
+      .pipe(
+        switchMap(() => {
+          console.log('StartTokenValidationThroughoutLifetime ran.');
+
+          const rawToken = this.jwtService.getRawJwtToken();
+          console.log('rawToken', rawToken);
+          
+          const rawRefreshToken = this.jwtService.getRawRefreshToken();
+          console.log('rawRefreshToken', rawRefreshToken);
+
+          if (rawToken && rawRefreshToken && this.jwtService.IsJwtTokenValid(rawToken)) {
+            console.log('Sent request for new tokens');
+            this.jwtService.refreshToken(rawRefreshToken);
+          }
+
+          return of(null); 
+        }),
+        catchError((err) => {
+          console.error('Token validation/refresh failed', err);
+          return of(null); 
+        })
+      )
+      .subscribe();
   }
 
-
+  StopTokenValidation(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  }
 }
