@@ -5,12 +5,37 @@ import { CookieService } from '../../browser/cookie/services/cookie.service';
 import CookieNames from '../../browser/cookie/constants/names';
 import { BaseService } from '../../http/services/BaseService.service';
 import { HttpClient } from '@angular/common/http';
-import env from '../../../environments/enviroment';
+import env from '../../../environments/environment';
+import {
+  catchError,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+  takeUntil,
+  timer,
+} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class JwtService extends BaseService {
+  /**
+   * Used as part of the cleanup process to ensure no memory leaks occur.
+   * @private
+   */
+  private destroyed$ = new Subject<void>();
+  /**
+   * The subscription to the timer that checks if the token is still valid.
+   */
+  private subscription: Subscription | null = null;
+  /**
+   * The time interval in milliseconds to check if the token is still valid.
+   * @private
+   * @readonly
+   */
+  private readonly FIVE_MINUTES = 5 * 60 * 1000;
+
   /**
    * The base url this service will use to make requests.
    * @private
@@ -43,7 +68,7 @@ export class JwtService extends BaseService {
    * Validates whether a given JWT token is still valid based on its expiration time.
    * The type `T` passed in should match the shape of the token you are passing in.
    * For example, if your token includes custom claims, extend `JwtPayload` with those claims.
-   * @param {string} token The raw JWT token to validate.
+   * @param {string} rawToken The raw JWT token to validate.
    * @returns {boolean} True if the token is valid (not expired); otherwise, false.
    */
   IsJwtTokenValid<T extends JwtPayload>(rawToken: string): boolean {
@@ -79,7 +104,7 @@ export class JwtService extends BaseService {
     return this.cookieService.getCookie(this.REFRESH_NAME);
   }
 
-  refreshToken(refreshToken: string) {
+  private refreshToken(refreshToken: string) {
     const body = { refreshToken };
 
     this.post<{ accessToken: string; refreshToken: string }>(
@@ -121,5 +146,58 @@ export class JwtService extends BaseService {
         'Failed to decode JWT token: ' + (error as Error).message
       );
     }
+  }
+
+  /**
+   * Background task every set time interval to check if the token is still valid and send a new request to backend to get a new token.
+   */
+  StartTokenValidationThroughoutLifetime(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
+    this.subscription = timer(0, this.FIVE_MINUTES)
+      .pipe(
+        takeUntil(this.destroyed$),
+        switchMap((): any => {
+          console.log('Token validation check running');
+
+          const rawToken = this.getRawJwtToken();
+          const rawRefreshToken = this.getRawRefreshToken();
+
+          if (!rawToken || !rawRefreshToken) {
+            console.warn('Missing tokens');
+            return of(null);
+          }
+
+          if (this.IsJwtTokenValid(rawToken)) {
+            console.log('Sending refresh token request');
+            return this.refreshToken(rawRefreshToken);
+          }
+
+          return of(null);
+        }),
+        catchError((err) => {
+          console.error('Token validation/refresh failed', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  private StopTokenValidation(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  }
+
+  /**
+   * Any cleaning up of resources should be done here.
+   */
+  DestroyAndStop(): void {
+    this.StopTokenValidation();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 }

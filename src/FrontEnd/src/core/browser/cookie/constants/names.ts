@@ -1,6 +1,6 @@
 const CookieNames = {
-    JWT : 'jt',
-    REFRESH_TOKEN : 'rt',
+    JWT : 'jwt',
+    REFRESH_TOKEN : 'refresh',
     DEVICE_FINGERPRINT : 'df',
 } as const
 

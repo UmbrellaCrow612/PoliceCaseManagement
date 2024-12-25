@@ -1,6 +1,6 @@
 // logging.service.ts
 import { Injectable } from '@angular/core';
-import env from '../../../environments/enviroment';
+import env from '../../../environments/environment';
 
 export enum LogLevel {
   Debug,
