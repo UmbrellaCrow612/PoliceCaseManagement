@@ -1,4 +1,5 @@
 import { CookieOptions } from '../types';
+import { COOKIE_CONSTRAINTS } from '../validator';
 import { CookieService } from './cookie.service';
 import { TestBed } from '@angular/core/testing';
 
@@ -33,13 +34,13 @@ describe('CookieService', () => {
 
       const defaultValidator = service['defaultOptions'].validation?.validator;
       if (defaultValidator) {
-        expect(defaultValidator('')).toBeFalse(); // too short
+        expect(defaultValidator('')).toBeFalse();
       }
       if (defaultValidator) {
-        expect(defaultValidator('a')).toBeTrue(); // valid
+        expect(defaultValidator('a')).toBeTrue();
       }
       if (defaultValidator) {
-        expect(defaultValidator('a'.repeat(4097))).toBeFalse(); // too long
+        expect(defaultValidator('a'.repeat(4097))).toBeFalse();
       }
     });
   });
@@ -59,7 +60,6 @@ describe('CookieService', () => {
         })
       ).toThrowError("secure must be true when sameSite is 'None'");
 
-      // Also test when existing default sameSite is 'None'
       service['defaultOptions'].sameSite = 'None';
       expect(() =>
         service.setDefaultOptions({
@@ -451,6 +451,20 @@ describe('CookieService', () => {
       );
     });
 
+    it('should throw an error if the name is a non string type', () => {
+      expect(() => service.getCookie({} as any)).toThrowError(
+        'Cookie name must be a non-empty string'
+      );
+    });
+
+    it('should throw an error if the name passed in is a forbidden character', () => {
+      const forbiddenName = 'invalid,name';
+
+      expect(() => service.getCookie(forbiddenName)).toThrowError(
+        'Cookie name contains invalid characters'
+      );
+    });
+
     it('should handle multiple cookies and return the correct one', () => {
       document.cookie =
         encodeURIComponent('cookie1') + '=' + encodeURIComponent('value1');
@@ -459,6 +473,41 @@ describe('CookieService', () => {
 
       const result = service.getCookie('cookie2');
       expect(result).toBe('value2');
+    });
+  });
+
+  describe('Testing setCookie function', () => {
+    it('should throw an error if cookie name is not a string', () => {
+      expect(() => service.setCookie(null as any, 'value')).toThrowError(
+        'Cookie name must be a non-empty string'
+      );
+      expect(() => service.setCookie(' ', 'value')).toThrowError(
+        'Cookie name must be a non-empty string'
+      );
+    });
+
+    it('should throw an error if cookie value is not a string', () => {
+      expect(() => service.setCookie('validName', null as any)).toThrowError(
+        'Cookie value must be a non empty string'
+      );
+
+      expect(() => service.setCookie('validName', " ")).toThrowError(
+        'Cookie value must be a non empty string'
+      );
+    });
+
+    it('should throw an error if cookie name contains forbidden characters', () => {
+      const forbiddenName = 'invalid$name';
+      expect(() => service.setCookie(forbiddenName, 'validValue')).toThrowError(
+        'Cookie name contains invalid characters'
+      );
+    });
+
+    it('should throw an error if cookie value exceeds maximum size', () => {
+      const largeValue = 'A'.repeat(COOKIE_CONSTRAINTS.MAX_SIZE_PER_DOMAIN + 1); 
+      expect(() => service.setCookie('validName', largeValue)).toThrowError(
+        'Cookie value exceeds maximum size'
+      );
     });
   });
 });

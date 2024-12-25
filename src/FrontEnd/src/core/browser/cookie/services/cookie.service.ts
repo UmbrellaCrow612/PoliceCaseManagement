@@ -90,7 +90,7 @@ export class CookieService {
       throw new Error('Cannot set both expires and maxAge');
     }
 
-    if (options.maxAge && options.maxAge <= 0 || options.maxAge === 0) {
+    if ((options.maxAge && options.maxAge <= 0) || options.maxAge === 0) {
       throw new Error('maxAge must be positive');
     }
 
@@ -103,7 +103,6 @@ export class CookieService {
     if (options.path && !options.path.startsWith('/')) {
       throw new Error('Path must start with /');
     }
-
   }
 
   /**
@@ -131,7 +130,7 @@ export class CookieService {
       throw new Error('Cookie name must be a non-empty string');
     }
 
-    if (COOKIE_CONSTRAINTS.FORBIDDEN_NAME_CHARS.test(name)) {
+    if (!COOKIE_CONSTRAINTS.ALLOWED_NAME_CHARS.test(name)) {
       throw new Error('Cookie name contains invalid characters');
     }
 
@@ -193,15 +192,15 @@ export class CookieService {
     value: string,
     options?: Partial<CookieOptions>
   ): void {
-    if (!name || typeof name !== 'string') {
+    if (typeof name !== 'string' || name.trim() === '') {
       throw new Error('Cookie name must be a non-empty string');
     }
 
-    if (typeof value !== 'string') {
-      throw new Error('Cookie value must be a string');
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new Error('Cookie value must be a non empty string');
     }
 
-    if (COOKIE_CONSTRAINTS.FORBIDDEN_NAME_CHARS.test(name)) {
+    if (!COOKIE_CONSTRAINTS.ALLOWED_NAME_CHARS.test(name)) {
       throw new Error('Cookie name contains invalid characters');
     }
 
@@ -233,7 +232,7 @@ export class CookieService {
       }
     } catch (error) {
       console.error('Error setting cookie:', error);
-      throw error; 
+      throw error;
     }
   }
 
@@ -336,13 +335,13 @@ export class CookieService {
       throw new Error('Cookie name must be a non-empty string');
     }
 
-    if (COOKIE_CONSTRAINTS.FORBIDDEN_NAME_CHARS.test(name)) {
+    if (!COOKIE_CONSTRAINTS.ALLOWED_NAME_CHARS.test(name)) {
       throw new Error('Cookie name contains invalid characters');
     }
 
     try {
       if (!this.hasCookie(name)) {
-        return true; 
+        return true;
       }
 
       const existingOptions = this.getCookieOptions(name);

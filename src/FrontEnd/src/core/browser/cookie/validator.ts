@@ -1,4 +1,4 @@
-import { CookieOptions } from "./types";
+import { CookieOptions } from './types';
 
 /**
  * Type guard to check if a value is a valid CookieOptions object
@@ -163,8 +163,6 @@ export const COOKIE_CONSTRAINTS = {
   MAX_SIZE_PER_DOMAIN: 4096,
   /** Maximum age in seconds (about 400 days) */
   MAX_AGE: 34560000,
-  /** Characters not allowed in cookie names */
-  FORBIDDEN_NAME_CHARS: /[^\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]/,
-  /** Characters that must be encoded in values */
-  ENCODE_VALUE_CHARS: /[^\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]/
+  /** Allowed characters for cookie names */
+  ALLOWED_NAME_CHARS: /^[a-zA-Z0-9_-]+$/,
 } as const;
