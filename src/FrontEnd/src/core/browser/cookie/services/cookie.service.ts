@@ -282,12 +282,10 @@ export class CookieService {
    * Validate complete set of options after merging
    */
   private validateCombinedOptions(options: CookieOptions): void {
-    // Check for expires + maxAge conflict
     if (options.expires && options.maxAge) {
       throw new Error('Cannot set both expires and maxAge');
     }
 
-    // Validate maxAge
     if (options.maxAge) {
       if (options.maxAge <= 0 || options.maxAge > COOKIE_CONSTRAINTS.MAX_AGE) {
         throw new Error(
@@ -296,17 +294,14 @@ export class CookieService {
       }
     }
 
-    // Validate domain
     if (options.domain && !this.isValidDomain(options.domain)) {
       throw new Error('Invalid domain');
     }
 
-    // Validate path
     if (options.path && !options.path.startsWith('/')) {
       throw new Error('Path must start with /');
     }
 
-    // Validate sameSite + secure combination
     if (options.sameSite === 'None' && !options.secure) {
       throw new Error("secure must be true when sameSite is 'None'");
     }

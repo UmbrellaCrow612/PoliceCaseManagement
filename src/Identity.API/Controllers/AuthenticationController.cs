@@ -250,6 +250,23 @@ namespace Identity.API.Controllers
             var res = await _userManager.UpdateAsync(user);
             if (!res.Succeeded) return BadRequest(res.Errors);
 
+            Response.Cookies.Append(CookieNamesConstant.JWT, accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, 
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes) 
+            });
+
+           
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, 
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(_JWTOptions.RefreshTokenExpiriesInMinutes) 
+            });
+
             return Ok(new { accessToken, refreshToken });
         }
 
