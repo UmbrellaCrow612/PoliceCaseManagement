@@ -190,14 +190,17 @@ export class CookieService {
   setCookie(
     name: string,
     value: string,
-    options?: Partial<CookieOptions>
+    options?: Partial<CookieOptions>,
+    modeDelete = false
   ): void {
     if (typeof name !== 'string' || name.trim() === '') {
       throw new Error('Cookie name must be a non-empty string');
     }
 
-    if (typeof value !== 'string' || value.trim() === '') {
-      throw new Error('Cookie value must be a non empty string');
+    if (!modeDelete) {
+      if (typeof value !== 'string' || value.trim() === '') {
+        throw new Error('Cookie value must be a non empty string');
+      }
     }
 
     if (!COOKIE_CONSTRAINTS.ALLOWED_NAME_CHARS.test(name)) {
@@ -227,8 +230,10 @@ export class CookieService {
 
       document.cookie = cookieString;
 
-      if (!this.hasCookie(name)) {
-        throw new Error('Failed to set cookie');
+      if (!modeDelete) {
+        if (!this.hasCookie(name)) {
+          throw new Error('Failed to set cookie');
+        }
       }
     } catch (error) {
       console.error('Error setting cookie:', error);
@@ -359,7 +364,7 @@ export class CookieService {
           this.defaultOptions.domain,
       };
 
-      this.setCookie(name, '', mergedOptions);
+      this.setCookie(name, '', mergedOptions, true);
 
       const stillExists = this.hasCookie(name);
       if (stillExists) {

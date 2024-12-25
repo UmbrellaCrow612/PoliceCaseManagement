@@ -16,6 +16,11 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.adamService.initialize();
     this.cs.setCookie("id", "$$");
+    console.log(this.cs.getCookie("id"));
+    this.cs.setCookie("id", "two");
+    console.log(this.cs.getCookie("id"));
+    this.cs.deleteCookie("id");
+    console.log(this.cs.getCookie("id"));
   }
 
   ngOnDestroy(): void {
