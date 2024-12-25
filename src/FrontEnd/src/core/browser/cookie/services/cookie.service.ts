@@ -1,44 +1,6 @@
 import { Injectable } from '@angular/core';
-import { COOKIE_CONSTRAINTS, CookieOptions } from '../types';
-
-/**
- * Type guard to check if a value is a valid CookieOptions object
- * @param value Value to check
- * @returns True if value is a valid CookieOptions object
- */
-function isCookieOptions(value: unknown): value is CookieOptions {
-  if (!value || typeof value !== 'object') return false;
-
-  const options = value as CookieOptions;
-
-  if (
-    options.expires &&
-    !(options.expires instanceof Date) &&
-    typeof options.expires !== 'number'
-  )
-    return false;
-  if (
-    options.maxAge !== undefined &&
-    (typeof options.maxAge !== 'number' ||
-      options.maxAge > COOKIE_CONSTRAINTS.MAX_AGE)
-  )
-    return false;
-  if (options.path && typeof options.path !== 'string') return false;
-  if (options.domain && typeof options.domain !== 'string') return false;
-  if (options.secure !== undefined && typeof options.secure !== 'boolean')
-    return false;
-  if (options.sameSite && !['Strict', 'Lax', 'None'].includes(options.sameSite))
-    return false;
-  if (options.priority && !['Low', 'Medium', 'High'].includes(options.priority))
-    return false;
-  if (
-    options.partitioned !== undefined &&
-    typeof options.partitioned !== 'boolean'
-  )
-    return false;
-
-  return true;
-}
+import { CookieOptions } from '../types';
+import { COOKIE_CONSTRAINTS, isCookieOptions } from '../validator';
 
 @Injectable({
   providedIn: 'root',
@@ -124,29 +86,24 @@ export class CookieService {
    * @throws Error if options are invalid
    */
   private validateOptions(options: CookieOptions): void {
-    // Validate expires and maxAge coexistence
     if (options.expires && options.maxAge) {
       throw new Error('Cannot set both expires and maxAge');
     }
 
-    // Validate maxAge is positive
-    if (options.maxAge && options.maxAge <= 0) {
+    if (options.maxAge && options.maxAge <= 0 || options.maxAge === 0) {
       throw new Error('maxAge must be positive');
     }
 
-    // Validate domain if provided
     if (options.domain) {
       if (!this.isValidDomain(options.domain)) {
         throw new Error('Invalid domain provided');
       }
     }
 
-    // Validate path starts with /
     if (options.path && !options.path.startsWith('/')) {
       throw new Error('Path must start with /');
     }
 
-    // Add any other specific validations needed
   }
 
   /**
@@ -155,12 +112,10 @@ export class CookieService {
    * @returns boolean indicating if domain is valid
    */
   private isValidDomain(domain: string): boolean {
-    // Basic domain validation
     if (!/^[a-zA-Z0-9-_.]+$/.test(domain)) {
       return false;
     }
 
-    // Must be current domain or parent domain
     const currentDomain = window.location.hostname;
     return domain === currentDomain || currentDomain.endsWith('.' + domain);
   }
@@ -172,7 +127,6 @@ export class CookieService {
    * @throws Error if name is invalid
    */
   getCookie(name: string): string | null {
-    // Input validation
     if (!name || typeof name !== 'string') {
       throw new Error('Cookie name must be a non-empty string');
     }
@@ -239,7 +193,6 @@ export class CookieService {
     value: string,
     options?: Partial<CookieOptions>
   ): void {
-    // Input validation
     if (!name || typeof name !== 'string') {
       throw new Error('Cookie name must be a non-empty string');
     }
@@ -248,48 +201,39 @@ export class CookieService {
       throw new Error('Cookie value must be a string');
     }
 
-    // Validate name
     if (COOKIE_CONSTRAINTS.FORBIDDEN_NAME_CHARS.test(name)) {
       throw new Error('Cookie name contains invalid characters');
     }
 
-    // Validate value length
     if (value.length > COOKIE_CONSTRAINTS.MAX_SIZE_PER_DOMAIN) {
       throw new Error('Cookie value exceeds maximum size');
     }
 
     try {
-      // Merge with default options
       const mergedOptions = this.getMergedOptions(options);
 
-      // Validate combined options
       this.validateCombinedOptions(mergedOptions);
 
-      // Build cookie string
       const cookieParts: string[] = [
         `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
       ];
 
-      // Add options to cookie string
       this.appendOptionsToCookie(cookieParts, mergedOptions);
 
-      // Set the cookie
       const cookieString = cookieParts.join('; ');
 
-      // Verify cookie size
       if (cookieString.length > COOKIE_CONSTRAINTS.MAX_SIZE_PER_DOMAIN) {
         throw new Error('Total cookie size exceeds maximum allowed size');
       }
 
       document.cookie = cookieString;
 
-      // Verify cookie was set successfully
       if (!this.hasCookie(name)) {
         throw new Error('Failed to set cookie');
       }
     } catch (error) {
       console.error('Error setting cookie:', error);
-      throw error; // Re-throw to let caller handle
+      throw error; 
     }
   }
 
@@ -373,7 +317,6 @@ export class CookieService {
       ...options,
     };
 
-    // Force secure=true if sameSite='None'
     if (mergedOptions.sameSite === 'None') {
       mergedOptions.secure = true;
     }
@@ -389,7 +332,6 @@ export class CookieService {
    * @returns boolean indicating if cookie was successfully deleted
    */
   deleteCookie(name: string, options?: Partial<CookieOptions>): boolean {
-    // Input validation
     if (!name || typeof name !== 'string') {
       throw new Error('Cookie name must be a non-empty string');
     }
@@ -399,21 +341,17 @@ export class CookieService {
     }
 
     try {
-      // Check if cookie exists first
       if (!this.hasCookie(name)) {
-        return false; // Cookie doesn't exist, nothing to delete
+        return true; 
       }
 
-      // Merge with default options and any existing cookie options
       const existingOptions = this.getCookieOptions(name);
       const mergedOptions: CookieOptions = {
         ...this.defaultOptions,
         ...existingOptions,
         ...options,
-        // Force deletion-specific options
         expires: new Date(0), // Past date forces deletion
         maxAge: 0, // Alternative way to force deletion
-        // Preserve path and domain if set
         path:
           options?.path || existingOptions?.path || this.defaultOptions.path,
         domain:
@@ -422,15 +360,11 @@ export class CookieService {
           this.defaultOptions.domain,
       };
 
-      // Attempt to delete by setting expired cookie
       this.setCookie(name, '', mergedOptions);
 
-      // Verify deletion
       const stillExists = this.hasCookie(name);
       if (stillExists) {
-        // Try alternative deletion approach if first attempt failed
         try {
-          // Try removing with minimal options
           document.cookie = `${encodeURIComponent(
             name
           )}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
@@ -447,7 +381,6 @@ export class CookieService {
         }
       }
 
-      // Final verification
       const deleted = !this.hasCookie(name);
 
       return deleted;

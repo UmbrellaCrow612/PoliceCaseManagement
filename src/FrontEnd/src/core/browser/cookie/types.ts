@@ -119,20 +119,3 @@ export interface CookieOptions {
     validator?: (value: string) => boolean;
   };
 }
-
-/**
- * Cookie attribute constraints as defined by RFC 6265
- * and various browser implementations
- */
-export const COOKIE_CONSTRAINTS = {
-    /** Maximum number of cookies per domain */
-    MAX_COOKIES_PER_DOMAIN: 50,
-    /** Maximum size of all cookies per domain (in bytes) */
-    MAX_SIZE_PER_DOMAIN: 4096,
-    /** Maximum age in seconds (about 400 days) */
-    MAX_AGE: 34560000,
-    /** Characters not allowed in cookie names */
-    FORBIDDEN_NAME_CHARS: /[^\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]/,
-    /** Characters that must be encoded in values */
-    ENCODE_VALUE_CHARS: /[^\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]/
-  } as const;
