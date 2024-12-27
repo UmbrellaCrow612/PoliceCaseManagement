@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdamService } from '../core/app/services/adam.service';
-import { CookieService } from '../core/browser/cookie/services/cookie.service';
 
 @Component({
   selector: 'app-root',
@@ -11,14 +10,10 @@ import { CookieService } from '../core/browser/cookie/services/cookie.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit, OnDestroy {
-  constructor(private adamService: AdamService, private cs : CookieService) {}
+  constructor(private adamService: AdamService) {}
 
   ngOnInit(): void {
     this.adamService.initialize();
-    this.cs.setCookie("id", "$$");
-    console.log(this.cs.getCookie("id"));
-    this.cs.setCookie("id", "two");
-    console.log(this.cs.getCookie("id"));
   }
 
   ngOnDestroy(): void {
