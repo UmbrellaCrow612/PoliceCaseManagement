@@ -1,1 +1,6 @@
-<p>login-view works!</p>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <label for="first-name">First Name: </label>
+  <input id="first-name" type="text" formControlName="firstName" />
+  <label for="last-name">Last Name: </label>
+  <input id="last-name" type="text" formControlName="lastName" />
+</form>
