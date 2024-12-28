@@ -23,7 +23,7 @@ namespace Identity.Core.Models
 
         public bool IsLinkedToADepartment()
         {
-            return DepartmentId is null;
+            return DepartmentId is not null;
         }
 
         public void LinkToDepartment(string departmentId)

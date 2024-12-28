@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Identity.Core.Models
+﻿namespace Identity.Core.Models
 {
     public class EmailVerificationAttempt
     {
