@@ -145,7 +145,7 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsUsed")
+                    b.Property<bool>("IsSuccessful")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UsedAt")

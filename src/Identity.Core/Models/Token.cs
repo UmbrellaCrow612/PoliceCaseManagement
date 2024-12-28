@@ -1,0 +1,48 @@
+﻿namespace Identity.Core.Models
+{
+    public class Token
+    {
+        public required string Id { get; set; }
+        public required string UserId { get; set; }
+        public ApplicationUser? User { get; set; } = null;
+        public required string RefreshToken { get; set; }
+        public required DateTime RefreshTokenExpiresAt { get; set; }
+        public bool IsRevoked { get; set; } = false;
+        public DateTime? RevokedAt { get; set; } = null;
+        public string? RevokedReason { get; set; } = null;
+        public bool IsBlackListed { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public required string UserDeviceId { get; set; }
+
+
+        public bool IsValid(double windowTime)
+        {
+            if (IsRevoked)
+            {
+                return false;
+            }
+
+            if (IsBlackListed)
+            {
+                return false;
+            }
+
+            if (DateTime.UtcNow > RefreshTokenExpiresAt.AddMinutes(windowTime))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void Revoke()
+        {
+            IsRevoked = true;
+        }
+
+        public void BlackList()
+        {
+            IsBlackListed = true;
+        }
+    }
+}
