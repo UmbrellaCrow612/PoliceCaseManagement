@@ -40,7 +40,7 @@ namespace Identity.Core.Tests
             };
 
             // Act
-            bool result = token.IsValid(30);
+            bool result = token.IsValid("refresh-token", "device-id");
 
             // Assert
             Assert.True(result);
@@ -61,7 +61,7 @@ namespace Identity.Core.Tests
             };
 
             // Act
-            bool result = token.IsValid(30);
+            bool result = token.IsValid("refresh-token", "device-id");
 
             // Assert
             Assert.False(result);
@@ -82,40 +82,34 @@ namespace Identity.Core.Tests
             };
 
             // Act
-            bool result = token.IsValid(30);
+            bool result = token.IsValid("refresh-token", "device-id");
 
             // Assert
             Assert.False(result);
         }
 
-        [Theory]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(30)]
-        public void IsValid_WithinTimeWindow_ReturnsTrue(double windowTime)
+        [Fact]
+        public void IsValid_WhenIncorrectRefreshToken_ReturnsFalse()
         {
             // Arrange
             var token = new Token
             {
                 Id = "test-id",
                 UserId = "test-user",
-                RefreshToken = "refresh-token",
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(windowTime - 1),
+                RefreshToken = "correct-refresh-token",
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1),
                 UserDeviceId = "device-id"
             };
 
             // Act
-            bool result = token.IsValid(windowTime);
+            bool result = token.IsValid("wrong-refresh-token", "device-id");
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
         }
 
-        [Theory]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(30)]
-        public void IsValid_OutsideTimeWindow_ReturnsFalse(double windowTime)
+        [Fact]
+        public void IsValid_WhenIncorrectDeviceId_ReturnsFalse()
         {
             // Arrange
             var token = new Token
@@ -123,12 +117,12 @@ namespace Identity.Core.Tests
                 Id = "test-id",
                 UserId = "test-user",
                 RefreshToken = "refresh-token",
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(-(windowTime + 1)),
-                UserDeviceId = "device-id"
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1),
+                UserDeviceId = "correct-device-id"
             };
 
             // Act
-            bool result = token.IsValid(windowTime);
+            bool result = token.IsValid("refresh-token", "wrong-device-id");
 
             // Assert
             Assert.False(result);
@@ -190,7 +184,7 @@ namespace Identity.Core.Tests
             };
 
             // Act
-            bool result = token.IsValid(30);
+            bool result = token.IsValid("refresh-token", "device-id");
 
             // Assert
             Assert.False(result);

@@ -1,13 +1,11 @@
 ﻿using Identity.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class TokenStore(IdentityApplicationDbContext dbContext, IConfiguration configuration) : ITokenStore
+    public class TokenStore(IdentityApplicationDbContext dbContext) : ITokenStore
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
-        private readonly IConfiguration _configuration = configuration;
 
         public IQueryable<Token> Tokens => _dbContext.Tokens.AsQueryable();
 
@@ -35,8 +33,8 @@ namespace Identity.Infrastructure.Data.Stores
 
             foreach (var token in tokens)
             {
-                token.IsRevoked = true;
-                token.IsBlackListed = true;
+                token.Revoke();
+                token.BlackList();
             }
 
             await _dbContext.SaveChangesAsync();
@@ -48,8 +46,8 @@ namespace Identity.Infrastructure.Data.Stores
 
             if (token is not null)
             {
-                token.IsRevoked = true;
-                token.IsBlackListed = true;
+                token.Revoke();
+                token.BlackList();
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -68,33 +66,16 @@ namespace Identity.Infrastructure.Data.Stores
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string deviceId, string refreshToken)
+        public async Task<(bool isValid, DateTime? RefreshTokenExpiresAt)> ValidateTokenAsync(string tokenId, string deviceId, string refreshToken)
         {
-            List<string> errors = [];
-            double lifetime =  double.Parse(_configuration["Jwt:ExpiresInMinutes"] ?? throw new ApplicationException("Jwt:ExpiresInMinutes not provided"));
-            double halfLifeTime = lifetime / 2;
-
             var token = await _dbContext.Tokens.FirstOrDefaultAsync(x => x.Id == tokenId);
-            if(
-                token is null 
-                || token.IsRevoked 
-                || token.IsBlackListed 
-                || token.RefreshToken != refreshToken
-                || token.RefreshTokenExpiresAt < DateTime.UtcNow
-                || token.UserDeviceId != deviceId
-                )
+
+            if(token is null || !token.IsValid(refreshToken, deviceId))
             {
-                errors.Add("Token Invalid");
-                return (false, null, errors);
+                return (false, null);
             }
 
-            if (DateTime.UtcNow < token.CreatedAt.AddMinutes(halfLifeTime))
-            {
-                errors.Add("Token is still valid for over half its lifetime, please request after the half life period.");
-                return (false, null, errors);
-            }
-
-            return (true, token.RefreshTokenExpiresAt, errors);
+            return (true, token.RefreshTokenExpiresAt);
         }
 
         public Task RevokeTokenAsync(Token token)

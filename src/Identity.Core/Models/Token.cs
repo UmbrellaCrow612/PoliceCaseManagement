@@ -15,7 +15,13 @@
         public required string UserDeviceId { get; set; }
 
 
-        public bool IsValid(double windowTime)
+        /// <summary>
+        /// Checks if a Token is valid
+        /// </summary>
+        /// <param name="refreshToken">The refresh token that the current token was issued with</param>
+        /// <param name="deviceId">The device the token was issued to</param>
+        /// <returns>True or false</returns>
+        public bool IsValid(string refreshToken, string deviceId)
         {
             if (IsRevoked)
             {
@@ -27,7 +33,17 @@
                 return false;
             }
 
-            if (DateTime.UtcNow > RefreshTokenExpiresAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > RefreshTokenExpiresAt)
+            {
+                return false;
+            }
+
+            if (RefreshToken != refreshToken)
+            {
+                return false;
+            }
+
+            if (UserDeviceId != deviceId)
             {
                 return false;
             }

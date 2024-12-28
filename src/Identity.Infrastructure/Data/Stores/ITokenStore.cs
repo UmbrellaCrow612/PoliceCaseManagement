@@ -18,7 +18,7 @@ namespace Identity.Infrastructure.Data.Stores
 
         Task RevokeAllUserTokensAsync(string userId);
 
-        Task<(bool isValid, DateTime? RefreshTokenExpiresAt, IEnumerable<string> Errors)> ValidateTokenAsync(string tokenId, string deviceId, string refreshToken);
+        Task<(bool isValid, DateTime? RefreshTokenExpiresAt)> ValidateTokenAsync(string tokenId, string deviceId, string refreshToken);
 
         Task<int> CleanupExpiredTokensAsync();
 
