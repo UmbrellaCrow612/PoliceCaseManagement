@@ -1,5 +1,5 @@
 ﻿using Identity.API.Settings;
-using Identity.Infrastructure.Data.Models;
+using Identity.Core.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

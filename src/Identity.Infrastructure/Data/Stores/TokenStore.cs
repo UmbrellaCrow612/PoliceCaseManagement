@@ -1,5 +1,4 @@
-﻿
-using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -10,7 +9,7 @@ namespace Identity.Infrastructure.Data.Stores
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly IConfiguration _configuration = configuration;
 
-        public IQueryable<Token> Tokens => _dbContext.Tokens.AsNoTracking();
+        public IQueryable<Token> Tokens => _dbContext.Tokens.AsQueryable();
 
         public async Task<int> CleanupExpiredTokensAsync()
         {

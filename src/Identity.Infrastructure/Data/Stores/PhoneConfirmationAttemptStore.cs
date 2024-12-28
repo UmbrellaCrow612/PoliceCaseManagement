@@ -1,4 +1,4 @@
-﻿using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

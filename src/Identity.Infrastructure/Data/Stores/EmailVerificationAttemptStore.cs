@@ -1,4 +1,4 @@
-﻿using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,7 @@ namespace Identity.Infrastructure.Data.Stores
 
             var recentValidAttempt = await _dbcontext.EmailVerificationAttempts
                 .Where(x => 
-                x.IsUsed == false && 
+                x.IsSuccessful == false && 
                 x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow &&
                 x.UsedAt == null &&
                 x.UserId == attempt.UserId
@@ -64,7 +64,7 @@ namespace Identity.Infrastructure.Data.Stores
             }
 
             var _attempt = await _dbcontext.EmailVerificationAttempts
-                .FirstOrDefaultAsync(x => x.Email == email && x.Code == code && x.IsUsed == false);
+                .FirstOrDefaultAsync(x => x.Email == email && x.Code == code && x.IsSuccessful == false);
             if (_attempt is null)
             {
                 errors.Add("Attempt not found.");

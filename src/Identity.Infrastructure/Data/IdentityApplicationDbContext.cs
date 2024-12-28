@@ -1,4 +1,4 @@
-﻿using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -12,8 +12,6 @@ namespace Identity.Infrastructure.Data
         public required DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
         public required DbSet<UserDevice> UserDevices { get; set; }
         public required DbSet<EmailVerificationAttempt> EmailVerificationAttempts { get; set; }
-        public required DbSet<Permission> Permissions { get; set; }
-        public required DbSet<RolePermission> RolePermissions { get; set; }
         public required DbSet<Department> Departments { get; set; }
         public required DbSet<LoginAttempt> LoginAttempts { get; set; }
         public required DbSet<Token> Tokens { get; set; }

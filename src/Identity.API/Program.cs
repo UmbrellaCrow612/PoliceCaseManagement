@@ -9,8 +9,8 @@ using Microsoft.OpenApi.Models;
 using Serilog.Events;
 using Serilog;
 using System.Text;
-using Identity.Infrastructure.Data.Models;
 using Identity.API.Settings;
+using Identity.Core.Models;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

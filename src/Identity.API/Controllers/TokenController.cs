@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Identity.API.DTOs;
+using Identity.Core.Models;
 using Identity.Infrastructure.Data;
-using Identity.Infrastructure.Data.Models;
 using Identity.Infrastructure.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

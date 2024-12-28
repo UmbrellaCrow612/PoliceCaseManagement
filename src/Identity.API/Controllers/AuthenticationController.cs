@@ -1,7 +1,7 @@
 ﻿using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Settings;
-using Identity.Infrastructure.Data.Models;
+using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores;
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authorization;
@@ -193,9 +193,9 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt not found."
             });
 
-            var errs = loginAttempt.Validate(_timeWindows.LoginLifetime);
+            var loginAttemptIsValid = loginAttempt.IsValid(_timeWindows.LoginLifetime);
 
-            if (errs.Count != 0) return BadRequest(errs);
+            if (!loginAttemptIsValid) return BadRequest();
 
             var (isValid, attempt, user, errors) = await _twoFactorCodeAttempt.ValidateAttempt(loginAttempt.Id, validateTwoFactorCodeDto.Code);
             if (!isValid) return Unauthorized(errors);
@@ -290,9 +290,9 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt not found or already sucessfull."
             });
 
-            var errs = loginAttempt.Validate(_timeWindows.LoginLifetime);
+            var loginAttemptIsValid = loginAttempt.IsValid(_timeWindows.LoginLifetime);
 
-            if (errs.Count != 0) return BadRequest(errs);
+            if (!loginAttemptIsValid) return BadRequest();
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null) return Unauthorized(new ErrorDetail

@@ -1,5 +1,5 @@
 ﻿using Identity.Core.Constants;
-using Identity.Infrastructure.Data.Models;
+using Identity.Core.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.Data.Seeding

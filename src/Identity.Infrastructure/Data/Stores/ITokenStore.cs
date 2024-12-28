@@ -1,4 +1,4 @@
-﻿using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
 
 namespace Identity.Infrastructure.Data.Stores
 {

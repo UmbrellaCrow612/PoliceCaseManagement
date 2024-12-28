@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Identity.API.DTOs;
-using Identity.Infrastructure.Data.Models;
+using Identity.Core.Models;
 
 namespace Identity.API.Mappings
 {

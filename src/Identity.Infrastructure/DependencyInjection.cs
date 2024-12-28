@@ -1,5 +1,5 @@
-﻿using Identity.Infrastructure.Data;
-using Identity.Infrastructure.Data.Models;
+﻿using Identity.Core.Models;
+using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Stores;
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;

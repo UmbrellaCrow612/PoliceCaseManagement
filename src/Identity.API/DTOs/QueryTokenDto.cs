@@ -1,6 +1,4 @@
-﻿using Identity.Infrastructure.Data.Models;
-
-namespace Identity.API.DTOs
+﻿namespace Identity.API.DTOs
 {
     public class QueryTokenDto
     {
