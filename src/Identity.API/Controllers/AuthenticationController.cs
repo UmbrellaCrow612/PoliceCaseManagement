@@ -122,7 +122,7 @@ namespace Identity.API.Controllers
 
                 return StatusCode(403, new
                 {
-                    redirectUrl = "/phoneConfirme",
+                    redirectUrl = "/phoneConfirm",
                     message = "Phone needs confirmation"
                 });
             }

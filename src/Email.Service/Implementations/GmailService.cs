@@ -1,14 +1,15 @@
 ﻿using Email.Service.Interfaces;
 using Email.Service.Models;
 using Email.Service.Settings;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
 namespace Email.Service.Implamentations
 {
-    public class GmailService(EmailSettings emailSettings) : IEmailService
+    public class GmailService(IOptions<EmailSettings> emailSettings) : IEmailService
     {
-        private readonly EmailSettings _emailSettings = emailSettings;
+        private readonly EmailSettings _emailSettings = emailSettings.Value;
 
         public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
         {

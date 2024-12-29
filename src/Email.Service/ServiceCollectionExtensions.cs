@@ -11,7 +11,9 @@ namespace Email.Service
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSingleton<EmailSettings>(configuration.GetSection("EmailSettings").Get<EmailSettings>() ?? throw new ApplicationException("EmailSettings not present."));
+            services.AddOptionsWithValidateOnStart<EmailSettings>("EmailSettings")
+                .BindConfiguration("EmailSettings")
+                .ValidateDataAnnotations();
 
             services.AddScoped<GmailService>();
 
