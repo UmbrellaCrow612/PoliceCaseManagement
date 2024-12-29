@@ -7,16 +7,16 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
-        public required DbSet<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; }
-        public required DbSet<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; }
-        public required DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
-        public required DbSet<UserDevice> UserDevices { get; set; }
-        public required DbSet<EmailVerificationAttempt> EmailVerificationAttempts { get; set; }
-        public required DbSet<Department> Departments { get; set; }
-        public required DbSet<LoginAttempt> LoginAttempts { get; set; }
-        public required DbSet<Token> Tokens { get; set; }
-        public required DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
-        public required DbSet<SecurityAudit> SecurityAudits { get; set; }
+        public DbSet<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; }
+        public DbSet<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; }
+        public DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
+        public DbSet<UserDevice> UserDevices { get; set; }
+        public DbSet<EmailVerificationAttempt> EmailVerificationAttempts { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<LoginAttempt> LoginAttempts { get; set; }
+        public DbSet<Token> Tokens { get; set; }
+        public DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
+        public DbSet<SecurityAudit> SecurityAudits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

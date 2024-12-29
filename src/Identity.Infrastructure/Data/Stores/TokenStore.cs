@@ -17,7 +17,7 @@ namespace Identity.Infrastructure.Data.Stores
 
             var count = tokens.Count;
 
-            _dbContext.Remove(tokens);
+            _dbContext.RemoveRange(tokens);
 
             await _dbContext.SaveChangesAsync();
 
