@@ -47,47 +47,39 @@ namespace Identity.Infrastructure.Data.Stores
             _dbcontext.TwoFactorSmsAttempts.Update(attempt);
         }
 
-        public async Task<(bool isValid, TwoFactorSmsAttempt? attempt, ApplicationUser? user, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code)
+        public async Task<(bool isValid, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code)
         {
             List<ErrorDetail> errors = [];
             var validTime = _timeWindows.TwoFactorSmsTime;
 
+            var loginAttempt = await _dbcontext.LoginAttempts.FindAsync(loginAttemptId);
+            if(loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime))
+            {
+                errors.Add(new ErrorDetail
+                {
+                    Field = "Two facor sms authentication",
+                    Reason = "Login attempt not found or is invalid."
+                });
+            }
+
             var _attempt = await _dbcontext.TwoFactorSmsAttempts
-                .Where(x => x.LoginAttemptId == loginAttemptId 
-                && x.IsSuccessful == false && x.Code == code).FirstOrDefaultAsync();
+                .Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code).FirstOrDefaultAsync();
 
-            if(_attempt is null)
+            if(_attempt is null || !_attempt.IsValid(validTime))
             {
                 errors.Add(new ErrorDetail
                 {
                     Field = "Two factor auth.",
-                    Reason = "Attempt not found."
+                    Reason = "Attempt not found or is invalid."
                 });
-                return (false, null, null, errors);
             }
 
-            if (!_attempt.IsValid(validTime))
-            {
-                errors.Add(new ErrorDetail
-                {
-                    Field = "Two factor auth.",
-                    Reason = "Attempt not valid."
-                });
-                return (false, null, null, errors);
-            }
+            if (errors.Count != 0) return (false, errors);
 
-            var user = await _dbcontext.Users.FirstOrDefaultAsync(x => x.Id == _attempt.UserId);
-            if(user is null)
-            {
-                errors.Add(new ErrorDetail
-                {
-                    Field = "Two factor auth.",
-                    Reason = "User not found."
-                });
-                return (false, null, null, errors);
-            }
+            loginAttempt.Status = LoginStatus.SUCCESS;
+            _attempt.MarkUsed();
 
-            return (true, _attempt, user, errors);
+            return (true, errors);
         }
     }
 }

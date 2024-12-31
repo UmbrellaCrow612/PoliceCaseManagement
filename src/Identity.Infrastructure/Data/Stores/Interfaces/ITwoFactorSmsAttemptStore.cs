@@ -8,7 +8,7 @@ namespace Identity.Infrastructure.Data.Stores.Interfaces
         IQueryable<TwoFactorSmsAttempt> TwoFactorSmsAttempts { get; }
 
         Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(TwoFactorSmsAttempt attempt);
-        Task<(bool isValid, TwoFactorSmsAttempt? attempt, ApplicationUser? user, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code);
+        Task<(bool isValid, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code);
         void SetToUpdateAttempt(TwoFactorSmsAttempt attempt);
     }
 }

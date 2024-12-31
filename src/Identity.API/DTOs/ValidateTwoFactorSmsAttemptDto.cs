@@ -2,7 +2,7 @@
 
 namespace Identity.API.DTOs
 {
-    public class ValidateTwoFactorCodeDto
+    public class ValidateTwoFactorSmsAttemptDto
     {
         [Required]
         public required string LoginAttemptId { get; set; }

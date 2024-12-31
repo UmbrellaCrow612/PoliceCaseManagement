@@ -55,21 +55,30 @@ namespace Identity.API.Helpers
             string userAgent = request.Headers.UserAgent.ToString();
             var deviceFingerprint = request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
-            if (!UserAgentValid(userAgent) || string.IsNullOrWhiteSpace(deviceFingerprint))
+            if (!UserAgentValid(userAgent))
             {
                 errors.Add(new ErrorDetail
                 {
                     Field = "Request Headers",
-                    Reason = "Request is missing device user agent or is malformed or is missing device fingerpint."
+                    Reason = "Request is missing device user agent or is malformed."
                 });
-
-                return (false, errors);
             }
+
+            if (string.IsNullOrWhiteSpace(deviceFingerprint))
+            {
+                errors.Add(new ErrorDetail
+                {
+                    Field = "Request Headers",
+                    Reason = $"Missing {CustomHeaderOptions.XDeviceFingerprint.ToString()} header value."
+                });
+            }
+
+            if (errors.Count != 0) return (false, errors);
 
             return (true, []);
         }
 
-        public async Task<UserDevice?> GetRequestingDeviceById(string userId, HttpRequest request)
+        public async Task<UserDevice?> GetRequestingDevice(string userId, HttpRequest request)
         {
             var deviceFingerprint = request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
             var deviceId = _deviceIdentification.GenerateDeviceId(userId, request.Headers.UserAgent.ToString(), deviceFingerprint!);
