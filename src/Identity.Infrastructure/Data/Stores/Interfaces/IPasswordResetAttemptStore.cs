@@ -1,7 +1,7 @@
 ﻿using Identity.Core.Models;
 using Shared.DTOs;
 
-namespace Identity.Infrastructure.Data.Stores
+namespace Identity.Infrastructure.Data.Stores.Interfaces
 {
     public interface IPasswordResetAttemptStore
     {

@@ -1,7 +1,6 @@
-﻿
-using Identity.Core.Models;
+﻿using Identity.Core.Models;
 
-namespace Identity.Infrastructure.Data.Stores
+namespace Identity.Infrastructure.Data.Stores.Interfaces
 {
     public interface IUserDeviceChallengeAttemptStore
     {

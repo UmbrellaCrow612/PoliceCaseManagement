@@ -1,5 +1,5 @@
 ﻿using Identity.Core.Models;
-using Identity.Infrastructure.Data.Stores;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

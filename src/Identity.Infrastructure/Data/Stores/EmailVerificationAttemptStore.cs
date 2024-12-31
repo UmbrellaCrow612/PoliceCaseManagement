@@ -1,4 +1,5 @@
 ﻿using Identity.Core.Models;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

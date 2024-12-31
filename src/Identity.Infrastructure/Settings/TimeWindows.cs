@@ -49,8 +49,15 @@ namespace Identity.Infrastructure.Settings
         /// Time allowed for a two factor code to be valid for.
         /// </summary>
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "TwoFactorCodeTime must be greater than 0.")]
-        public required int TwoFactorCodeTime { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "TwoFactorSmsTime must be greater than 0.")]
+        public required int TwoFactorSmsTime { get; set; }
+
+        /// <summary>
+        /// Time allowed for a two factor code to be valid for.
+        /// </summary>
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "TwoFactorEmailTime must be greater than 0.")]
+        public required int TwoFactorEmailTime { get; set; }
 
         /// <summary>
         /// How long a login attempt is alive for it to be used to issue 2FA codes for.

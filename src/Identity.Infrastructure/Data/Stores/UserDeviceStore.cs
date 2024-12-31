@@ -1,4 +1,5 @@
 ﻿using Identity.Core.Models;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Shared.Utils;
 
@@ -10,9 +11,9 @@ namespace Identity.Infrastructure.Data.Stores
 
         public IQueryable<UserDevice> UserDevices => throw new NotImplementedException();
 
-        public async Task<UserDevice?> GetUserDeviceByIdAsync(ApplicationUser user, string deviceId)
+        public async Task<UserDevice?> GetUserDeviceByIdAsync(string deviceId)
         {
-            return  await _dbcontext.UserDevices.FirstOrDefaultAsync(x => x.Id == deviceId && x.UserId == user.Id);
+            return  await _dbcontext.UserDevices.FirstOrDefaultAsync(x => x.Id == deviceId);
         }
 
         public async Task SetUserDevice(ApplicationUser user, UserDevice userDevice)

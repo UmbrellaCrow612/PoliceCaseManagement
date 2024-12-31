@@ -1,4 +1,5 @@
 ﻿using Identity.Core.Models;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -6,20 +7,20 @@ using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    public class TwoFactorCodeAttemptStore(IdentityApplicationDbContext dbContext, IOptions<TimeWindows> timeWindows) : ITwoFactorCodeAttemptStore
+    public class TwoFactorSmsAttemptStore(IdentityApplicationDbContext dbContext, IOptions<TimeWindows> timeWindows) : ITwoFactorSmsAttemptStore
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
 
-        public IQueryable<TwoFactorCodeAttempt> TwoFactorCodeAttempts => _dbcontext.TwoFactorCodeAttempts.AsQueryable();
+        public IQueryable<TwoFactorSmsAttempt> TwoFactorSmsAttempts => _dbcontext.TwoFactorSmsAttempts.AsQueryable();
 
-        public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(TwoFactorCodeAttempt attempt)
+        public async Task<(bool canMakeAttempt, ICollection<ErrorDetail> errors)> AddAttempt(TwoFactorSmsAttempt attempt)
         {
             List<ErrorDetail> errors = [];
 
-            var validTime = _timeWindows.TwoFactorCodeTime;
+            var validTime = _timeWindows.TwoFactorSmsTime;
 
-            var validRecentAttemptForThisLogin = await _dbcontext.TwoFactorCodeAttempts
+            var validRecentAttemptForThisLogin = await _dbcontext.TwoFactorSmsAttempts
                 .Where(x => x.LoginAttemptId == attempt.LoginAttemptId 
                 && x.IsSuccessful == false 
                 && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow)
@@ -35,23 +36,23 @@ namespace Identity.Infrastructure.Data.Stores
                 return (false, errors);
             }
 
-            await _dbcontext.TwoFactorCodeAttempts.AddAsync(attempt);
+            await _dbcontext.TwoFactorSmsAttempts.AddAsync(attempt);
             await _dbcontext.SaveChangesAsync();
 
             return (true, errors);
         }
 
-        public void SetToUpdateAttempt(TwoFactorCodeAttempt attempt)
+        public void SetToUpdateAttempt(TwoFactorSmsAttempt attempt)
         {
-            _dbcontext.TwoFactorCodeAttempts.Update(attempt);
+            _dbcontext.TwoFactorSmsAttempts.Update(attempt);
         }
 
-        public async Task<(bool isValid, TwoFactorCodeAttempt? attempt, ApplicationUser? user, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code)
+        public async Task<(bool isValid, TwoFactorSmsAttempt? attempt, ApplicationUser? user, ICollection<ErrorDetail> errors)> ValidateAttempt(string loginAttemptId, string code)
         {
             List<ErrorDetail> errors = [];
-            var validTime = _timeWindows.TwoFactorCodeTime;
+            var validTime = _timeWindows.TwoFactorSmsTime;
 
-            var _attempt = await _dbcontext.TwoFactorCodeAttempts
+            var _attempt = await _dbcontext.TwoFactorSmsAttempts
                 .Where(x => x.LoginAttemptId == loginAttemptId 
                 && x.IsSuccessful == false && x.Code == code).FirstOrDefaultAsync();
 

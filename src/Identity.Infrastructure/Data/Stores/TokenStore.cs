@@ -1,4 +1,5 @@
 ﻿using Identity.Core.Models;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Data.Stores

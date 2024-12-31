@@ -8,29 +8,6 @@ namespace Identity.API.Helpers
     {
         private readonly ILogger<DeviceIdentification> _logger = logger;
 
-        public bool ValidateUserAgent(string userAgent)
-        {
-            if (string.IsNullOrWhiteSpace(userAgent))
-                return false;
-
-            try
-            {
-                var parser = Parser.GetDefault();
-                var clientInfo = parser.Parse(userAgent);
-
-                // Check if required properties exist and are not null/empty
-                return !string.IsNullOrWhiteSpace(clientInfo.UA?.Family) &&
-                       !string.IsNullOrWhiteSpace(clientInfo.OS?.Family) &&
-                       !string.IsNullOrWhiteSpace(clientInfo.Device?.Family);
-            }
-            catch
-            {
-                // Return false if any exception occurs during parsing
-                return false;
-            }
-        }
-
-
         public string GenerateDeviceId(string userId, string userAgent, string deviceFingerPrint)
         {
             var parser = Parser.GetDefault();

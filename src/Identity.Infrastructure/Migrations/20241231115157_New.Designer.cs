@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20241228150955_New")]
+    [Migration("20241231115157_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -347,7 +347,40 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("Tokens");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorCodeAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorEmailAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LoginAttemptId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoginAttemptId");
+
+                    b.ToTable("TwoFactorEmailAttempts");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -383,7 +416,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TwoFactorCodeAttempts");
+                    b.ToTable("TwoFactorSmsAttempts");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
@@ -626,16 +659,27 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorCodeAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorEmailAttempt", b =>
                 {
                     b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
-                        .WithMany("TwoFactorCodeAttempts")
+                        .WithMany("TwoFactorEmailAttempts")
+                        .HasForeignKey("LoginAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoginAttempt");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
+                {
+                    b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
+                        .WithMany("TwoFactorSmsAttempts")
                         .HasForeignKey("LoginAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("TwoFactorCodeAttempts")
+                        .WithMany("TwoFactorSmsAttempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -740,7 +784,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("Tokens");
 
-                    b.Navigation("TwoFactorCodeAttempts");
+                    b.Navigation("TwoFactorSmsAttempts");
 
                     b.Navigation("UserDeviceChallengeAttempts");
 
@@ -754,7 +798,9 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
                 {
-                    b.Navigation("TwoFactorCodeAttempts");
+                    b.Navigation("TwoFactorSmsAttempts");
+
+                    b.Navigation("TwoFactorEmailAttempts");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>

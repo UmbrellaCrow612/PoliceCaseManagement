@@ -7,7 +7,7 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
-        public DbSet<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; }
+        public DbSet<TwoFactorSmsAttempt> TwoFactorSmsAttempts { get; set; }
         public DbSet<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; }
         public DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
         public DbSet<UserDevice> UserDevices { get; set; }
@@ -17,6 +17,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<Token> Tokens { get; set; }
         public DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
         public DbSet<SecurityAudit> SecurityAudits { get; set; }
+        public DbSet<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Identity.Core.Models;
 using Shared.DTOs;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 
 namespace Identity.Infrastructure.Data.Stores
 {

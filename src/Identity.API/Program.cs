@@ -124,8 +124,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddSingleton<StringEncryptionHelper>();
-
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
+builder.Services.AddScoped<DeviceManager>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

@@ -1,6 +1,7 @@
 ﻿using Identity.Core.Models;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Stores;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,8 @@ namespace Identity.Infrastructure
             services.AddScoped<IUserDeviceStore, UserDeviceStore>();
             services.AddScoped<IUserDeviceChallengeAttemptStore, UserDeviceChallengeAttemptStore>();
             services.AddScoped<IPhoneConfirmationAttemptStore, PhoneConfirmationAttemptStore>();
-            services.AddScoped<ITwoFactorCodeAttemptStore, TwoFactorCodeAttemptStore>();
+            services.AddScoped<ITwoFactorSmsAttemptStore, TwoFactorSmsAttemptStore>();
+            services.AddScoped<ITwoFactorEmailAttemptStore, TwoFactorEmailAttemptStore>();
 
             return services;
         }

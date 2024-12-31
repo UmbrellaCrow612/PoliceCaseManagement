@@ -2,7 +2,6 @@
 {
     public class UserDevice
     {
-
         public required string Id { get; set; }
         public required string UserId { get; set; }
         public ApplicationUser? User { get; set; } = null;

@@ -22,21 +22,6 @@
         /// </remarks>
         string GenerateDeviceId(string userId, string userAgent, string deviceFingerPrint);
 
-        /// <summary>
-        /// Validates whether the provided user agent string contains the required properties for generating a device identifier.
-        /// </summary>
-        /// <param name="userAgent">The user agent string containing device and browser information. Must not be null or empty.</param>
-        /// <returns>
-        /// True if the user agent contains valid and non-empty properties required for device identification, 
-        /// otherwise false.
-        /// </returns>
-        /// <remarks>
-        /// This method checks for the presence of the following components in the user agent string:
-        /// - User Agent family
-        /// - Operating System family
-        /// - Device family
-        /// If any of these components are missing or invalid, the method returns false.
-        /// </remarks>
-        bool ValidateUserAgent(string userAgent);
+      
     }
 }

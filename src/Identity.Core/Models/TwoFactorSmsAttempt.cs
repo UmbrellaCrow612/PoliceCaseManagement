@@ -1,6 +1,6 @@
 ﻿namespace Identity.Core.Models
 {
-    public class TwoFactorCodeAttempt
+    public class TwoFactorSmsAttempt
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

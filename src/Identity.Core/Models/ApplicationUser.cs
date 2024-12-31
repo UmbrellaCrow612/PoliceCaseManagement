@@ -11,7 +11,7 @@ namespace Identity.Core.Models
         public Department? Department { get; set; } = null;
         public string? LastLoginDeviceId { get; set; } = null;
 
-        public ICollection<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; } = [];
+        public ICollection<TwoFactorSmsAttempt> TwoFactorCodeAttempts { get; set; } = [];
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
         public ICollection<Token> Tokens { get; set; } = [];
         public ICollection<PasswordResetAttempt> PasswordResetAttempts { get; set; } = [];

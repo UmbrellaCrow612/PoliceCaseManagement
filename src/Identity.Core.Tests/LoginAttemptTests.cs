@@ -32,7 +32,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 IpAddress = "127.0.0.1",
                 UserAgent = "test-agent",
-                Status = LoginStatus.TwoFactorAuthenticationSent,
+                Status = LoginStatus.TwoFactorAuthenticationReached,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -52,7 +52,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 IpAddress = "127.0.0.1",
                 UserAgent = "test-agent",
-                Status = LoginStatus.TwoFactorAuthenticationSent,
+                Status = LoginStatus.TwoFactorAuthenticationReached,
                 CreatedAt = DateTime.UtcNow.AddMinutes(-10)
             };
 
@@ -98,7 +98,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 IpAddress = "127.0.0.1",
                 UserAgent = "test-agent",
-                Status = LoginStatus.TwoFactorAuthenticationSent,
+                Status = LoginStatus.TwoFactorAuthenticationReached,
                 CreatedAt = DateTime.UtcNow.AddMinutes(-(windowTime - 0.5))
             };
 
@@ -125,8 +125,8 @@ namespace Identity.Core.Tests
             Assert.Equal(LoginStatus.FAILED, loginAttempt.Status);
             Assert.Null(loginAttempt.FailureReason);
             Assert.NotEqual(default(DateTime), loginAttempt.CreatedAt);
-            Assert.NotNull(loginAttempt.TwoFactorCodeAttempts);
-            Assert.Empty(loginAttempt.TwoFactorCodeAttempts);
+            Assert.NotNull(loginAttempt.TwoFactorSmsAttempts);
+            Assert.Empty(loginAttempt.TwoFactorSmsAttempts);
         }
     }
 }

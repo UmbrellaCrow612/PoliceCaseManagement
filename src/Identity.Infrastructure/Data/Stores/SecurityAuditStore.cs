@@ -1,5 +1,6 @@
 ﻿
 using Identity.Core.Models;
+using Identity.Infrastructure.Data.Stores.Interfaces;
 
 namespace Identity.Infrastructure.Data.Stores
 {

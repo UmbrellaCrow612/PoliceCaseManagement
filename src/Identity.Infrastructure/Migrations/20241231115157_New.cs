@@ -341,7 +341,30 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TwoFactorCodeAttempts",
+                name: "TwoFactorEmailAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    LoginAttemptId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TwoFactorEmailAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TwoFactorEmailAttempts_LoginAttempts_LoginAttemptId",
+                        column: x => x.LoginAttemptId,
+                        principalTable: "LoginAttempts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TwoFactorSmsAttempts",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
@@ -355,15 +378,15 @@ namespace Identity.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TwoFactorCodeAttempts", x => x.Id);
+                    table.PrimaryKey("PK_TwoFactorSmsAttempts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TwoFactorCodeAttempts_AspNetUsers_UserId",
+                        name: "FK_TwoFactorSmsAttempts_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TwoFactorCodeAttempts_LoginAttempts_LoginAttemptId",
+                        name: "FK_TwoFactorSmsAttempts_LoginAttempts_LoginAttemptId",
                         column: x => x.LoginAttemptId,
                         principalTable: "LoginAttempts",
                         principalColumn: "Id",
@@ -473,13 +496,18 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TwoFactorCodeAttempts_LoginAttemptId",
-                table: "TwoFactorCodeAttempts",
+                name: "IX_TwoFactorEmailAttempts_LoginAttemptId",
+                table: "TwoFactorEmailAttempts",
                 column: "LoginAttemptId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TwoFactorCodeAttempts_UserId",
-                table: "TwoFactorCodeAttempts",
+                name: "IX_TwoFactorSmsAttempts_LoginAttemptId",
+                table: "TwoFactorSmsAttempts",
+                column: "LoginAttemptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TwoFactorSmsAttempts_UserId",
+                table: "TwoFactorSmsAttempts",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -532,7 +560,10 @@ namespace Identity.Infrastructure.Migrations
                 name: "Tokens");
 
             migrationBuilder.DropTable(
-                name: "TwoFactorCodeAttempts");
+                name: "TwoFactorEmailAttempts");
+
+            migrationBuilder.DropTable(
+                name: "TwoFactorSmsAttempts");
 
             migrationBuilder.DropTable(
                 name: "UserDeviceChallengeAttempts");

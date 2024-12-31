@@ -11,11 +11,12 @@
         public string? FailureReason { get; set; } = null;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<TwoFactorCodeAttempt> TwoFactorCodeAttempts { get; set; } = [];
+        public ICollection<TwoFactorSmsAttempt> TwoFactorSmsAttempts { get; set; } = [];
+        public ICollection<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; } = [];
 
         public bool IsValid(double windowTime)
         {
-            if (Status != LoginStatus.TwoFactorAuthenticationSent)
+            if (Status != LoginStatus.TwoFactorAuthenticationReached)
             {
                 return false;
             }
@@ -34,7 +35,7 @@
         SUCCESS = 0,
         FAILED = 1,
         BLOCKED = 2,
-        TwoFactorAuthenticationSent = 3,
+        TwoFactorAuthenticationReached = 3,
     }
 }
 
