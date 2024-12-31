@@ -267,23 +267,7 @@ namespace Identity.API.Controllers
             });
 
             var device = await _deviceManager.GetRequestingDeviceById(user.Id, Request);
-            if (device is null)
-            {
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/deviceConfirm",
-                    message = "Device needs confirmation"
-                });
-            }
-
-            if (!device.IsTrusted)
-            {
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/deviceConfirm?untrusted-device-used=true",
-                    message = "Device needs confirmation"
-                });
-            }
+            if (device is null || !device.Trusted()) { return StatusCode(403, new { redirectUrl = "/deviceConfirm", message = "Device needs confirmation"});}
 
             TwoFactorSmsAttempt attempt = new()
             {
@@ -321,7 +305,46 @@ namespace Identity.API.Controllers
             var (isValid, errors) = await _twoFactorEmailAttemptStore.ValidateAttempt(dto.LoginAttemptId, dto.EmailCode);
             if(!isValid) return BadRequest(errors);
 
-            return Ok("jwt token issued");
+            var roles = await _userManager.GetRolesAsync(user);
+
+            (string accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
+            var refreshToken = _jwtHelper.GenerateRefreshToken();
+
+            Token token = new()
+            {
+                Id = tokenId,
+                RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes),
+                UserId = user.Id,
+                UserDeviceId = device.Id
+            };
+
+            await _tokenStore.SetToken(token);
+
+            user.LastLoginDeviceId = device.Id;
+
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return BadRequest(res.Errors);
+
+            Response.Cookies.Append(CookieNamesConstant.JWT, accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
+            });
+
+
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(_JWTOptions.RefreshTokenExpiriesInMinutes)
+            });
+
+
+            return Ok(new { accessToken, refreshToken });
         }
 
         [AllowAnonymous]

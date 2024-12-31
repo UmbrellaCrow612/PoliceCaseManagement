@@ -47,7 +47,7 @@ namespace Identity.Infrastructure.Data.Stores
         {
             List<ErrorDetail> errors = [];
 
-            var loginAttempt = await _dbcontext.LoginAttempts.Where(x => x.Id == loginAttemptId).FirstOrDefaultAsync();
+            var loginAttempt = await _dbcontext.LoginAttempts.FindAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime))
             {
                 errors.Add(new ErrorDetail
@@ -56,6 +56,7 @@ namespace Identity.Infrastructure.Data.Stores
                     Reason = "Login attempt dose not exist or is invalid"
                 });
             }
+
 
             var _attempt = await _dbcontext.TwoFactorEmailAttempts.Where(
                 x => x.LoginAttemptId == loginAttemptId && x.Code == code)
@@ -73,9 +74,10 @@ namespace Identity.Infrastructure.Data.Stores
             if (errors.Count != 0) return (false, errors);
 
             _attempt.MarkUsed();
+            loginAttempt.Status = LoginStatus.SUCCESS;
 
+            _dbcontext.LoginAttempts.Update(loginAttempt);
             _dbcontext.TwoFactorEmailAttempts.Update(_attempt);
-            await _dbcontext.SaveChangesAsync();
 
             return (true, errors);
         }
