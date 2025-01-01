@@ -242,7 +242,7 @@ namespace Identity.API.Controllers
             });
 
             var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
-            if (device is null || !device.Trusted()) { return StatusCode(403, new { redirectUrl = "/deviceConfirm", message = "Device needs confirmation"});}
+            if (device is null || !device.Trusted()) { return StatusCode(403, new { redirectUrl = "/deviceConfirm", message = "Device needs confirmation" }); }
 
             TwoFactorSmsAttempt attempt = new()
             {
@@ -257,7 +257,7 @@ namespace Identity.API.Controllers
 
             // send sms for this login attempt
 
-            return Ok(attempt.Code);
+            return Ok(new { attempt.Code });
         }
 
 

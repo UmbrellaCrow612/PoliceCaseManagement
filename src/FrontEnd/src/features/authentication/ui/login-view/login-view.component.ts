@@ -15,6 +15,7 @@ import { LoginCredentials } from '../../../../core/authentication/types';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import formatBackendError from '../../../../core/errors/utils/format-error';
 
 @Component({
   selector: 'app-login-view',
@@ -61,20 +62,17 @@ export class LoginViewComponent {
           this.isLoggingIn = false;
           this.router.navigate(['../two-factor'], {
             relativeTo: this.route,
-            queryParams: { loginAttemptId: config.id, email: this.loginCredentials.email },
+            queryParams: { loginAttemptId: config.id },
           });
         },
         error: (err) => {
           this.isLoggingIn = false;
-          const errorMessage = err?.error || 'Login failed. Please try again.';
-          this.snackBar.open(
-            `Status code: ${err.status} Error: ${errorMessage}`,
-            'Close',
-            {
-              duration: 5000,
-              horizontalPosition: 'left',
-            }
-          );
+          let errorMessage = formatBackendError(err);
+
+          this.snackBar.open(errorMessage, 'Close', {
+            duration: 5000,
+            horizontalPosition: 'center',
+          });
         },
       });
     }

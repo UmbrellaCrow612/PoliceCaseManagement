@@ -35,5 +35,13 @@ export interface JwtPayload {
  * Represents the standard response you receive after a successful login
  */
 export interface LoginResponse {
-  id: string
+  id: string;
+}
+
+export interface SmsCodeRequest {
+  loginAttemptId: string;
+}
+
+export interface SmsCodeResponse {
+  code: string;
 }

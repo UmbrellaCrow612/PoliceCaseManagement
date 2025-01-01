@@ -22,7 +22,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class TwoFactorViewComponent {
   selectedMethod: 'sms' | 'email' | null = null;
   loginAttemptId: string | null = null;
-  email: string | null = null;
 
   constructor(
     private snackBar: MatSnackBar,
@@ -36,12 +35,9 @@ export class TwoFactorViewComponent {
 
   proceed(): void {
     this.loginAttemptId = this.active.snapshot.queryParams['loginAttemptId'];
-    this.email = this.active.snapshot.queryParams['email'];
     if (
       typeof this.loginAttemptId !== 'string' ||
-      this.loginAttemptId.trim() === '' ||
-      typeof this.email !== 'string' ||
-      this.email.trim() === ''
+      this.loginAttemptId.trim() === ''
     ) {
       this.router.navigate(['../login'], { relativeTo: this.active });
       return;
@@ -49,7 +45,7 @@ export class TwoFactorViewComponent {
 
     this.router.navigate([`./${this.selectedMethod}`], {
       relativeTo: this.active,
-      queryParams: { loginAttemptId: this.loginAttemptId, email: this.email },
+      queryParams: { loginAttemptId: this.loginAttemptId },
     });
   }
 }

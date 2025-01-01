@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../../http/services/BaseService.service';
-import { LoginResponse, LoginCredentials } from '../types';
+import { LoginResponse, LoginCredentials, SmsCodeRequest, SmsCodeResponse } from '../types';
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { JwtService } from './jwt.service';
@@ -23,6 +23,10 @@ export class AuthenticationService extends BaseService {
 
   Login(credentials: LoginCredentials): Observable<LoginResponse> {
     return this.post(`${this.BASE_URL}/authentication/login`, credentials);
+  }
+
+  SendSmsCode(details : SmsCodeRequest): Observable<SmsCodeResponse> {
+    return this.post(`${this.BASE_URL}/authentication/resend-two-factor-sms-authentication`, details);
   }
 
   Logout() {

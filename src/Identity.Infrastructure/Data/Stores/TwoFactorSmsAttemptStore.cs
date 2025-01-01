@@ -31,7 +31,7 @@ namespace Identity.Infrastructure.Data.Stores
                 errors.Add(new ErrorDetail
                 {
                     Field = "Two factor auth.",
-                    Reason = "There is a valid recent attempt issued for this login attempt."
+                    Reason = "There is a valid recent SMS attempt issued for this login."
                 });
                 return (false, errors);
             }
