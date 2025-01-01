@@ -43,4 +43,18 @@ export const AUTHENTICATION_ROUTES: Routes = [
         (c) => c.TwoFactorViewComponent
       ),
   },
+  {
+    path: 'two-factor/sms',
+    loadComponent: () =>
+      import('./ui/two-factor-sms-view/two-factor-sms-view.component').then(
+        (c) => c.TwoFactorSmsViewComponent
+      ),
+  },
+  {
+    path: 'two-factor/email',
+    loadComponent: () =>
+      import('./ui/two-factor-email-view/two-factor-email-view.component').then(
+        (c) => c.TwoFactorEmailViewComponent
+      ),
+  },
 ];

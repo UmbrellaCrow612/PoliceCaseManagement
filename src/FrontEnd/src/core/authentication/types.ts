@@ -2,8 +2,8 @@
  * Represents the standard login credentials needed to authenticate a user
  */
 export interface LoginCredentials {
-    email: string | null | undefined
-    password: string | null | undefined;
+  email: string | null | undefined;
+  password: string | null | undefined;
 }
 
 /**
@@ -34,7 +34,6 @@ export interface JwtPayload {
 /**
  * Represents the standard response you receive after a successful login
  */
-export interface JwtResponse {
-  accessToken: string;
-  refreshToken : string;
+export interface LoginResponse {
+  id: string
 }

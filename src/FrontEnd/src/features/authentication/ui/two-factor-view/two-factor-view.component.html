@@ -1,1 +1,49 @@
-<p>two-factor-view works!</p>
+<div class="container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>Choose Verification Method</mat-card-title>
+      <mat-card-subtitle
+        >Select how you'd like to receive your verification
+        code</mat-card-subtitle
+      >
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-selection-list
+        [multiple]="false"
+        (selectionChange)="selectMethod($event.options[0].value)"
+      >
+        <mat-list-option value="sms" aria-label="SMS Verification">
+          <div class="method-item">
+            <mat-icon color="primary">smartphone</mat-icon>
+            <div class="method-details">
+              <h3>SMS Verification</h3>
+              <p>Receive a code via text message</p>
+            </div>
+          </div>
+        </mat-list-option>
+
+        <mat-list-option value="email" aria-label="Email Verification">
+          <div class="method-item">
+            <mat-icon color="primary">email</mat-icon>
+            <div class="method-details">
+              <h3>Email Verification</h3>
+              <p>Receive a code via email</p>
+            </div>
+          </div>
+        </mat-list-option>
+      </mat-selection-list>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!selectedMethod"
+        (click)="proceed()"
+      >
+        Continue
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

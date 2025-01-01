@@ -14,6 +14,7 @@ import { AuthenticationService } from '../../../../core/authentication/services/
 import { LoginCredentials } from '../../../../core/authentication/types';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-view',
@@ -31,7 +32,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class LoginViewComponent {
   constructor(
     private authService: AuthenticationService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   isLoggingIn = false;
@@ -56,19 +59,22 @@ export class LoginViewComponent {
       this.authService.Login(this.loginCredentials).subscribe({
         next: (config) => {
           this.isLoggingIn = false;
-          this.snackBar.open('Logged in successfully!', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'left',
+          this.router.navigate(['../two-factor'], {
+            relativeTo: this.route,
+            queryParams: { loginAttemptId: config.id, email: this.loginCredentials.email },
           });
-          console.log('Logged in successfully!', config)
         },
         error: (err) => {
           this.isLoggingIn = false;
           const errorMessage = err?.error || 'Login failed. Please try again.';
-          this.snackBar.open(`Status code: ${err.status} Error: ${errorMessage}`, 'Close', {
-            duration: 5000,
-            horizontalPosition: 'left',
-          });
+          this.snackBar.open(
+            `Status code: ${err.status} Error: ${errorMessage}`,
+            'Close',
+            {
+              duration: 5000,
+              horizontalPosition: 'left',
+            }
+          );
         },
       });
     }
