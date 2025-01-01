@@ -1,6 +1,75 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  <label for="first-name">First Name: </label>
-  <input id="first-name" type="text" formControlName="firstName" />
-  <label for="last-name">Last Name: </label>
-  <input id="last-name" type="text" formControlName="lastName" />
-</form>
+<div class="wrapper">
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    class="form"
+    aria-labelledby="loginFormTitle"
+    novalidate
+  >
+    <!-- Logo -->
+    <img
+      src="/assets/brand/logo.png"
+      alt="Brand Logo"
+      class="logo"
+      aria-hidden="true"
+    />
+
+    <!-- Form Title -->
+    <h1 id="loginFormTitle" class="form-title">Police Case System Login</h1>
+
+    <!-- Email Field -->
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label for="email">Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        id="email"
+        type="email"
+        required
+        aria-required="true"
+        aria-describedby="emailHelp"
+      />
+      <mat-hint id="emailHelp">Enter your email address</mat-hint>
+      @if (loginForm.get("email")?.hasError("required")) {
+      <mat-error>Required field</mat-error>
+      } @else if(loginForm.get("email")?.hasError("email")) {
+      <mat-error>Invalid email address</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Password Field -->
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label for="password">Password</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        id="password"
+        type="password"
+        required
+        aria-required="true"
+        aria-describedby="passwordHelp"
+        autocomplete="on"
+      />
+      <mat-hint id="passwordHelp">Enter your password</mat-hint>
+      @if (loginForm.get("password")?.hasError("required")) {
+      <mat-error>Required field</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Submit Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      class="full-width"
+      [disabled]="loginForm.invalid || isLoggingIn"
+      aria-label="Login"
+    >
+      @if (!isLoggingIn) {
+      <span>Login</span>
+      } @else {
+      <mat-spinner diameter="20" color="accent"></mat-spinner>
+      }
+    </button>
+  </form>
+</div>

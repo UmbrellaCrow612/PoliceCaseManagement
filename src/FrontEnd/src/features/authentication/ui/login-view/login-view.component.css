@@ -1,0 +1,118 @@
+
+.success-snackbar {
+  background: #4caf50;
+  color: white;
+}
+
+.success-snackbar .mat-simple-snackbar-action {
+  color: white;
+}
+
+.error-snackbar {
+  background: #f44336;
+  color: white;
+}
+
+.error-snackbar .mat-simple-snackbar-action {
+  color: white;
+}
+
+.success-snackbar, .error-snackbar {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.success-snackbar .mat-simple-snackbar-action:hover,
+.error-snackbar .mat-simple-snackbar-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem; /* Add padding for mobile screens */
+  background-color: #e8f1fa; /* Light blue background */
+}
+
+.form {
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff; /* White form background */
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.logo {
+  max-width: 90px; /* Adjust the width as necessary */
+  margin: 0 auto 1rem; /* Center the logo and add spacing below */
+  display: block;
+}
+
+.form-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333; /* Darker text for contrast */
+}
+
+@media (max-width: 768px) {
+  .form {
+    padding: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.25rem; /* Slightly smaller font for mobile */
+  }
+
+  .logo {
+    max-width: 120px; /* Scale down the logo for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    padding: 1rem;
+  }
+
+  .form-title {
+    font-size: 1.1rem; /* Further reduce font size for smaller screens */
+  }
+
+  .logo {
+    max-width: 100px; /* Adjust logo size for very small screens */
+  }
+}

@@ -2,9 +2,8 @@
  * Represents the standard login credentials needed to authenticate a user
  */
 export interface LoginCredentials {
-    userName: string | null,
-    email: string | null,
-    password: string
+    email: string | null | undefined
+    password: string | null | undefined;
 }
 
 /**

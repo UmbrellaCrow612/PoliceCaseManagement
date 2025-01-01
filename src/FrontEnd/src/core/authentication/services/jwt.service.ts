@@ -74,17 +74,25 @@ export class JwtService extends BaseService {
   IsJwtTokenValid<T extends JwtPayload>(rawToken: string): boolean {
     try {
       const claims = this.decodeToken<T>(rawToken);
-
+  
       if (claims.exp) {
-        const expiryDate = new Date(claims.exp * 1000);
+        const expiryDate = new Date(claims.exp * 1000); // Convert exp to milliseconds
         const currentDate = new Date();
+        const timeDifferenceInMinutes = (expiryDate.getTime() - currentDate.getTime()) / (1000 * 60);
+  
+        // Token is invalid if it's expiring in 5 minutes or less
+        if (timeDifferenceInMinutes <= 5) {
+          return false;
+        }
+  
+        // Otherwise, the token is still valid
         return expiryDate > currentDate;
       }
     } catch (error) {
       console.error('Error decoding token:', error);
       return false;
     }
-
+  
     return false;
   }
 
@@ -170,7 +178,7 @@ export class JwtService extends BaseService {
             return of(null);
           }
 
-          if (this.IsJwtTokenValid(rawToken)) {
+          if (!this.IsJwtTokenValid(rawToken)) {
             console.log('Sending refresh token request');
             return this.refreshToken(rawRefreshToken);
           }
@@ -190,6 +198,11 @@ export class JwtService extends BaseService {
       this.subscription.unsubscribe();
       this.subscription = null;
     }
+  }
+
+  clearTokens(): void {
+    this.cookieService.deleteCookie(this.JWT_NAME);
+    this.cookieService.deleteCookie(this.REFRESH_NAME);
   }
 
   /**

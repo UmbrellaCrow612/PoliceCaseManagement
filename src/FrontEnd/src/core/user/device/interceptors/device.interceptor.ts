@@ -8,7 +8,7 @@ export function DeviceFingerPrintInterceptor(
 ): Observable<HttpEvent<unknown>> {
   
   const reqWithHeader = req.clone({
-    headers: req.headers.set(CustomHeaderNames.DEVICE_FINGERPRINT, 'new header value'),
+    headers: req.headers.set(CustomHeaderNames.DEVICE_FINGERPRINT, 'frfrfrfrf'),
   });
 
   return next(reqWithHeader);
