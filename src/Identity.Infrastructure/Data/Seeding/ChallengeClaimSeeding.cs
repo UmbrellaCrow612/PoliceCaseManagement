@@ -1,4 +1,5 @@
-﻿using Challenge.Core.Models;
+﻿using Challenge.Core.Constants;
+using Challenge.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Data.Seeding
@@ -12,13 +13,10 @@ namespace Identity.Infrastructure.Data.Seeding
             _identityApplicationDbContext.RemoveRange(prevClaims);
             await _identityApplicationDbContext.SaveChangesAsync();
 
-            var claims = new List<ChallengeClaim>
-                {
-                    new() { Name = "DeleteCase" },
-                };
+            var claims = ChallengeConstants.Challenges.Select(c => new ChallengeClaim { Name = c }).ToList();
 
-                await _identityApplicationDbContext.ChallengeClaims.AddRangeAsync(claims);
-                await _identityApplicationDbContext.SaveChangesAsync();
+            await _identityApplicationDbContext.ChallengeClaims.AddRangeAsync(claims);
+            await _identityApplicationDbContext.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Challenge.Core.Annotations;
+using Challenge.Core.Constants;
 using Challenge.Core.Models;
 using Challenge.Core.Settings;
 using Identity.API.DTOs;
@@ -68,7 +69,8 @@ namespace Identity.API.Controllers
 
 
         [HttpGet("protected")]
-        [Challenge("DeleteCase")] 
+        [Authorize]
+        [Challenge(ChallengeConstants.DELETE_CASE)] 
         public IActionResult ProtectedEndpoint()
         {
             return Ok("You have access!");
