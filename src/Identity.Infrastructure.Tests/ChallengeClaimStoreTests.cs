@@ -1,9 +1,7 @@
 ﻿using Challenge.Core.Helpers;
 using Challenge.Core.Models;
-using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Identity.Infrastructure.Data.Stores;
 using Challenge.Core.Settings;
 using Microsoft.Extensions.Options;

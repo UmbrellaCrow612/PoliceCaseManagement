@@ -29,8 +29,8 @@ namespace Challenge.Core.Helpers
             [
                 new Claim(JwtRegisteredClaimNames.Jti, token.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, token.UserId),
-                new Claim("ChallengeClaimId", token.ChallengeClaimId),
-                new Claim("ChallengeClaimName", token.ChallengeClaimName),
+                new Claim(JwtRegisteredChallengeClaimNames.ChallengeClaimId, token.ChallengeClaimId),
+                new Claim(JwtRegisteredChallengeClaimNames.ChallengeClaimName, token.ChallengeClaimName),
             ];
 
             foreach (var aud in audiences)

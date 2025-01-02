@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
-using System.Runtime;
 
 namespace Challenge.Core.Annotations
 {
@@ -45,8 +44,9 @@ namespace Challenge.Core.Annotations
             foreach (var claimCookie in claimCookies)
             {
                 var jwtToken = claimCookie.Value;
+                var name = claimCookie.Key;
 
-                if (!ValidateJwtToken(jwtToken, settings))
+                if (!ValidateJwtToken(jwtToken,name, settings))
                 {
                     // If JWT validation fails, return Unauthorized
                     context.Result = new ConflictResult();
@@ -55,7 +55,7 @@ namespace Challenge.Core.Annotations
             }
         }
 
-        private static bool ValidateJwtToken(string jwtToken, ChallengeJwtSettings settings)
+        private static bool ValidateJwtToken(string jwtToken, string claimName, ChallengeJwtSettings settings)
         {
             try
             {
@@ -73,11 +73,16 @@ namespace Challenge.Core.Annotations
                     ClockSkew = TimeSpan.Zero
                 };
 
-                // Validate the token
-                tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out var validatedToken);
+                var principal = tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out var validatedToken);
 
-                // If token is valid, return true
-                return true;
+                if (validatedToken is not JwtSecurityToken jwtSecurityToken)
+                {
+                    return false;
+                }
+
+                var challengeClaim = principal.FindFirst(JwtRegisteredChallengeClaimNames.ChallengeClaimName)?.Value;
+
+                return challengeClaim != null && challengeClaim == claimName;
             }
             catch(Exception e)
             {
