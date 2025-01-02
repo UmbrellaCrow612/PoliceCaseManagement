@@ -6,7 +6,7 @@ using Shared.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores
 {
-    internal class ChallengeClaimStore(IdentityApplicationDbContext dbContext, JwtChallengeHelper jwtChallengeHelper) : IChallengeClaimStore
+    public class ChallengeClaimStore(IdentityApplicationDbContext dbContext, JwtChallengeHelper jwtChallengeHelper) : IChallengeClaimStore
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly JwtChallengeHelper _jwtChallengeHelper = jwtChallengeHelper;
