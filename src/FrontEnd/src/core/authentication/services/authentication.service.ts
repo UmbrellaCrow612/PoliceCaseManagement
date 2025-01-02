@@ -31,6 +31,6 @@ export class AuthenticationService extends BaseService {
 
   Logout() {
     this.jwtService.clearTokens();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/authentication/login']);
   }
 }

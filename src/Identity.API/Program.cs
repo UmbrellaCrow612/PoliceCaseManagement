@@ -11,6 +11,8 @@ using Serilog;
 using System.Text;
 using Identity.API.Settings;
 using Identity.Core.Models;
+using Challenge.Core;
+using Identity.Infrastructure.Data;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -120,6 +122,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddChallenges(builder.Configuration);
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSingleton<JwtHelper>();
@@ -156,8 +160,12 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityApplicationDbContext>();
 
     var rs = new RoleSeeding(roleManager);
+    var claimSeeder = new ChallengeClaimSeeding(dbContext);
+
+    await claimSeeder.Seed();
 
     rs.SeedRoles();
 }

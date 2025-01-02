@@ -17,6 +17,45 @@ namespace Identity.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("Challenge.Core.Models.ChallengeClaim", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChallengeClaims");
+                });
+
+            modelBuilder.Entity("Challenge.Core.Models.ChallengeToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ChallengeClaimId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ChallengeClaimName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChallengeTokens");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
@@ -676,7 +715,7 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("TwoFactorSmsAttempts")
+                        .WithMany("TwoFactorCodeAttempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -781,7 +820,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("Tokens");
 
-                    b.Navigation("TwoFactorSmsAttempts");
+                    b.Navigation("TwoFactorCodeAttempts");
 
                     b.Navigation("UserDeviceChallengeAttempts");
 
@@ -795,9 +834,9 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
                 {
-                    b.Navigation("TwoFactorSmsAttempts");
-
                     b.Navigation("TwoFactorEmailAttempts");
+
+                    b.Navigation("TwoFactorSmsAttempts");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
