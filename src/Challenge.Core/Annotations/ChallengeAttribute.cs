@@ -22,7 +22,7 @@ namespace Challenge.Core.Annotations
             var options = services.GetService<IOptions<ChallengeJwtSettings>>();
             if (options == null)
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new ConflictResult();
                 return;
             }
 
@@ -38,7 +38,7 @@ namespace Challenge.Core.Annotations
             if (claimCookies.Count != _claimNames.Length)
             {
                 // If any claim cookie is missing, return Unauthorized
-                context.Result = new UnauthorizedResult();
+                context.Result = new ConflictResult();
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace Challenge.Core.Annotations
                 if (!ValidateJwtToken(jwtToken, settings))
                 {
                     // If JWT validation fails, return Unauthorized
-                    context.Result = new UnauthorizedResult();
+                    context.Result = new ConflictResult();
                     return;
                 }
             }
