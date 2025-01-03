@@ -70,7 +70,7 @@ namespace Identity.API.Controllers
 
         [HttpGet("protected")]
         [Authorize]
-        [Challenge(ChallengeConstants.DELETE_CASE)] 
+        [Challenge(ChallengeConstants.DELETE_CASE, "test")] 
         public IActionResult ProtectedEndpoint()
         {
             return Ok("You have access!");

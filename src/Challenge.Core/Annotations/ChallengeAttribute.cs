@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
+using Challenge.Core.Responses;
 
 namespace Challenge.Core.Annotations
 {
@@ -22,14 +23,14 @@ namespace Challenge.Core.Annotations
             var userId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(userId is null)
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = context.Result = new _401RedirectResult("/login", "Unauthorized access. Please log in.");
                 return;
             }
 
             var options = services.GetService<IOptions<ChallengeJwtSettings>>();
             if (options is null)
             {
-                context.Result = new ConflictResult();
+                context.Result = new _401RedirectResult("/404", "ChallengeJwtSettings not found.");
                 return;
             }
 
@@ -45,7 +46,8 @@ namespace Challenge.Core.Annotations
             if (claimCookies.Count != _claimNames.Length)
             {
                 // If any claim cookie is missing, return Unauthorized
-                context.Result = new ConflictResult();
+                string claimNamesString = string.Join("&", _claimNames.Select(cn => $"claimNames={cn}"));
+                context.Result = new _409RedirectResult($"/challenge?{claimNamesString}", "Challenge tokens not found.");
                 return;
             }
 
@@ -57,7 +59,8 @@ namespace Challenge.Core.Annotations
                 if (!ValidateJwtToken(jwtToken,name,userId,settings))
                 {
                     // If JWT validation fails, return Unauthorized
-                    context.Result = new ConflictResult();
+                    string claimNamesString = string.Join("&", _claimNames.Select(cn => $"claimNames={cn}"));
+                    context.Result = new _409RedirectResult($"/challenge?{claimNamesString}", "Challenge tokens invalid.");
                     return;
                 }
             }
