@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 namespace Challenge.Core.Annotations
 {
@@ -18,8 +19,15 @@ namespace Challenge.Core.Annotations
         {
             IServiceProvider services = context.HttpContext.RequestServices;
 
+            var userId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId is null)
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
+
             var options = services.GetService<IOptions<ChallengeJwtSettings>>();
-            if (options == null)
+            if (options is null)
             {
                 context.Result = new ConflictResult();
                 return;
@@ -46,7 +54,7 @@ namespace Challenge.Core.Annotations
                 var jwtToken = claimCookie.Value;
                 var name = claimCookie.Key;
 
-                if (!ValidateJwtToken(jwtToken,name, settings))
+                if (!ValidateJwtToken(jwtToken,name,userId,settings))
                 {
                     // If JWT validation fails, return Unauthorized
                     context.Result = new ConflictResult();
@@ -55,7 +63,7 @@ namespace Challenge.Core.Annotations
             }
         }
 
-        private static bool ValidateJwtToken(string jwtToken, string claimName, ChallengeJwtSettings settings)
+        private static bool ValidateJwtToken(string jwtToken, string claimName,string userId, ChallengeJwtSettings settings)
         {
             try
             {
@@ -81,8 +89,9 @@ namespace Challenge.Core.Annotations
                 }
 
                 var challengeClaim = principal.FindFirst(JwtRegisteredChallengeClaimNames.ChallengeClaimName)?.Value;
+                var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                return challengeClaim != null && challengeClaim == claimName;
+                return challengeClaim != null && challengeClaim == claimName && userIdClaim != null && userIdClaim == userId;
             }
             catch(Exception e)
             {
