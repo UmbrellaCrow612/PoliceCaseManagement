@@ -39,8 +39,11 @@ export class TwoFactorSmsViewComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  resendCount = 1;
+
   ngOnInit(): void {
     this.sendCode();
+    this.startCountdown();
   }
 
   private sendCode() {
@@ -66,8 +69,49 @@ export class TwoFactorSmsViewComponent implements OnInit {
     });
   }
 
+  isResendDisabled = true;
+  countdown = 60;
+  private countdownInterval: any;
+
+  resendCode() {
+    this.resendCount += 1;
+
+    if (this.resendCount > 3) {
+      this.snackBar.open('Limit reached. Redirecting to login...', 'Close', {
+        duration: 4000,
+        horizontalPosition: 'center',
+      });
+
+      setTimeout(() => {
+        this.router.navigate(['/authentication/login']);
+      }, 4000);
+    }
+    this.sendCode();
+    this.isResendDisabled = true;
+    this.countdown = 60;
+    this.startCountdown();
+  }
+
+  startCountdown() {
+    this.countdownInterval = setInterval(() => {
+      if (this.countdown > 0) {
+        this.countdown--;
+      } else {
+        this.isResendDisabled = false;
+        clearInterval(this.countdownInterval);
+      }
+    }, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+  }
+
   SmsCodeRequest: SmsCodeRequest = {
     loginAttemptId: '',
+    code: '',
   };
 
   smsForm = new FormGroup({
@@ -76,7 +120,17 @@ export class TwoFactorSmsViewComponent implements OnInit {
 
   onSubmit() {
     if (this.smsForm.valid) {
-      console.log();
+      this.SmsCodeRequest.code = this.smsForm.get('code')?.value;
+
+      this.authService.ValidateSmsCode(this.SmsCodeRequest).subscribe({
+        next: (config) => {
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          let errorMessage = formatBackendError(err);
+          this.snackBar.open(errorMessage, 'close', { duration: 7000 });
+        },
+      });
     }
   }
 }

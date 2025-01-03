@@ -40,6 +40,7 @@ export interface LoginResponse {
 
 export interface SmsCodeRequest {
   loginAttemptId: string;
+  code: string | null | undefined;
 }
 
 export interface SmsCodeResponse {

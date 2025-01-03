@@ -12,6 +12,16 @@ export default function formatBackendError(err: any): string {
     }
   }
 
+  if (
+    err.error &&
+    typeof err.error === "object" &&
+    "field" in err.error &&
+    "reason" in err.error
+  ) {
+    errorMessage += `\nField: ${err.error.field}\nReason: ${err.error.reason}`;
+    return errorMessage;
+  }
+
   // Check if the error has a message property
   if (err.error && err.error.message) {
     errorMessage += `\nMessage: ${err.error.message}`;

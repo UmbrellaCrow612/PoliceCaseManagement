@@ -17,7 +17,7 @@
         </mat-form-field>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button type="button" disabled="true">Resend Code</button>
+        <button mat-button type="button" (click)="resendCode()" [disabled]="isResendDisabled"> {{ countdown > 0 ? countdown : 'Resend Code' }}</button>
         <button mat-button [disabled]="smsForm.invalid">Submit</button>
       </mat-card-actions>
     </mat-card>

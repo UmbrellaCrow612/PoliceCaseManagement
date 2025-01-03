@@ -29,6 +29,10 @@ export class AuthenticationService extends BaseService {
     return this.post(`${this.BASE_URL}/authentication/resend-two-factor-sms-authentication`, details);
   }
 
+  ValidateSmsCode(details: SmsCodeRequest): Observable<SmsCodeResponse> {
+    return this.post(`${this.BASE_URL}/authentication/validate-two-factor-sms-authentication`, details);
+  }
+
   Logout() {
     this.jwtService.clearTokens();
     this.router.navigate(['/authentication/login']);

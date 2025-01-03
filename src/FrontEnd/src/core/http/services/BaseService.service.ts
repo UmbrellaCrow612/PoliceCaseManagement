@@ -37,8 +37,10 @@ export class BaseService {
     body: any,
     headers?: HttpHeaders | { [header: string]: string | string[] }
   ): Observable<T> {
-    return this.http
-      .post<T>(url, body, { headers })
+    return this.http.post<T>(url, body, {
+      headers,
+      withCredentials: true, 
+    });
   }
 
   /**
