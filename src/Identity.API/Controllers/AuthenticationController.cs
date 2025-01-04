@@ -143,7 +143,7 @@ namespace Identity.API.Controllers
 
         [DeviceInformation]
         [AllowAnonymous]
-        [HttpPost("validate-two-factor-sms-authentication")]
+        [HttpPost("validate-two-factor-sms")]
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
         {
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(dto.LoginAttemptId);
@@ -212,7 +212,7 @@ namespace Identity.API.Controllers
 
         [DeviceInformation]
         [AllowAnonymous]
-        [HttpPost("resend-two-factor-sms-authentication")]
+        [HttpPost("resend-two-factor-sms")]
         public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode reSendTwoFactorCode)
         {
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(reSendTwoFactorCode.LoginAttemptId);
@@ -250,7 +250,7 @@ namespace Identity.API.Controllers
 
         [DeviceInformation]
         [AllowAnonymous]
-        [HttpPost("validate-two-factor-email-authentication")]
+        [HttpPost("validate-two-factor-email")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(dto.LoginAttemptId);
@@ -309,7 +309,7 @@ namespace Identity.API.Controllers
 
         [DeviceInformation]
         [AllowAnonymous]
-        [HttpPost("resend-two-factor-email-authentication")]
+        [HttpPost("resend-two-factor-email")]
         public async Task<ActionResult> ReSendTwoFactorEmailAuth([FromBody] ReSendTwoFactorEmailAttemptDto reSendTwoFactorEmailAttemptDto)
         {
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(reSendTwoFactorEmailAttemptDto.LoginAttemptId);
@@ -493,7 +493,7 @@ namespace Identity.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("confirm-email")]
+        [HttpPost("validate-confirmation-email")]
         public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
         {
             (bool isValid, EmailVerificationAttempt? attempt, ApplicationUser? user, ICollection<string> errors) = await _emailVerificationAttemptStore
@@ -545,7 +545,7 @@ namespace Identity.API.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("user-device-challenge")]
+        [HttpPost("validate-user-device-challenge")]
         public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto challengeDto)
         {
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
@@ -606,7 +606,7 @@ namespace Identity.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("phone-confirmation")]
+        [HttpPost("validate-phone-confirmation")]
         public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto phoneConfirmationDto)
         {
             (bool isValid, PhoneConfirmationAttempt? attempt,ICollection<ErrorDetail> errors) = 

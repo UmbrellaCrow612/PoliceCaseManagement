@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Identity.API.Annotations
 {
+    /// <summary>
+    /// Use this attribute to validate the device information in the request.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class DeviceInformationAttribute : Attribute, IAuthorizationFilter
     {
