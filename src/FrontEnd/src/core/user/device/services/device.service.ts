@@ -22,7 +22,7 @@ export class DeviceService {
       const existingCookie = this.cookieService.getCookie(this.COOKIE_NAME);
 
       if (existingCookie) {
-        console.log("Existing cookie found");
+        console.log("Existing cookie found for device fingerprint");
         const { fingerprint, timestamp } = JSON.parse(existingCookie);
         const daysSinceCreation = this.getDaysSinceTimestamp(timestamp);
 

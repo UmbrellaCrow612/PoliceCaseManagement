@@ -1,5 +1,7 @@
-﻿using Identity.API.DTOs;
+﻿using Identity.API.Annotations;
+using Identity.API.DTOs;
 using Identity.API.Helpers;
+using Identity.API.Responses;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores.Interfaces;
@@ -43,15 +45,13 @@ namespace Identity.API.Controllers
         private readonly DeviceManager _deviceManager = deviceManager;
         private readonly ITwoFactorEmailAttemptStore _twoFactorEmailAttemptStore = twoFactorEmailAttemptStore;
 
+        [DeviceInformation]
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] LoginRequestDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
                                 ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
                                 ?? "Unknown";
-
-            var (isValid, errors) = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!isValid) return BadRequest(errors);
 
             ApplicationUser? user;
             if (!string.IsNullOrWhiteSpace(dto.UserName))
@@ -122,11 +122,7 @@ namespace Identity.API.Controllers
                 loginAttempt.FailureReason = "New Device being used.";
                 await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
 
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/deviceConfirm",
-                    message = "Device needs confirmation"
-                });
+                return DeviceConfirmationResponse.GetResponse();
             }
 
             if (!device.IsTrusted)
@@ -134,11 +130,7 @@ namespace Identity.API.Controllers
                 loginAttempt.FailureReason = "Untrusted Device being used.";
                 await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
 
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/deviceConfirm?untrusted-device-used=true",
-                    message = "Device needs confirmation"
-                });
+                return DeviceConfirmationResponse.Untrusted.GetResponse();
             }
 
             loginAttempt.Status = LoginStatus.TwoFactorAuthenticationReached;

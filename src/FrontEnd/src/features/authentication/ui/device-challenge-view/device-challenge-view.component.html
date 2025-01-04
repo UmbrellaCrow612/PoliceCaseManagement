@@ -1,1 +1,32 @@
-<p>device-challenge-view works!</p>
+<div class="container">
+  <form action="">
+    <mat-card appearance="outlined" class="card">
+      <mat-card-header>
+        <mat-card-title
+          >This device or browser needs to be confirmed</mat-card-title
+        >
+        <mat-card-subtitle>
+          This is because it is a device or browser not previously used to login
+          in with or confirmed for your account.
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="content">
+        <mat-form-field class="input-wrapper">
+          <mat-label>Email</mat-label>
+          <input
+            class="full"
+            matInput
+            type="email"
+            placeholder="example@company.com"
+            required
+          />
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button type="submit" [disabled]="true">
+          Send verification code
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

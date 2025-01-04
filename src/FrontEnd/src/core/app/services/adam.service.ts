@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthenticationService } from '../../authentication/services/authentication.service';
 import { JwtService } from '../../authentication/services/jwt.service';
+import { DeviceService } from '../../user/device/services/device.service';
 
 /**
  * AdamService is used to initialize application-wide logic or state when the app starts.
@@ -12,13 +13,17 @@ import { JwtService } from '../../authentication/services/jwt.service';
   providedIn: 'root',
 })
 export class AdamService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private deviceService: DeviceService
+  ) {}
 
   /**
    * Initializes the application-wide logic or state.
    */
   initialize() {
     this.jwtService.StartTokenValidationThroughoutLifetime();
+    this.deviceService.GetDeviceFingerPrint();
   }
 
   /**

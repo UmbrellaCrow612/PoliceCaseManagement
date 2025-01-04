@@ -2,21 +2,27 @@ export default function formatBackendError(err: any): string {
   let errorMessage = `Status: ${err.status || 'Unknown'}`;
 
   // Check if the error has a specific error structure with field and reason
-  if (err.error && Array.isArray(err.error) && err.error.length > 0) {
+  if (
+    err.error &&
+    Array.isArray(err.error) &&
+    err.error.length > 0 &&
+    'field' in err.error &&
+    'reason' in err.error
+  ) {
     const backendErrors = err.error;
-    if (backendErrors[0].field && backendErrors[0].reason) {
-      backendErrors.forEach((element: any) => {
-        errorMessage += `\nField: ${element.field}\nReason: ${element.reason}`;
-      });
-      return errorMessage;
-    }
+
+    backendErrors.forEach((element: any) => {
+      errorMessage += `\nField: ${element.field}\nReason: ${element.reason}`;
+    });
+
+    return errorMessage;
   }
 
   if (
     err.error &&
-    typeof err.error === "object" &&
-    "field" in err.error &&
-    "reason" in err.error
+    typeof err.error === 'object' &&
+    'field' in err.error &&
+    'reason' in err.error
   ) {
     errorMessage += `\nField: ${err.error.field}\nReason: ${err.error.reason}`;
     return errorMessage;

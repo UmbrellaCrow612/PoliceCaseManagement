@@ -41,7 +41,7 @@ export function ComputeFingerPrint(): string {
     gPUVendor,
     gPURenderer,
     navigator.doNotTrack,
-    nav.connection.effectiveType || 'Unknown',
+    nav?.connection?.effectiveType || 'Unknown',
     Intl.DateTimeFormat().resolvedOptions().timeZone,
   ];
 
