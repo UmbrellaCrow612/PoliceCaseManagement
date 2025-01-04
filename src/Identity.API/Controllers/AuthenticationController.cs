@@ -141,13 +141,11 @@ namespace Identity.API.Controllers
             return Ok(new {loginAttempt.Id});
         }
 
+        [DeviceInformation]
         [AllowAnonymous]
         [HttpPost("validate-two-factor-sms-authentication")]
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
         {
-            var devRes = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!devRes.isValid) return BadRequest(devRes.errors);
-
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(dto.LoginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime)) return Unauthorized(new ErrorDetail
             {
@@ -212,13 +210,11 @@ namespace Identity.API.Controllers
             return Ok(new { accessToken, refreshToken });
         }
 
+        [DeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-two-factor-sms-authentication")]
         public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode reSendTwoFactorCode)
         {
-            var devRes = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!devRes.isValid) return BadRequest(devRes.errors);
-
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(reSendTwoFactorCode.LoginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime)) return Unauthorized(new ErrorDetail
             {
@@ -252,14 +248,11 @@ namespace Identity.API.Controllers
             return Ok(new { attempt.Code });
         }
 
-
+        [DeviceInformation]
         [AllowAnonymous]
         [HttpPost("validate-two-factor-email-authentication")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
-            var devRes = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!devRes.isValid) return BadRequest(devRes.errors);
-
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(dto.LoginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime)) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "Login attempt dose not exist or is invalid." });
 
@@ -314,13 +307,11 @@ namespace Identity.API.Controllers
             return Ok(new { accessToken, refreshToken });
         }
 
+        [DeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-two-factor-email-authentication")]
         public async Task<ActionResult> ReSendTwoFactorEmailAuth([FromBody] ReSendTwoFactorEmailAttemptDto reSendTwoFactorEmailAttemptDto)
         {
-            var devRes = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!devRes.isValid) return BadRequest(devRes.errors);
-
             var loginAttempt = await _loginAttemptStore.GetLoginAttemptById(reSendTwoFactorEmailAttemptDto.LoginAttemptId);
             if(loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime)) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "Login attempt dose not exist or is invalid."});
 
@@ -364,19 +355,13 @@ namespace Identity.API.Controllers
             return Ok(new { id = userToCreate.Id });
         }
 
-        /// <summary>
-        /// Accepts a refresh token Validates the refresh token Generates a 
-        /// new access token Returns the new access token
-        /// </summary>
+        [DeviceInformation]
         [Authorize]
         [HttpPost("refresh-token")]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-
-            var devRes = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!devRes.isValid) return BadRequest(devRes.errors);
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -416,9 +401,6 @@ namespace Identity.API.Controllers
             return Ok(new { accessToken });
         }
 
-        /// <summary>
-        /// Accepts an access token or refresh token Revokes the token, adding it to a blacklist
-        /// </summary>
         [Authorize]
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
@@ -585,13 +567,11 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
+        [DeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-user-device-challenge")]
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
-            var (isValid, errors) = _deviceManager.VerifyRequestHasRequiredProperties(Request);
-            if (!isValid) return BadRequest(errors);
-
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
             if (user is null) return Ok("User dose not exist - would not show in prod");
 
