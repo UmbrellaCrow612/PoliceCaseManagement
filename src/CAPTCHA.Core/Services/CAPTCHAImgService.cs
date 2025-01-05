@@ -7,104 +7,138 @@ namespace CAPTCHA.Core.Services
 {
     public class CAPTCHAImgService : ICAPTCHAImgService
     {
+        private readonly Random _random = new();
+        private readonly string[] _fonts = { "Arial", "Verdana", "Georgia", "Tahoma", "Times New Roman" };
 
         public byte[] CreateImg(CAPTCHAMathQuestion question, string expression)
         {
-            // Image dimensions
-            int width = 200;
-            int height = 80;
+            // Image dimensions with slight randomization
+            int width = _random.Next(180, 220);
+            int height = _random.Next(70, 90);
 
             using var bitmap = new Bitmap(width, height);
             using var graphics = Graphics.FromImage(bitmap);
             using var memoryStream = new MemoryStream();
-            // Set up graphics quality
+
+            // Enhanced quality settings
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-            // Fill background with light color
-            using (var brush = new SolidBrush(Color.White))
-            {
-                graphics.FillRectangle(brush, 0, 0, width, height);
-            }
+            // Random background pattern
+            CreateRandomBackground(graphics, width, height);
 
-            // Add noise/pattern to background
-            AddNoiseToImage(graphics, width, height);
+            // Add complex noise patterns
+            AddComplexNoise(graphics, width, height);
 
-            // Draw the expression
-            using (var font = new Font("Arial", 20, FontStyle.Bold))
-            using (var brush = new SolidBrush(Color.Black))
-            {
-                // Measure string to center it
-                var stringSize = graphics.MeasureString(expression, font);
-                var x = (width - stringSize.Width) / 2;
-                var y = (height - stringSize.Height) / 2;
+            // Draw the expression with enhanced distortion
+            DrawEnhancedText(graphics, expression, width, height);
 
-                // Apply slight rotation to each character
-                DrawDistortedText(graphics, expression, font, brush, x, y);
-            }
+            // Add overlapping lines and curves
+            AddOverlappingDistortion(graphics, width, height);
 
-            // Add some random lines for additional security
-            AddRandomLines(graphics, width, height);
-
-            // Save to memory stream as PNG
             bitmap.Save(memoryStream, ImageFormat.Png);
             return memoryStream.ToArray();
         }
 
-        private static void AddNoiseToImage(Graphics graphics, int width, int height)
+        private void CreateRandomBackground(Graphics graphics, int width, int height)
         {
-            var random = new Random();
-            using (var brush = new SolidBrush(Color.LightGray))
+            using var brush = new LinearGradientBrush(
+                new Point(0, 0),
+                new Point(width, height),
+                Color.FromArgb(_random.Next(230, 255), _random.Next(230, 255), _random.Next(230, 255)),
+                Color.FromArgb(_random.Next(230, 255), _random.Next(230, 255), _random.Next(230, 255))
+            );
+            graphics.FillRectangle(brush, 0, 0, width, height);
+        }
+
+        private void AddComplexNoise(Graphics graphics, int width, int height)
+        {
+            // Add multiple layers of noise with varying opacity
+            for (int layer = 0; layer < 3; layer++)
             {
-                for (int i = 0; i < 100; i++)
+                using var brush = new SolidBrush(Color.FromArgb(
+                    _random.Next(30, 90),
+                    _random.Next(0, 255),
+                    _random.Next(0, 255),
+                    _random.Next(0, 255)
+                ));
+
+                for (int i = 0; i < 200; i++)
                 {
-                    int x = random.Next(0, width);
-                    int y = random.Next(0, height);
-                    graphics.FillEllipse(brush, x, y, 2, 2);
+                    float size = _random.Next(1, 4);
+                    graphics.FillEllipse(brush,
+                        _random.Next(-5, width + 5),
+                        _random.Next(-5, height + 5),
+                        size, size);
                 }
             }
         }
 
-        private static void AddRandomLines(Graphics graphics, int width, int height)
+        private void DrawEnhancedText(Graphics graphics, string text, int width, int height)
         {
-            var random = new Random();
-            using (var pen = new Pen(Color.Gray, 1))
+            float startX = width * 0.1f;
+            float startY = height * 0.3f;
+            float charSpacing = (width * 0.8f) / text.Length;
+
+            for (int i = 0; i < text.Length; i++)
             {
-                for (int i = 0; i < 5; i++)
-                {
-                    int x1 = random.Next(0, width);
-                    int y1 = random.Next(0, height);
-                    int x2 = random.Next(0, width);
-                    int y2 = random.Next(0, height);
-                    graphics.DrawLine(pen, x1, y1, x2, y2);
-                }
-            }
-        }
+                using var font = new Font(
+                    _fonts[_random.Next(_fonts.Length)],
+                    _random.Next(18, 28),
+                    FontStyle.Bold
+                );
 
-        private static void DrawDistortedText(Graphics graphics, string text, Font font, Brush brush, float startX, float startY)
-        {
-            var random = new Random();
-            float currentX = startX;
+                using var brush = new SolidBrush(Color.FromArgb(
+                    _random.Next(0, 80),
+                    _random.Next(0, 80),
+                    _random.Next(0, 80)
+                ));
 
-            foreach (char c in text)
-            {
-                // Apply random rotation between -15 and 15 degrees
-                float rotation = random.Next(-15, 15);
-
-                // Save the current graphics state
                 var state = graphics.Save();
 
-                // Rotate around the current character position
-                graphics.TranslateTransform(currentX, startY);
-                graphics.RotateTransform(rotation);
-                graphics.DrawString(c.ToString(), font, brush, 0, 0);
+                // Enhanced distortion with variable rotation and position
+                float x = startX + (i * charSpacing) + _random.Next(-5, 5);
+                float y = startY + _random.Next(-5, 5);
+                graphics.TranslateTransform(x, y);
+                graphics.RotateTransform(_random.Next(-30, 30));
+                graphics.ScaleTransform(
+                    1.0f + (_random.Next(-10, 10) / 100.0f),
+                    1.0f + (_random.Next(-10, 10) / 100.0f)
+                );
 
-                // Restore graphics state
+                graphics.DrawString(text[i].ToString(), font, brush, 0, 0);
                 graphics.Restore(state);
+            }
+        }
 
-                // Move to next character position
-                currentX += graphics.MeasureString(c.ToString(), font).Width;
+        private void AddOverlappingDistortion(Graphics graphics, int width, int height)
+        {
+            // Add curves and lines with varying thickness and opacity
+            for (int i = 0; i < _random.Next(3, 6); i++)
+            {
+                using var pen = new Pen(
+                    Color.FromArgb(_random.Next(30, 90), _random.Next(0, 100), _random.Next(0, 100), _random.Next(0, 100)),
+                    _random.Next(1, 3)
+                );
+
+                var points = new Point[_random.Next(3, 6)];
+                for (int j = 0; j < points.Length; j++)
+                {
+                    points[j] = new Point(
+                        _random.Next(0, width),
+                        _random.Next(0, height)
+                    );
+                }
+
+                if (_random.Next(2) == 0)
+                {
+                    graphics.DrawCurve(pen, points);
+                }
+                else
+                {
+                    graphics.DrawLines(pen, points);
+                }
             }
         }
     }
