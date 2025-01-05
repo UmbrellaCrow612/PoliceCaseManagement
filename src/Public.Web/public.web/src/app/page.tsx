@@ -1,100 +1,238 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PhoneCall,
+  Mail,
+  MapPin,
+  Shield,
+  Users,
+  Bell,
+  FileText,
+  Calendar,
+} from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-blue-900 text-white">
+        <div className="container mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center">
+          <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+            <Shield className="h-8 w-8" />
+            <span className="text-2xl font-bold">City Police Department</span>
+          </div>
+          <nav>
+            <ul className="flex flex-wrap justify-center sm:space-x-4">
+              <li className="w-1/2 sm:w-auto text-center mb-2 sm:mb-0">
+                <Link href="#about" className="hover:underline">
+                  About
+                </Link>
+              </li>
+              <li className="w-1/2 sm:w-auto text-center mb-2 sm:mb-0">
+                <Link href="#services" className="hover:underline">
+                  Services
+                </Link>
+              </li>
+              <li className="w-1/2 sm:w-auto text-center mb-2 sm:mb-0">
+                <Link href="#community" className="hover:underline">
+                  Community
+                </Link>
+              </li>
+              <li className="w-1/2 sm:w-auto text-center">
+                <Link href="#contact" className="hover:underline">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
+      </header>
+
+      <main className="flex-grow">
+        <section className="bg-blue-800 text-white py-12 sm:py-20">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+              Serving and Protecting Our Community
+            </h1>
+            <p className="text-lg sm:text-xl mb-8">24/7 Emergency: Call 911</p>
+            <Link href="/report" className="w-full sm:w-auto px-3 py-2 border">
+              Report a Non-Emergency
+            </Link>
+          </div>
+        </section>
+
+        <section id="about" className="py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+              About Our Department
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Our Mission</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    To serve our community with integrity, respect, and
+                    professionalism, ensuring the safety and well-being of all
+                    citizens.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Our Values</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc list-inside">
+                    <li>Integrity</li>
+                    <li>Respect</li>
+                    <li>Accountability</li>
+                    <li>Excellence</li>
+                    <li>Community Partnership</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" className="bg-gray-100 py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+              Our Services
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <Card>
+                <CardHeader>
+                  <Users className="h-8 w-8 mb-2" />
+                  <CardTitle>Community Policing</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    Engaging with the community to build trust and solve
+                    problems together.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <Bell className="h-8 w-8 mb-2" />
+                  <CardTitle>Emergency Response</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    Rapid response to emergencies and critical incidents to
+                    ensure public safety.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <FileText className="h-8 w-8 mb-2" />
+                  <CardTitle>Crime Prevention</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    Proactive measures and education to prevent crime in our
+                    community.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section id="community" className="py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+              Community Engagement
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upcoming Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    <li className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
+                      <span>Community Safety Workshop - June 15</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
+                      <span>National Night Out - August 3</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
+                      <span>Youth Police Academy - July 10-14</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Volunteer Opportunities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4">
+                    Get involved and make a difference in your community:
+                  </p>
+                  <Button className="w-full sm:w-auto">
+                    Learn More About Volunteering
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="bg-blue-900 text-white py-12 sm:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+              Contact Us
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center text-center">
+                <PhoneCall className="h-12 w-12 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Phone</h3>
+                <p>Emergency: 911</p>
+                <p>Non-Emergency: (555) 123-4567</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <Mail className="h-12 w-12 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Email</h3>
+                <p>info@citypolicedept.gov</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <MapPin className="h-12 w-12 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Address</h3>
+                <p>123 Main Street</p>
+                <p>City, State 12345</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p>&copy; 2023 City Police Department. All rights reserved.</p>
+          <div className="mt-4 space-y-2 sm:space-y-0">
+            <Link
+              href="/privacy"
+              className="hover:underline block sm:inline-block sm:mr-4"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/accessibility"
+              className="hover:underline block sm:inline-block"
+            >
+              Accessibility
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
