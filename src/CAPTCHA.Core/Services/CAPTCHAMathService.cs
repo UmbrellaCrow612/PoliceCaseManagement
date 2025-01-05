@@ -6,13 +6,11 @@ namespace CAPTCHA.Core.Services
         public static (byte[] imgQuestionBytes, CAPTCHAMathQuestion question) CreateQuestion()
         {
             var random = new Random();
-            int num1 = random.Next(1, 50); 
-            int num2 = random.Next(1, 50); 
+            int num1 = random.Next(1, 50);
+            int num2 = random.Next(1, 50);
             char[] operations = { '+', '-', '*', '/' };
             char operation = operations[random.Next(operations.Length)];
-
             string expression = $"{num1} {operation} {num2}";
-
             double answer = operation switch
             {
                 '+' => num1 + num2,
@@ -28,13 +26,10 @@ namespace CAPTCHA.Core.Services
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };
 
-            return ([], question);
-        }
+            var imgService = new CAPTCHAImgService();
+            var bytes = imgService.CreateImg(question, expression);
 
-
-        public bool VaidateQuestion(CAPTCHAMathQuestion question)
-        {
-            throw new NotImplementedException();
+            return (bytes, question);
         }
     }
 }

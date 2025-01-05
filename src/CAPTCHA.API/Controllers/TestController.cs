@@ -10,9 +10,9 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public ActionResult Test()
         {
-            var test = CAPTCHAMathService.CreateQuestion();
+            var (imgQuestionBytes, question) = CAPTCHAMathService.CreateQuestion();
 
-            return Ok();
+            return Ok(imgQuestionBytes);
         }
     }
 }
