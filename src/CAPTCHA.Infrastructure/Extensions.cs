@@ -1,7 +1,6 @@
 ﻿namespace CAPTCHA.Infrastructure
 {
-    public class Class1
+    public static class Extensions
     {
-
     }
 }

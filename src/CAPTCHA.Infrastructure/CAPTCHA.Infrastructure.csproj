@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CAPTCHA.Core\CAPTCHA.Core.csproj" />
+  </ItemGroup>
+
 </Project>
