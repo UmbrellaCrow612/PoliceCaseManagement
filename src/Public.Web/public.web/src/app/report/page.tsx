@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import Link from "next/link";
-import { Shield, ArrowLeft } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,14 +17,26 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+type FormData = {
+  name: string;
+  email: string;
+  phone: string;
+  incidentType: string;
+  location: string;
+  date: string;
+  time: string;
+  description: string;
+};
+
 export default function ReportPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = (data: FormData) => {
     // Here you would typically send the form data to your backend
-    // For this example, we'll just set isSubmitted to true
+    console.log(data);
     setIsSubmitted(true);
+    reset();
   };
 
   return (
@@ -56,23 +69,51 @@ export default function ReportPage() {
           </CardHeader>
           <CardContent>
             {!isSubmitted ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" required />
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input 
+                      id="name" 
+                      {...register("name", { required: "Full name is required" })}
+                    />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      {...register("email", { 
+                        required: "Email is required",
+                        pattern: {
+                          value: /\S+@\S+\.\S+/,
+                          message: "Invalid email address"
+                        }
+                      })}
+                    />
+                    {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" required />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    {...register("phone", { 
+                      required: "Phone number is required",
+                      pattern: {
+                        value: /^[0-9]{10}$/,
+                        message: "Invalid phone number, please use 10 digits"
+                      }
+                    })}
+                  />
+                  {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label>Incident Type</Label>
                   <RadioGroup
-                    defaultValue="property"
+                    {...register("incidentType", { required: "Please select an incident type" })}
                     className="flex flex-col space-y-1"
                   >
                     <div className="flex items-center space-x-2">
@@ -92,22 +133,49 @@ export default function ReportPage() {
                       <Label htmlFor="other">Other</Label>
                     </div>
                   </RadioGroup>
+                  {errors.incidentType && <p className="text-red-500 text-sm">{errors.incidentType.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location">Incident Location</Label>
-                  <Input id="location" required />
+                  <Input 
+                    id="location" 
+                    {...register("location", { required: "Incident location is required" })}
+                  />
+                  {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date">Date of Incident</Label>
-                  <Input id="date" type="date" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="time">Time of Incident</Label>
-                  <Input id="time" type="time" required />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Date of Incident</Label>
+                    <Input 
+                      id="date" 
+                      type="date" 
+                      {...register("date", { required: "Date is required" })}
+                    />
+                    {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="time">Time of Incident</Label>
+                    <Input 
+                      id="time" 
+                      type="time" 
+                      {...register("time", { required: "Time is required" })}
+                    />
+                    {errors.time && <p className="text-red-500 text-sm">{errors.time.message}</p>}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Incident Description</Label>
-                  <Textarea id="description" required />
+                  <Textarea 
+                    id="description" 
+                    {...register("description", { 
+                      required: "Description is required",
+                      minLength: {
+                        value: 20,
+                        message: "Description must be at least 20 characters long"
+                      }
+                    })}
+                  />
+                  {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                 </div>
                 <Button type="submit" className="w-full">
                   Submit Report
@@ -134,16 +202,16 @@ export default function ReportPage() {
       <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <p>&copy; 2023 City Police Department. All rights reserved.</p>
-          <div className="mt-4 space-y-2 sm:space-y-0">
+          <div className="mt-4 space-x-4">
             <Link
               href="/privacy"
-              className="hover:underline block sm:inline-block sm:mr-4"
+              className="hover:underline inline-block"
             >
               Privacy Policy
             </Link>
             <Link
               href="/accessibility"
-              className="hover:underline block sm:inline-block"
+              className="hover:underline inline-block"
             >
               Accessibility
             </Link>
@@ -153,3 +221,4 @@ export default function ReportPage() {
     </div>
   );
 }
+
