@@ -9,5 +9,7 @@ namespace CAPTCHA.Infrastructure.Data.Stores.Interfaces
         Task<CAPTCHAMathQuestion?> FindByIdAsync(string captchaMathQuestionId);
 
         Task<bool> ExistsAsync(string captchaMathQuestionId);
+
+        Task UpdateAsync(CAPTCHAMathQuestion question);
     }
 }

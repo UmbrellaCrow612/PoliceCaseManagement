@@ -22,7 +22,7 @@ namespace CAPTCHA.Core.Services
 
             var question = new CAPTCHAMathQuestion
             {
-                Answer = answer.ToString(),
+                AnswerHash = answer.ToString(),
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };
 

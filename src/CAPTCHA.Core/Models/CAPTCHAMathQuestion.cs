@@ -3,7 +3,9 @@
     public class CAPTCHAMathQuestion
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public required string Answer {  get; set; }
+
+        private const int MaxAttempts = 3;
+        public required string AnswerHash {  get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public required DateTime ExpiresAt {  get; set; }
         public bool IsSuccessful { get; set; } = false;
@@ -27,6 +29,11 @@
             return true;
         }
 
+        public bool CheckAnswer(string givenAnswer)
+        {
+            return string.Equals(AnswerHash, givenAnswer, StringComparison.Ordinal);
+        }
+
         public void MarkAsSuccessful()
         {
             SuccessfulAt = DateTime.UtcNow;
@@ -39,13 +46,24 @@
             IPAddress = ipAddress;
         }
 
+        public bool UserEntriesExists()
+        {
+            return !string.IsNullOrWhiteSpace(UserAgent) && !string.IsNullOrWhiteSpace(IPAddress);
+        }
+
+        public bool Suspicious(string userAgent, string ipAddress)
+        {
+            return UserAgent != userAgent || IPAddress != ipAddress;
+        }
+
         public void IncrementAttempts()
         {
             Attempts += 1;
         }
-    }
 
-    // The answer will be a math expression hshed btypes sent across with the ID of the question, we wont store that part
-    // Then that ill be decrptyed on frontnend and displayed
-    // thy wuld sed {idOfCaptcha: 123, answer: 123}
+        public bool MaxAttemptLimitReached()
+        {
+            return Attempts >= MaxAttempts;
+        }
+    }
 }
