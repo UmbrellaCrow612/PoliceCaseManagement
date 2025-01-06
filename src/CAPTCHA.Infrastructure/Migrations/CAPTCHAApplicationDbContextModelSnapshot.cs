@@ -22,9 +22,8 @@ namespace CAPTCHA.Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AnswerHash")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Answer")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("Attempts")
                         .HasColumnType("INTEGER");

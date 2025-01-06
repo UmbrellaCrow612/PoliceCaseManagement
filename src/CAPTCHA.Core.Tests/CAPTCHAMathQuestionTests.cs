@@ -10,7 +10,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5)
             };
 
@@ -27,7 +27,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(-1)
             };
 
@@ -44,7 +44,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5),
                 IsSuccessful = true
             };
@@ -62,7 +62,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5)
             };
 
@@ -81,7 +81,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5)
             };
             var userAgent = "Mozilla/5.0";
@@ -101,7 +101,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5),
                 Attempts = 2
             };
@@ -119,7 +119,7 @@ namespace CAPTCHA.Core.Tests
             // Arrange
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = "42",
+                Answer = "42",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5)
             };
 

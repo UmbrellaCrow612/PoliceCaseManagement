@@ -20,9 +20,11 @@ namespace CAPTCHA.Core.Services
                 _ => throw new InvalidOperationException("Unsupported operation")
             };
 
+            answer = Math.Round(answer, 1);
+
             var question = new CAPTCHAMathQuestion
             {
-                AnswerHash = answer.ToString(),
+                Answer = answer,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };
 

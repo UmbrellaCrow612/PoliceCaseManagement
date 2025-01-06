@@ -5,7 +5,7 @@
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         private const int MaxAttempts = 3;
-        public required string AnswerHash {  get; set; }
+        public double Answer {  get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public required DateTime ExpiresAt {  get; set; }
         public bool IsSuccessful { get; set; } = false;
@@ -29,9 +29,9 @@
             return true;
         }
 
-        public bool CheckAnswer(string givenAnswer)
+        public bool CheckAnswer(double answer)
         {
-            return string.Equals(AnswerHash, givenAnswer, StringComparison.Ordinal);
+            return Answer == answer;
         }
 
         public void MarkAsSuccessful()

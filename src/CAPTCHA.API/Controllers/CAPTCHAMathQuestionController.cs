@@ -28,6 +28,7 @@ namespace CAPTCHA.API.Controllers
 
             var convertedSuc = double.TryParse(dto.Answer, out var answer);
             if (!convertedSuc) return BadRequest("Answer must be a double precsion number.");
+            answer = Math.Round(answer, 1);
 
             var question = await _mathQuestionStore.FindByIdAsync(dto.MathQuestionId);
             if(question is null) return NotFound("Question not found.");
@@ -49,10 +50,11 @@ namespace CAPTCHA.API.Controllers
             }
 
             question.SetUser(userAgent, ipAddress ?? "unknown");
-            if (!question.CheckAnswer(answer.ToString()))
+
+            if (!question.CheckAnswer(answer))
             {
                 await _mathQuestionStore.UpdateAsync(question);
-                return BadRequest("AnswerHash incorrect.");
+                return BadRequest("Answer incorrect.");
             }
 
             question.MarkAsSuccessful();

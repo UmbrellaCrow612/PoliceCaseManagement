@@ -16,7 +16,7 @@ namespace CAPTCHA.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    AnswerHash = table.Column<string>(type: "TEXT", nullable: false),
+                    Answer = table.Column<double>(type: "REAL", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
