@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { Shield, ArrowLeft } from 'lucide-react';
@@ -30,17 +30,81 @@ type FormData = {
 
 export default function ReportPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [captchaImage, setCaptchaImage] = useState<string | null>(null);
+  const [captchaId, setCaptchaId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
-  const onSubmit = (data: FormData) => {
-    // Here you would typically send the form data to your backend
-    console.log(data);
-    setIsSubmitted(true);
-    reset();
+  const fetchCaptcha = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('https://localhost:7052/captcha/math-questions');
+      if (!response.ok) {
+        throw new Error('Failed to fetch CAPTCHA');
+      }
+      const data = await response.json();
+      setCaptchaImage(`data:image/png;base64,${data.bytes}`);
+      setCaptchaId(data.id);
+    } catch (err) {
+      setError('Failed to load CAPTCHA. Please try again.');
+      console.error('Error fetching CAPTCHA:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
+  const verifyCaptcha = async (answer: string) => {
+    try {
+      const response = await fetch('https://localhost:7052/captcha/math-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mathQuestionId: captchaId,
+          answer: answer,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('CAPTCHA verification failed');
+      }
+      return true;
+    } catch (err) {
+      console.error('Error verifying CAPTCHA:', err);
+      return false;
+    }
+  };
+
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const isCaptchaValid = await verifyCaptcha(data.captchaAnswer);
+      if (!isCaptchaValid) {
+        setError('CAPTCHA verification failed. Please try again.');
+        await fetchCaptcha(); // Fetch a new CAPTCHA
+        return;
+      }
+      // Here you would typically send the form data to your backend
+      console.log(data);
+      setIsSubmitted(true);
+      reset();
+    } catch (err) {
+      setError('An error occurred while submitting the form. Please try again.');
+      console.error('Error submitting form:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col w-full h-full">
       <header className="bg-blue-900 text-white">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2">
@@ -177,8 +241,27 @@ export default function ReportPage() {
                   />
                   {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                 </div>
-                <Button type="submit" className="w-full">
-                  Submit Report
+                 {/* CAPTCHA Section */}
+                 <div className="space-y-2">
+                  <Label htmlFor="captcha">CAPTCHA Verification</Label>
+                  {captchaImage && (
+                    <img src={captchaImage} alt="CAPTCHA" className="mb-2" />
+                  )}
+                  <Input 
+                    id="captchaAnswer" 
+                    {...register("captchaAnswer", { required: "CAPTCHA answer is required" })}
+                    placeholder="Enter the answer to the math question"
+                  />
+                  {errors.captchaAnswer && <p className="text-red-500 text-sm">{errors.captchaAnswer.message}</p>}
+                  <Button type="button" onClick={fetchCaptcha} disabled={isLoading}>
+                    Refresh CAPTCHA
+                  </Button>
+                </div>
+
+                {error && <p className="text-red-500">{error}</p>}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Submitting...' : 'Submit Report'}
                 </Button>
               </form>
             ) : (

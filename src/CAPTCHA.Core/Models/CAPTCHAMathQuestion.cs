@@ -31,7 +31,7 @@
 
         public bool CheckAnswer(double answer)
         {
-            return Answer == answer;
+            return Math.Abs(Answer - answer) < 0.0001; 
         }
 
         public void MarkAsSuccessful()

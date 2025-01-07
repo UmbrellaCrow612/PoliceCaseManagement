@@ -5,131 +5,219 @@ namespace CAPTCHA.Core.Tests
     public class CAPTCHAMathQuestionTests
     {
         [Fact]
-        public void IsValid_ReturnsTrue_WhenNotExpiredAndNotSuccessful()
+        public void IsValid_ShouldReturnFalse_WhenExpired()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
+            var captcha = new CAPTCHAMathQuestion
             {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+                ExpiresAt = DateTime.UtcNow.AddSeconds(-1) // Already expired
             };
 
             // Act
-            var result = question.IsValid();
+            var result = captcha.IsValid();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void IsValid_ShouldReturnFalse_WhenAlreadySuccessful()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion
+            {
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                IsSuccessful = true
+            };
+
+            // Act
+            var result = captcha.IsValid();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void IsValid_ShouldReturnTrue_WhenValid()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion
+            {
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                IsSuccessful = false
+            };
+
+            // Act
+            var result = captcha.IsValid();
 
             // Assert
             Assert.True(result);
         }
 
         [Fact]
-        public void IsValid_ReturnsFalse_WhenExpired()
+        public void CheckAnswer_ShouldReturnTrue_ForCorrectAnswer()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
+            var captcha = new CAPTCHAMathQuestion
             {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(-1)
+                Answer = 42.0,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1)
             };
 
             // Act
-            var result = question.IsValid();
+            var result = captcha.CheckAnswer(42.0);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckAnswer_ShouldReturnFalse_ForIncorrectAnswer()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion
+            {
+                Answer = 42.0,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1)
+            };
+
+            // Act
+            var result = captcha.CheckAnswer(41.9999);
 
             // Assert
             Assert.False(result);
         }
 
         [Fact]
-        public void IsValid_ReturnsFalse_WhenAlreadySuccessful()
+        public void MarkAsSuccessful_ShouldSetPropertiesCorrectly()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
+            var captcha = new CAPTCHAMathQuestion()
             {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
-                IsSuccessful = true
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1)
             };
 
             // Act
-            var result = question.IsValid();
+            captcha.MarkAsSuccessful();
 
             // Assert
-            Assert.False(result);
+            Assert.True(captcha.IsSuccessful);
+            Assert.NotNull(captcha.SuccessfulAt);
         }
 
         [Fact]
-        public void MarkAsSuccessful_SetsIsSuccessfulAndSuccessfulAt()
+        public void SetUser_ShouldSetUserPropertiesCorrectly()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
+            var captcha = new CAPTCHAMathQuestion()
             {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1)
             };
-
-            // Act
-            question.MarkAsSuccessful();
-
-            // Assert
-            Assert.True(question.IsSuccessful);
-            Assert.NotNull(question.SuccessfulAt);
-            Assert.True(question.SuccessfulAt <= DateTime.UtcNow);
-        }
-
-        [Fact]
-        public void SetUser_SetsUserAgentAndIPAddress()
-        {
-            // Arrange
-            var question = new CAPTCHAMathQuestion
-            {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5)
-            };
-            var userAgent = "Mozilla/5.0";
+            var userAgent = "TestUserAgent";
             var ipAddress = "127.0.0.1";
 
             // Act
-            question.SetUser(userAgent, ipAddress);
+            captcha.SetUser(userAgent, ipAddress);
 
             // Assert
-            Assert.Equal(userAgent, question.UserAgent);
-            Assert.Equal(ipAddress, question.IPAddress);
+            Assert.Equal(userAgent, captcha.UserAgent);
+            Assert.Equal(ipAddress, captcha.IPAddress);
         }
 
         [Fact]
-        public void IncrementAttempts_IncreasesAttemptsByOne()
+        public void UserEntriesExists_ShouldReturnTrue_WhenUserSet()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
-            {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
-                Attempts = 2
-            };
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+            captcha.SetUser("TestUserAgent", "127.0.0.1");
 
             // Act
-            question.IncrementAttempts();
+            var result = captcha.UserEntriesExists();
 
             // Assert
-            Assert.Equal(3, question.Attempts);
+            Assert.True(result);
         }
 
         [Fact]
-        public void DefaultValues_AreSetCorrectly()
+        public void UserEntriesExists_ShouldReturnFalse_WhenUserNotSet()
         {
             // Arrange
-            var question = new CAPTCHAMathQuestion
-            {
-                Answer = "42",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5)
-            };
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
 
-            // Act & Assert
-            Assert.False(question.IsSuccessful);
-            Assert.Equal(0, question.Attempts);
-            Assert.NotNull(question.Id);
-            Assert.Null(question.SuccessfulAt);
-            Assert.Null(question.UserAgent);
-            Assert.Null(question.IPAddress);
+            // Act
+            var result = captcha.UserEntriesExists();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Suspicious_ShouldReturnTrue_ForMismatchedUserAgentOrIpAddress()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+            captcha.SetUser("TestUserAgent", "127.0.0.1");
+
+            // Act
+            var result = captcha.Suspicious("OtherUserAgent", "127.0.0.2");
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Suspicious_ShouldReturnFalse_ForMatchingUserAgentAndIpAddress()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+            captcha.SetUser("TestUserAgent", "127.0.0.1");
+
+            // Act
+            var result = captcha.Suspicious("TestUserAgent", "127.0.0.1");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void IncrementAttempts_ShouldIncreaseAttemptsCount()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+
+            // Act
+            captcha.IncrementAttempts();
+
+            // Assert
+            Assert.Equal(1, captcha.Attempts);
+        }
+
+        [Fact]
+        public void MaxAttemptLimitReached_ShouldReturnTrue_WhenLimitReached()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+            captcha.Attempts = 3;
+
+            // Act
+            var result = captcha.MaxAttemptLimitReached();
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void MaxAttemptLimitReached_ShouldReturnFalse_WhenBelowLimit()
+        {
+            // Arrange
+            var captcha = new CAPTCHAMathQuestion() { ExpiresAt = DateTime.UtcNow.AddMinutes(1) };
+            captcha.Attempts = 2;
+
+            // Act
+            var result = captcha.MaxAttemptLimitReached();
+
+            // Assert
+            Assert.False(result);
         }
     }
 }
