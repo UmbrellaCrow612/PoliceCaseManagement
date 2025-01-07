@@ -33,7 +33,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    ValueInPlainText = table.Column<string>(type: "TEXT", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
                     UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
@@ -67,7 +66,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    ValueInPlainText = table.Column<string>(type: "TEXT", nullable: false),
                     CAPTCHAGridParentQuestionId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>

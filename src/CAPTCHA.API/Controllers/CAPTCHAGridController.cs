@@ -15,15 +15,16 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
         {
-            var (question, parentsChildren, fullChildren) = CAPTCHAGridParentQuestionService.CreateQuestion();
+            var (questionText, question, answerChildren, fullChildren) = CAPTCHAGridParentQuestionService.CreateQuestion();
             await _gridStore.AddAsync(question);
-            await _childStore.AddManyAsync(parentsChildren);
+            await _childStore.AddManyAsync(answerChildren);
 
             var children = fullChildren.Select(x => new { x.Id, Bytes = x.GetTempBytes() });
 
             return Ok(new
             {
                 id = question.Id,
+                text = questionText,
                 children,
             });
         }

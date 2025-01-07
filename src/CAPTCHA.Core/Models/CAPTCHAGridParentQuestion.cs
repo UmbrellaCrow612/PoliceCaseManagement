@@ -3,7 +3,6 @@
     public class CAPTCHAGridParentQuestion
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public required string ValueInPlainText { get; set; }
         public ICollection<CAPTCHAGridChild> Children { get; set; } = [];
 
         public required DateTime ExpiresAt { get; set; }
@@ -32,7 +31,6 @@
     public class CAPTCHAGridChild
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public required string ValueInPlainText { get; set; }
 
 
         private byte[] _tempBytes = [];

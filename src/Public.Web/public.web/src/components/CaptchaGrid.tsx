@@ -14,6 +14,7 @@ interface CaptchaChild {
 
 interface CaptchaData {
   id: string
+  text : string
   children: CaptchaChild[]
 }
 
@@ -70,7 +71,7 @@ export default function CaptchaGrid() {
         </div>
       ) : data ? (
         <>
-          <p className="mb-4">Parent ID: {data.id}</p>
+          <p className="mb-4">Parent ID: {data.id} Value you need to make by picking selected children: {data.text}</p>
           <div className="grid grid-cols-3 gap-4">
             {data.children.map((child) => (
               <div key={child.id} className="relative h-32">

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPTCHA.Infrastructure.Migrations
 {
     [DbContext(typeof(CAPTCHAApplicationDbContext))]
-    [Migration("20250107175727_New")]
+    [Migration("20250107190142_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -58,10 +58,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ValueInPlainText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CAPTCHAGridParentQuestionId");
@@ -81,10 +77,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ValueInPlainText")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

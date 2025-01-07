@@ -4,20 +4,21 @@ namespace CAPTCHA.Core.Services
 {
     public class CAPTCHAGridParentQuestionService
     {
-        public static (CAPTCHAGridParentQuestion question, ICollection<CAPTCHAGridChild> parentsChildren, ICollection<CAPTCHAGridChild> fullChildren) CreateQuestion()
+        public static (string questionText, CAPTCHAGridParentQuestion question, ICollection<CAPTCHAGridChild> answerChildren, ICollection<CAPTCHAGridChild> fullChildren) CreateQuestion()
         {
             var imgService = new CAPTCHAImgService();
-            var rn = RandomStringService.GenerateRandomString(12); 
+            var randomString = RandomStringService.GenerateRandomString(12);
+
+            var questionText = randomString[..2];
 
             var question = new CAPTCHAGridParentQuestion()
             {
-                ValueInPlainText = rn[..2],
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };
 
-            var allRandomStrings = rn.ToCharArray(); 
+            var allRandomStrings = randomString.ToCharArray(); 
 
-            List<CAPTCHAGridChild> parentsChildren = [];
+            List<CAPTCHAGridChild> answerChildren = [];
             List<CAPTCHAGridChild> fullChildren = [];
 
             foreach (var component in allRandomStrings)
@@ -25,21 +26,22 @@ namespace CAPTCHA.Core.Services
                 var child = new CAPTCHAGridChild
                 {
                     CAPTCHAGridParentQuestionId = question.Id,
-                    ValueInPlainText = component.ToString()
                 };
 
-                if (question.ValueInPlainText.Contains(child.ValueInPlainText))
+                if (questionText.Contains(component))
                 {
-                    parentsChildren.Add(child);
+                    answerChildren.Add(child);
                 }
 
                 fullChildren.Add(child);
 
-                var bytes = imgService.CreateImg(question, child.ValueInPlainText);
+                var bytes = imgService.CreateImg(question, component.ToString());
                 child.SetTempBytes(bytes);
             }
 
-            return (question, parentsChildren, fullChildren);
+            fullChildren = [.. fullChildren.OrderBy(x => Guid.NewGuid())]; // change order
+
+            return (questionText, question, answerChildren, fullChildren);
         }
 
 

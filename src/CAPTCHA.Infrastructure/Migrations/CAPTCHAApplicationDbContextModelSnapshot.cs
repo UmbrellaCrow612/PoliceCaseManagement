@@ -55,10 +55,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ValueInPlainText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CAPTCHAGridParentQuestionId");
@@ -78,10 +74,6 @@ namespace CAPTCHA.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ValueInPlainText")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
