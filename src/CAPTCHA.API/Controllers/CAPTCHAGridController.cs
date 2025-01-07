@@ -10,12 +10,14 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
         {
-            var (childrenAsBytes, question, parentsChildren) = CAPTCHAGridParentQuestionService.CreateQuestion();
+            var (question, parentsChildren) = CAPTCHAGridParentQuestionService.CreateQuestion();
+
+            var children = parentsChildren.Select(x => new { x.Id, Bytes = x.GetTempBytes() });
 
             return Ok(new
             {
                 id = question.Id,
-                childrenAsBytes,
+                children,
             });
         }
     }

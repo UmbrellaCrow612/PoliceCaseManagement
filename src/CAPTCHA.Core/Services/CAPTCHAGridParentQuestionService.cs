@@ -4,7 +4,7 @@ namespace CAPTCHA.Core.Services
 {
     public class CAPTCHAGridParentQuestionService
     {
-        public static (ICollection<byte[]> childrenAsBytes, CAPTCHAGridParentQuestion question, ICollection<CAPTCHAGridChild> parentsChildren) CreateQuestion()
+        public static (CAPTCHAGridParentQuestion question, ICollection<CAPTCHAGridChild> parentsChildren) CreateQuestion()
         {
             var imgService = new CAPTCHAImgService();
             var rn = RandomStringService.GenerateRandomString(12);
@@ -14,24 +14,23 @@ namespace CAPTCHA.Core.Services
             var componentsOfValue = rn.ToCharArray();
 
             List<CAPTCHAGridChild> parentsChildren = [];
-            List<byte[]> childrenAsBytes = [];
 
             foreach (var component in componentsOfValue)
             {
-                parentsChildren.Add(new CAPTCHAGridChild 
-                { 
-                    CAPTCHAGridParentQuestionId = question.Id, 
-                    ValueInPlainText = component.ToString() 
-                });
-            }
+                var child = new CAPTCHAGridChild
+                {
+                    CAPTCHAGridParentQuestionId = question.Id,
+                    ValueInPlainText = component.ToString()
+                };
 
-            foreach (var child in parentsChildren)
-            {
+                parentsChildren.Add(child);
+
                 var bytes = imgService.CreateImg(question, child.ValueInPlainText);
-                childrenAsBytes.Add(bytes);
+                
+                child.SetTempBytes(bytes);
             }
 
-            return (childrenAsBytes, question, parentsChildren);
+            return (question, parentsChildren);
         }
     }
 }

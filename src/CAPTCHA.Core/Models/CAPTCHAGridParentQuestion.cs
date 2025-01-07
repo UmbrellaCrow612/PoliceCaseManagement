@@ -12,7 +12,19 @@
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string ValueInPlainText { get; set; }
 
+
+        private byte[] _tempBytes = [];
+        public void SetTempBytes(byte[] bytes)
+        {
+            _tempBytes = bytes;
+        }
+
+        public byte[] GetTempBytes()
+        {
+            return _tempBytes;
+        }
+
         public required string CAPTCHAGridParentQuestionId { get; set; }
-        public CAPTCHAGridParentQuestion? question { get; set; } = null;
+        public CAPTCHAGridParentQuestion? Question { get; set; } = null;
     }
 }
