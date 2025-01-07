@@ -14,5 +14,10 @@ namespace CAPTCHA.Core.Services
         /// <param name="expression">The expression to be served to users you want to convert to a img.</param>
         /// <returns>Byte array of the img.</returns>
         byte[] CreateImg(CAPTCHAMathQuestion question, string expression);
+
+        /// <summary>
+        /// Create a byte array img for a <see cref="CAPTCHAGridParentQuestion"/> the component is the value of a child component
+        /// </summary>
+        byte[] CreateImg(CAPTCHAGridParentQuestion question, string component);
     }
 }

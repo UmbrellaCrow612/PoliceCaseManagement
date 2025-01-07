@@ -7,7 +7,7 @@ namespace CAPTCHA.Core.Services
     {
         public static (byte[] audioInBytes, CAPTCHAAudioQuestion question) CreateQuestion()
         {
-            var sentence = string.Join(" ", WordBank.GetRandomWords(3));
+            var sentence = string.Join(" ", WordBank.GetRandomWords(2));
 
             var bytes = AudioService.ConvertSentenceToAudioBytes(sentence);
 

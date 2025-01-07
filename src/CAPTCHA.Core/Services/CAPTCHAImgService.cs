@@ -141,5 +141,37 @@ namespace CAPTCHA.Core.Services
                 }
             }
         }
+
+        public byte[] CreateImg(CAPTCHAGridParentQuestion question, string component)
+        {
+            // Image dimensions with slight randomization
+            int width = _random.Next(100, 150);
+            int height = _random.Next(50, 70);
+
+            using var bitmap = new Bitmap(width, height);
+            using var graphics = Graphics.FromImage(bitmap);
+            using var memoryStream = new MemoryStream();
+
+            // Enhanced quality settings
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            // Random background pattern
+            CreateRandomBackground(graphics, width, height);
+
+            // Add complex noise patterns
+            AddComplexNoise(graphics, width, height);
+
+            // Draw the component text with enhanced distortion
+            DrawEnhancedText(graphics, component, width, height);
+
+            // Add overlapping lines and curves
+            AddOverlappingDistortion(graphics, width, height);
+
+            bitmap.Save(memoryStream, ImageFormat.Png);
+            return memoryStream.ToArray();
+        }
+
     }
 }
