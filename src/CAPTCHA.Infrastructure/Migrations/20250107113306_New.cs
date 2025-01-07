@@ -12,6 +12,23 @@ namespace CAPTCHA.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "CAPTCHAAudioQuestions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    AnswerInPlainText = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attempts = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CAPTCHAAudioQuestions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CAPTCHAMathQuestions",
                 columns: table => new
                 {
@@ -34,6 +51,9 @@ namespace CAPTCHA.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CAPTCHAAudioQuestions");
+
             migrationBuilder.DropTable(
                 name: "CAPTCHAMathQuestions");
         }

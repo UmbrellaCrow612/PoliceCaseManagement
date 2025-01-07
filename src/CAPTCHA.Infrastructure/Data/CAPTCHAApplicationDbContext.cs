@@ -6,6 +6,7 @@ namespace CAPTCHA.Infrastructure.Data
     public class CAPTCHAApplicationDbContext(DbContextOptions<CAPTCHAApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<CAPTCHAMathQuestion> CAPTCHAMathQuestions { get; set; }
+        public DbSet<CAPTCHAAudioQuestion> CAPTCHAAudioQuestions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

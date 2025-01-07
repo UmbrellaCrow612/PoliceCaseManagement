@@ -17,6 +17,35 @@ namespace CAPTCHA.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAAudioQuestion", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AnswerInPlainText")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("SuccessfulAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CAPTCHAAudioQuestions");
+                });
+
             modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAMathQuestion", b =>
                 {
                     b.Property<string>("Id")

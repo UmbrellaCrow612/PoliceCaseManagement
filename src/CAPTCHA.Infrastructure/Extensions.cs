@@ -19,6 +19,7 @@ namespace CAPTCHA.Infrastructure
 
 
             services.AddScoped<ICAPTCHAMathQuestionStore, CAPTCHAMathQuestionStore>();
+            services.AddScoped<ICAPTCHAAudioQuestionStore, CAPTCHAAudioQuestionStore>();
 
             return services;
         }
