@@ -14,7 +14,7 @@ interface CaptchaChild {
 
 interface CaptchaData {
   id: string
-  text : string
+  text: string
   children: CaptchaChild[]
 }
 
@@ -22,10 +22,14 @@ export default function CaptchaGrid() {
   const [data, setData] = useState<CaptchaData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
 
   const fetchData = async () => {
     setIsLoading(true)
     setError(null)
+    setValidationMessage(null)
+    setSelectedIds([])
     try {
       const response = await fetch('https://localhost:7052/captcha/grid')
       if (!response.ok) {
@@ -38,6 +42,38 @@ export default function CaptchaGrid() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleValidate = async () => {
+    if (!data) return
+
+    try {
+      const response = await fetch('https://localhost:7052/captcha/grid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: data.id,
+          selectedIds,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      setValidationMessage(result.message || 'Validation successful!')
+    } catch (err) {
+      setValidationMessage(err instanceof Error ? err.message : 'Validation failed.')
+    }
+  }
+
+  const toggleSelection = (childId: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId]
+    )
   }
 
   useEffect(() => {
@@ -71,22 +107,39 @@ export default function CaptchaGrid() {
         </div>
       ) : data ? (
         <>
-          <p className="mb-4">Parent ID: {data.id} Value you need to make by picking selected children: {data.text}</p>
+          <p className="mb-4">
+            Parent ID: {data.id} Value you need to make by picking selected children: {data.text}
+          </p>
           <div className="grid grid-cols-3 gap-4">
             {data.children.map((child) => (
-              <div key={child.id} className="relative h-32">
+              <div
+                key={child.id}
+                className={`relative h-32 border-2 rounded-md ${
+                  selectedIds.includes(child.id) ? 'border-blue-500' : 'border-transparent'
+                } cursor-pointer`}
+                onClick={() => toggleSelection(child.id)}
+              >
                 <Image
                   src={`data:image/png;base64,${child.bytes}`}
                   alt={`Captcha image ${child.id}`}
                   fill
-                  className="object-cover rounded-md"
+                  className="rounded-md"
                 />
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Button onClick={handleValidate} disabled={selectedIds.length === 0}>
+              Validate Selection
+            </Button>
+            {validationMessage && (
+              <p className="mt-4 text-lg font-semibold">
+                {validationMessage}
+              </p>
+            )}
           </div>
         </>
       ) : null}
     </div>
   )
 }
-

@@ -13,16 +13,25 @@ namespace CAPTCHA.Core.Services
                 throw new ArgumentException("Size must be greater than zero.", nameof(size));
             }
 
+            if (size > Characters.Length)
+            {
+                throw new ArgumentException($"Size cannot exceed the number of unique characters ({Characters.Length}).", nameof(size));
+            }
+
             var random = new Random();
+            var characterList = Characters.ToList();
+
             var stringBuilder = new StringBuilder(size);
 
             for (int i = 0; i < size; i++)
             {
-                int index = random.Next(Characters.Length);
-                stringBuilder.Append(Characters[index]);
+                int index = random.Next(characterList.Count);
+                stringBuilder.Append(characterList[index]);
+                characterList.RemoveAt(index); // Remove the used character to avoid repetition
             }
 
             return stringBuilder.ToString();
         }
     }
+
 }
