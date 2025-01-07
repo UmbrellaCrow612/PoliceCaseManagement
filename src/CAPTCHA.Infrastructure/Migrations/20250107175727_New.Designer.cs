@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPTCHA.Infrastructure.Migrations
 {
     [DbContext(typeof(CAPTCHAApplicationDbContext))]
-    [Migration("20250107113306_New")]
+    [Migration("20250107175727_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -49,6 +49,49 @@ namespace CAPTCHA.Infrastructure.Migrations
                     b.ToTable("CAPTCHAAudioQuestions");
                 });
 
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridChild", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CAPTCHAGridParentQuestionId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ValueInPlainText")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CAPTCHAGridParentQuestionId");
+
+                    b.ToTable("CAPTCHAGridChildren");
+                });
+
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ValueInPlainText")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CAPTCHAGridParentQuestions");
+                });
+
             modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAMathQuestion", b =>
                 {
                     b.Property<string>("Id")
@@ -81,6 +124,22 @@ namespace CAPTCHA.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CAPTCHAMathQuestions");
+                });
+
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridChild", b =>
+                {
+                    b.HasOne("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", "Question")
+                        .WithMany("Children")
+                        .HasForeignKey("CAPTCHAGridParentQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

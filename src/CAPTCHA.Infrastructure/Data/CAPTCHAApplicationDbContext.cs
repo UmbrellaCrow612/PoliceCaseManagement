@@ -7,6 +7,8 @@ namespace CAPTCHA.Infrastructure.Data
     {
         public DbSet<CAPTCHAMathQuestion> CAPTCHAMathQuestions { get; set; }
         public DbSet<CAPTCHAAudioQuestion> CAPTCHAAudioQuestions { get; set; }
+        public DbSet<CAPTCHAGridParentQuestion> CAPTCHAGridParentQuestions { get; set; }
+        public DbSet<CAPTCHAGridChild> CAPTCHAGridChildren { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
