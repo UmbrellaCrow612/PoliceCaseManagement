@@ -3,7 +3,7 @@ using CAPTCHA.Core.Models;
 
 namespace CAPTCHA.Core.Services
 {
-    public class CAPTCHAAudioQuestionService
+    public class AudioQuestionService
     {
         public static (byte[] audioInBytes, CAPTCHAAudioQuestion question) CreateQuestion()
         {

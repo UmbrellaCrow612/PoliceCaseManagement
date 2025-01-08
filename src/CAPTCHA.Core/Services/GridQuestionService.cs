@@ -2,16 +2,16 @@
 
 namespace CAPTCHA.Core.Services
 {
-    public class CAPTCHAGridParentQuestionService
+    public class GridQuestionService
     {
-        public static (string questionText, CAPTCHAGridParentQuestion question, ICollection<CAPTCHAGridChild> answerChildren, ICollection<CAPTCHAGridChild> fullChildren) CreateQuestion()
+        public static (string questionText, CAPTCHAGridQuestion question, ICollection<CAPTCHAGridChild> answerChildren, ICollection<CAPTCHAGridChild> fullChildren) CreateQuestion()
         {
-            var imgService = new CAPTCHAImgService();
+            var imgService = new ImgService();
             var randomString = RandomStringService.GenerateRandomString(12);
 
             var questionText = randomString[..2];
 
-            var question = new CAPTCHAGridParentQuestion()
+            var question = new CAPTCHAGridQuestion()
             {
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };

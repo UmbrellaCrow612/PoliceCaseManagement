@@ -13,7 +13,7 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
         {
-            var (audioInBytes, question) = CAPTCHAAudioQuestionService.CreateQuestion();
+            var (audioInBytes, question) = AudioQuestionService.CreateQuestion();
             await _store.AddAsync(question);
 
             return Ok(new {bytes = audioInBytes, id = question.Id});

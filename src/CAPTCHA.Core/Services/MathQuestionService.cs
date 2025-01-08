@@ -1,7 +1,7 @@
 ﻿using CAPTCHA.Core.Models;
 namespace CAPTCHA.Core.Services
 {
-    public class CAPTCHAMathService
+    public class MathQuestionService
     {
         public static (byte[] imgQuestionBytes, CAPTCHAMathQuestion question) CreateQuestion()
         {
@@ -24,7 +24,7 @@ namespace CAPTCHA.Core.Services
                 ExpiresAt = DateTime.UtcNow.AddMinutes(2)
             };
 
-            var imgService = new CAPTCHAImgService();
+            var imgService = new ImgService();
             var bytes = imgService.CreateImg(question, expression);
 
             return (bytes, question);

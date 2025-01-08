@@ -7,7 +7,7 @@ namespace CAPTCHA.API.Controllers
 {
     [ApiController]
     [Route("captcha/grid")]
-    public class CAPTCHAGridController(ICAPTCHAGridQuestionStore store, ICAPTCHAGridChildStore childStore) : ControllerBase
+    public class CAPTCHAGridQuestionController(ICAPTCHAGridQuestionStore store, ICAPTCHAGridChildStore childStore) : ControllerBase
     {
         private readonly ICAPTCHAGridQuestionStore _gridStore = store;
         private readonly ICAPTCHAGridChildStore _childStore = childStore;
@@ -15,9 +15,8 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
         {
-            var (questionText, question, answerChildren, fullChildren) = CAPTCHAGridParentQuestionService.CreateQuestion();
-            await _gridStore.AddAsync(question);
-            await _childStore.AddManyAsync(answerChildren);
+            var (questionText, question, answerChildren, fullChildren) = GridQuestionService.CreateQuestion();
+            await _gridStore.AddAsync(question, answerChildren);
 
             var children = fullChildren.Select(x => new { x.Id, Bytes = x.GetTempBytes() });
 
@@ -35,7 +34,11 @@ namespace CAPTCHA.API.Controllers
             var question = await _gridStore.FindByIdAsync(dto.Id);
             if(question is null) return NotFound("Question not found.");
 
-            if (!question.IsValid(dto.SelectedIds)) return BadRequest("Question invalid or slected id's do not match.");
+            var (isValid, errors) = question.IsValid(dto.SelectedIds);
+            if (!isValid) return BadRequest(errors);
+
+            question.MarkUsed();
+            await _gridStore.UpdateAsync(question);
 
             return Ok();
         }

@@ -5,7 +5,7 @@ namespace CAPTCHA.Core.Services
     /// <summary>
     /// To create Images for CAPTCHAs
     /// </summary>
-    public interface ICAPTCHAImgService
+    public interface IImgService
     {
         /// <summary>
         /// Create a byte array img for a <see cref="CAPTCHAMathQuestion"/>
@@ -16,8 +16,8 @@ namespace CAPTCHA.Core.Services
         byte[] CreateImg(CAPTCHAMathQuestion question, string expression);
 
         /// <summary>
-        /// Create a byte array img for a <see cref="CAPTCHAGridParentQuestion"/> the component is the value of a child component
+        /// Create a byte array img for a <see cref="CAPTCHAGridQuestion"/> the component is the value of a child component
         /// </summary>
-        byte[] CreateImg(CAPTCHAGridParentQuestion question, string component);
+        byte[] CreateImg(CAPTCHAGridQuestion question, string component);
     }
 }

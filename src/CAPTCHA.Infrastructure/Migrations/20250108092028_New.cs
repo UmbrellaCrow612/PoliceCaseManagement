@@ -83,6 +83,11 @@ namespace CAPTCHA.Infrastructure.Migrations
                 name: "IX_CAPTCHAGridChildren_CAPTCHAGridParentQuestionId",
                 table: "CAPTCHAGridChildren",
                 column: "CAPTCHAGridParentQuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CAPTCHAGridParentQuestions_Id",
+                table: "CAPTCHAGridParentQuestions",
+                column: "Id");
         }
 
         /// <inheritdoc />

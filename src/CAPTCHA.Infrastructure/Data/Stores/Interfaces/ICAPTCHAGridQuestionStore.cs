@@ -4,12 +4,12 @@ namespace CAPTCHA.Infrastructure.Data.Stores.Interfaces
 {
     public interface ICAPTCHAGridQuestionStore
     {
-        Task AddAsync(CAPTCHAGridParentQuestion question);
+        Task AddAsync(CAPTCHAGridQuestion question, ICollection<CAPTCHAGridChild> gridChildren);
 
-        Task<CAPTCHAGridParentQuestion?> FindByIdAsync(string captchaGridParentQuestionId);
+        Task<CAPTCHAGridQuestion?> FindByIdAsync(string captchaGridParentQuestionId);
 
         Task<bool> ExistsAsync(string captchaGridParentQuestionId);
 
-        Task UpdateAsync(CAPTCHAGridParentQuestion question);
+        Task UpdateAsync(CAPTCHAGridQuestion question);
     }
 }

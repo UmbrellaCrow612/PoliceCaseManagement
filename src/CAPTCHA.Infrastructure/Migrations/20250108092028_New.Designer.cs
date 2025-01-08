@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPTCHA.Infrastructure.Migrations
 {
     [DbContext(typeof(CAPTCHAApplicationDbContext))]
-    [Migration("20250107190142_New")]
+    [Migration("20250108092028_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -65,7 +65,7 @@ namespace CAPTCHA.Infrastructure.Migrations
                     b.ToTable("CAPTCHAGridChildren");
                 });
 
-            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", b =>
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridQuestion", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -80,6 +80,8 @@ namespace CAPTCHA.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id");
 
                     b.ToTable("CAPTCHAGridParentQuestions");
                 });
@@ -120,7 +122,7 @@ namespace CAPTCHA.Infrastructure.Migrations
 
             modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridChild", b =>
                 {
-                    b.HasOne("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", "Question")
+                    b.HasOne("CAPTCHA.Core.Models.CAPTCHAGridQuestion", "Question")
                         .WithMany("Children")
                         .HasForeignKey("CAPTCHAGridParentQuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -129,7 +131,7 @@ namespace CAPTCHA.Infrastructure.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridParentQuestion", b =>
+            modelBuilder.Entity("CAPTCHA.Core.Models.CAPTCHAGridQuestion", b =>
                 {
                     b.Navigation("Children");
                 });

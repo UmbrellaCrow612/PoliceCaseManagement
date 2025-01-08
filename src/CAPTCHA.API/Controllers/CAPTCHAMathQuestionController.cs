@@ -14,7 +14,7 @@ namespace CAPTCHA.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
         {
-            var (imgQuestionBytes, question) = CAPTCHAMathService.CreateQuestion();
+            var (imgQuestionBytes, question) = MathQuestionService.CreateQuestion();
             await _mathQuestionStore.AddAsync(question);
 
             return Ok(new { bytes = imgQuestionBytes, id = question.Id });

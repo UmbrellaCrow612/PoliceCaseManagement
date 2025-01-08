@@ -8,9 +8,11 @@ namespace CAPTCHA.Infrastructure.Data.Stores
     {
         private readonly CAPTCHAApplicationDbContext _dbContext = dbContext;
 
-        public async Task AddAsync(CAPTCHAGridParentQuestion question)
+        public async Task AddAsync(CAPTCHAGridQuestion question, ICollection<CAPTCHAGridChild> gridChildren)
         {
             await _dbContext.CAPTCHAGridParentQuestions.AddAsync(question);
+            await _dbContext.CAPTCHAGridChildren.AddRangeAsync(gridChildren);
+
             await _dbContext.SaveChangesAsync();
         }
 
@@ -19,12 +21,12 @@ namespace CAPTCHA.Infrastructure.Data.Stores
             return await _dbContext.CAPTCHAGridParentQuestions.AnyAsync(x => x.Id == captchaGridParentQuestionId);
         }
 
-        public async Task<CAPTCHAGridParentQuestion?> FindByIdAsync(string captchaGridParentQuestionId)
+        public async Task<CAPTCHAGridQuestion?> FindByIdAsync(string captchaGridParentQuestionId)
         {
             return await _dbContext.CAPTCHAGridParentQuestions.Include(x => x.Children).FirstOrDefaultAsync(x => x.Id == captchaGridParentQuestionId);
         }
 
-        public async Task UpdateAsync(CAPTCHAGridParentQuestion question)
+        public async Task UpdateAsync(CAPTCHAGridQuestion question)
         {
             _dbContext.CAPTCHAGridParentQuestions.Update(question);
             await _dbContext.SaveChangesAsync();

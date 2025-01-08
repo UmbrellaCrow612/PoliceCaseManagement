@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace CAPTCHA.Core.Services
 {
-    public class CAPTCHAImgService : ICAPTCHAImgService
+    public class ImgService : IImgService
     {
         private readonly Random _random = new();
         private readonly string[] _fonts = { "Arial", "Verdana", "Georgia", "Tahoma", "Times New Roman" };
@@ -142,7 +142,7 @@ namespace CAPTCHA.Core.Services
             }
         }
 
-        public byte[] CreateImg(CAPTCHAGridParentQuestion question, string component)
+        public byte[] CreateImg(CAPTCHAGridQuestion question, string component)
         {
             // Image dimensions with slight randomization
             int width = _random.Next(100, 150);
