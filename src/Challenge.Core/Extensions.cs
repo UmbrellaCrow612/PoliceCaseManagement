@@ -2,7 +2,6 @@
 using Challenge.Core.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.DataAnnotations;
 
 namespace Challenge.Core
 {

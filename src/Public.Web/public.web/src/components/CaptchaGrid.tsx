@@ -1,84 +1,93 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { AlertCircle, RefreshCw } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle, RefreshCw, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface CaptchaChild {
-  id: string
-  bytes: string
+  id: string;
+  bytes: string;
 }
 
 interface CaptchaData {
-  id: string
-  text: string
-  children: CaptchaChild[]
+  id: string;
+  text: string;
+  children: CaptchaChild[];
+}
+
+interface ValidationResponse {
+  success: boolean;
+  message?: string;
+  errors?: string[];
 }
 
 export default function CaptchaGrid() {
-  const [data, setData] = useState<CaptchaData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [data, setData] = useState<CaptchaData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [validationResult, setValidationResult] = useState<ValidationResponse | null>(null);
 
   const fetchData = async () => {
-    setIsLoading(true)
-    setError(null)
-    setValidationMessage(null)
-    setSelectedIds([])
+    setIsLoading(true);
+    setError(null);
+    setValidationResult(null);
+    setSelectedIds([]);
     try {
-      const response = await fetch('https://localhost:7052/captcha/grid')
+      const response = await fetch("https://localhost:7052/captcha/grid");
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const json = await response.json()
-      setData(json)
+      const json = await response.json();
+      setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleValidate = async () => {
-    if (!data) return
+    if (!data) return;
 
     try {
-      const response = await fetch('https://localhost:7052/captcha/grid', {
-        method: 'POST',
+      const response = await fetch("https://localhost:7052/captcha/grid", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id: data.id,
           selectedIds,
         }),
-      })
+      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      setValidationMessage(result.message || 'Validation successful!')
+      const result: ValidationResponse = await response.json();
+      setValidationResult(result);
     } catch (err) {
-      setValidationMessage(err instanceof Error ? err.message : 'Validation failed.')
+      setValidationResult({
+        success: false,
+        errors: [err instanceof Error ? err.message : "Validation failed."]
+      });
     }
-  }
+  };
 
   const toggleSelection = (childId: string) => {
     setSelectedIds((prev) =>
-      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId]
-    )
-  }
+      prev.includes(childId)
+        ? prev.filter((id) => id !== childId)
+        : [...prev, childId]
+    );
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   if (error) {
     return (
@@ -87,7 +96,7 @@ export default function CaptchaGrid() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -108,14 +117,17 @@ export default function CaptchaGrid() {
       ) : data ? (
         <>
           <p className="mb-4">
-            Parent ID: {data.id} Value you need to make by picking selected children: {data.text}
+            Parent ID: {data.id} Value you need to make by picking selected
+            children: {data.text}
           </p>
           <div className="grid grid-cols-3 gap-4">
             {data.children.map((child) => (
               <div
                 key={child.id}
                 className={`relative h-32 border-2 rounded-md ${
-                  selectedIds.includes(child.id) ? 'border-blue-500' : 'border-transparent'
+                  selectedIds.includes(child.id)
+                    ? "border-blue-500"
+                    : "border-transparent"
                 } cursor-pointer`}
                 onClick={() => toggleSelection(child.id)}
               >
@@ -129,17 +141,31 @@ export default function CaptchaGrid() {
             ))}
           </div>
           <div className="mt-6">
-            <Button onClick={handleValidate} disabled={selectedIds.length === 0}>
+            <Button
+              onClick={handleValidate}
+              disabled={selectedIds.length === 0}
+            >
               Validate Selection
             </Button>
-            {validationMessage && (
-              <p className="mt-4 text-lg font-semibold">
-                {validationMessage}
-              </p>
+            {validationResult && (
+              <Alert variant={validationResult.success ? "default" : "destructive"} className="mt-4">
+                {validationResult.success ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <AlertTitle>{validationResult.success ? "Success" : "Error"}</AlertTitle>
+                <AlertDescription>
+                  {validationResult.success
+                    ? validationResult.message
+                    : validationResult.errors?.join(", ") || "Validation failed."}
+                </AlertDescription>
+              </Alert>
             )}
           </div>
         </>
       ) : null}
     </div>
-  )
+  );
 }
+

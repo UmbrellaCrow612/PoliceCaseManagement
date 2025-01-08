@@ -1,5 +1,4 @@
-﻿using Identity.API.Settings;
-using Identity.Core.Models;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,19 +6,20 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Identity.API.Helpers
+namespace Authorization.Core
 {
-    public class JwtHelper(IOptions<JWTOptions> JWTOptions)
+    public class JwtBearerHelper(IOptions<JwtBearerOptions> JWTOptions)
     {
-        private readonly JWTOptions _JWTOptions = JWTOptions.Value;
+        private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
 
         /// <summary>
-        /// Generate a JWT token with claims
+        /// Generate a JWT Bearer token with claims
         /// </summary>
         /// <returns>
-        /// Access token and it's ID
+        /// Bearer token and it's ID
         /// </returns>
-        public (string accessToken, string accessTokenId) GenerateToken(ApplicationUser user, IList<string> roles)
+        public (string jwtBearerToken, string jwtBearerTokenId) GenerateBearerToken<TUser>(TUser user, IList<string> roles)
+        where TUser : IdentityUser
         {
             var handler = new JwtSecurityTokenHandler();
 
@@ -36,7 +36,6 @@ namespace Identity.API.Helpers
 
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, tokenId));
-
             claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));

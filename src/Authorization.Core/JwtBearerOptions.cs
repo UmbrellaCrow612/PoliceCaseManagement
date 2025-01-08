@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Settings
+namespace Authorization.Core
 {
     /// <summary>
     /// Configuration options for JSON Web Token (JWT) authentication and authorization.
     /// </summary>
-    public class JWTOptions
+    public class JwtBearerOptions
     {
         /// <summary>
         /// The issuer of the JWT token, typically representing the authentication server or application.

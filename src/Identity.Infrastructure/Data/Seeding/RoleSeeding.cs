@@ -1,4 +1,4 @@
-﻿using Identity.Core.Constants;
+﻿using Authorization.Core;
 using Identity.Core.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,7 +8,7 @@ namespace Identity.Infrastructure.Data.Seeding
     {
         public async void SeedRoles()
         {
-            var roles = RolesConstant.AllRoles;
+            var roles = Roles.AllRoles;
 
             foreach (var role in roles)
             {

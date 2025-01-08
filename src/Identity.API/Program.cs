@@ -2,17 +2,15 @@ using Identity.API.Helpers;
 using Email.Service;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog.Events;
 using Serilog;
-using System.Text;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Challenge.Core;
 using Identity.Infrastructure.Data;
+using Authorization.Core;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -30,13 +28,9 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 builder.Host.UseSerilog();
-
-builder.Services.AddOptions<JWTOptions>()
-    .Bind(builder.Configuration.GetSection("Jwt"))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -102,32 +96,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddBaseAuthorization(config);
+builder.Services.AddChallenges(config);
+builder.Services.AddInfrastructure(config);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer not provided"),
-            ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<string[]>(),
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))),
-
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-
-builder.Services.AddChallenges(builder.Configuration);
-
-builder.Services.AddInfrastructure(builder.Configuration);
-
-builder.Services.AddSingleton<JwtHelper>();
-builder.Services.AddSingleton<StringEncryptionHelper>();
+builder.Services.AddScoped<StringEncryptionHelper>();
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddScoped<DeviceManager>();
 

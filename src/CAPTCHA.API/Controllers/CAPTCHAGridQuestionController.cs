@@ -7,10 +7,9 @@ namespace CAPTCHA.API.Controllers
 {
     [ApiController]
     [Route("captcha/grid")]
-    public class CAPTCHAGridQuestionController(ICAPTCHAGridQuestionStore store, ICAPTCHAGridChildStore childStore) : ControllerBase
+    public class CAPTCHAGridQuestionController(ICAPTCHAGridQuestionStore store) : ControllerBase
     {
         private readonly ICAPTCHAGridQuestionStore _gridStore = store;
-        private readonly ICAPTCHAGridChildStore _childStore = childStore;
 
         [HttpGet]
         public async Task<ActionResult> GetQuestion()
@@ -35,7 +34,7 @@ namespace CAPTCHA.API.Controllers
             if(question is null) return NotFound("Question not found.");
 
             var (isValid, errors) = question.IsValid(dto.SelectedIds);
-            if (!isValid) return BadRequest(errors);
+            if (!isValid) return BadRequest(new { errors });
 
             question.MarkUsed();
             await _gridStore.UpdateAsync(question);

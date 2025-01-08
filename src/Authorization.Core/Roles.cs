@@ -1,9 +1,9 @@
-﻿namespace Identity.Core.Constants
+﻿namespace Authorization.Core
 {
     /// <summary>
-    /// Identity Roles Used In The System for Authorization
+    /// Authorization roles used throughout the system 
     /// </summary>
-    public class RolesConstant
+    public class Roles
     {
         public const string Admin = "Admin";
 

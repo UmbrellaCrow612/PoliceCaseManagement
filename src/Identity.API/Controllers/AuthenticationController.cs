@@ -1,4 +1,5 @@
-﻿using Identity.API.Annotations;
+﻿using Authorization.Core;
+using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Responses;
@@ -19,7 +20,7 @@ namespace Identity.API.Controllers
     [ApiController]
     [Route("authentication")]
     public class AuthenticationController(
-        JwtHelper jwtHelper, UserManager<ApplicationUser> userManager, IOptions<JWTOptions> JWTOptions,
+        JwtBearerHelper jwtHelper, UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
         StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
@@ -27,9 +28,9 @@ namespace Identity.API.Controllers
         ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, IOptions<TimeWindows> timeWindows, DeviceManager deviceManager, ITwoFactorEmailAttemptStore twoFactorEmailAttemptStore
         ) : ControllerBase
     {
-        private readonly JwtHelper _jwtHelper = jwtHelper;
+        private readonly JwtBearerHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly JWTOptions _JWTOptions = JWTOptions.Value;
+        private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
@@ -171,7 +172,7 @@ namespace Identity.API.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            (string accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
+            (string accessToken, string tokenId) = _jwtHelper.GenerateBearerToken(user, roles);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
             Token token = new()
@@ -267,7 +268,7 @@ namespace Identity.API.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            (string accessToken, string tokenId) = _jwtHelper.GenerateToken(user, roles);
+            (string accessToken, string tokenId) = _jwtHelper.GenerateBearerToken(user, roles);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
             Token token = new()
@@ -385,7 +386,7 @@ namespace Identity.API.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var (accessToken, accessTokenId) = _jwtHelper.GenerateToken(user, roles);
+            var (accessToken, accessTokenId) = _jwtHelper.GenerateBearerToken(user, roles);
 
             Token token = new()
             {
