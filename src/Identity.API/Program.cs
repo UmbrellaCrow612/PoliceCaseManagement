@@ -4,28 +4,15 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
-using Serilog.Events;
 using Serilog;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Challenge.Core;
 using Identity.Infrastructure.Data;
 using Authorization.Core;
+using Logging.Core;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-    .Enrich.FromLogContext()
-    .Enrich.WithMachineName()
-    .Enrich.WithThreadId()
-    .Enrich.WithProcessId()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
-    .WriteTo.File(
-        path: "logs/log-.txt",
-        rollingInterval: RollingInterval.Day,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-    .CreateLogger();
+SerilogExtensions.ConfigureSerilog();
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
