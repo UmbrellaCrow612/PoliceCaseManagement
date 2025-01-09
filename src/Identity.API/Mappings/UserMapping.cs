@@ -3,8 +3,13 @@ using Identity.Core.Models;
 
 namespace Identity.API.Mappings
 {
-    public class UserMapping : IMapper<ApplicationUser, UserDto, UpdateUserDto>
+    public class UserMapping : IMapper<ApplicationUser, UserDto, UpdateUserDto, RegisterRequestDto>
     {
+        public ApplicationUser Create(RegisterRequestDto createDto)
+        {
+            return new ApplicationUser { UserName = createDto.UserName, Email = createDto.Email , PhoneNumber = createDto.PhoneNumber, PasswordHash = createDto.Password};
+        }
+
         public UserDto ToDto(ApplicationUser @base)
         {
             return new UserDto

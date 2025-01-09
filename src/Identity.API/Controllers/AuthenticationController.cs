@@ -342,12 +342,7 @@ namespace Identity.API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
-            var userToCreate = new ApplicationUser
-            {
-                UserName = registerRequestDto.UserName,
-                Email = registerRequestDto.Email,
-                PhoneNumber = registerRequestDto.PhoneNumber,
-            };
+            var userToCreate = userMapping.Create(registerRequestDto);
 
             var result = await _userManager.CreateAsync(userToCreate, registerRequestDto.Password);
             if (!result.Succeeded)

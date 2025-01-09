@@ -25,7 +25,8 @@ namespace Identity.API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateDepartment([FromBody] CreateDepartmentDto dto)
         {
-            var department = new Department { Name = dto.Name };
+            var department = departmentMapper.Create(dto);
+
             var (successful, errors) = await _departmentStore.CreateDepartment(department);
             if (!successful) return BadRequest(errors);
 

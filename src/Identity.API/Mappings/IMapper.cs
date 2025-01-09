@@ -6,10 +6,13 @@
     /// <typeparam name="TBase">The base model</typeparam>
     /// <typeparam name="TDto">The class that is used to send the model</typeparam>
     /// <typeparam name="TUpdateDto">The dto used to update the model fields</typeparam>
-    public interface IMapper<TBase, TDto, TUpdateDto>
+    /// <typeparam name="TCreateDto">The dto used to create the model</typeparam>
+    public interface IMapper<TBase, TDto, TUpdateDto, TCreateDto>
     {
         public TDto ToDto(TBase @base);
 
         public void Update(TBase @base, TUpdateDto updateDto);
+
+        public TBase Create(TCreateDto createDto);
     }
 }
