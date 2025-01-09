@@ -19,5 +19,7 @@ namespace CAPTCHA.Core.Services
         /// Create a byte array img for a <see cref="CAPTCHAGridQuestion"/> the component is the value of a child component
         /// </summary>
         byte[] CreateImg(CAPTCHAGridQuestion question, string component);
+
+        byte[] CreateImg(CAPTCHACarouselChoiceGameQuestion question, string component);
     }
 }

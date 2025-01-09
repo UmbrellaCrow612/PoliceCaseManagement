@@ -173,5 +173,27 @@ namespace CAPTCHA.Core.Services
             return memoryStream.ToArray();
         }
 
+        public byte[] CreateImg(CAPTCHACarouselChoiceGameQuestion question, string component)
+        {
+            // Image dimensions with slight randomization
+            int width = _random.Next(100, 150);
+            int height = _random.Next(50, 70);
+
+            using var bitmap = new Bitmap(width, height);
+            using var graphics = Graphics.FromImage(bitmap);
+            using var memoryStream = new MemoryStream();
+
+            // Enhanced quality settings
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            // Draw the component text with enhanced distortion
+            DrawEnhancedText(graphics, component, width, height);
+
+
+            bitmap.Save(memoryStream, ImageFormat.Png);
+            return memoryStream.ToArray();
+        }
     }
 }
