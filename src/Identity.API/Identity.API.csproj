@@ -32,5 +32,6 @@
     <ProjectReference Include="..\Email.Service\Email.Service.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Mapper\Mapper.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Identity.API.DTOs;
 using Identity.Core.Models;
+using Mapper.Core;
 
 namespace Identity.API.Mappings
 {

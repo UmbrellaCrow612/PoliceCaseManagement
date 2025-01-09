@@ -1,10 +1,10 @@
-﻿namespace Identity.API.Mappings
+﻿namespace Mapper.Core
 {
     /// <summary>
-    /// Our way of mapping - inherit this and pass the mapping props and implament it
+    /// Our way of mapping - inherit this and pass the mapping props and implement it
     /// </summary>
     /// <typeparam name="TBase">The base model</typeparam>
-    /// <typeparam name="TDto">The class that is used to send the model</typeparam>
+    /// <typeparam name="TDto">The dto that is used to send the model</typeparam>
     /// <typeparam name="TUpdateDto">The dto used to update the model fields</typeparam>
     /// <typeparam name="TCreateDto">The dto used to create the model</typeparam>
     public interface IMapper<TBase, TDto, TUpdateDto, TCreateDto>
