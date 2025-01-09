@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Identity.API.DTOs;
+﻿using Identity.API.DTOs;
+using Identity.API.Mappings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Stores.Interfaces;
@@ -12,13 +12,13 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("tokens")]
-    public class TokenController(ITokenStore tokenStore, UserManager<ApplicationUser> userManager, ILogger<TokenController> logger, IdentityApplicationDbContext dbContext, IMapper mapper) : ControllerBase
+    public class TokenController(ITokenStore tokenStore, UserManager<ApplicationUser> userManager, ILogger<TokenController> logger, IdentityApplicationDbContext dbContext) : ControllerBase
     {
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ILogger<TokenController> _logger = logger;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-        private readonly IMapper _mapper = mapper;
+        private readonly TokenMapping tokenMapping = new();
 
         [Authorize]
         [HttpPost("clean-expired-tokens")]
@@ -77,7 +77,10 @@ namespace Identity.API.Controllers
 
             var tokens = await tokenQuery.ToListAsync();
 
-            var dto = _mapper.Map<ICollection<QueryTokenDto>>(tokens);
+            var dto = tokens.Select(x =>
+            {
+                return tokenMapping.ToDto(x);
+            });
 
             return Ok(dto);
         }

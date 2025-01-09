@@ -104,8 +104,6 @@ builder.Services.AddScoped<StringEncryptionHelper>();
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddScoped<DeviceManager>();
 
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
-
 builder.Services.AddEmailService(builder.Configuration);
 
 var app = builder.Build();

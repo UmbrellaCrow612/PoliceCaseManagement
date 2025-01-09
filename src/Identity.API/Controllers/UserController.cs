@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Identity.API.DTOs;
+﻿using Identity.API.DTOs;
+using Identity.API.Mappings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +10,11 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController(UserManager<ApplicationUser> userManager, ITokenStore tokenStore, IMapper mapper) : ControllerBase
+    public class UserController(UserManager<ApplicationUser> userManager, ITokenStore tokenStore) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ITokenStore _tokenStore = tokenStore;
-        private readonly IMapper _mapper = mapper;
+        private readonly UserMapping userMapper = new();
 
         [Authorize]
         [HttpPost("{userId}/lock")]
@@ -65,7 +65,7 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return NotFound("User not found.");
 
-            var dto = _mapper.Map<UserDto>(user);
+            var dto = userMapper.ToDto(user);
 
             return Ok(dto);
         }

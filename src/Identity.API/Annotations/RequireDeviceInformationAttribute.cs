@@ -8,7 +8,7 @@ namespace Identity.API.Annotations
     /// Use this attribute to validate the device information in the request.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class DeviceInformationAttribute : Attribute, IAuthorizationFilter
+    public class RequireDeviceInformationAttribute : Attribute, IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {

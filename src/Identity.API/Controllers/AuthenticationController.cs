@@ -2,6 +2,7 @@
 using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Helpers;
+using Identity.API.Mappings;
 using Identity.API.Responses;
 using Identity.API.Settings;
 using Identity.Core.Models;
@@ -45,8 +46,9 @@ namespace Identity.API.Controllers
         private readonly TimeWindows _timeWindows = timeWindows.Value;
         private readonly DeviceManager _deviceManager = deviceManager;
         private readonly ITwoFactorEmailAttemptStore _twoFactorEmailAttemptStore = twoFactorEmailAttemptStore;
+        private readonly UserMapping userMapping = new();
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
@@ -142,7 +144,7 @@ namespace Identity.API.Controllers
             return Ok(new {loginAttempt.Id});
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("validate-two-factor-sms")]
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
@@ -211,7 +213,7 @@ namespace Identity.API.Controllers
             return Ok(new { accessToken, refreshToken });
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-two-factor-sms")]
         public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode reSendTwoFactorCode)
@@ -249,7 +251,7 @@ namespace Identity.API.Controllers
             return Ok(new { attempt.Code });
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("validate-two-factor-email")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
@@ -308,7 +310,7 @@ namespace Identity.API.Controllers
             return Ok(new { accessToken, refreshToken });
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-two-factor-email")]
         public async Task<ActionResult> ReSendTwoFactorEmailAuth([FromBody] ReSendTwoFactorEmailAttemptDto reSendTwoFactorEmailAttemptDto)
@@ -353,10 +355,12 @@ namespace Identity.API.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return Ok(new { id = userToCreate.Id });
+            var dto = userMapping.ToDto(userToCreate);
+
+            return Ok(dto);
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [Authorize]
         [HttpPost("refresh-token")]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
@@ -568,7 +572,7 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
-        [DeviceInformation]
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("resend-user-device-challenge")]
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)

@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Identity.API.DTOs;
+﻿using Identity.API.DTOs;
+using Identity.API.Mappings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Stores.Interfaces;
@@ -12,19 +12,20 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("departments")]
-    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IdentityApplicationDbContext dbContext, IMapper mapper) : ControllerBase
+    public class DepartmentController(IDepartmentStore departmentStore, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IdentityApplicationDbContext dbContext) : ControllerBase
     {
         private readonly IDepartmentStore _departmentStore = departmentStore;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ILogger<DepartmentController> _logger = logger;
-        private readonly IMapper _mapper = mapper;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
+        private readonly DepartmentMapping departmentMapper = new();
+        private readonly UserMapping userMapper = new();
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> CreateDepartment([FromBody] CreateDepartmentDto createDepartmentDto)
+        public async Task<ActionResult> CreateDepartment([FromBody] CreateDepartmentDto dto)
         {
-            var department = _mapper.Map<Department>(createDepartmentDto);
+            var department = new Department { Name = dto.Name };
             var (successful, errors) = await _departmentStore.CreateDepartment(department);
             if (!successful) return BadRequest(errors);
 
@@ -95,7 +96,10 @@ namespace Identity.API.Controllers
 
             var departments = await departmentQuery.ToListAsync();
 
-            var dto = _mapper.Map<ICollection<DepartmentDto>>(departments);
+            var dto = departments.Select(x =>
+            {
+                return departmentMapper.ToDto(x);
+            });
 
             return Ok(dto);
         }
@@ -107,7 +111,7 @@ namespace Identity.API.Controllers
             var department = await _departmentStore.GetDepartmentById(departmentId);
             if (department is null) return NotFound("Department not found.");
 
-            var dto = _mapper.Map<DepartmentDto>(department);
+            var dto = departmentMapper.ToDto(department);
 
             return Ok(dto);
         }
@@ -121,7 +125,10 @@ namespace Identity.API.Controllers
 
             var users = await _departmentStore.GetUsers(department);
 
-            var dto = _mapper.Map<IEnumerable<UserDto>>(users);
+            var dto = users.Select(x =>
+            {
+                return userMapper.ToDto(x);
+            });
 
             return Ok(dto);
         }
@@ -133,7 +140,7 @@ namespace Identity.API.Controllers
             var department = await _departmentStore.GetDepartmentById(departmentId);
             if (department is null) return NotFound("Department not found.");
 
-            _mapper.Map(updateDepartmentDto, department);
+            departmentMapper.Update(department, updateDepartmentDto);
 
             await _departmentStore.UpdateDepartment(department);
 
