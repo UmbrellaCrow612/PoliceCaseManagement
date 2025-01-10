@@ -27,15 +27,15 @@
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\Mapper.Core\Mapper.Core.csproj" />
-    <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
-    <ProjectReference Include="..\Challenge.Core\Challenge.Core.csproj" />
-    <ProjectReference Include="..\Email.Service\Email.Service.csproj" />
-    <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
-    <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
-    <ProjectReference Include="..\Logging.Core\Logging.Core.csproj" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\..\..\libs\Mapper.Core\Mapper.Core.csproj" />
+    <ProjectReference Include="..\..\Authorization.Core\Authorization.Core.csproj" />
+    <ProjectReference Include="..\..\Challenge.Core\Challenge.Core.csproj" />
+    <ProjectReference Include="..\..\Email.Service\Email.Service.csproj" />
+    <ProjectReference Include="..\..\Logging.Core\Logging.Core.csproj" />
+    <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
+    <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
