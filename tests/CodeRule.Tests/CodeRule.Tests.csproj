@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CodeRule\CodeRule.csproj" />
+    <ProjectReference Include="..\..\libs\CodeRule\CodeRule.csproj" />
   </ItemGroup>
 
   <ItemGroup>
