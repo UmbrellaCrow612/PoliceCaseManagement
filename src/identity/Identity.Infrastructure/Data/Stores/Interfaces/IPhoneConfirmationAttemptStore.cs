@@ -1,5 +1,5 @@
 ﻿using Identity.Core.Models;
-using Shared.DTOs;
+using Utils.DTOs;
 
 namespace Identity.Infrastructure.Data.Stores.Interfaces
 {

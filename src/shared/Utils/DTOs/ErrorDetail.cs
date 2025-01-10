@@ -1,4 +1,4 @@
-﻿namespace Shared.DTOs
+﻿namespace Utils.DTOs
 {
     /// <summary>
     /// Represents a specific error detail with field and reason

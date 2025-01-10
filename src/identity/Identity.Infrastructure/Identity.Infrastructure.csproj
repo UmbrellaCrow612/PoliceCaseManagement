@@ -15,9 +15,9 @@
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Authorization.Core\Authorization.Core.csproj" />
-    <ProjectReference Include="..\..\Challenge.Core\Challenge.Core.csproj" />
-    <ProjectReference Include="..\..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\shared\Authorization.Core\Authorization.Core.csproj" />
+    <ProjectReference Include="..\..\shared\Challenge.Core\Challenge.Core.csproj" />
+    <ProjectReference Include="..\..\shared\Utils\Utils.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

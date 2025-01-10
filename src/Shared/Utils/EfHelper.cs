@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Shared.Utils
+namespace Utils
 {
     public static class EfHelper
     {

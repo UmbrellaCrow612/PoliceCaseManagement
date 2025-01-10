@@ -3,8 +3,9 @@ using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Shared.DTOs;
-using Shared.Utils;
+using Utils;
+using Utils.DTOs;
+
 
 namespace Identity.Infrastructure.Data.Stores
 {

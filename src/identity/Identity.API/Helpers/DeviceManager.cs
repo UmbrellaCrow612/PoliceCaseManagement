@@ -1,8 +1,8 @@
 ﻿using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores.Interfaces;
-using Shared.DTOs;
 using UAParser;
+using Utils.DTOs;
 
 namespace Identity.API.Helpers
 {
