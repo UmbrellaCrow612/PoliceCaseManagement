@@ -1,6 +1,17 @@
 export default function formatBackendError(err: any): string {
   let errorMessage = `Status: ${err.status || 'Unknown'}`;
 
+  if (
+    err.error &&
+    typeof Array.isArray(err.error) &&
+    typeof err.error[0] == 'string'
+  ) {
+    const errs: [string] = err.error;
+    errs.forEach((element) => {
+      errorMessage += ` ${element} `
+    });
+  }
+
   // Check if the error has a specific error structure with field and reason
   if (
     err.error &&

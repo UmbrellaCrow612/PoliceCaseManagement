@@ -1,5 +1,5 @@
 <div class="container">
-  <form action="">
+  <form [formGroup]="deviceChallengeForm" (ngSubmit)="onSubmit()">
     <mat-card appearance="outlined" class="card">
       <mat-card-header>
         <mat-card-title
@@ -19,12 +19,24 @@
             type="email"
             placeholder="example@company.com"
             required
+            formControlName="email"
           />
+          @if (deviceChallengeForm.controls.email.hasError("email")) {
+          <mat-error>Provide a valid email address</mat-error>
+          } @else if (deviceChallengeForm.controls.email.hasError("required")) {
+          <mat-error>Email address required</mat-error>
+          }
         </mat-form-field>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button mat-button type="submit" [disabled]="true">
-          Send verification code
+        <button
+          mat-raised-button
+          type="submit"
+          [disabled]="deviceChallengeForm.invalid || isSendingRequestInProgress"
+        >
+          @if (isSendingRequestInProgress) {
+          <mat-spinner diameter="20" color="accent"></mat-spinner>
+          } @else { <span>Send verification code</span> }
         </button>
       </mat-card-actions>
     </mat-card>

@@ -1,4 +1,4 @@
-# FrontEnd
+# WebClient
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.1.
 
@@ -58,13 +58,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
-
 ## Run and add docker img
 
-
 ```docker
-docker build -t pcms-frontend .
-docker run -d -p 80:80 --name pcms-frontend-container pcms-frontend
+docker build -t pcms-WebClient .
+docker run -d -p 80:80 --name pcms-WebClient-container pcms-WebClient
 ```
 
 delete old img
@@ -74,6 +72,6 @@ docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 ```
 
-## Making requests 
+## Making requests
 
 - Use rxjs `observable` pattern instead of `async` when you can.

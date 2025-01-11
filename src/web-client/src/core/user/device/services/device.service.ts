@@ -1,17 +1,31 @@
-import { Injectable } from "@angular/core";
-import { ComputeFingerPrint } from "../utils/FingerPrint";
-import { CookieService } from "../../../browser/cookie/services/cookie.service";
-import CookieNames from "../../../browser/cookie/constants/names";
-
+import { Injectable } from '@angular/core';
+import { ComputeFingerPrint } from '../utils/FingerPrint';
+import { CookieService } from '../../../browser/cookie/services/cookie.service';
+import CookieNames from '../../../browser/cookie/constants/names';
+import { BaseService } from '../../../http/services/BaseService.service';
+import { HttpClient } from '@angular/common/http';
+import env from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class DeviceService {
   private readonly COOKIE_NAME = CookieNames.DEVICE_FINGERPRINT;
   private readonly EXPIRATION_DAYS = 2;
 
-  constructor(private cookieService: CookieService) {} 
+  private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
+
+  constructor(
+    private cookieService: CookieService,
+    private httpClient: HttpClient
+  ) {}
+
+  SendDeviceChallengeAttempt(email: string | null) {
+    return this.httpClient.post(
+      `${this.BASE_URL}/authentication/resend-user-device-challenge`,
+      { email: email }
+    );
+  }
 
   /**
    * Get the device fingerprint. Either retrieve it from cookies or compute a new one.
@@ -22,7 +36,7 @@ export class DeviceService {
       const existingCookie = this.cookieService.getCookie(this.COOKIE_NAME);
 
       if (existingCookie) {
-        console.log("Existing cookie found for device fingerprint");
+        console.log('Existing cookie found for device fingerprint');
         const { fingerprint, timestamp } = JSON.parse(existingCookie);
         const daysSinceCreation = this.getDaysSinceTimestamp(timestamp);
 
@@ -51,8 +65,8 @@ export class DeviceService {
 
       this.cookieService.setCookie(this.COOKIE_NAME, cookieValue, {
         expires: this.EXPIRATION_DAYS,
-        path: "/",
-        sameSite: "Strict",
+        path: '/',
+        sameSite: 'Strict',
         secure: true,
       });
 

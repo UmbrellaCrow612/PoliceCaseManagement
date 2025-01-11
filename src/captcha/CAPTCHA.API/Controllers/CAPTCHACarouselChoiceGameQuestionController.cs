@@ -1,4 +1,5 @@
-﻿using CAPTCHA.Core.Services;
+﻿using CAPTCHA.API.DTOs;
+using CAPTCHA.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CAPTCHA.API.Controllers
@@ -8,7 +9,7 @@ namespace CAPTCHA.API.Controllers
     public class CAPTCHACarouselChoiceGameQuestionController : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult> GetQuestion()
+        public ActionResult GetQuestion()
         {
             var (question, choices, answerSubChildren) = CarouselChoiceGameQuestionService.CreateQuestion();
 
@@ -32,6 +33,18 @@ namespace CAPTCHA.API.Controllers
             };
 
             return Ok(dto);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ValidateQuestion([FromBody] CreateValidateCaroselGameDto gameDto)
+        {
+            var gId = gameDto.Id;
+
+            for (var i = 0; i < gameDto.Choices.Count; i++)
+            {
+
+            }
+            return Ok();
         }
     }
 }

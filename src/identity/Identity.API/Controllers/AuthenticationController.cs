@@ -602,7 +602,7 @@ namespace Identity.API.Controllers
             (bool canMakeAttempt,ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
             if (!canMakeAttempt) return BadRequest(Errors);
 
-            return Ok(code);
+            return Ok(new { code });
         }
 
         [AllowAnonymous]

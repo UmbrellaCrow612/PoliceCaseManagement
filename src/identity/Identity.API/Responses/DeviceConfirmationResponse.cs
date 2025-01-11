@@ -22,7 +22,7 @@ namespace Identity.API.Responses
             {
                 return new ObjectResult(new
                 {
-                    redirectUrl = "authentication/device-challenge?trusted=false",
+                    redirectUrl = "authentication/device-challenge",
                     message = "Device needs confirmation"
                 })
                 {
