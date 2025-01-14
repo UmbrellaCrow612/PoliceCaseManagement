@@ -65,12 +65,7 @@ export class DeviceService extends BaseService {
         timestamp: new Date().getTime(),
       });
 
-      this.cookieService.setCookie(this.COOKIE_NAME, cookieValue, {
-        expires: this.EXPIRATION_DAYS,
-        path: '/',
-        sameSite: 'Strict',
-        secure: true,
-      });
+      this.cookieService.setCookie(this.COOKIE_NAME, cookieValue);
 
       return fingerprint;
     } catch {

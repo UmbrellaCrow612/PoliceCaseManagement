@@ -74,17 +74,18 @@ export class JwtService extends BaseService {
   IsJwtTokenValid<T extends JwtPayload>(rawToken: string): boolean {
     try {
       const claims = this.decodeToken<T>(rawToken);
-  
+
       if (claims.exp) {
         const expiryDate = new Date(claims.exp * 1000); // Convert exp to milliseconds
         const currentDate = new Date();
-        const timeDifferenceInMinutes = (expiryDate.getTime() - currentDate.getTime()) / (1000 * 60);
-  
+        const timeDifferenceInMinutes =
+          (expiryDate.getTime() - currentDate.getTime()) / (1000 * 60);
+
         // Token is invalid if it's expiring in 5 minutes or less
         if (timeDifferenceInMinutes <= 5) {
           return false;
         }
-  
+
         // Otherwise, the token is still valid
         return expiryDate > currentDate;
       }
@@ -92,7 +93,7 @@ export class JwtService extends BaseService {
       console.error('Error decoding token:', error);
       return false;
     }
-  
+
     return false;
   }
 
