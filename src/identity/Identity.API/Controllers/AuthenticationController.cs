@@ -50,11 +50,25 @@ namespace Identity.API.Controllers
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
+        private LoginRequestInfo ComposeLoginRequestInfo()
+        {
+            return new LoginRequestInfo
+            {
+                DeviceFingerPrint = Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!,
+                IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                                ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                                ?? "Unknown",
+                UserAgent = Request.Headers.UserAgent.ToString()
+            };
+        }
+
         [RequireDeviceInformation]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var res = await _authService.Login(dto.Email, dto.Password, Request);
+            var info = ComposeLoginRequestInfo();
+
+            var res = await _authService.Login(dto.Email, dto.Password, info);
             if(!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok(new { res.LoginAttemptId });
@@ -78,7 +92,8 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null) return NotFound(new ErrorDetail { Field = "Two factor sms authentication", Reason = "User associated with login attempt not found." });
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is null || !device.Trusted())
             {
                 return StatusCode(403, new
@@ -148,7 +163,8 @@ namespace Identity.API.Controllers
                 Reason = "Login attempt User dose not exist."
             });
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is null || !device.Trusted()) { return StatusCode(403, new { redirectUrl = "/deviceConfirm", message = "Device needs confirmation" }); }
 
             TwoFactorSmsAttempt attempt = new()
@@ -178,7 +194,8 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "User dose not exist." });
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is null || !device.Trusted()) return StatusCode(403, new { redirectUrl = "/deviceConfirme", message = "Device needs confirmation" });
 
             var (isValid, errors) = await _twoFactorEmailAttemptStore.ValidateAttempt(dto.LoginAttemptId, dto.EmailCode);
@@ -237,7 +254,8 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "User dose not exist." });
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is null || !device.Trusted()) return StatusCode(403, new { redirectUrl = "/deviceConfirme", message = "Device needs confirmation" });
 
             var attempt = new TwoFactorEmailAttempt
@@ -292,8 +310,9 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
-            if(device is null || !device.IsTrusted) return Unauthorized("Device not registered or trusted.");
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
+            if (device is null || !device.IsTrusted) return Unauthorized("Device not registered or trusted.");
 
             (bool isValid, DateTime? RefreshTokenExpiresAt) = await _tokenStore.ValidateTokenAsync(tokenId, device.Id, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
 
@@ -473,7 +492,8 @@ namespace Identity.API.Controllers
             attempt.MarkUsed();
             _userDeviceChallengeAttemptStore.SetToUpdateAttempt(attempt);
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is null) return NotFound("Device not found.");
 
             device.IsTrusted = true;
@@ -495,7 +515,8 @@ namespace Identity.API.Controllers
 
             var deviceId = _deviceIdentification.GenerateDeviceId(user.Id, Request.Headers.UserAgent!, Request.HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!);
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
+            var info = ComposeLoginRequestInfo();
+            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
             if (device is not null && device.IsTrusted is true) return BadRequest();
 
             device ??= new UserDevice

@@ -13,7 +13,7 @@ namespace Identity.API.Services
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
         private readonly DeviceManager _deviceManager = deviceManager;
 
-        public async Task<LoginResult> Login(string email, string password, HttpRequest request)
+        public async Task<LoginResult> Login(string email, string password, LoginRequestInfo request)
         {
             var result = new LoginResult();
             var user = await _userManager.FindByEmailAsync(email);
@@ -26,10 +26,8 @@ namespace Identity.API.Services
 
             LoginAttempt loginAttempt = new()
             {
-                IpAddress = request.HttpContext.Connection.RemoteIpAddress?.ToString()
-                                ?? request.Headers["X-Forwarded-For"].FirstOrDefault()
-                                ?? "Unknown",
-                UserAgent = request.Headers.UserAgent.ToString(),
+                IpAddress = request.IpAddress,
+                UserAgent = request.UserAgent,
                 UserId = user.Id,
             };
             result.LoginAttemptId = loginAttempt.Id;
@@ -71,7 +69,7 @@ namespace Identity.API.Services
                 return result;
             }
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, request);
+            var device = await _deviceManager.GetRequestingDevice(user.Id, request.DeviceFingerPrint, request.UserAgent);
             if(device is null || !device.Trusted())
             {
                 loginAttempt.FailureReason = "Untrusted Device being used.";

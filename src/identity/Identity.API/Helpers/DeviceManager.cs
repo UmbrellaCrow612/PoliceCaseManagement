@@ -78,10 +78,9 @@ namespace Identity.API.Helpers
             return (true, []);
         }
 
-        public async Task<UserDevice?> GetRequestingDevice(string userId, HttpRequest request)
+        public async Task<UserDevice?> GetRequestingDevice(string userId, string deviceFingerprint, string userAgent)
         {
-            var deviceFingerprint = request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
-            var deviceId = _deviceIdentification.GenerateDeviceId(userId, request.Headers.UserAgent.ToString(), deviceFingerprint!);
+            var deviceId = _deviceIdentification.GenerateDeviceId(userId, userAgent, deviceFingerprint);
 
             return await _userDeviceStore.GetUserDeviceByIdAsync(deviceId);
         }
