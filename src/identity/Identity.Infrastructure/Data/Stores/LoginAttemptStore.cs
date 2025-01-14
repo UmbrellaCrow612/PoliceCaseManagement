@@ -35,7 +35,7 @@ namespace Identity.Infrastructure.Data.Stores
             _dbcontext.LoginAttempts.Update(loginAttempt);
         }
 
-        public async Task StoreLoginAttempt(LoginAttempt loginAttempt)
+        public async Task StoreLoginAttemptAsync(LoginAttempt loginAttempt)
         {
             if(!EfHelper.ExistsInContext(_dbcontext, loginAttempt))
             {

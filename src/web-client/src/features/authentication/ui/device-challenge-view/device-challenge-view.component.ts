@@ -15,6 +15,7 @@ import { DeviceService } from '../../../../core/user/device/services/device.serv
 import { MatSnackBar } from '@angular/material/snack-bar';
 import formatBackendError from '../../../../core/errors/utils/format-error';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-device-challenge-view',
@@ -34,7 +35,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class DeviceChallengeViewComponent {
   constructor(
     private deviceService: DeviceService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private active: ActivatedRoute
   ) {}
 
   isSendingRequestInProgress = false;
@@ -52,18 +55,16 @@ export class DeviceChallengeViewComponent {
         .subscribe({
           next: (res) => {
             this.isSendingRequestInProgress = false;
-            console.log(res)
+            this.router.navigate(['../confirm-device-challenge'], {
+              relativeTo: this.active,
+            });
           },
           error: (err) => {
             this.isSendingRequestInProgress = false;
             const errorMessage = formatBackendError(err);
-            this.snackBar.open(
-              `Failed to send request: ${errorMessage}`,
-              'Close',
-              {
-                duration: 5000,
-              }
-            );
+            this.snackBar.open(errorMessage, 'Close', {
+              duration: 5000,
+            });
           },
         });
     }

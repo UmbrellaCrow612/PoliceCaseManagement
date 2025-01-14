@@ -16,10 +16,17 @@ export const AUTHENTICATION_ROUTES: Routes = [
       ),
   },
   {
-    path: 'device-challenge', // have query params in URL for device confirmation
+    path: 'device-challenge',
     loadComponent: () =>
       import('./ui/device-challenge-view/device-challenge-view.component').then(
         (c) => c.DeviceChallengeViewComponent
+      ),
+  },
+  {
+    path: 'confirm-device-challenge',
+    loadComponent: () =>
+      import('./ui/confirm-device-challenge-view/confirm-device-challenge-view.component').then(
+        (c) => c.ConfirmDeviceChallengeViewComponent
       ),
   },
   {

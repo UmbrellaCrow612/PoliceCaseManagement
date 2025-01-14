@@ -4,6 +4,7 @@ using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Mappings;
 using Identity.API.Responses;
+using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores.Interfaces;
@@ -26,7 +27,7 @@ namespace Identity.API.Controllers
         ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
-        ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, IOptions<TimeWindows> timeWindows, DeviceManager deviceManager, ITwoFactorEmailAttemptStore twoFactorEmailAttemptStore
+        ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, IOptions<TimeWindows> timeWindows, DeviceManager deviceManager, ITwoFactorEmailAttemptStore twoFactorEmailAttemptStore, IAuthService authService
         ) : ControllerBase
     {
         private readonly JwtBearerHelper _jwtHelper = jwtHelper;
@@ -47,101 +48,16 @@ namespace Identity.API.Controllers
         private readonly DeviceManager _deviceManager = deviceManager;
         private readonly ITwoFactorEmailAttemptStore _twoFactorEmailAttemptStore = twoFactorEmailAttemptStore;
         private readonly UserMapping userMapping = new();
+        private readonly IAuthService _authService = authService;
 
         [RequireDeviceInformation]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
-                                ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                                ?? "Unknown";
+            var res = await _authService.Login(dto.Email, dto.Password, Request);
+            if(!res.Succeeded) return Unauthorized(res.Errors);
 
-            ApplicationUser? user;
-            if (!string.IsNullOrWhiteSpace(dto.UserName))
-            {
-                user = await _userManager.FindByNameAsync(dto.UserName);
-                if (user is null) return Unauthorized("Incorrect credentials");
-            }
-            else
-            {
-                user = await _userManager.FindByEmailAsync(dto.Email ?? string.Empty);
-                if (user is null) return Unauthorized("Incorrect credentials");
-            }
-
-            if (user is null) return Unauthorized();
-
-            string userAgent = Request.Headers.UserAgent.ToString();
-            LoginAttempt loginAttempt = new()
-            {
-                IpAddress = ipAddress,
-                UserAgent = userAgent,
-                UserId = user.Id,
-            };
-           
-            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-            if (!isPasswordCorrect)
-            {
-                loginAttempt.FailureReason = "User credentials";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return Unauthorized("Incorrect credentials");
-            }
-
-            if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
-            {
-                loginAttempt.FailureReason = "User account locked.";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return Unauthorized("User account locked.");
-            }
-
-            if (!user.EmailConfirmed)
-            {
-                loginAttempt.FailureReason = "Email not confirmed.";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/emailConfirm",
-                    message = "Email needs confirmation"
-                });
-            }
-
-            if (!user.PhoneNumberConfirmed)
-            {
-                loginAttempt.FailureReason = "Phone not confirmed.";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return StatusCode(403, new
-                {
-                    redirectUrl = "/phoneConfirm",
-                    message = "Phone needs confirmation"
-                });
-            }
-
-            var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
-            if (device is null)
-            {
-                loginAttempt.FailureReason = "New Device being used.";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return DeviceConfirmationResponse.GetResponse();
-            }
-
-            if (!device.IsTrusted)
-            {
-                loginAttempt.FailureReason = "Untrusted Device being used.";
-                await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-                return DeviceConfirmationResponse.Untrusted.GetResponse();
-            }
-
-            loginAttempt.Status = LoginStatus.TwoFactorAuthenticationReached;
-            await _loginAttemptStore.StoreLoginAttempt(loginAttempt);
-
-            // send a redirect to /tfa?loginAttempt=id - they will choose a TFA method for this attempt
-
-            return Ok(new {loginAttempt.Id});
+            return Ok(new { res.LoginAttemptId });
         }
 
         [RequireDeviceInformation]
@@ -573,14 +489,14 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
         {
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
-            if (user is null) return Ok("User dose not exist - would not show in prod");
+            if (user is null) return Ok();
 
             var code = Guid.NewGuid().ToString();
 
             var deviceId = _deviceIdentification.GenerateDeviceId(user.Id, Request.Headers.UserAgent!, Request.HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!);
 
             var device = await _deviceManager.GetRequestingDevice(user.Id, Request);
-            if (device is not null && device.IsTrusted is true) return BadRequest("Device is already trusted - no need to send a challenge.");
+            if (device is not null && device.IsTrusted is true) return BadRequest();
 
             device ??= new UserDevice
             {

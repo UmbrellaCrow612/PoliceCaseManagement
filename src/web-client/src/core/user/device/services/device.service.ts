@@ -9,19 +9,21 @@ import env from '../../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class DeviceService {
+export class DeviceService extends BaseService {
   private readonly COOKIE_NAME = CookieNames.DEVICE_FINGERPRINT;
   private readonly EXPIRATION_DAYS = 2;
 
   private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
 
   constructor(
-    private cookieService: CookieService,
-    private httpClient: HttpClient
-  ) {}
+    protected override http: HttpClient,
+    private cookieService: CookieService
+  ) {
+    super(http);
+  }
 
   SendDeviceChallengeAttempt(email: string | null) {
-    return this.httpClient.post(
+    return this.post(
       `${this.BASE_URL}/authentication/resend-user-device-challenge`,
       { email: email }
     );

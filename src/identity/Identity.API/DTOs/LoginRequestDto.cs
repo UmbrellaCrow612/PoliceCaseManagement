@@ -7,9 +7,9 @@ namespace Identity.API.DTOs
         [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "The field cannot contain only whitespace.")]
         public string? UserName { get; set; } = null;
 
-        [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "The field cannot contain only whitespace.")]
+        [Required]
         [EmailAddress]
-        public string? Email { get; set; } = null;
+        public required string Email { get; set; }
 
         [Required]
         public required string Password { get; set; }

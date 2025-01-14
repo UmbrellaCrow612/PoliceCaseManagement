@@ -27,9 +27,6 @@
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\libs\Mapper.Core\Mapper.Core.csproj" />
     <ProjectReference Include="..\..\infra\Email.Service\Email.Service.csproj" />
     <ProjectReference Include="..\..\shared\Challenge.Core\Challenge.Core.csproj" />

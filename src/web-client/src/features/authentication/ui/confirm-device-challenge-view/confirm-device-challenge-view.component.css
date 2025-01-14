@@ -1,0 +1,31 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2em;
+  background-color: #e8f1fa; /* Light blue background */
+}
+
+.card {
+  width: 90%;
+  max-width: 500px;
+}
+
+.btns {
+  display: flex;
+  gap: 1em;
+}
+
+@media (min-width: 768px) {
+  .card {
+    width: 60%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .card {
+    width: 40%;
+  }
+}

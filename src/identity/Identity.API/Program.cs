@@ -11,6 +11,7 @@ using Challenge.Core;
 using Identity.Infrastructure.Data;
 using Authorization.Core;
 using Logging.Core;
+using Identity.API;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddScoped<DeviceManager>();
 
 builder.Services.AddEmailService(builder.Configuration);
+builder.Services.AddServices(config);
 
 var app = builder.Build();
 
