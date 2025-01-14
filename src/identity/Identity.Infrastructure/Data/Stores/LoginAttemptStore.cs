@@ -11,9 +11,9 @@ namespace Identity.Infrastructure.Data.Stores
 
         public IQueryable<LoginAttempt> LoginAttempts => _dbcontext.LoginAttempts.AsQueryable();
 
-        public async Task<LoginAttempt?> GetLoginAttemptById(string loginAttemptId)
+        public async Task<LoginAttempt?> FindAsync(string loginAttemptId)
         {
-            return await _dbcontext.LoginAttempts.FirstOrDefaultAsync(x => x.Id == loginAttemptId);
+            return await _dbcontext.LoginAttempts.FindAsync(loginAttemptId);
         }
 
         public async Task<ICollection<LoginAttempt>> GetUserLoginAttempts(ApplicationUser user)

@@ -48,7 +48,7 @@ namespace Identity.Infrastructure.Data.Stores
             List<ErrorDetail> errors = [];
 
             var loginAttempt = await _dbcontext.LoginAttempts.FindAsync(loginAttemptId);
-            if (loginAttempt is null || !loginAttempt.IsValid(_timeWindows.LoginLifetime))
+            if (loginAttempt is null || !loginAttempt.IsValid())
             {
                 errors.Add(new ErrorDetail
                 {

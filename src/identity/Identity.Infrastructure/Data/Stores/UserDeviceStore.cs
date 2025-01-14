@@ -13,7 +13,7 @@ namespace Identity.Infrastructure.Data.Stores
 
         public async Task<UserDevice?> GetUserDeviceByIdAsync(string deviceId)
         {
-            return  await _dbcontext.UserDevices.FirstOrDefaultAsync(x => x.Id == deviceId);
+            return  await _dbcontext.UserDevices.FindAsync(deviceId);
         }
 
         public async Task SetUserDevice(ApplicationUser user, UserDevice userDevice)

@@ -21,6 +21,11 @@ namespace Identity.Core.Models
         public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
         public ICollection<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; } = [];
 
+        public bool IsPhoneNumberConfirmed()
+        {
+            return PhoneNumberConfirmed;
+        }
+
         public bool IsLinkedToADepartment()
         {
             return DepartmentId is not null;

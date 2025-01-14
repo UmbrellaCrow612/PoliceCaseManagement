@@ -12,15 +12,16 @@
         public required string PhoneNumber { get; set; }
         public required string UserId { get; set; }
         public ApplicationUser? User { get; set; } = null;
+        public required DateTime ExpiresAt { get; set; }
 
-        public bool IsValid(double windowTime)
+        public bool IsValid()
         {
             if (IsSuccessful is true)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }

@@ -10,23 +10,29 @@
         public LoginStatus Status { get; set; } = LoginStatus.FAILED;
         public string? FailureReason { get; set; } = null;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public required DateTime ExpiresAt { get; set; }
 
         public ICollection<TwoFactorSmsAttempt> TwoFactorSmsAttempts { get; set; } = [];
         public ICollection<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; } = [];
 
-        public bool IsValid(double windowTime)
+        public bool IsValid()
         {
             if (Status != LoginStatus.TwoFactorAuthenticationReached)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }
 
             return true;
+        }
+
+        public void MarkUsed()
+        {
+            Status = LoginStatus.SUCCESS;
         }
     }
 
