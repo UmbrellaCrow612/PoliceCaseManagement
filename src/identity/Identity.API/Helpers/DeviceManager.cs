@@ -1,15 +1,16 @@
 ﻿using Identity.API.Settings;
 using Identity.Core.Models;
+using Identity.Core.Repositorys;
 using Identity.Infrastructure.Data.Stores.Interfaces;
 using UAParser;
 using Utils.DTOs;
 
 namespace Identity.API.Helpers
 {
-    public class DeviceManager(IUserDeviceStore userDeviceStore, IDeviceIdentification deviceIdentification)
+    public class DeviceManager(IDeviceIdentification deviceIdentification, IUnitOfWork unitOfWork)
     {
-        private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         /// <summary>
         /// Validates whether the provided user agent string contains the required properties for generating a device identifier.
@@ -82,7 +83,7 @@ namespace Identity.API.Helpers
         {
             var deviceId = _deviceIdentification.GenerateDeviceId(userId, userAgent, deviceFingerprint);
 
-            return await _userDeviceStore.GetUserDeviceByIdAsync(deviceId);
+            return await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
         }
     }
 }

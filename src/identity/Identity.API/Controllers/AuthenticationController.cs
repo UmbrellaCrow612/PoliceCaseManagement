@@ -84,10 +84,7 @@ namespace Identity.API.Controllers
             var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, info);
             if(!result.Succeeded) return Unauthorized(result.Errors);
 
-            var res = await _authService.GenerateTokensAsync(dto.LoginAttemptId, info);
-            if (!res.Succeeded) return BadRequest(res.Errors);
-
-            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
+            Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true, 
@@ -96,7 +93,7 @@ namespace Identity.API.Controllers
             });
 
            
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, result.Tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true, 
@@ -104,7 +101,7 @@ namespace Identity.API.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes) 
             });
 
-            return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
+            return Ok(new { result.Tokens.JwtBearerToken, result.Tokens.RefreshToken });
         }
 
         [RequireDeviceInformation]

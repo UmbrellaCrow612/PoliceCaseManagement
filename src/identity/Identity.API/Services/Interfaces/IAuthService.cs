@@ -4,23 +4,9 @@
     {
         Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo);
 
-        Task<TwoFactorSmsVerificationResult> SendTwoFactorSmsVerificationCodeAsync(string loginAttemptId);
+        Task<TwoFactorSmsSentResult> SendTwoFactorSmsVerificationCodeAsync(string loginAttemptId);
 
-        Task<TwoFactorSmsVerificationResult> ValidateTwoFactorSmsCodeAsync(string loginAttemptId, string code, DeviceInfo deviceInfo);
-
-        Task<JwtBearerTokenResult> GenerateTokensAsync(string loginAttemptId, DeviceInfo deviceInfo);
-    }
-
-    public class TwoFactorSmsVerificationResult
-    {
-        public ICollection<TwoFactorSmsVerificationError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class TwoFactorSmsVerificationError
-    {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
+        Task<TwoFactorSmsValidationResult> ValidateTwoFactorSmsCodeAsync(string loginAttemptId, string code, DeviceInfo deviceInfo);
     }
 
     public class LoginResult
@@ -37,24 +23,37 @@
         public string? RedirectUrl { get; set; } = null;
     }
 
+    public class TwoFactorSmsSentResult
+    {
+        public ICollection<TwoFactorSmsSentResultError> Errors { get; set; } = [];
+        public bool Succeeded { get; set; } = false;
+    }
+
+    public class TwoFactorSmsSentResultError
+    {
+        public required int Code { get; set; }
+        public required string Message { get; set; }
+    }
+
+    public class TwoFactorSmsValidationResult
+    {
+        public ICollection<TwoFactorSmsValidationResultError> Errors { get; set; } = [];
+        public bool Succeeded { get; set; } = false;
+        public Tokens Tokens {  get; set; } = new(); 
+    }
+
+    public class TwoFactorSmsValidationResultError
+    {
+        public required int Code { get; set; }
+
+        public required string Message { get; set; }
+    }
+
     public class DeviceInfo
     {
         public required string IpAddress { get; set; }
         public required string UserAgent { get; set; }
         public required string DeviceFingerPrint { get; set; }
-    }
-
-    public class JwtBearerTokenResult
-    {
-        public required Tokens Tokens { get; set; }
-        public ICollection<JwtBearerTokenError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class JwtBearerTokenError
-    {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
     }
 
     public class Tokens

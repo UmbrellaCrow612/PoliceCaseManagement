@@ -18,7 +18,7 @@ namespace Authorization.Core
         /// <returns>
         /// Bearer token and it's ID
         /// </returns>
-        public (string jwtBearerToken, string jwtBearerTokenId) GenerateBearerToken<TUser>(TUser user, IList<string> roles)
+        public (string jwtBearerToken, string jwtBearerAcessTokenId) GenerateBearerToken<TUser>(TUser user, IList<string> roles)
         where TUser : IdentityUser
         {
             var handler = new JwtSecurityTokenHandler();
