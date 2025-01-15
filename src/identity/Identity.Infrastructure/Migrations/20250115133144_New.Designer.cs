@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250114210036_New")]
+    [Migration("20250115133144_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -403,6 +403,9 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsSuccessful")

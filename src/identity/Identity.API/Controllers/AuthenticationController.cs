@@ -177,32 +177,13 @@ namespace Identity.API.Controllers
 
         [RequireDeviceInformation]
         [AllowAnonymous]
-        [HttpPost("resend-two-factor-email")]
-        public async Task<ActionResult> ReSendTwoFactorEmailAuth([FromBody] ReSendTwoFactorEmailAttemptDto reSendTwoFactorEmailAttemptDto)
+        [HttpPost("send-two-factor-email")]
+        public async Task<ActionResult> ReSendTwoFactorEmailAuth([FromBody] ReSendTwoFactorEmailAttemptDto dto)
         {
-            var loginAttempt = await _loginAttemptStore.FindAsync(reSendTwoFactorEmailAttemptDto.LoginAttemptId);
-            if(loginAttempt is null || !loginAttempt.IsValid()) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "LoginAsync attempt dose not exist or is invalid."});
-
-            var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
-            if(user is null) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "User dose not exist." });
-
-            var info = ComposeDeviceInfo();
-            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
-            if (device is null || !device.Trusted()) return StatusCode(403, new { redirectUrl = "/deviceConfirme", message = "Device needs confirmation" });
-
-            var attempt = new TwoFactorEmailAttempt
-            {
-                Code = Guid.NewGuid().ToString(),
-                Email = user.Email!,
-                LoginAttemptId = loginAttempt.Id,
-            };
-
-            var (canMakeAttempt, errors) = await _twoFactorEmailAttemptStore.AddAttempt(attempt);
-            if (!canMakeAttempt) return BadRequest(errors);
-
-            // send email
-
-            return Ok(attempt.Code);
+            var res = await _authService.SendTwoFactorEmailVerificationCodeAsync(dto.LoginAttemptId);
+            if (!res.Succeeded) return BadRequest(res.Errors);
+          
+            return Ok();
         }
 
         [HttpPost("register")]

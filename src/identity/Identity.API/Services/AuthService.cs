@@ -102,6 +102,66 @@ namespace Identity.API.Services
             return result;
         }
 
+        public async Task<TwoFactorEmailSentResult> SendTwoFactorEmailVerificationCodeAsync(string loginAttemptId)
+        {
+            var result = new TwoFactorEmailSentResult();
+
+            var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
+            if (loginAttempt is null)
+            {
+                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status404NotFound, Message = "Login attempt not found"});
+                return result;
+            }
+
+            if (!loginAttempt.IsValid())
+            {
+                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status401Unauthorized, Message = "Login attempt no longer valid" });
+                return result;
+            }
+
+            var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
+            if (user is null)
+            {
+                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                return result;
+            }
+
+            if (!user.IsEmailConfirmed())
+            {
+                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status401Unauthorized, Message = "User email not confirmed" });
+                return result;
+            }
+
+            var validRecentTwoFactorEmailAttemptExists = await _unitOfWork.Repository<TwoFactorEmailAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.LoginAttemptId == loginAttemptId && x.IsSuccessful == false)
+                .OrderBy(x => x.CreatedAt)
+                .AnyAsync();
+
+            if (validRecentTwoFactorEmailAttemptExists)
+            {
+                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status400BadRequest, Message = "Valid recent email attempt already issued for this login" });
+                return result;
+            }
+
+            var twoFactorEmailAttempt = new TwoFactorEmailAttempt
+            {
+                Code = Guid.NewGuid().ToString()[..5],
+                Email = user.Email!,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.TwoFactorEmailTime),
+                LoginAttemptId = loginAttemptId,
+            };
+
+            await _unitOfWork.Repository<TwoFactorEmailAttempt>().AddAsync(twoFactorEmailAttempt);
+
+            // use email service and send the code 
+
+            await _unitOfWork.SaveChangesAsync();
+            result.Succeeded = true;
+
+            return result;
+        }
+
         public async Task<TwoFactorSmsSentResult> SendTwoFactorSmsVerificationCodeAsync(string loginAttemptId)
         {
             var result = new TwoFactorSmsSentResult();

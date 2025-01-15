@@ -10,19 +10,16 @@
         public DateTime? SuccessfulAt { get; set; } = null;
         public required string LoginAttemptId { get; set; }
         public LoginAttempt? LoginAttempt { get; set; } = null;
-
-        /// <summary>
-        /// Checks if a attempt is valid - By checking if it not already used or expired
-        /// </summary>
-        /// <param name="windowTime">The time a attempt is considred valid for</param>
-        public bool IsValid(double windowTime)
+        public required DateTime ExpiresAt {  get; set; }
+   
+        public bool IsValid()
         {
             if (IsSuccessful)
             {
                 return false; // already been used
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false; // time elapsed
             }

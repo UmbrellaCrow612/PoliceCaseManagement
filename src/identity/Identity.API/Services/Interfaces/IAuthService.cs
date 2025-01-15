@@ -7,6 +7,8 @@
         Task<TwoFactorSmsSentResult> SendTwoFactorSmsVerificationCodeAsync(string loginAttemptId);
 
         Task<TwoFactorSmsValidationResult> ValidateTwoFactorSmsCodeAsync(string loginAttemptId, string code, DeviceInfo deviceInfo);
+
+        Task<TwoFactorEmailSentResult> SendTwoFactorEmailVerificationCodeAsync(string loginAttemptId);
     }
 
     public class LoginResult
@@ -46,6 +48,18 @@
     {
         public required int Code { get; set; }
 
+        public required string Message { get; set; }
+    }
+
+    public class TwoFactorEmailSentResult
+    {
+        public ICollection<TwoFactorEmailSentResultError> Errors { get; set; } = [];
+        public bool Succeeded { get; set; } = false;
+    }
+
+    public class TwoFactorEmailSentResultError
+    {
+        public required int Code { get; set; }
         public required string Message { get; set; }
     }
 

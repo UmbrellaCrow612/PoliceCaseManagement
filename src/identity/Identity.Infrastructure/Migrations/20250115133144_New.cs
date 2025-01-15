@@ -378,7 +378,8 @@ namespace Identity.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
                     SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    LoginAttemptId = table.Column<string>(type: "TEXT", nullable: false)
+                    LoginAttemptId = table.Column<string>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

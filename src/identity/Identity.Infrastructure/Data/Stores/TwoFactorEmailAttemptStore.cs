@@ -62,7 +62,7 @@ namespace Identity.Infrastructure.Data.Stores
                 x => x.LoginAttemptId == loginAttemptId && x.Code == code)
                 .FirstOrDefaultAsync();
 
-            if (_attempt is null || !_attempt.IsValid(_timeWindows.TwoFactorEmailTime))
+            if (_attempt is null || !_attempt.IsValid())
             {
                 errors.Add(new ErrorDetail
                 {
