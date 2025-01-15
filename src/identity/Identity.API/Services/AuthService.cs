@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace Identity.API.Services
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, ILoginAttemptStore loginAttemptStore, DeviceManager deviceManager, IOptions<TimeWindows> options, ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, ITokenStore tokenStore) : IAuthService
+    internal class AuthService(UserManager<ApplicationUser> userManager, ILoginAttemptStore loginAttemptStore, DeviceManager deviceManager, IOptions<TimeWindows> options, ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, ITokenStore tokenStore, IUnitOfWork unitOfWork) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
@@ -22,6 +22,7 @@ namespace Identity.API.Services
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly ITokenStore _tokenStore = tokenStore;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<JwtBearerTokenResult> GenerateTokensAsync(string loginAttemptId, DeviceInfo deviceInfo)
         {
@@ -106,11 +107,14 @@ namespace Identity.API.Services
             };
             result.LoginAttemptId = loginAttempt.Id;
 
+            await _unitOfWork.Repository<LoginAttempt>().AddAsync(loginAttempt);
+
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
             if (!isPasswordCorrect)
             {
                 loginAttempt.FailureReason = "User credentials";
-                await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Incorrect credentials" });
                 return result;
@@ -119,7 +123,8 @@ namespace Identity.API.Services
             if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
                 loginAttempt.FailureReason = "User account locked.";
-                await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Account locked" });
                 return result;
@@ -128,7 +133,8 @@ namespace Identity.API.Services
             if (!user.EmailConfirmed)
             {
                 loginAttempt.FailureReason = "Email not confirmed.";
-                await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Email not confirmed", RedirectUrl = IdentityApplicationRedirectUrls.EmailConfirmationUrl });
                 return result;
@@ -137,7 +143,8 @@ namespace Identity.API.Services
             if (!user.PhoneNumberConfirmed)
             {
                 loginAttempt.FailureReason = "Phone not confirmed.";
-                await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Phone number not confirmed", RedirectUrl = IdentityApplicationRedirectUrls.PhoneConfirmationUrl });
                 return result;
@@ -147,14 +154,15 @@ namespace Identity.API.Services
             if(device is null || !device.Trusted())
             {
                 loginAttempt.FailureReason = "Untrusted Device being used.";
-                await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Untrsuted device being used", RedirectUrl = IdentityApplicationRedirectUrls.DeviceConfirmationUrl });
                 return result;
             }
 
             loginAttempt.Status = LoginStatus.TwoFactorAuthenticationReached;
-            await _loginAttemptStore.StoreLoginAttemptAsync(loginAttempt);
+            await _unitOfWork.SaveChangesAsync();
 
             result.Succeeded = true;
 

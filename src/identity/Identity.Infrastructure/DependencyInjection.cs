@@ -1,5 +1,7 @@
 ﻿using Identity.Core.Models;
+using Identity.Core.Repositorys;
 using Identity.Infrastructure.Data;
+using Identity.Infrastructure.Data.Repositorys;
 using Identity.Infrastructure.Data.Stores;
 using Identity.Infrastructure.Data.Stores.Interfaces;
 using Identity.Infrastructure.Settings;
@@ -28,6 +30,8 @@ namespace Identity.Infrastructure
             {
                 options.User.RequireUniqueEmail = true;
             });
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddOptions<TimeWindows>()
                 .Bind(configuration.GetSection("TimeWindows"))
