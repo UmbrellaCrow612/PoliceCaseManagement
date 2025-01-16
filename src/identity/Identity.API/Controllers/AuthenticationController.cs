@@ -120,41 +120,12 @@ namespace Identity.API.Controllers
         [HttpPost("validate-two-factor-email")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
-            var loginAttempt = await _loginAttemptStore.FindAsync(dto.LoginAttemptId);
-            if (loginAttempt is null || !loginAttempt.IsValid()) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "LoginAsync attempt dose not exist or is invalid." });
-
-            var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
-            if (user is null) return NotFound(new ErrorDetail { Field = "Two factor email", Reason = "User dose not exist." });
-
             var info = ComposeDeviceInfo();
-            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
-            if (device is null || !device.Trusted()) return StatusCode(403, new { redirectUrl = "/deviceConfirme", message = "Device needs confirmation" });
 
-            var (isValid, errors) = await _twoFactorEmailAttemptStore.ValidateAttempt(dto.LoginAttemptId, dto.EmailCode);
-            if(!isValid) return BadRequest(errors);
+            var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, info);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            var roles = await _userManager.GetRolesAsync(user);
-
-            (string accessToken, string tokenId) = _jwtHelper.GenerateBearerToken(user, roles);
-            var refreshToken = _jwtHelper.GenerateRefreshToken();
-
-            Token token = new()
-            {
-                Id = tokenId,
-                RefreshToken = _stringEncryptionHelper.Hash(refreshToken),
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes),
-                UserId = user.Id,
-                UserDeviceId = device.Id
-            };
-
-            await _tokenStore.SetToken(token);
-
-            user.LastLoginDeviceId = device.Id;
-
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return BadRequest(res.Errors);
-
-            Response.Cookies.Append(CookieNamesConstant.JWT, accessToken, new CookieOptions
+            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -163,7 +134,7 @@ namespace Identity.API.Controllers
             });
 
 
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, refreshToken, new CookieOptions
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -172,7 +143,7 @@ namespace Identity.API.Controllers
             });
 
 
-            return Ok(new { accessToken, refreshToken });
+            return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
         }
 
         [RequireDeviceInformation]

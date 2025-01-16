@@ -8,6 +8,7 @@ using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using UAParser;
 
 namespace Identity.API.Services
 {
@@ -19,6 +20,12 @@ namespace Identity.API.Services
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+
+        private async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
@@ -224,6 +231,87 @@ namespace Identity.API.Services
             return result;
         }
 
+        public async Task<(bool isValid, LoginAttempt? loginAttempt)> ValidateLoginAttemptAsync(string loginAttemptId)
+        {
+            var attempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
+            if (attempt is null)
+                return (false, null);
+
+            return (attempt.IsValid(), attempt);
+        }
+
+        public async Task<TwoFactorEmailValidationResult> ValidateTwoFactorEmailCodeAsync(string loginAttemptId, string code, DeviceInfo deviceInfo)
+        {
+            var result = new TwoFactorEmailValidationResult();
+
+            var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
+            if(!isValid || loginAttempt is null)
+            {
+                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "Login attempt not found or is invalid" });
+                return result;
+            }
+
+            var user = await GetUserByIdAsync(loginAttempt.UserId);
+            if (user is null)
+            {
+                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                return result;
+            }
+
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
+            if(!isTrusted || userDevice is null)
+            {
+                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "User device not found or is not trusted" });
+                return result;
+            }
+
+            var twoFactorEmailAttempt = await _unitOfWork.Repository<TwoFactorEmailAttempt>()
+                .Query
+                .Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code)
+                .FirstOrDefaultAsync();
+
+            if (twoFactorEmailAttempt is null || !twoFactorEmailAttempt.IsValid())
+            {
+                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "Two factor code not found or is invalid" });
+                return result;
+            }
+
+            twoFactorEmailAttempt.MarkUsed();
+            _unitOfWork.Repository<TwoFactorEmailAttempt>().Update(twoFactorEmailAttempt);
+
+            loginAttempt.MarkUsed();
+            _unitOfWork.Repository<LoginAttempt>().Update(loginAttempt);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            (string jwtBearerAcessToken, string jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
+            var refreshToken = _jwtBearerHelper.GenerateRefreshToken();
+
+            result.Tokens.JwtBearerToken = jwtBearerAcessToken;
+            result.Tokens.RefreshToken = refreshToken;
+
+            var token = new Token
+            {
+                Id = jwtBearerAcessTokenId,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
+                UserDeviceId = userDevice.Id,
+                UserId = user.Id
+            };
+
+            await _unitOfWork.Repository<Token>().AddAsync(token);
+
+            user.LastLoginDeviceId = userDevice.Id;
+
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+
+            return result;
+        }
+
         public async Task<TwoFactorSmsValidationResult> ValidateTwoFactorSmsCodeAsync(string loginAttemptId, string code, DeviceInfo deviceInfo)
         {
             var result = new TwoFactorSmsValidationResult();
@@ -302,6 +390,16 @@ namespace Identity.API.Services
             result.Succeeded = true;
 
             return result;
+        }
+
+        public async Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info)
+        {
+            var device = await _deviceManager.GetRequestingDevice(userId, info.DeviceFingerPrint, info.UserAgent);
+            if (device is null) return (false, null);
+
+            if (!device.Trusted()) return (false, null);
+
+            return (true, device);
         }
     }
 }

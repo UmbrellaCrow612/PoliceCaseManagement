@@ -8,6 +8,6 @@ namespace Identity.API.DTOs
         public required string LoginAttemptId { get; set; }
 
         [Required]
-        public required string EmailCode { get; set; }
+        public required string Code { get; set; }
     }
 }
