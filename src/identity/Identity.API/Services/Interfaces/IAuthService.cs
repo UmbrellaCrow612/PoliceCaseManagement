@@ -1,4 +1,5 @@
 ﻿using Identity.Core.Models;
+using System.Globalization;
 
 namespace Identity.API.Services.Interfaces
 {
@@ -17,6 +18,8 @@ namespace Identity.API.Services.Interfaces
         Task<(bool isValid, LoginAttempt? loginAttempt)> ValidateLoginAttemptAsync(string loginAttemptId);
 
         Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info);
+
+        Task<RefreshTokenResult> RefreshTokens(string userId,string tokenId, string refreshToken, DeviceInfo deviceInfo);
     }
 
     public class LoginResult
@@ -82,6 +85,18 @@ namespace Identity.API.Services.Interfaces
     {
         public required int Code { get; set;}
         public required string Message { get; set;}
+    }
+
+    public class RefreshTokenResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<RefreshTokenResultError> Errors { get; set; } = [];
+        public Tokens Tokens { get; set; } = new();
+    }
+
+    public class RefreshTokenResultError
+    {
+
     }
 
     public class DeviceInfo

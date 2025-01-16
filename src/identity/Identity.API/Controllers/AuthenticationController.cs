@@ -3,12 +3,10 @@ using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Mappings;
-using Identity.API.Responses;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Infrastructure.Data.Stores.Interfaces;
-using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +21,10 @@ namespace Identity.API.Controllers
     [Route("authentication")]
     public class AuthenticationController(
         JwtBearerHelper jwtHelper, UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
-        StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore, 
-        ILogger<AuthenticationController> logger, ILoginAttemptStore loginAttemptStore,
+        StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
-        ITwoFactorSmsAttemptStore twoFactorSmsAttemptStore, IOptions<TimeWindows> timeWindows, DeviceManager deviceManager, ITwoFactorEmailAttemptStore twoFactorEmailAttemptStore, IAuthService authService
+        DeviceManager deviceManager, IAuthService authService
         ) : ControllerBase
     {
         private readonly JwtBearerHelper _jwtHelper = jwtHelper;
@@ -36,17 +33,12 @@ namespace Identity.API.Controllers
         private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
-        private readonly ILogger<AuthenticationController> _logger = logger;
-        private readonly ILoginAttemptStore _loginAttemptStore = loginAttemptStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
         private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
-        private readonly ITwoFactorSmsAttemptStore _twoFactorSmsAttemptStore = twoFactorSmsAttemptStore;
-        private readonly TimeWindows _timeWindows = timeWindows.Value;
         private readonly DeviceManager _deviceManager = deviceManager;
-        private readonly ITwoFactorEmailAttemptStore _twoFactorEmailAttemptStore = twoFactorEmailAttemptStore;
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
@@ -69,7 +61,7 @@ namespace Identity.API.Controllers
             var info = ComposeDeviceInfo();
 
             var res = await _authService.LoginAsync(dto.Email, dto.Password, info);
-            if(!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok(new { res.LoginAttemptId });
         }
@@ -82,23 +74,23 @@ namespace Identity.API.Controllers
             var info = ComposeDeviceInfo();
 
             var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, info);
-            if(!result.Succeeded) return Unauthorized(result.Errors);
+            if (!result.Succeeded) return Unauthorized(result.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, 
+                Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes) 
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
             });
 
-           
+
             Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, result.Tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, 
+                Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes) 
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
             });
 
             return Ok(new { result.Tokens.JwtBearerToken, result.Tokens.RefreshToken });
@@ -106,11 +98,11 @@ namespace Identity.API.Controllers
 
         [RequireDeviceInformation]
         [AllowAnonymous]
-        [HttpPost("resend-two-factor-sms")]
+        [HttpPost("send-two-factor-sms")]
         public async Task<ActionResult> ReSendTwoFactorAuthentication(ReSendTwoFactorCode dto)
         {
             var res = await _authService.SendTwoFactorSmsVerificationCodeAsync(dto.LoginAttemptId);
-            if(!res.Succeeded) return BadRequest(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -153,7 +145,7 @@ namespace Identity.API.Controllers
         {
             var res = await _authService.SendTwoFactorEmailVerificationCodeAsync(dto.LoginAttemptId);
             if (!res.Succeeded) return BadRequest(res.Errors);
-          
+
             return Ok();
         }
 
@@ -176,7 +168,7 @@ namespace Identity.API.Controllers
         [RequireDeviceInformation]
         [Authorize]
         [HttpPost("refresh-token")]
-        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
@@ -191,33 +183,19 @@ namespace Identity.API.Controllers
                 return Unauthorized("Jti ID not found in token.");
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
-
             var info = ComposeDeviceInfo();
-            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
-            if (device is null || !device.IsTrusted) return Unauthorized("Device not registered or trusted.");
+            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, info);
+            if (!result.Succeeded) return Unauthorized(result.Errors);
 
-            (bool isValid, DateTime? RefreshTokenExpiresAt) = await _tokenStore.ValidateTokenAsync(tokenId, device.Id, _stringEncryptionHelper.Hash(refreshTokenRequestDto.RefreshToken));
-
-            if (!isValid || RefreshTokenExpiresAt is null) return Unauthorized();
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            var (accessToken, accessTokenId) = _jwtHelper.GenerateBearerToken(user, roles);
-
-            Token token = new()
+            Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
             {
-                Id = accessTokenId,
-                RefreshToken = refreshTokenRequestDto.RefreshToken,
-                RefreshTokenExpiresAt = (DateTime)RefreshTokenExpiresAt,
-                UserId = userId,
-                UserDeviceId = device.Id
-            };
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
+            });
 
-            await _tokenStore.StoreTokenAsync(token);
-
-            return Ok(new { accessToken });
+            return Ok(new { result.Tokens.JwtBearerToken });
         }
 
         [Authorize]
@@ -250,18 +228,18 @@ namespace Identity.API.Controllers
 
             PasswordResetAttempt passwordResetAttempt = new()
             {
-                Code = trueCode, 
+                Code = trueCode,
                 UserId = user.Id,
             };
 
-            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
+            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
 
             if (!canMakeAttempt)
             {
                 return BadRequest(errors);
             }
 
-           // Send Email link with true code
+            // Send Email link with true code
 
             return Ok(new { trueCode });
         }
@@ -285,7 +263,7 @@ namespace Identity.API.Controllers
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, confirmPasswordResetRequestDto.NewPassword);
 
-            if(!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok();
         }
@@ -354,7 +332,7 @@ namespace Identity.API.Controllers
                 UserId = user.Id
             };
 
-            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
+            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
             if (!canMakeAttempt) return BadRequest(errors);
 
             // send code in email
@@ -370,7 +348,7 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByEmailAsync(challengeDto.Email);
             if (user is null) return Ok("User dose not exist - would not show in prod");
 
-            (bool isValid,UserDeviceChallengeAttempt? attempt) = await _userDeviceChallengeAttemptStore.ValidateAttemptAsync(challengeDto.Email, challengeDto.Code);
+            (bool isValid, UserDeviceChallengeAttempt? attempt) = await _userDeviceChallengeAttemptStore.ValidateAttemptAsync(challengeDto.Email, challengeDto.Code);
             if (!isValid || attempt is null) return BadRequest("Attempt is invalid or attempt not found.");
 
             attempt.MarkUsed();
@@ -420,7 +398,7 @@ namespace Identity.API.Controllers
                 UserId = user.Id,
             };
 
-            (bool canMakeAttempt,ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
+            (bool canMakeAttempt, ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
             if (!canMakeAttempt) return BadRequest(Errors);
 
             return Ok(new { code });
@@ -430,12 +408,12 @@ namespace Identity.API.Controllers
         [HttpPost("validate-phone-confirmation")]
         public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto phoneConfirmationDto)
         {
-            (bool isValid, PhoneConfirmationAttempt? attempt,ICollection<ErrorDetail> errors) = 
+            (bool isValid, PhoneConfirmationAttempt? attempt, ICollection<ErrorDetail> errors) =
                 await _phoneConfirmationAttemptStore.ValidateAttempt(phoneConfirmationDto.PhoneNumber, phoneConfirmationDto.Code);
 
             if (!isValid) return BadRequest(errors);
 
-            if(attempt is null) return Unauthorized();
+            if (attempt is null) return Unauthorized();
 
             var user = await _userManager.FindByIdAsync(attempt.UserId);
             if (user is null) return Unauthorized();
@@ -458,17 +436,17 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByEmailAsync(reSendPhoneConfirmation.Email);
             if (user is null) return NotFound("User not found.");
 
-            if (user.PhoneNumberConfirmed) return BadRequest(new ErrorDetail 
-            { Field = "Phone Confirmation", Reason = "Users phone number already confirmed."});
+            if (user.PhoneNumberConfirmed) return BadRequest(new ErrorDetail
+            { Field = "Phone Confirmation", Reason = "Users phone number already confirmed." });
 
             var attempt = new PhoneConfirmationAttempt
             {
-                Code= Guid.NewGuid().ToString(),
+                Code = Guid.NewGuid().ToString(),
                 PhoneNumber = user.PhoneNumber!,
-                UserId= user.Id,
+                UserId = user.Id,
             };
 
-            (bool canMakeAttempt,ICollection<ErrorDetail> errors) = await _phoneConfirmationAttemptStore.AddAttempt(attempt);
+            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _phoneConfirmationAttemptStore.AddAttempt(attempt);
             if (!canMakeAttempt) return BadRequest(errors);
 
             // send code in sms message

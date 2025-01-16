@@ -8,7 +8,7 @@ using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using UAParser;
+using System.Data;
 
 namespace Identity.API.Services
 {
@@ -400,6 +400,43 @@ namespace Identity.API.Services
             if (!device.Trusted()) return (false, null);
 
             return (true, device);
+        }
+
+        public async Task<RefreshTokenResult> RefreshTokens(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo)
+        {
+            var result = new RefreshTokenResult();
+
+            var user = await GetUserByIdAsync(userId);
+            if (user is null)
+            {
+                return result;
+            }
+
+            var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
+            if (device is null) return result;
+
+            var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(tokenId);
+            if (storedToken is null || !storedToken.IsValid(refreshToken, device.Id)) return result;
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var (jwtBearerToken, jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
+
+            var newToken = new Token
+            {
+                Id = jwtBearerAcessTokenId,
+                RefreshToken = storedToken.RefreshToken,
+                RefreshTokenExpiresAt = storedToken.RefreshTokenExpiresAt, // bind to previous refresh token and time
+                UserDeviceId = device.Id,
+                UserId = user.Id,
+            };
+           result.Tokens.JwtBearerToken = jwtBearerToken;
+
+            await _unitOfWork.Repository<Token>().AddAsync(newToken);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }
