@@ -12,11 +12,12 @@ using System.Data;
 
 namespace Identity.API.Services
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork) : IAuthService
+    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, IOptions<IdentityApplicationRedirectUrls> redirectOptions) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
         private readonly TimeWindows _timeWindows = options.Value;
+        private readonly IdentityApplicationRedirectUrls redirectUrls = redirectOptions.Value;
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -96,7 +97,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Email not confirmed", RedirectUrl = IdentityApplicationRedirectUrls.EmailConfirmationUrl });
+                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Email not confirmed", RedirectUrl = redirectUrls.EmailConfirmationUrl });
                 return result;
             }
 
@@ -106,7 +107,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Phone number not confirmed", RedirectUrl = IdentityApplicationRedirectUrls.PhoneConfirmationUrl });
+                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Phone number not confirmed", RedirectUrl = redirectUrls.PhoneConfirmationUrl });
                 return result;
             }
 
@@ -117,7 +118,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Untrsuted device being used", RedirectUrl = IdentityApplicationRedirectUrls.DeviceConfirmationUrl });
+                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Untrsuted device being used", RedirectUrl = redirectUrls.DeviceConfirmationUrl });
                 return result;
             }
 

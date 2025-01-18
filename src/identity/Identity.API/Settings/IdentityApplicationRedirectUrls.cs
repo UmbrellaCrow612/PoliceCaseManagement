@@ -1,9 +1,16 @@
-﻿namespace Identity.API.Settings
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Identity.API.Settings
 {
-    public static class IdentityApplicationRedirectUrls
+    public class IdentityApplicationRedirectUrls
     {
-        public static readonly string EmailConfirmationUrl = "/email-confirme";
-        public static readonly string PhoneConfirmationUrl = "/phone-confirme";
-        public static readonly string DeviceConfirmationUrl = "/device-confirme";
+        [Required]
+        public required string EmailConfirmationUrl {  get; set; }
+
+        [Required]
+        public required string PhoneConfirmationUrl { get; set; }
+
+        [Required]
+        public required string DeviceConfirmationUrl { get; set; }
     }
 }

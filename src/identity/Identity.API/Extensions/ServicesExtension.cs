@@ -1,7 +1,7 @@
 ﻿using Identity.API.Services;
 using Identity.API.Services.Interfaces;
 
-namespace Identity.API
+namespace Identity.API.Extensions
 {
     public static class ServicesExtension
     {
