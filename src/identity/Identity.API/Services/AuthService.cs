@@ -442,5 +442,29 @@ namespace Identity.API.Services
             result.Succeeded = true;
             return result;
         }
+
+        public async Task<LogoutResult> LogoutAsync(string userId)
+        {
+            var result = new LogoutResult();
+
+            var user = GetUserByIdAsync(userId);
+            if (user is null) return result;
+
+            var validTokens = await _unitOfWork.Repository<Token>()
+                .Query
+                .Where(x => x.IsRevoked == false && x.UserId == userId && x.RefreshTokenExpiresAt > DateTime.UtcNow)
+                .ToArrayAsync();
+
+            foreach ( var token in validTokens)
+            {
+                token.Revoke();
+            }
+
+            _unitOfWork.Repository<Token>().UpdateRange(validTokens);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
     }
 }

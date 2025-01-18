@@ -20,6 +20,8 @@ namespace Identity.API.Services.Interfaces
         Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info);
 
         Task<RefreshTokenResult> RefreshTokens(string userId,string tokenId, string refreshToken, DeviceInfo deviceInfo);
+
+        Task<LogoutResult> LogoutAsync(string userId);
     }
 
     public class LoginResult
@@ -95,6 +97,17 @@ namespace Identity.API.Services.Interfaces
     }
 
     public class RefreshTokenResultError
+    {
+
+    }
+
+    public class LogoutResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<LogoutResultError> Errors { get; set; } = [];
+    }
+
+    public class LogoutResultError
     {
 
     }

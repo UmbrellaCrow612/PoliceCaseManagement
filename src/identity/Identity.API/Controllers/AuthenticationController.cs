@@ -207,12 +207,20 @@ namespace Identity.API.Controllers
                 return Unauthorized("User ID not found in token.");
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
+            var res = await _authService.LogoutAsync(userId);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            await _tokenStore.RevokeAllUserTokensAsync(user.Id);
+            return Ok();
+        }
 
-            return NoContent();
+        [Authorize]
+        [HttpPost]
+        public ActionResult AdminLogsoutUserByThereId()
+        {
+            // recieve the user id of the user he wants to logout
+            // call logout on there id
+            // only admin roles dose it etc
+            return Ok();
         }
 
         [AllowAnonymous]

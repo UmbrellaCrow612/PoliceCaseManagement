@@ -18,5 +18,7 @@ namespace Identity.Infrastructure.Data.Repositorys
         public void Update(T entity) => _dbSet.Update(entity);
 
         public void Delete(T entity) => _dbSet.Remove(entity);
+
+        public void UpdateRange(ICollection<T> values) => _dbSet.UpdateRange(values);
     }
 }
