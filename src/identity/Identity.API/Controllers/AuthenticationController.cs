@@ -20,17 +20,15 @@ namespace Identity.API.Controllers
     [ApiController]
     [Route("authentication")]
     public class AuthenticationController(
-        JwtBearerHelper jwtHelper, UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
-        StringEncryptionHelper stringEncryptionHelper, ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore,
+        UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
+        ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore,
         IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
         DeviceManager deviceManager, IAuthService authService
         ) : ControllerBase
     {
-        private readonly JwtBearerHelper _jwtHelper = jwtHelper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
-        private readonly StringEncryptionHelper _stringEncryptionHelper = stringEncryptionHelper;
         private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;

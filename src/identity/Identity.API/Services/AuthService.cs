@@ -21,6 +21,26 @@ namespace Identity.API.Services
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+        private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            (string jwtBearerAcessToken, string jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
+            var refreshToken = _jwtBearerHelper.GenerateRefreshToken();
+
+            var token = new Token
+            {
+                Id = jwtBearerAcessTokenId,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
+                UserDeviceId = device.Id,
+                UserId = user.Id
+            };
+
+            await _unitOfWork.Repository<Token>().AddAsync(token);
+
+            return new Tokens { JwtBearerToken = jwtBearerAcessToken, RefreshToken = refreshToken };
+        }
 
         private async Task<ApplicationUser?> GetUserByIdAsync(string userId)
         {
@@ -282,26 +302,10 @@ namespace Identity.API.Services
             loginAttempt.MarkUsed();
             _unitOfWork.Repository<LoginAttempt>().Update(loginAttempt);
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var tokens = await GenerateAndStoreTokens(user, userDevice);
+            result.Tokens = tokens;
 
-            (string jwtBearerAcessToken, string jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
-            var refreshToken = _jwtBearerHelper.GenerateRefreshToken();
-
-            result.Tokens.JwtBearerToken = jwtBearerAcessToken;
-            result.Tokens.RefreshToken = refreshToken;
-
-            var token = new Token
-            {
-                Id = jwtBearerAcessTokenId,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
-                UserDeviceId = userDevice.Id,
-                UserId = user.Id
-            };
-
-            await _unitOfWork.Repository<Token>().AddAsync(token);
-
-            user.LastLoginDeviceId = userDevice.Id;
+            user.SetLastUsedDevice(userDevice.Id);
 
             _unitOfWork.Repository<ApplicationUser>().Update(user);
 

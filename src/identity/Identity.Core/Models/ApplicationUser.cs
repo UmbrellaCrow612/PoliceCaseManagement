@@ -21,6 +21,11 @@ namespace Identity.Core.Models
         public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
         public ICollection<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; } = [];
 
+        public void SetLastUsedDevice(string userDeviceId)
+        {
+            LastLoginDeviceId = userDeviceId;
+        }
+
         public bool IsEmailConfirmed()
         {
             return EmailConfirmed;
