@@ -52,6 +52,65 @@ namespace Identity.API.Controllers
             };
         }
 
+        [HttpPost("turn-on-magic-link")]
+        [Authorize]
+        public async Task<ActionResult> TunrnOnMagicLinkAuth()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
+
+            user.MagicLinkAuthEnabled = true;
+            var res = await _userManager.UpdateAsync(user);
+            if(!res.Succeeded) return Unauthorized(res.Errors);
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [RequireDeviceInformation]
+        [HttpPost("send-magic-link")]
+        public async Task<ActionResult> SendMagicLink([FromBody] string email)
+        {
+            var info = ComposeDeviceInfo();
+            var res = await _authService.SendMagicLink(email, info);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [RequireDeviceInformation]
+        [HttpPost("validate-magic-link")]
+        public async Task<ActionResult> ValidateMagicLink([FromBody] string code)
+        {
+            var info = ComposeDeviceInfo();
+            var res = await _authService.ValidateMagicLink(code, info);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
+
+            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
+            });
+
+
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
+            });
+
+            return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
+        }
+
+
         [RequireDeviceInformation]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)

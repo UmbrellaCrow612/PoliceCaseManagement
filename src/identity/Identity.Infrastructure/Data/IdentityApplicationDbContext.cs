@@ -21,6 +21,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; }
         public DbSet<ChallengeClaim> ChallengeClaims { get; set; }
         public DbSet<ChallengeToken> ChallengeTokens { get; set; }
+        public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

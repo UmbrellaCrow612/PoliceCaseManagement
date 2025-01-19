@@ -467,5 +467,65 @@ namespace Identity.API.Services
             result.Succeeded = true;
             return result;
         }
+
+        public async Task<SendMagicLinkResult> SendMagicLink(string email, DeviceInfo device)
+        {
+            var result = new SendMagicLinkResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null) return result;
+
+            if (!user.IsMagicLinkAuthEnabled()) return result;
+            if (!user.IsEmailConfirmed()) return result;
+
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, device);
+            if(!isTrusted || userDevice is null) return result;
+
+            var validRecentAttemptExists = await _unitOfWork.Repository<MagicLinkAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
+                .AnyAsync();
+
+            if (validRecentAttemptExists) return result;
+
+            var magicLink = new MagicLinkAttempt()
+            {
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1),
+                UserId = user.Id,
+            };
+
+            await _unitOfWork.Repository<MagicLinkAttempt>().AddAsync(magicLink);
+            await _unitOfWork.SaveChangesAsync();
+
+            // send email using email service domain/magic-link?code=magicLink.id
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<ValidateMagicLinkResult> ValidateMagicLink(string code, DeviceInfo device)
+        {
+            var result = new ValidateMagicLinkResult();
+
+            var magicLinkAttempt = await _unitOfWork.Repository<MagicLinkAttempt>().FindByIdAsync(code);
+            if (magicLinkAttempt is null || !magicLinkAttempt.IsValid()) return result;
+
+            var user = await GetUserByIdAsync(magicLinkAttempt.UserId);
+            if (user is null) return result;
+
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, device);
+            if (!isTrusted || userDevice is null) return result;
+
+            magicLinkAttempt.MarkUsed();
+            _unitOfWork.Repository<MagicLinkAttempt>().Update(magicLinkAttempt);
+
+            var tokens = await GenerateAndStoreTokens(user, userDevice);
+            result.Tokens = tokens;
+
+            await _unitOfWork.SaveChangesAsync();
+            result.Succeeded = true;
+
+            return result;
+        }
     }
 }

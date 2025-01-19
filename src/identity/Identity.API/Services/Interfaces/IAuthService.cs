@@ -1,5 +1,4 @@
 ﻿using Identity.Core.Models;
-using System.Globalization;
 
 namespace Identity.API.Services.Interfaces
 {
@@ -22,6 +21,10 @@ namespace Identity.API.Services.Interfaces
         Task<RefreshTokenResult> RefreshTokens(string userId,string tokenId, string refreshToken, DeviceInfo deviceInfo);
 
         Task<LogoutResult> LogoutAsync(string userId);
+
+        Task<SendMagicLinkResult> SendMagicLink(string email, DeviceInfo device);
+
+        Task<ValidateMagicLinkResult> ValidateMagicLink(string code, DeviceInfo device);
     }
 
     public class LoginResult
@@ -108,6 +111,29 @@ namespace Identity.API.Services.Interfaces
     }
 
     public class LogoutResultError
+    {
+
+    }
+
+    public class SendMagicLinkResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<SendMagicLinkResultError> Errors { get; set; } = [];
+    }
+
+    public class SendMagicLinkResultError
+    {
+
+    }
+
+    public class ValidateMagicLinkResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public Tokens Tokens { get; set; } = new();
+        public ICollection<ValidateMagicLinkResultError> Errors { get; set; } = [];
+    }
+
+    public class ValidateMagicLinkResultError
     {
 
     }

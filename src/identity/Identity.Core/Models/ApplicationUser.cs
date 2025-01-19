@@ -11,6 +11,8 @@ namespace Identity.Core.Models
         public Department? Department { get; set; } = null;
         public string? LastLoginDeviceId { get; set; } = null;
 
+        public bool MagicLinkAuthEnabled { get; set; } = false;
+
         public ICollection<TwoFactorSmsAttempt> TwoFactorCodeAttempts { get; set; } = [];
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
         public ICollection<Token> Tokens { get; set; } = [];
@@ -20,6 +22,12 @@ namespace Identity.Core.Models
         public ICollection<UserDevice> UserDevices { get; set; } = [];
         public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
         public ICollection<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; } = [];
+        public ICollection<MagicLinkAttempt> MagicLinkAttempts { get; set; } = [];
+
+        public bool IsMagicLinkAuthEnabled()
+        {
+            return MagicLinkAuthEnabled;
+        }
 
         public void SetLastUsedDevice(string userDeviceId)
         {

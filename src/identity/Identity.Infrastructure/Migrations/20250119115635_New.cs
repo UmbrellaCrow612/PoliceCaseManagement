@@ -94,6 +94,7 @@ namespace Identity.Infrastructure.Migrations
                     TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     DepartmentId = table.Column<string>(type: "TEXT", nullable: true),
                     LastLoginDeviceId = table.Column<string>(type: "TEXT", nullable: true),
+                    MagicLinkAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -243,6 +244,28 @@ namespace Identity.Infrastructure.Migrations
                     table.PrimaryKey("PK_LoginAttempts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_LoginAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MagicLinkAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MagicLinkAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MagicLinkAttempts_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -506,6 +529,11 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MagicLinkAttempts_UserId",
+                table: "MagicLinkAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetAttempts_UserId",
                 table: "PasswordResetAttempts",
                 column: "UserId");
@@ -582,6 +610,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmailVerificationAttempts");
+
+            migrationBuilder.DropTable(
+                name: "MagicLinkAttempts");
 
             migrationBuilder.DropTable(
                 name: "PasswordResetAttempts");

@@ -113,6 +113,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("MagicLinkAuthEnabled")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -235,6 +238,34 @@ namespace Identity.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("LoginAttempts");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.MagicLinkAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MagicLinkAttempts");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
@@ -662,6 +693,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.MagicLinkAttempt", b =>
+                {
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithMany("MagicLinkAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
@@ -820,6 +862,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("EmailVerificationAttempts");
 
                     b.Navigation("LoginAttempts");
+
+                    b.Navigation("MagicLinkAttempts");
 
                     b.Navigation("PasswordResetAttempts");
 
