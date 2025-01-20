@@ -527,5 +527,116 @@ namespace Identity.API.Services
 
             return result;
         }
+
+        public async Task<SendOTPResult> SendOTP(OTPMethod method, OTPCreds creds, DeviceInfo device)
+        {
+            var result = new SendOTPResult();
+
+            if (string.IsNullOrWhiteSpace(creds.Email) && string.IsNullOrWhiteSpace(creds.PhoneNumber)) return result;
+
+            if (method == OTPMethod.Email)
+            {
+                if (string.IsNullOrWhiteSpace(creds.Email)) return result;
+
+                var user = await _userManager.FindByEmailAsync(creds.Email);
+                if(user is null || !user.IsEmailConfirmed() || !user.IsOTPAuthEnabled()) return result;
+
+                var validRecentOTPEmailExists = await _unitOfWork.Repository<OTPAttempt>()
+                    .Query
+                    .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false && x.Method == OTPMethod.Email)
+                    .AnyAsync();
+
+                if (validRecentOTPEmailExists) return result;
+
+                var newAttempt = new OTPAttempt
+                {
+                    Code = Guid.NewGuid().ToString()[..5], // could be more secure not bothered atm
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(1),
+                    UserId = user.Id,
+                    Method = OTPMethod.Email,
+                };
+
+                await _unitOfWork.Repository<OTPAttempt>().AddAsync(newAttempt);
+                await _unitOfWork.SaveChangesAsync();
+
+                // use email service and send OTP code
+                result.Succeeded = true;
+
+                return result;
+            }
+
+            if (method == OTPMethod.Sms)
+            {
+                if (string.IsNullOrWhiteSpace(creds.PhoneNumber)) return result;
+
+                var user = await _userManager.Users.Where(x => x.PhoneNumber == creds.PhoneNumber).FirstOrDefaultAsync();
+                if (user is null || !user.IsPhoneNumberConfirmed() || !user.IsOTPAuthEnabled()) return result;
+
+                var validRecentOTPSmsExists = await _unitOfWork.Repository<OTPAttempt>()
+                  .Query
+                  .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false && x.Method == OTPMethod.Sms)
+                  .AnyAsync();
+
+                if (validRecentOTPSmsExists) return result;
+
+                var newAttempt = new OTPAttempt
+                {
+                    Code = Guid.NewGuid().ToString()[..5],
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(1),
+                    UserId = user.Id,
+                    Method = OTPMethod.Sms,
+                };
+
+                await _unitOfWork.Repository<OTPAttempt>().AddAsync(newAttempt);
+                await _unitOfWork.SaveChangesAsync();
+
+                // use sms service and send OTP Code
+                result.Succeeded = true;
+
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<ValidateOTPResult> ValidateOTP(OTPMethod method, OTPCreds creds, string code, DeviceInfo device)
+        {
+            var result = new ValidateOTPResult();
+
+            if (string.IsNullOrWhiteSpace(creds.Email) && string.IsNullOrWhiteSpace(creds.PhoneNumber)) return result;
+
+            if (method == OTPMethod.Email)
+            {
+                if (string.IsNullOrWhiteSpace(creds.Email)) return result;
+
+                var user = await _userManager.FindByEmailAsync(creds.Email);
+                if (user is null || !user.IsEmailConfirmed() || !user.IsOTPAuthEnabled()) return result;
+
+                var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, device);
+                if (!isTrusted || userDevice is null) return result;
+
+                var otpEmailAttempt = await _unitOfWork.Repository<OTPAttempt>()
+                    .Query
+                    .Where(x => x.UserId == user.Id && x.Code == code)
+                    .FirstOrDefaultAsync();
+
+                if (otpEmailAttempt is null || !otpEmailAttempt.IsValid()) return result;
+
+                otpEmailAttempt.MarkUsed();
+                _unitOfWork.Repository<OTPAttempt>().Update(otpEmailAttempt);
+
+                var tokens = await GenerateAndStoreTokens(user, userDevice);
+                result.Tokens = tokens;
+
+                await _unitOfWork.SaveChangesAsync();
+                result.Succeeded = true;
+
+                return result;
+            }
+
+            // do sms later
+
+            return result;
+        }
     }
 }

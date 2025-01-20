@@ -12,6 +12,7 @@ namespace Identity.Core.Models
         public string? LastLoginDeviceId { get; set; } = null;
 
         public bool MagicLinkAuthEnabled { get; set; } = false;
+        public bool OTPAuthEnabled { get; set; } = false;
 
         public ICollection<TwoFactorSmsAttempt> TwoFactorCodeAttempts { get; set; } = [];
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
@@ -23,6 +24,12 @@ namespace Identity.Core.Models
         public ICollection<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; } = [];
         public ICollection<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; } = [];
         public ICollection<MagicLinkAttempt> MagicLinkAttempts { get; set; } = [];
+        public ICollection<OTPAttempt> OTPAttempts { get; set; } = [];
+
+        public bool IsOTPAuthEnabled()
+        {
+            return OTPAuthEnabled;
+        }
 
         public bool IsMagicLinkAuthEnabled()
         {

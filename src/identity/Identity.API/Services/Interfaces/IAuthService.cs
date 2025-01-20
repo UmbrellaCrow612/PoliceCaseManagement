@@ -25,6 +25,10 @@ namespace Identity.API.Services.Interfaces
         Task<SendMagicLinkResult> SendMagicLink(string email, DeviceInfo device);
 
         Task<ValidateMagicLinkResult> ValidateMagicLink(string code, DeviceInfo device);
+
+        Task<SendOTPResult> SendOTP(OTPMethod method, OTPCreds creds, DeviceInfo device);
+
+        Task<ValidateOTPResult> ValidateOTP(OTPMethod method, OTPCreds creds, string code, DeviceInfo device);
     }
 
     public class LoginResult
@@ -137,6 +141,19 @@ namespace Identity.API.Services.Interfaces
     {
 
     }
+
+    public class SendOTPResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+
+    public class ValidateOTPResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public Tokens Tokens { get; set; } = new();
+    }
+
+  
 
     public class DeviceInfo
     {

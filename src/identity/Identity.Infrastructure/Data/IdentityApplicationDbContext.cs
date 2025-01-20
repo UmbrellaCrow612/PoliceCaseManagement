@@ -22,6 +22,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<ChallengeClaim> ChallengeClaims { get; set; }
         public DbSet<ChallengeToken> ChallengeTokens { get; set; }
         public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
+        public DbSet<OTPAttempt> OTPAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

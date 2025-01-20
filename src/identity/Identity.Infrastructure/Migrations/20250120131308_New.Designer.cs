@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250119115635_New")]
+    [Migration("20250120131308_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -127,6 +127,9 @@ namespace Identity.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("OTPAuthEnabled")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -150,12 +153,18 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -269,6 +278,41 @@ namespace Identity.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("MagicLinkAttempts");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.OTPAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OTPAttempts");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
@@ -707,6 +751,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.OTPAttempt", b =>
+                {
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithMany("OTPAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
@@ -867,6 +922,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("LoginAttempts");
 
                     b.Navigation("MagicLinkAttempts");
+
+                    b.Navigation("OTPAttempts");
 
                     b.Navigation("PasswordResetAttempts");
 

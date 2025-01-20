@@ -20,7 +20,4 @@
     <ProjectReference Include="..\..\shared\Utils\Utils.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\Configs\" />
-  </ItemGroup>
 </Project>

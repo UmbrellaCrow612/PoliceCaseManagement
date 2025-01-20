@@ -95,6 +95,7 @@ namespace Identity.Infrastructure.Migrations
                     DepartmentId = table.Column<string>(type: "TEXT", nullable: true),
                     LastLoginDeviceId = table.Column<string>(type: "TEXT", nullable: true),
                     MagicLinkAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    OTPAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -266,6 +267,30 @@ namespace Identity.Infrastructure.Migrations
                     table.PrimaryKey("PK_MagicLinkAttempts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_MagicLinkAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OTPAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Method = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OTPAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OTPAttempts_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -513,6 +538,18 @@ namespace Identity.Infrastructure.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Id",
+                table: "AspNetUsers",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_PhoneNumber",
+                table: "AspNetUsers",
+                column: "PhoneNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -531,6 +568,11 @@ namespace Identity.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MagicLinkAttempts_UserId",
                 table: "MagicLinkAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OTPAttempts_UserId",
+                table: "OTPAttempts",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -613,6 +655,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "MagicLinkAttempts");
+
+            migrationBuilder.DropTable(
+                name: "OTPAttempts");
 
             migrationBuilder.DropTable(
                 name: "PasswordResetAttempts");

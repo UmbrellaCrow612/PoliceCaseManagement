@@ -10,6 +10,7 @@ using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -50,6 +51,64 @@ namespace Identity.API.Controllers
                                 ?? "Unknown",
                 UserAgent = Request.Headers.UserAgent.ToString()
             };
+        }
+
+        [AllowAnonymous]
+        [HttpPost("validate-otp")]
+        public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
+        {
+            var info = ComposeDeviceInfo();
+            var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, info);
+            if (!res.Succeeded) return Unauthorized();
+
+            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
+            });
+
+
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
+            });
+
+            return Ok(new { res.Tokens });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("send-otp")]
+        public async Task<ActionResult> SendOtp([FromBody] SendOtpDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.OTPCreds.Email) && string.IsNullOrWhiteSpace(dto.OTPCreds.PhoneNumber)) return BadRequest();
+            var info = ComposeDeviceInfo();
+
+            var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, info);
+            if(!res.Succeeded) return Unauthorized();
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("turn-on-otp")]
+        public async Task<ActionResult> TurnOnOTP()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
+
+            user.OTPAuthEnabled = true;
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
+
+            return Ok();
         }
 
         [HttpPost("turn-on-magic-link")]
@@ -210,6 +269,8 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
             var userToCreate = userMapping.Create(registerRequestDto);
+            var phoneNumberTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == registerRequestDto.PhoneNumber);
+            if (phoneNumberTaken) return BadRequest(new { message = "Phone number taken" });
 
             var result = await _userManager.CreateAsync(userToCreate, registerRequestDto.Password);
             if (!result.Succeeded)
