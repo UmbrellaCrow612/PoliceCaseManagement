@@ -22,6 +22,11 @@ namespace Identity.API.Services
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+        private void AddErr()
+        {
+
+        }
+
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -55,7 +60,7 @@ namespace Identity.API.Services
 
             if(user is null)
             {
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "User not found" });
+                result.AddError(StatusCodes.Status404NotFound, "user not found");
                 return result;
             }
 

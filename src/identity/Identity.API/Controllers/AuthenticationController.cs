@@ -333,16 +333,6 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
-        [Authorize]
-        [HttpPost]
-        public ActionResult AdminLogsoutUserByThereId()
-        {
-            // recieve the user id of the user he wants to logout
-            // call logout on there id
-            // only admin roles dose it etc
-            return Ok();
-        }
-
         [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)

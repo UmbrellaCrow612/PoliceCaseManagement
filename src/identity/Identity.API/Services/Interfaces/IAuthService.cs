@@ -36,6 +36,16 @@ namespace Identity.API.Services.Interfaces
         public string? LoginAttemptId { get; set; } = null;
         public ICollection<LoginError> Errors { get; set; } = [];
         public bool Succeeded { get; set; } = false;
+
+        public void AddError(int code, string message, string? redirectUrl = null)
+        {
+            Errors.Add(new LoginError
+            {
+                Code = code,
+                Message = message,
+                RedirectUrl = redirectUrl
+            });
+        }
     }
 
     public class LoginError
