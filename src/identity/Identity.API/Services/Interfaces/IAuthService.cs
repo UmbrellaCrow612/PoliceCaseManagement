@@ -37,6 +37,19 @@ namespace Identity.API.Services.Interfaces
         Task<SendResetPasswordResult> SendResetPassword(string email);
 
         Task<ValidateResetPasswordResult> ValidateResetPassword(string code, string newPassword);
+
+        Task<SendConfirmationEmailResult> SendConfirmationEmail(string email);
+
+        Task<ConfirmEmailResult> ConfirmEmail(string email, string code);
+    }
+
+    public class ConfirmEmailResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+    public class SendConfirmationEmailResult
+    {
+        public bool Succeeded { get; set; } = false;
     }
 
     public class ValidateResetPasswordResult

@@ -22,16 +22,13 @@ namespace Identity.API.Controllers
     [Route("authentication")]
     public class AuthenticationController(
         UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
-        ITokenStore tokenStore, IPasswordResetAttemptStore passwordResetAttemptStore,
-        IEmailVerificationAttemptStore emailVerificationAttemptStore, IUserDeviceStore userDeviceStore,
+        IUserDeviceStore userDeviceStore,
         IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
         DeviceManager deviceManager, IAuthService authService
         ) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
-        private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
-        private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
         private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
         private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
@@ -92,6 +89,23 @@ namespace Identity.API.Controllers
         {
             var res = await _authService.ValidateTOTP(dto.Email, dto.Code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized();
+
+            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
+            });
+
+
+            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
+            });
 
             return Ok(new { res.Tokens });
         }
@@ -388,78 +402,25 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
-        [Authorize]
-        [HttpPost("change-password")]
-        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordRequestDto)
+        [AllowAnonymous]
+        [HttpPost("confirm-email")]
+        public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var res = await _authService.ConfirmEmail(dto.Email, dto.Code);
+            if(!res.Succeeded) return BadRequest();
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User ID not found in token.");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return NotFound();
-
-            var result = await _userManager.ChangePasswordAsync(user, changePasswordRequestDto.Password, changePasswordRequestDto.NewPassword);
-
-            if (!result.Succeeded) return BadRequest(result.Errors);
-
-            return NoContent();
+            return Ok();
         }
 
         [AllowAnonymous]
-        [HttpPost("validate-confirmation-email")]
-        public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
+        [HttpPost("send-confirmation-email")]
+        public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto dto)
         {
-            (bool isValid, EmailVerificationAttempt? attempt, ApplicationUser? user, ICollection<string> errors) = await _emailVerificationAttemptStore
-                .ValidateAttemptAsync(confirmEmailDto.Email, confirmEmailDto.Code);
+            var res = await _authService.SendConfirmationEmail(dto.Email);
+            if(!res.Succeeded) return BadRequest();
 
-            if (!isValid) return BadRequest(errors);
-
-            if (attempt is null || user is null) return Unauthorized();
-
-            user.EmailConfirmed = true;
-
-            attempt.MarkUsed();
-
-            _emailVerificationAttemptStore.SetToUpdateAttempt(attempt);
-
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return BadRequest(res.Errors);
-
-            return NoContent();
+            return Ok();
         }
-
-        [AllowAnonymous]
-        [HttpPost("resend-confirmation-email")]
-        public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto resendConfirmationEmailDto)
-        {
-            var user = await _userManager.FindByEmailAsync(resendConfirmationEmailDto.Email);
-            if (user is null) return Unauthorized();
-
-            if (user.EmailConfirmed) return BadRequest(new ErrorDetail
-            {
-                Field = "Email confirmation.",
-                Reason = "User email already comfirmed."
-            });
-
-            var attempt = new EmailVerificationAttempt()
-            {
-                Email = resendConfirmationEmailDto.Email,
-                Code = Guid.NewGuid().ToString(),
-                UserId = user.Id
-            };
-
-            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _emailVerificationAttemptStore.AddAttemptAsync(attempt);
-            if (!canMakeAttempt) return BadRequest(errors);
-
-            // send code in email
-
-            return Ok(attempt.Code);
-        }
-
 
         [AllowAnonymous]
         [HttpPost("validate-user-device-challenge")]

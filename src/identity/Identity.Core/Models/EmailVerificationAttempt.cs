@@ -8,17 +8,18 @@
         public required string Email { get; set; }
         public required string Code { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public required DateTime ExpiresAt { get; set; }
         public DateTime? UsedAt { get; set; }
-        public bool IsSuccessful { get; set; } = false;
+        public bool IsUsed { get; set; } = false;
 
-        public bool IsValid(double windowTime)
+        public bool IsValid()
         {
-            if (IsSuccessful is true)
+            if (IsUsed is true || UsedAt.HasValue)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }
@@ -28,7 +29,7 @@
 
         public void MarkUsed()
         {
-            IsSuccessful = true;
+            IsUsed = true;
             UsedAt = DateTime.UtcNow;
         }
     }

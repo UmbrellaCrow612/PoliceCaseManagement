@@ -215,8 +215,9 @@ namespace Identity.Infrastructure.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -576,6 +577,18 @@ namespace Identity.Infrastructure.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailVerificationAttempts_Code",
+                table: "EmailVerificationAttempts",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailVerificationAttempts_Id",
+                table: "EmailVerificationAttempts",
+                column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(

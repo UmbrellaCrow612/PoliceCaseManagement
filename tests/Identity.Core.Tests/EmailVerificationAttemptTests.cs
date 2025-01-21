@@ -10,7 +10,7 @@ namespace Identity.Core.Tests
             // Arrange
             var attempt = new EmailVerificationAttempt
             {
-                IsSuccessful = true,
+                IsUsed = true,
                 Code = "test",
                 Email = "test@email.com",
                 UserId = "test_user"
@@ -76,7 +76,7 @@ namespace Identity.Core.Tests
             attempt.MarkUsed();
 
             // Assert
-            Assert.True(attempt.IsSuccessful);
+            Assert.True(attempt.IsUsed);
             Assert.NotNull(attempt.UsedAt);
             Assert.True(attempt.UsedAt <= DateTime.UtcNow);
         }

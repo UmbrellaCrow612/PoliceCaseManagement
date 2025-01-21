@@ -22,7 +22,7 @@ namespace Identity.Infrastructure.Data.Stores
 
             var recentValidAttempt = await _dbcontext.EmailVerificationAttempts
                 .Where(x => 
-                x.IsSuccessful == false && 
+                x.IsUsed == false && 
                 x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow &&
                 x.UsedAt == null &&
                 x.UserId == attempt.UserId
@@ -65,14 +65,14 @@ namespace Identity.Infrastructure.Data.Stores
             }
 
             var _attempt = await _dbcontext.EmailVerificationAttempts
-                .FirstOrDefaultAsync(x => x.Email == email && x.Code == code && x.IsSuccessful == false);
+                .FirstOrDefaultAsync(x => x.Email == email && x.Code == code && x.IsUsed == false);
             if (_attempt is null)
             {
                 errors.Add("Attempt not found.");
                 return (false, null,null, errors);
             }
 
-            if(!_attempt.IsValid(validTime))
+            if(!_attempt.IsValid())
             {
                 errors.Add("Attempt invalid.");
                 return (false, null, null, errors);

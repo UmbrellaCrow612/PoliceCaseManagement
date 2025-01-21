@@ -1,5 +1,4 @@
 ﻿using Authorization.Core;
-using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
@@ -775,6 +774,61 @@ namespace Identity.API.Services
             if (!changePasswordResult.Succeeded) return result;
 
             result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<SendConfirmationEmailResult> SendConfirmationEmail(string email)
+        {
+            var result = new SendConfirmationEmailResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null || user.IsEmailConfirmed()) return result;
+
+            var validRecentEmailConfirmationAttemptExists = await _unitOfWork.Repository<EmailVerificationAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
+                .AnyAsync();
+
+            if (validRecentEmailConfirmationAttemptExists) return result;
+
+            var newAttempt = new EmailVerificationAttempt
+            {
+                Code = Guid.NewGuid().ToString(),
+                Email = user.Email!,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.EmailConfirmationTime),
+                UserId = user.Id,
+            };
+
+            // send email using email service domain/confirm-email?code=newAttempt.code
+
+            await _unitOfWork.Repository<EmailVerificationAttempt>().AddAsync(newAttempt);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<ConfirmEmailResult> ConfirmEmail(string email, string code)
+        {
+            var result = new ConfirmEmailResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null || user.IsEmailConfirmed()) return result;
+
+            var attempt = await _unitOfWork.Repository<EmailVerificationAttempt>()
+                .Query
+                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Code == code);
+
+            if (attempt is null || !attempt.IsValid()) return result;
+            user.EmailConfirmed = true;
+
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+            attempt.MarkUsed();
+            _unitOfWork.Repository<EmailVerificationAttempt>().Update(attempt);
+
+            await _unitOfWork.SaveChangesAsync();
+            result.Succeeded = true;
+
             return result;
         }
     }
