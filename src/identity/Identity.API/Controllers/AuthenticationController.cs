@@ -84,7 +84,18 @@ namespace Identity.API.Controllers
             var res = await _authService.SetUpTOTP(userId, info);
             if (!res.Succeeded) return Unauthorized();
 
-            return Ok(new { res.TotpSecretQrCodeBytes });
+            return Ok(new {  });
+        }
+
+        [AllowAnonymous]
+        [RequireDeviceInformation]
+        [HttpPost("validate-totp")]
+        public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
+        {
+            var res = await _authService.ValidateTOTP(dto.Email, dto.Code, ComposeDeviceInfo());
+            if (!res.Succeeded) return Unauthorized();
+
+            return Ok(new { res.Tokens });
         }
 
         [RequireDeviceInformation]

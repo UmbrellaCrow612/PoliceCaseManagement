@@ -8,7 +8,9 @@ using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OtpNet;
 using System.Data;
+using System.Security.Cryptography;
 
 namespace Identity.API.Services
 {
@@ -655,15 +657,25 @@ namespace Identity.API.Services
 
             if (totpExists) return result;
 
-            var secret = Guid.NewGuid().ToString()[..2]; 
+            byte[] secretBytes = new byte[20];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(secretBytes);
+            }
 
-            byte[] secretAsQrCodebytes = QRCodeHandler.GenerateQRCodeBytes(secret); 
-            result.TotpSecretQrCodeBytes = secretAsQrCodebytes; 
+            string base32Secret = Base32Encoding.ToString(secretBytes);
+
+            byte[] secretAsQrCodebytes = QRCodeHandler.GenerateQRCodeBytes(
+                        base32Secret,
+                        user.Email!,  
+                        "YourAppName"  
+                        );
+            result.TotpSecretQrCodeBytes = secretAsQrCodebytes;
 
             var totp = new TimeBasedOneTimePassCode
             {
                 UserId = user.Id,
-                Secret = secret,  
+                Secret = base32Secret  
             };
 
             await _unitOfWork.Repository<TimeBasedOneTimePassCode>().AddAsync(totp);
@@ -674,9 +686,35 @@ namespace Identity.API.Services
             return result;
         }
 
-        public Task ValidateTOTP(string userId, string code, DeviceInfo deviceInfo)
+        public async Task<ValidateTOTPResult> ValidateTOTP(string email, string code, DeviceInfo deviceInfo)
         {
-            throw new NotImplementedException();
+            var result = new ValidateTOTPResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null || !user.IsTOTPAuthEnabled()) return result;
+
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
+            if (!isTrusted || userDevice is null) return result;
+
+            var storedTotp = await _unitOfWork.Repository<TimeBasedOneTimePassCode>()
+                .Query
+                .Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+
+            if (storedTotp is null) return result;
+
+            var bytes = Base32Encoding.ToBytes(storedTotp.Secret);
+            var totp = new Totp(bytes);
+            var trueCode = totp.ComputeTotp(); 
+
+            if (!string.Equals(trueCode, code)) return result;
+
+            var tokens = await GenerateAndStoreTokens(user, userDevice);
+            result.Tokens = tokens;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }
