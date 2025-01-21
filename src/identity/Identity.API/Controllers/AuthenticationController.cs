@@ -53,6 +53,41 @@ namespace Identity.API.Controllers
             };
         }
 
+        [Authorize]
+        [HttpPost("turn-on-totp")]
+        public async Task<ActionResult> TurnOnTOTP()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized();
+
+            user.TimeBasedOneTimePassCodeEnabled = true;
+            var res = await _userManager.UpdateAsync(user);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
+
+            return Ok();
+        }
+
+        [RequireDeviceInformation]
+        [Authorize]
+        [HttpPost("setup-totp")]
+        public async Task<ActionResult> SetUpTOTP()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var info = ComposeDeviceInfo();
+            var res = await _authService.SetUpTOTP(userId, info);
+            if (!res.Succeeded) return Unauthorized();
+
+            return Ok(new { res.TotpSecretQrCodeBytes });
+        }
+
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("validate-otp")]
         public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
@@ -81,6 +116,7 @@ namespace Identity.API.Controllers
             return Ok(new { res.Tokens });
         }
 
+        [RequireDeviceInformation]
         [AllowAnonymous]
         [HttpPost("send-otp")]
         public async Task<ActionResult> SendOtp([FromBody] SendOtpDto dto)
@@ -89,7 +125,7 @@ namespace Identity.API.Controllers
             var info = ComposeDeviceInfo();
 
             var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, info);
-            if(!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized();
 
             return Ok();
         }
@@ -123,7 +159,7 @@ namespace Identity.API.Controllers
 
             user.MagicLinkAuthEnabled = true;
             var res = await _userManager.UpdateAsync(user);
-            if(!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
         }

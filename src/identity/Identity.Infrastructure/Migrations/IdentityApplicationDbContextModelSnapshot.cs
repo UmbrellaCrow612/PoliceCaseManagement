@@ -139,6 +139,12 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("TimeBasedOneTimePassCodeEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TimeBasedOneTimePassCodeId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
 
@@ -417,6 +423,30 @@ namespace Identity.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("SecurityAudits");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Secret")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("TimeBasedOneTimePassCodes");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
@@ -790,6 +820,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
+                {
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithOne("TimeBasedOneTimePassCode")
+                        .HasForeignKey("Identity.Core.Models.TimeBasedOneTimePassCode", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
@@ -927,6 +968,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("PhoneConfirmationAttempts");
 
                     b.Navigation("SecurityAudits");
+
+                    b.Navigation("TimeBasedOneTimePassCode");
 
                     b.Navigation("Tokens");
 

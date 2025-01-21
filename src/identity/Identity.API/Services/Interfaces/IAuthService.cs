@@ -29,6 +29,16 @@ namespace Identity.API.Services.Interfaces
         Task<SendOTPResult> SendOTP(OTPMethod method, OTPCreds creds, DeviceInfo device);
 
         Task<ValidateOTPResult> ValidateOTP(OTPMethod method, OTPCreds creds, string code, DeviceInfo device);
+
+        Task<SetUpTOTPResult> SetUpTOTP(string userId, DeviceInfo deviceInfo);
+
+        Task ValidateTOTP(string userId, string code, DeviceInfo deviceInfo);
+    }
+
+    public class SetUpTOTPResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public byte[] TotpSecretQrCodeBytes { get; set; } = [];
     }
 
     public class LoginResult

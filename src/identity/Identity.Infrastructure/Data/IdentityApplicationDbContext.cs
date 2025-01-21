@@ -23,6 +23,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<ChallengeToken> ChallengeTokens { get; set; }
         public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
         public DbSet<OTPAttempt> OTPAttempts { get; set; }
+        public DbSet<TimeBasedOneTimePassCode> TimeBasedOneTimePassCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

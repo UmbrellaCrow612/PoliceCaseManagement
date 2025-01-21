@@ -21,12 +21,6 @@ namespace Identity.API.Services
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-        private void AddErr()
-        {
-
-        }
-
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -642,6 +636,47 @@ namespace Identity.API.Services
             // do sms later
 
             return result;
+        }
+
+        public async Task<SetUpTOTPResult> SetUpTOTP(string userId, DeviceInfo deviceInfo)
+        {
+            var result = new SetUpTOTPResult();
+
+            var user = await GetUserByIdAsync(userId);
+            if (user is null || !user.IsTOTPAuthEnabled()) return result;
+
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
+            if (!isTrusted || userDevice is null) return result;
+
+            var totpExists = await _unitOfWork.Repository<TimeBasedOneTimePassCode>()
+                .Query
+                .Where(x => x.UserId == user.Id)
+                .AnyAsync();
+
+            if (totpExists) return result;
+
+            var secret = Guid.NewGuid().ToString()[..2]; 
+
+            byte[] secretAsQrCodebytes = QRCodeHandler.GenerateQRCodeBytes(secret); 
+            result.TotpSecretQrCodeBytes = secretAsQrCodebytes; 
+
+            var totp = new TimeBasedOneTimePassCode
+            {
+                UserId = user.Id,
+                Secret = secret,  
+            };
+
+            await _unitOfWork.Repository<TimeBasedOneTimePassCode>().AddAsync(totp);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+
+            return result;
+        }
+
+        public Task ValidateTOTP(string userId, string code, DeviceInfo deviceInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

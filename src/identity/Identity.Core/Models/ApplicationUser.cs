@@ -26,6 +26,15 @@ namespace Identity.Core.Models
         public ICollection<MagicLinkAttempt> MagicLinkAttempts { get; set; } = [];
         public ICollection<OTPAttempt> OTPAttempts { get; set; } = [];
 
+        public TimeBasedOneTimePassCode? TimeBasedOneTimePassCode { get; set; } = null;
+        public string? TimeBasedOneTimePassCodeId { get; set; } = null;
+        public bool TimeBasedOneTimePassCodeEnabled { get; set; } = false;
+
+        public bool IsTOTPAuthEnabled()
+        {
+            return TimeBasedOneTimePassCodeEnabled;
+        }
+
         public bool IsOTPAuthEnabled()
         {
             return OTPAuthEnabled;

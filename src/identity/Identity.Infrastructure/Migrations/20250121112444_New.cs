@@ -96,6 +96,8 @@ namespace Identity.Infrastructure.Migrations
                     LastLoginDeviceId = table.Column<string>(type: "TEXT", nullable: true),
                     MagicLinkAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     OTPAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TimeBasedOneTimePassCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    TimeBasedOneTimePassCodeEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -370,6 +372,26 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TimeBasedOneTimePassCodes",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Secret = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeBasedOneTimePassCodes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TimeBasedOneTimePassCodes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tokens",
                 columns: table => new
                 {
@@ -591,6 +613,12 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TimeBasedOneTimePassCodes_UserId",
+                table: "TimeBasedOneTimePassCodes",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tokens_UserId",
                 table: "Tokens",
                 column: "UserId");
@@ -667,6 +695,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SecurityAudits");
+
+            migrationBuilder.DropTable(
+                name: "TimeBasedOneTimePassCodes");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
