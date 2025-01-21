@@ -21,7 +21,7 @@ namespace Identity.Infrastructure.Data.Stores
 
             var validRecentAttempt = await _dbcontext.PasswordResetAttempts
                 .Where(x => x.UserId == attempt.UserId
-                 && x.IsSuccessful == false
+                 && x.IsUsed == false
                  && x.IsRevoked == false
                  && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow)
                 .OrderByDescending(x => x.CreatedAt)
@@ -51,7 +51,7 @@ namespace Identity.Infrastructure.Data.Stores
             var validRecentAttempts = await _dbcontext.PasswordResetAttempts
              .Where(
               x => x.UserId == userId
-              && x.IsSuccessful == false
+              && x.IsUsed == false
               && x.IsRevoked == false
               && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow
               )
@@ -82,7 +82,7 @@ namespace Identity.Infrastructure.Data.Stores
             var _attempt = await _dbcontext.PasswordResetAttempts.FirstOrDefaultAsync(x => x.Code == code);
             if (_attempt is null) return (false, null);
 
-            if (!_attempt.IsValid(validTime)) return (false, null);
+            if (!_attempt.IsValid()) return (false, null);
 
             return (true, _attempt);
         }

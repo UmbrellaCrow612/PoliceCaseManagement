@@ -79,8 +79,7 @@ namespace Identity.API.Controllers
 
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var info = ComposeDeviceInfo();
-            var res = await _authService.SetUpTOTP(userId, info);
+            var res = await _authService.SetUpTOTP(userId, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized();
 
             return Ok(new { res.TotpSecretQrCodeBytes });
@@ -102,8 +101,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-otp")]
         public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
         {
-            var info = ComposeDeviceInfo();
-            var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, info);
+            var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized();
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
@@ -179,8 +177,7 @@ namespace Identity.API.Controllers
         [HttpPost("send-magic-link")]
         public async Task<ActionResult> SendMagicLink([FromBody] string email)
         {
-            var info = ComposeDeviceInfo();
-            var res = await _authService.SendMagicLink(email, info);
+            var res = await _authService.SendMagicLink(email, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
@@ -191,8 +188,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-magic-link")]
         public async Task<ActionResult> ValidateMagicLink([FromBody] string code)
         {
-            var info = ComposeDeviceInfo();
-            var res = await _authService.ValidateMagicLink(code, info);
+            var res = await _authService.ValidateMagicLink(code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
@@ -220,9 +216,7 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var info = ComposeDeviceInfo();
-
-            var res = await _authService.LoginAsync(dto.Email, dto.Password, info);
+            var res = await _authService.LoginAsync(dto.Email, dto.Password, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok(new { res.LoginAttemptId });
@@ -233,9 +227,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-two-factor-sms")]
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
         {
-            var info = ComposeDeviceInfo();
-
-            var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, info);
+            var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
@@ -274,9 +266,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-two-factor-email")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
-            var info = ComposeDeviceInfo();
-
-            var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, info);
+            var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
@@ -347,8 +337,7 @@ namespace Identity.API.Controllers
                 return Unauthorized("Jti ID not found in token.");
             }
 
-            var info = ComposeDeviceInfo();
-            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, info);
+            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
@@ -381,51 +370,20 @@ namespace Identity.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("reset-password")]
-        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordRequestDto)
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(resetPasswordRequestDto.Email);
-            if (user is null) return Ok(); // We don't reveal if a user exists
+            var res = await _authService.SendResetPassword(dto.Email);
+            if(!res.Succeeded) return BadRequest();
 
-            var trueCode = Guid.NewGuid().ToString();
-
-            PasswordResetAttempt passwordResetAttempt = new()
-            {
-                Code = trueCode,
-                UserId = user.Id,
-            };
-
-            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _passwordResetAttemptStore.AddAttempt(passwordResetAttempt);
-
-            if (!canMakeAttempt)
-            {
-                return BadRequest(errors);
-            }
-
-            // Send Email link with true code
-
-            return Ok(new { trueCode });
+            return Ok();
         }
 
         [AllowAnonymous]
-        [HttpPost("confirm-password-reset/{code}")]
-        public async Task<ActionResult> ConfirmResetPassword(string code, [FromBody] ConfirmPasswordResetRequestDto confirmPasswordResetRequestDto)
+        [HttpPost("reset-password/{code}")]
+        public async Task<ActionResult> ConfirmResetPassword(string code, [FromBody] ConfirmPasswordResetRequestDto dto)
         {
-            (bool isValid, PasswordResetAttempt? attempt) = await _passwordResetAttemptStore.ValidateAttempt(code);
-            if (!isValid) return Unauthorized(); // Either session expired or code is wrong for latest attempt or already used
-
-            if (attempt is null) return Unauthorized(); // attempt is either not found or time elapsed and is no longer valid
-
-            var user = await _userManager.FindByIdAsync(attempt.UserId);
-            if (user is null) return BadRequest();
-
-            attempt.MarkUsed();
-
-            _passwordResetAttemptStore.SetToUpdateAttempt(attempt);
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, confirmPasswordResetRequestDto.NewPassword);
-
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            var res = await _authService.ValidateResetPassword(code, dto.NewPassword);
+            if(!res.Succeeded) return BadRequest();
 
             return Ok();
         }

@@ -307,8 +307,9 @@ namespace Identity.Infrastructure.Migrations
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -596,6 +597,18 @@ namespace Identity.Infrastructure.Migrations
                 name: "IX_OTPAttempts_UserId",
                 table: "OTPAttempts",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordResetAttempts_Code",
+                table: "PasswordResetAttempts",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordResetAttempts_Id",
+                table: "PasswordResetAttempts",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetAttempts_UserId",

@@ -1,4 +1,5 @@
 ﻿using Authorization.Core;
+using Identity.API.DTOs;
 using Identity.API.Helpers;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
@@ -712,6 +713,66 @@ namespace Identity.API.Services
             result.Tokens = tokens;
 
             await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<SendResetPasswordResult> SendResetPassword(string email)
+        {
+            var result = new SendResetPasswordResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+            {
+                result.Succeeded = true; // dont reveal if user exists
+                return result;
+            }
+
+            var validRecentResetPasswordAttemptExists = await _unitOfWork.Repository<PasswordResetAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
+                .AnyAsync();
+
+            if (validRecentResetPasswordAttemptExists) return result;
+
+            var newAttempt = new PasswordResetAttempt
+            {
+                Code = Guid.NewGuid().ToString(), // Is unique
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.ResetPasswordTime),
+                UserId = user.Id,
+            };
+
+            await _unitOfWork.Repository<PasswordResetAttempt>().AddAsync(newAttempt);
+            await _unitOfWork.SaveChangesAsync();
+
+            // send email using email service domain/reset-password?code=newAttempt.code
+
+            result.Succeeded = true;
+
+            return result;
+        }
+
+        public async Task<ValidateResetPasswordResult> ValidateResetPassword(string code, string newPassword)
+        {
+            var result = new ValidateResetPasswordResult();
+
+            var attempt = await _unitOfWork.Repository<PasswordResetAttempt>()
+                .Query
+                .FirstOrDefaultAsync(x => x.Code == code);
+
+            if (attempt is null || !attempt.IsValid()) return result;
+
+            var user = await GetUserByIdAsync(attempt.UserId);
+            if (user is null) return result;
+
+            attempt.MarkUsed();
+
+            _unitOfWork.Repository<PasswordResetAttempt>().Update(attempt);
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var changePasswordResult = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!changePasswordResult.Succeeded) return result;
 
             result.Succeeded = true;
             return result;

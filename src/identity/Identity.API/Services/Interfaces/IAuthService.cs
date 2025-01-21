@@ -33,6 +33,20 @@ namespace Identity.API.Services.Interfaces
         Task<SetUpTOTPResult> SetUpTOTP(string userId, DeviceInfo deviceInfo);
 
         Task<ValidateTOTPResult> ValidateTOTP(string email, string code, DeviceInfo deviceInfo);
+
+        Task<SendResetPasswordResult> SendResetPassword(string email);
+
+        Task<ValidateResetPasswordResult> ValidateResetPassword(string code, string newPassword);
+    }
+
+    public class ValidateResetPasswordResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+
+        public class SendResetPasswordResult
+    {
+        public bool Succeeded { get; set; } = false;
     }
 
     public class ValidateTOTPResult

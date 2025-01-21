@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250121112444_New")]
+    [Migration("20250121165420_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -333,13 +333,16 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsRevoked")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsSuccessful")
+                    b.Property<bool>("IsUsed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("SuccessfulAt")
+                    b.Property<DateTime?>("UsedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -347,6 +350,12 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 

@@ -18,8 +18,8 @@ namespace Identity.Core.Tests
             Assert.NotNull(attempt.Id);
             Assert.Null(attempt.User);
             Assert.NotEqual(default(DateTime), attempt.CreatedAt);
-            Assert.Null(attempt.SuccessfulAt);
-            Assert.False(attempt.IsSuccessful);
+            Assert.Null(attempt.UsedAt);
+            Assert.False(attempt.IsUsed);
             Assert.False(attempt.IsRevoked);
         }
 
@@ -69,7 +69,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 Code = "123456",
                 CreatedAt = DateTime.UtcNow,
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act
@@ -135,10 +135,10 @@ namespace Identity.Core.Tests
             attempt.MarkUsed();
 
             // Assert
-            Assert.True(attempt.IsSuccessful);
-            Assert.NotNull(attempt.SuccessfulAt);
+            Assert.True(attempt.IsUsed);
+            Assert.NotNull(attempt.UsedAt);
             Assert.InRange(
-                attempt.SuccessfulAt!.Value,
+                attempt.UsedAt!.Value,
                 DateTime.UtcNow.AddSeconds(-1),
                 DateTime.UtcNow.AddSeconds(1)
             );
@@ -171,7 +171,7 @@ namespace Identity.Core.Tests
                 Code = "123456",
                 CreatedAt = DateTime.UtcNow,
                 IsRevoked = true,
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act
