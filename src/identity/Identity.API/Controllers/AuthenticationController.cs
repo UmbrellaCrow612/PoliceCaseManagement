@@ -30,7 +30,6 @@ namespace Identity.API.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
-        private readonly ITokenStore _tokenStore = tokenStore;
         private readonly IPasswordResetAttemptStore _passwordResetAttemptStore = passwordResetAttemptStore;
         private readonly IEmailVerificationAttemptStore _emailVerificationAttemptStore = emailVerificationAttemptStore;
         private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
@@ -84,7 +83,7 @@ namespace Identity.API.Controllers
             var res = await _authService.SetUpTOTP(userId, info);
             if (!res.Succeeded) return Unauthorized();
 
-            return Ok(new {  });
+            return Ok(new { res.TotpSecretQrCodeBytes });
         }
 
         [AllowAnonymous]

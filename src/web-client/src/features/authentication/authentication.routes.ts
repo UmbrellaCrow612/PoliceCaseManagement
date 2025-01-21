@@ -64,4 +64,11 @@ export const AUTHENTICATION_ROUTES: Routes = [
         (c) => c.TwoFactorEmailViewComponent
       ),
   },
+  {
+    path: 'two-factor/totp',
+    loadComponent: () =>
+      import('./ui/two-factor-totpview/two-factor-totpview.component').then(
+        (c) => c.TwoFactorTOTPViewComponent
+      ),
+  }
 ];
