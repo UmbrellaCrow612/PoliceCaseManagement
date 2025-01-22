@@ -831,5 +831,74 @@ namespace Identity.API.Services
 
             return result;
         }
+
+        public async Task<SendUserDeviceChallengeResult> SendUserDeviceChallenge(string email, DeviceInfo info)
+        {
+            var result = new SendUserDeviceChallengeResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null) return result;
+
+            var deviceId = _deviceManager.GenerateDeviceId(user.Id, info.DeviceFingerPrint, info.UserAgent);
+            var deviceExists = await _unitOfWork.Repository<UserDevice>().Query.Where(x => x.Id == deviceId).AnyAsync();
+            if (!deviceExists)
+            {
+                var deviceToAdd = new UserDevice
+                {
+                    DeviceName = info.UserAgent,
+                    Id = deviceId,
+                    UserId = user.Id,
+                };
+                await _unitOfWork.Repository<UserDevice>().AddAsync(deviceToAdd);
+            }
+
+            var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
+            if (device is null || device.IsTrusted) return result;
+
+            var validRecentAttemptExists = await _unitOfWork.Repository<UserDeviceChallengeAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.UserDeviceId == device.Id && x.IsUsed == false)
+                .AnyAsync();
+
+            if (validRecentAttemptExists) return result;
+
+            var attempt = new UserDeviceChallengeAttempt
+            {
+                Code = Guid.NewGuid().ToString(),
+                Email = user.Email!,
+                UserDeviceId = device.Id,
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.DeviceChallengeTime),   
+            };
+            await _unitOfWork.Repository<UserDeviceChallengeAttempt>().AddAsync(attempt);
+            await _unitOfWork.SaveChangesAsync();
+
+            // send email using email service domain/device-challenge?code=attempt.code
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<ValidateUserDeviceChallengeResult> ValidateUserDeviceChallenge(string email, string code)
+        {
+            var result = new ValidateUserDeviceChallengeResult();
+
+            var attempt = await _unitOfWork.Repository<UserDeviceChallengeAttempt>()
+                .Query
+                .FirstOrDefaultAsync(x => x.Code == code && x.Email == email);
+            if (attempt is null || !attempt.IsValid()) return result;
+
+            var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(attempt.UserDeviceId);
+            if (device is null || device.IsTrusted) return result;
+
+            attempt.MarkUsed();
+            _unitOfWork.Repository<UserDeviceChallengeAttempt>().Update(attempt);
+            device.IsTrusted = true;
+            _unitOfWork.Repository<UserDevice>().Update(device);
+
+            await _unitOfWork.SaveChangesAsync();
+            result.Succeeded = true;
+            return result;
+        }
     }
 }

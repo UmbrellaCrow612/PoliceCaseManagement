@@ -85,5 +85,10 @@ namespace Identity.API.Helpers
 
             return await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
         }
-    }
+
+        public string GenerateDeviceId(string userId, string deviceFingerprint, string userAgent)
+        {
+            return _deviceIdentification.GenerateDeviceId(userId, userAgent, deviceFingerprint);
+        }
+}
 }

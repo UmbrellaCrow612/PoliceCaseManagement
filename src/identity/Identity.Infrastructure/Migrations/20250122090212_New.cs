@@ -504,9 +504,10 @@ namespace Identity.Infrastructure.Migrations
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     UserDeviceId = table.Column<string>(type: "TEXT", nullable: false),
-                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
-                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -663,6 +664,18 @@ namespace Identity.Infrastructure.Migrations
                 name: "IX_TwoFactorSmsAttempts_UserId",
                 table: "TwoFactorSmsAttempts",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDeviceChallengeAttempts_Code",
+                table: "UserDeviceChallengeAttempts",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDeviceChallengeAttempts_Id",
+                table: "UserDeviceChallengeAttempts",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserDeviceChallengeAttempts_UserDeviceId",

@@ -18,7 +18,7 @@ namespace Identity.API.Services.Interfaces
 
         Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info);
 
-        Task<RefreshTokenResult> RefreshTokens(string userId,string tokenId, string refreshToken, DeviceInfo deviceInfo);
+        Task<RefreshTokenResult> RefreshTokens(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo);
 
         Task<LogoutResult> LogoutAsync(string userId);
 
@@ -41,9 +41,23 @@ namespace Identity.API.Services.Interfaces
         Task<SendConfirmationEmailResult> SendConfirmationEmail(string email);
 
         Task<ConfirmEmailResult> ConfirmEmail(string email, string code);
+
+        Task<SendUserDeviceChallengeResult> SendUserDeviceChallenge(string email, DeviceInfo info);
+
+        Task<ValidateUserDeviceChallengeResult> ValidateUserDeviceChallenge(string email, string code);
     }
 
-    public class ConfirmEmailResult
+    public class ValidateUserDeviceChallengeResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+
+    public class SendUserDeviceChallengeResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+
+        public class ConfirmEmailResult
     {
         public bool Succeeded { get; set; } = false;
     }
@@ -57,7 +71,7 @@ namespace Identity.API.Services.Interfaces
         public bool Succeeded { get; set; } = false;
     }
 
-        public class SendResetPasswordResult
+    public class SendResetPasswordResult
     {
         public bool Succeeded { get; set; } = false;
     }
@@ -114,7 +128,7 @@ namespace Identity.API.Services.Interfaces
     {
         public ICollection<TwoFactorSmsValidationResultError> Errors { get; set; } = [];
         public bool Succeeded { get; set; } = false;
-        public Tokens Tokens {  get; set; } = new(); 
+        public Tokens Tokens { get; set; } = new();
     }
 
     public class TwoFactorSmsValidationResultError
@@ -140,13 +154,13 @@ namespace Identity.API.Services.Interfaces
     {
         public ICollection<TwoFactorEmailValidationError> Errors { get; set; } = [];
         public bool Succeeded { get; set; } = false;
-        public Tokens Tokens{ get; set; } = new();
+        public Tokens Tokens { get; set; } = new();
     }
 
     public class TwoFactorEmailValidationError()
     {
-        public required int Code { get; set;}
-        public required string Message { get; set;}
+        public required int Code { get; set; }
+        public required string Message { get; set; }
     }
 
     public class RefreshTokenResult
@@ -206,7 +220,7 @@ namespace Identity.API.Services.Interfaces
         public Tokens Tokens { get; set; } = new();
     }
 
-  
+
 
     public class DeviceInfo
     {

@@ -20,8 +20,8 @@ namespace Identity.Core.Tests
             Assert.NotNull(attempt.Id);
             Assert.Null(attempt.User);
             Assert.Null(attempt.UserDevice);
-            Assert.False(attempt.IsSuccessful);
-            Assert.Null(attempt.SuccessfulAt);
+            Assert.False(attempt.IsUsed);
+            Assert.Null(attempt.UsedAt);
             Assert.NotEqual(default(DateTime), attempt.CreatedAt);
         }
 
@@ -56,7 +56,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 UserDeviceId = "device-id",
                 CreatedAt = DateTime.UtcNow,
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act
@@ -128,10 +128,10 @@ namespace Identity.Core.Tests
             attempt.MarkUsed();
 
             // Assert
-            Assert.True(attempt.IsSuccessful);
-            Assert.NotNull(attempt.SuccessfulAt);
+            Assert.True(attempt.IsUsed);
+            Assert.NotNull(attempt.UsedAt);
             Assert.InRange(
-                attempt.SuccessfulAt!.Value,
+                attempt.UsedAt!.Value,
                 DateTime.UtcNow.AddSeconds(-1),
                 DateTime.UtcNow.AddSeconds(1)
             );
@@ -148,7 +148,7 @@ namespace Identity.Core.Tests
                 UserId = "test-user",
                 UserDeviceId = "device-id",
                 CreatedAt = DateTime.UtcNow.AddMinutes(-31),
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act

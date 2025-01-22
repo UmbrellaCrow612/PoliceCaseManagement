@@ -20,8 +20,8 @@ namespace Identity.Infrastructure.Data.Stores
             var validTime = _timeWindows.DeviceChallengeTime;
 
             var validRecentAttempt = await _dbcontext.UserDeviceChallengeAttempts
-                .Where(x => x.UserId == attempt.UserId && x.IsSuccessful == false 
-                && x.SuccessfulAt == null 
+                .Where(x => x.UserId == attempt.UserId && x.IsUsed == false 
+                && x.UsedAt == null 
                 && x.UserDeviceId == attempt.UserDeviceId
                 && x.CreatedAt.AddMinutes(validTime) > DateTime.UtcNow)
                 .OrderBy(x => x.CreatedAt)
@@ -60,11 +60,11 @@ namespace Identity.Infrastructure.Data.Stores
             var validTime = _timeWindows.DeviceChallengeTime;
 
             var attempt = await _dbcontext.UserDeviceChallengeAttempts
-                .Where(x => x.Email == email && x.Code == code && x.IsSuccessful == false).FirstOrDefaultAsync();
+                .Where(x => x.Email == email && x.Code == code && x.IsUsed == false).FirstOrDefaultAsync();
 
             if (attempt is null) return (false, null);
 
-            if(!attempt.IsValid(validTime)) return (false, null);
+            if(!attempt.IsValid()) return (false, null);
 
             return (true, attempt);
         }

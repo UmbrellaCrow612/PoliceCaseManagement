@@ -1,7 +1,6 @@
 ﻿using Authorization.Core;
 using Identity.API.Annotations;
 using Identity.API.DTOs;
-using Identity.API.Helpers;
 using Identity.API.Mappings;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
@@ -22,18 +21,13 @@ namespace Identity.API.Controllers
     [Route("authentication")]
     public class AuthenticationController(
         UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
-        IUserDeviceStore userDeviceStore,
-        IUserDeviceChallengeAttemptStore userDeviceChallengeAttemptStore, IDeviceIdentification deviceIdentification, IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
-        DeviceManager deviceManager, IAuthService authService
+    IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
+        IAuthService authService
         ) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
-        private readonly IUserDeviceStore _userDeviceStore = userDeviceStore;
-        private readonly IUserDeviceChallengeAttemptStore _userDeviceChallengeAttemptStore = userDeviceChallengeAttemptStore;
-        private readonly IDeviceIdentification _deviceIdentification = deviceIdentification;
         private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
-        private readonly DeviceManager _deviceManager = deviceManager;
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
@@ -387,7 +381,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
         {
             var res = await _authService.SendResetPassword(dto.Email);
-            if(!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest();
 
             return Ok();
         }
@@ -397,7 +391,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ConfirmResetPassword(string code, [FromBody] ConfirmPasswordResetRequestDto dto)
         {
             var res = await _authService.ValidateResetPassword(code, dto.NewPassword);
-            if(!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest();
 
             return Ok();
         }
@@ -407,7 +401,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
             var res = await _authService.ConfirmEmail(dto.Email, dto.Code);
-            if(!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest();
 
             return Ok();
         }
@@ -417,72 +411,30 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto dto)
         {
             var res = await _authService.SendConfirmationEmail(dto.Email);
-            if(!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest();
 
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpPost("validate-user-device-challenge")]
-        public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto challengeDto)
+        public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(challengeDto.Email);
-            if (user is null) return Ok("User dose not exist - would not show in prod");
-
-            (bool isValid, UserDeviceChallengeAttempt? attempt) = await _userDeviceChallengeAttemptStore.ValidateAttemptAsync(challengeDto.Email, challengeDto.Code);
-            if (!isValid || attempt is null) return BadRequest("Attempt is invalid or attempt not found.");
-
-            attempt.MarkUsed();
-            _userDeviceChallengeAttemptStore.SetToUpdateAttempt(attempt);
-
-            var info = ComposeDeviceInfo();
-            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
-            if (device is null) return NotFound("Device not found.");
-
-            device.IsTrusted = true;
-
-            await _userDeviceStore.UpdateAsync(device);
+            var res = await _authService.ValidateUserDeviceChallenge(dto.Email, dto.Code);
+            if (!res.Succeeded) return Unauthorized();
 
             return Ok();
         }
 
         [RequireDeviceInformation]
         [AllowAnonymous]
-        [HttpPost("resend-user-device-challenge")]
-        public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto challengeDto)
+        [HttpPost("send-user-device-challenge")]
+        public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(challengeDto.Email);
-            if (user is null) return Ok();
+            var res = await _authService.SendUserDeviceChallenge(dto.Email, ComposeDeviceInfo());
+            if (!res.Succeeded) return Unauthorized();
 
-            var code = Guid.NewGuid().ToString();
-
-            var deviceId = _deviceIdentification.GenerateDeviceId(user.Id, Request.Headers.UserAgent!, Request.HttpContext.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!);
-
-            var info = ComposeDeviceInfo();
-            var device = await _deviceManager.GetRequestingDevice(user.Id, info.DeviceFingerPrint, info.UserAgent);
-            if (device is not null && device.IsTrusted is true) return BadRequest();
-
-            device ??= new UserDevice
-            {
-                Id = deviceId,
-                DeviceName = Request.Headers.UserAgent.ToString(),
-                UserId = user.Id,
-            };
-
-            await _userDeviceStore.SetUserDevice(user, device);
-
-            var attempt = new UserDeviceChallengeAttempt
-            {
-                Code = code,
-                Email = challengeDto.Email,
-                UserDeviceId = deviceId,
-                UserId = user.Id,
-            };
-
-            (bool canMakeAttempt, ICollection<string> Errors) = await _userDeviceChallengeAttemptStore.AddAttempt(attempt);
-            if (!canMakeAttempt) return BadRequest(Errors);
-
-            return Ok(new { code });
+            return Ok();
         }
 
         [AllowAnonymous]

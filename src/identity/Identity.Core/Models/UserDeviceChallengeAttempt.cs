@@ -9,18 +9,19 @@
         public ApplicationUser? User { get; set; } = null;
         public required string UserDeviceId { get; set; }
         public UserDevice? UserDevice { get; set; } = null;
-        public bool IsSuccessful { get; set; } = false;
-        public DateTime? SuccessfulAt { get; set; } = null;
+        public bool IsUsed { get; set; } = false;
+        public DateTime? UsedAt { get; set; } = null;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public required DateTime ExpiresAt { get; set; }
 
-        public bool IsValid(double windowTime)
+        public bool IsValid()
         {
-            if (IsSuccessful is true)
+            if (IsUsed)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }
@@ -30,8 +31,8 @@
 
         public void MarkUsed()
         {
-            IsSuccessful = true;
-            SuccessfulAt = DateTime.UtcNow;
+            IsUsed = true;
+            UsedAt = DateTime.UtcNow;
         }
     }
 }
