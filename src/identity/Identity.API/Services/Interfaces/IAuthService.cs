@@ -45,6 +45,20 @@ namespace Identity.API.Services.Interfaces
         Task<SendUserDeviceChallengeResult> SendUserDeviceChallenge(string email, DeviceInfo info);
 
         Task<ValidateUserDeviceChallengeResult> ValidateUserDeviceChallenge(string email, string code);
+
+        Task<SendPhoneConfirmationResult> SendPhoneConfirmation(string phoneNumber);
+
+        Task<ConfirmPhoneNumberResult> ConfirmPhoneNumber(string phoneNumber, string code);
+    }
+
+    public class SendPhoneConfirmationResult
+    {
+        public bool Succeeded { get; set; } = false;
+    }
+
+    public class ConfirmPhoneNumberResult
+    {
+        public bool Succeeded { get; set; } = false;
     }
 
     public class ValidateUserDeviceChallengeResult
@@ -57,7 +71,7 @@ namespace Identity.API.Services.Interfaces
         public bool Succeeded { get; set; } = false;
     }
 
-        public class ConfirmEmailResult
+    public class ConfirmEmailResult
     {
         public bool Succeeded { get; set; } = false;
     }

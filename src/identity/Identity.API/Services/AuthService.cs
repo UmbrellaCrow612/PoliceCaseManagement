@@ -4,7 +4,6 @@ using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Core.Repositorys;
-using Identity.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -897,6 +896,58 @@ namespace Identity.API.Services
             _unitOfWork.Repository<UserDevice>().Update(device);
 
             await _unitOfWork.SaveChangesAsync();
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<SendPhoneConfirmationResult> SendPhoneConfirmation(string phoneNumber)
+        {
+            var result = new SendPhoneConfirmationResult();
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+            if (user is null || user.PhoneNumberConfirmed) return result;
+
+            var validRecentPhoneConfirmationAttemptExists = await _unitOfWork.Repository<PhoneConfirmationAttempt>()
+                .Query
+                .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
+                .AnyAsync();
+
+            if (validRecentPhoneConfirmationAttemptExists) return result;
+
+            var newAttempt = new PhoneConfirmationAttempt
+            {
+                Code = Guid.NewGuid().ToString()[..5],
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.PhoneConfirmationTime),
+                PhoneNumber = user.PhoneNumber!,
+                UserId = user.Id,
+            };
+            await _unitOfWork.Repository<PhoneConfirmationAttempt>().AddAsync(newAttempt);
+            await _unitOfWork.SaveChangesAsync();
+
+            // send sms using sms service
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<ConfirmPhoneNumberResult> ConfirmPhoneNumber(string phoneNumber, string code)
+        {
+            var result = new ConfirmPhoneNumberResult();
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+            if (user is null || user.PhoneNumberConfirmed) return result;
+
+            var attempt = await _unitOfWork.Repository<PhoneConfirmationAttempt>()
+                .Query
+                .FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber && x.Code == code);
+
+            if (attempt is null || !attempt.IsValid()) return result;
+
+            user.PhoneNumberConfirmed = true;
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+            attempt.MarkUsed();
+            _unitOfWork.Repository<PhoneConfirmationAttempt>().Update(attempt);
+            await _unitOfWork.SaveChangesAsync();
+
             result.Succeeded = true;
             return result;
         }

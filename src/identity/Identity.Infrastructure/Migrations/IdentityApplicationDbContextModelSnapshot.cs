@@ -380,14 +380,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsSuccessful")
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("SuccessfulAt")
+                    b.Property<DateTime?>("UsedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")

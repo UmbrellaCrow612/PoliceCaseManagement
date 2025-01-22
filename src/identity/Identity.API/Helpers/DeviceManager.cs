@@ -1,7 +1,6 @@
 ﻿using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Core.Repositorys;
-using Identity.Infrastructure.Data.Stores.Interfaces;
 using UAParser;
 using Utils.DTOs;
 

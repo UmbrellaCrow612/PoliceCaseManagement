@@ -5,7 +5,6 @@ using Identity.API.Mappings;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
 using Identity.Core.Models;
-using Identity.Infrastructure.Data.Stores.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Utils.DTOs;
 
 namespace Identity.API.Controllers
 {
@@ -21,13 +19,11 @@ namespace Identity.API.Controllers
     [Route("authentication")]
     public class AuthenticationController(
         UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
-    IPhoneConfirmationAttemptStore phoneConfirmationAttemptStore,
         IAuthService authService
         ) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
-        private readonly IPhoneConfirmationAttemptStore _phoneConfirmationAttemptStore = phoneConfirmationAttemptStore;
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
@@ -439,52 +435,22 @@ namespace Identity.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("validate-phone-confirmation")]
-        public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto phoneConfirmationDto)
+        public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto dto)
         {
-            (bool isValid, PhoneConfirmationAttempt? attempt, ICollection<ErrorDetail> errors) =
-                await _phoneConfirmationAttemptStore.ValidateAttempt(phoneConfirmationDto.PhoneNumber, phoneConfirmationDto.Code);
+            var res = await _authService.ConfirmPhoneNumber(dto.PhoneNumber, dto.Code);
+            if (!res.Succeeded) return BadRequest();
 
-            if (!isValid) return BadRequest(errors);
-
-            if (attempt is null) return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(attempt.UserId);
-            if (user is null) return Unauthorized();
-
-            attempt.MarkUsed();
-            _phoneConfirmationAttemptStore.SetToUpdate(attempt);
-
-            user.PhoneNumberConfirmed = true;
-
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return BadRequest(res.Errors);
-
-            return NoContent();
+            return Ok();
         }
 
         [AllowAnonymous]
-        [HttpPost("resend-phone-confirmation")]
-        public async Task<ActionResult> ReSendPhoneConfirmation([FromBody] ReSendPhoneConfirmationDto reSendPhoneConfirmation)
+        [HttpPost("send-phone-confirmation")]
+        public async Task<ActionResult> ReSendPhoneConfirmation([FromBody] SendPhoneConfirmationDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(reSendPhoneConfirmation.Email);
-            if (user is null) return NotFound("User not found.");
+            var res = await _authService.SendPhoneConfirmation(dto.PhoneNumber);
+            if (!res.Succeeded) return BadRequest();
 
-            if (user.PhoneNumberConfirmed) return BadRequest(new ErrorDetail
-            { Field = "Phone Confirmation", Reason = "Users phone number already confirmed." });
-
-            var attempt = new PhoneConfirmationAttempt
-            {
-                Code = Guid.NewGuid().ToString(),
-                PhoneNumber = user.PhoneNumber!,
-                UserId = user.Id,
-            };
-
-            (bool canMakeAttempt, ICollection<ErrorDetail> errors) = await _phoneConfirmationAttemptStore.AddAttempt(attempt);
-            if (!canMakeAttempt) return BadRequest(errors);
-
-            // send code in sms message
-
-            return Ok(attempt.Code);
+            return Ok();
         }
     }
 }

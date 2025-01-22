@@ -13,5 +13,15 @@ namespace Identity.API.Extensions
 
             return services;
         }
+
+        public static IServiceCollection AddTimeWindows(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions<TimeWindows>()
+             .Bind(configuration.GetSection("TimeWindows"))
+             .ValidateDataAnnotations()
+             .ValidateOnStart();
+
+            return services;
+        }
     }
 }

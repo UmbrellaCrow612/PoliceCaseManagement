@@ -331,10 +331,11 @@ namespace Identity.Infrastructure.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
-                    SuccessfulAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

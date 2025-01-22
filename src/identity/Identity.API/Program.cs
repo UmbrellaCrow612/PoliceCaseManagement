@@ -92,6 +92,7 @@ builder.Services.AddScoped<StringEncryptionHelper>();
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddScoped<DeviceManager>();
 builder.Services.AddIdentityApplicationRedirectUrls(config);
+builder.Services.AddTimeWindows(config);
 
 builder.Services.AddEmailService(builder.Configuration);
 builder.Services.AddServices(config);

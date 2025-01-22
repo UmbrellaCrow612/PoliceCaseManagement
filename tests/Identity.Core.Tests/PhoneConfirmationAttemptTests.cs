@@ -19,8 +19,8 @@ namespace Identity.Core.Tests
             Assert.NotNull(attempt.Id);
             Assert.NotEqual(default(DateTime), attempt.CreatedAt);
             Assert.Null(attempt.User);
-            Assert.False(attempt.IsSuccessful);
-            Assert.Null(attempt.SuccessfulAt);
+            Assert.False(attempt.IsUsed);
+            Assert.Null(attempt.UsedAt);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace Identity.Core.Tests
                 Code = "123456",
                 PhoneNumber = "+1234567890",
                 CreatedAt = DateTime.UtcNow,
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act
@@ -121,10 +121,10 @@ namespace Identity.Core.Tests
             attempt.MarkUsed();
 
             // Assert
-            Assert.True(attempt.IsSuccessful);
-            Assert.NotNull(attempt.SuccessfulAt);
+            Assert.True(attempt.IsUsed);
+            Assert.NotNull(attempt.UsedAt);
             Assert.InRange(
-                attempt.SuccessfulAt!.Value,
+                attempt.UsedAt!.Value,
                 DateTime.UtcNow.AddSeconds(-1),
                 DateTime.UtcNow.AddSeconds(1)
             );
@@ -140,7 +140,7 @@ namespace Identity.Core.Tests
                 Code = "123456",
                 PhoneNumber = "+1234567890",
                 CreatedAt = DateTime.UtcNow.AddMinutes(-31),
-                IsSuccessful = true
+                IsUsed = true
             };
 
             // Act

@@ -5,26 +5,27 @@
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Code { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public required DateTime ExpiresAt { get; set; }
         public required string UserId { get; set; }
         public ApplicationUser? User { get; set; } = null;
         public required string PhoneNumber { get; set; }
-        public bool IsSuccessful { get; set; } = false;
-        public DateTime? SuccessfulAt { get; set; } = null;
+        public bool IsUsed { get; set; } = false;
+        public DateTime? UsedAt { get; set; } = null;
 
         public void MarkUsed()
         {
-            IsSuccessful = true;
-            SuccessfulAt = DateTime.UtcNow;
+            IsUsed = true;
+            UsedAt = DateTime.UtcNow;
         }
 
-        public bool IsValid(double windowTime)
+        public bool IsValid()
         {
-            if (IsSuccessful is true)
+            if (IsUsed is true)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > CreatedAt.AddMinutes(windowTime))
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }

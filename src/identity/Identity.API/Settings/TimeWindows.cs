@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Identity.Infrastructure.Settings
+namespace Identity.API.Settings
 {
     /// <summary>
     /// Configures time windows for critical identity-related actions, 
