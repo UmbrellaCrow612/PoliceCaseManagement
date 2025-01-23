@@ -22,6 +22,7 @@ namespace Identity.API.Services
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -77,7 +78,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Incorrect credentials" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Incorrect credentials");
                 return result;
             }
 
@@ -87,7 +88,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Account locked" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Account locked");
                 return result;
             }
 
@@ -97,7 +98,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Email not confirmed", RedirectUrl = redirectUrls.EmailConfirmationUrl });
+                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", redirectUrls.EmailConfirmationUrl);
                 return result;
             }
 
@@ -107,7 +108,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Phone number not confirmed", RedirectUrl = redirectUrls.PhoneConfirmationUrl });
+                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", redirectUrls.PhoneConfirmationUrl);
                 return result;
             }
 
@@ -118,7 +119,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.Errors.Add(new LoginError { Code = StatusCodes.Status401Unauthorized, Message = "Untrsuted device being used", RedirectUrl = redirectUrls.DeviceConfirmationUrl });
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", redirectUrls.DeviceConfirmationUrl);
                 return result;
             }
 
@@ -135,28 +136,22 @@ namespace Identity.API.Services
             var result = new TwoFactorEmailSentResult();
 
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
-            if (loginAttempt is null)
+            if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status404NotFound, Message = "Login attempt not found"});
+                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
                 return result;
             }
-
-            if (!loginAttempt.IsValid())
-            {
-                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status401Unauthorized, Message = "Login attempt no longer valid" });
-                return result;
-            }
-
+     
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
                 return result;
             }
 
             if (!user.IsEmailConfirmed())
             {
-                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status401Unauthorized, Message = "User email not confirmed" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", redirectUrls.EmailConfirmationUrl);
                 return result;
             }
 
@@ -168,7 +163,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorEmailAttemptExists)
             {
-                result.Errors.Add(new TwoFactorEmailSentResultError { Code = StatusCodes.Status400BadRequest, Message = "Valid recent email attempt already issued for this login" });
+                result.AddError(StatusCodes.Status400BadRequest, "Valid recent attempt already issued");
                 return result;
             }
 
@@ -195,28 +190,22 @@ namespace Identity.API.Services
             var result = new TwoFactorSmsSentResult();
 
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
-            if(loginAttempt is null)
+            if(loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.Errors.Add(new TwoFactorSmsSentResultError { Code = StatusCodes.Status404NotFound, Message = "LoginAsync loginAttempt not found" });
-                return result;
-            }
-
-            if (!loginAttempt.IsValid())
-            {
-                result.Errors.Add(new TwoFactorSmsSentResultError { Code = StatusCodes.Status400BadRequest, Message = "LoginAsync loginAttempt no longer valid" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.Errors.Add(new TwoFactorSmsSentResultError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
                 return result;
             }
 
             if (!user.IsPhoneNumberConfirmed())
             {
-                result.Errors.Add(new TwoFactorSmsSentResultError { Code = StatusCodes.Status400BadRequest, Message = "User not phone number not confirmed" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", redirectUrls.PhoneConfirmationUrl);
                 return result;
             }
 
@@ -228,7 +217,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorSmsAttemptExist)
             {
-                result.Errors.Add(new TwoFactorSmsSentResultError { Code = StatusCodes.Status400BadRequest, Message = "There is a valid recent sms code issued already for this login attempt" });
+                result.AddError(StatusCodes.Status400BadRequest, "Valid recent attempt already issued");
                 return result;
             }
 
@@ -268,21 +257,21 @@ namespace Identity.API.Services
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if(!isValid || loginAttempt is null)
             {
-                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "Login attempt not found or is invalid" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Valid recent attempt issued");
                 return result;
             }
 
             var user = await GetUserByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(!isTrusted || userDevice is null)
             {
-                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "User device not found or is not trusted" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", redirectUrls.DeviceConfirmationUrl);
                 return result;
             }
 
@@ -293,7 +282,7 @@ namespace Identity.API.Services
 
             if (twoFactorEmailAttempt is null || !twoFactorEmailAttempt.IsValid())
             {
-                result.Errors.Add(new TwoFactorEmailValidationError { Code = StatusCodes.Status401Unauthorized, Message = "Two factor code not found or is invalid" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
                 return result;
             }
 
@@ -322,42 +311,30 @@ namespace Identity.API.Services
             var result = new TwoFactorSmsValidationResult();
 
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
-            if (loginAttempt is null)
+            if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status404NotFound, Message = "LoginAsync attempt not found" });
-                return result;
-            }
-
-            if (!loginAttempt.IsValid())
-            {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status400BadRequest, Message = "LoginAsync attempt no longer valid" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status404NotFound, Message = "User not found" });
+                result.AddError(StatusCodes.Status401Unauthorized, "user not found");
                 return result;
             }
 
             var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
             if(device is null || !device.Trusted())
             {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status401Unauthorized, Message = "Device not found or trsuted" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed");
                 return result;
             }
 
             var smsAttempt = await _unitOfWork.Repository<TwoFactorSmsAttempt>().Query.Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code).FirstOrDefaultAsync();
-            if (smsAttempt is null)
+            if (smsAttempt is null || !smsAttempt.IsValid())
             {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status404NotFound, Message = "Sms verifaction attempt not found for thus login attempt" });
-                return result;
-            }
-
-            if (!smsAttempt.IsValid())
-            {
-                result.Errors.Add(new TwoFactorSmsValidationResultError { Code = StatusCodes.Status400BadRequest, Message = "Sms verifaction attempt not longer valid" });
+                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
                 return result;
             }
 

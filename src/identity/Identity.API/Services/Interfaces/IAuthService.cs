@@ -51,66 +51,22 @@ namespace Identity.API.Services.Interfaces
         Task<ConfirmPhoneNumberResult> ConfirmPhoneNumber(string phoneNumber, string code);
     }
 
-    public class SendPhoneConfirmationResult
+    public class AuthError
     {
-        public bool Succeeded { get; set; } = false;
+        public required int Code { get; set; }
+        public required string Message { get; set; }
+        public string? RedirectUrl { get; set; }
     }
 
-    public class ConfirmPhoneNumberResult
+    // Base result class for all authentication results
+    public class AuthResult
     {
         public bool Succeeded { get; set; } = false;
-    }
-
-    public class ValidateUserDeviceChallengeResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class SendUserDeviceChallengeResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class ConfirmEmailResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-    public class SendConfirmationEmailResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class ValidateResetPasswordResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class SendResetPasswordResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class ValidateTOTPResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public Tokens Tokens { get; set; } = new();
-    }
-
-    public class SetUpTOTPResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public byte[] TotpSecretQrCodeBytes { get; set; } = [];
-    }
-
-    public class LoginResult
-    {
-        public string? LoginAttemptId { get; set; } = null;
-        public ICollection<LoginError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
+        public ICollection<AuthError> Errors { get; private set; } = [];
 
         public void AddError(int code, string message, string? redirectUrl = null)
         {
-            Errors.Add(new LoginError
+            Errors.Add(new AuthError
             {
                 Code = code,
                 Message = message,
@@ -119,121 +75,58 @@ namespace Identity.API.Services.Interfaces
         }
     }
 
-    public class LoginError
+    public class TokenAuthResult : AuthResult
     {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
-        public string? RedirectUrl { get; set; } = null;
-    }
-
-    public class TwoFactorSmsSentResult
-    {
-        public ICollection<TwoFactorSmsSentResultError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class TwoFactorSmsSentResultError
-    {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
-    }
-
-    public class TwoFactorSmsValidationResult
-    {
-        public ICollection<TwoFactorSmsValidationResultError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
         public Tokens Tokens { get; set; } = new();
     }
 
-    public class TwoFactorSmsValidationResultError
+    public class LoginResult : AuthResult
     {
-        public required int Code { get; set; }
-
-        public required string Message { get; set; }
+        public string? LoginAttemptId { get; set; }
     }
 
-    public class TwoFactorEmailSentResult
+    public class TwoFactorSmsSentResult : AuthResult { }
+
+    public class TwoFactorSmsValidationResult : TokenAuthResult { }
+
+    public class TwoFactorEmailSentResult : AuthResult { }
+
+    public class TwoFactorEmailValidationResult : TokenAuthResult { }
+
+    public class RefreshTokenResult : TokenAuthResult { }
+
+    public class LogoutResult : AuthResult { }
+
+    public class SendMagicLinkResult : AuthResult { }
+
+    public class ValidateMagicLinkResult : TokenAuthResult { }
+
+    public class SendOTPResult : AuthResult { }
+
+    public class ValidateOTPResult : TokenAuthResult { }
+
+    public class SetUpTOTPResult : AuthResult
     {
-        public ICollection<TwoFactorEmailSentResultError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
+        public byte[] TotpSecretQrCodeBytes { get; set; } = [];
     }
 
-    public class TwoFactorEmailSentResultError
-    {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
-    }
+    public class ValidateTOTPResult : TokenAuthResult { }
 
-    public class TwoFactorEmailValidationResult()
-    {
-        public ICollection<TwoFactorEmailValidationError> Errors { get; set; } = [];
-        public bool Succeeded { get; set; } = false;
-        public Tokens Tokens { get; set; } = new();
-    }
+    public class SendResetPasswordResult : AuthResult { }
 
-    public class TwoFactorEmailValidationError()
-    {
-        public required int Code { get; set; }
-        public required string Message { get; set; }
-    }
+    public class ValidateResetPasswordResult : AuthResult { }
 
-    public class RefreshTokenResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<RefreshTokenResultError> Errors { get; set; } = [];
-        public Tokens Tokens { get; set; } = new();
-    }
+    public class SendConfirmationEmailResult : AuthResult { }
 
-    public class RefreshTokenResultError
-    {
+    public class ConfirmEmailResult : AuthResult { }
 
-    }
+    public class SendUserDeviceChallengeResult : AuthResult { }
 
-    public class LogoutResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<LogoutResultError> Errors { get; set; } = [];
-    }
+    public class ValidateUserDeviceChallengeResult : AuthResult { }
 
-    public class LogoutResultError
-    {
+    public class SendPhoneConfirmationResult : AuthResult { }
 
-    }
-
-    public class SendMagicLinkResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<SendMagicLinkResultError> Errors { get; set; } = [];
-    }
-
-    public class SendMagicLinkResultError
-    {
-
-    }
-
-    public class ValidateMagicLinkResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public Tokens Tokens { get; set; } = new();
-        public ICollection<ValidateMagicLinkResultError> Errors { get; set; } = [];
-    }
-
-    public class ValidateMagicLinkResultError
-    {
-
-    }
-
-    public class SendOTPResult
-    {
-        public bool Succeeded { get; set; } = false;
-    }
-
-    public class ValidateOTPResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public Tokens Tokens { get; set; } = new();
-    }
-
+    public class ConfirmPhoneNumberResult : AuthResult { }
 
 
     public class DeviceInfo
