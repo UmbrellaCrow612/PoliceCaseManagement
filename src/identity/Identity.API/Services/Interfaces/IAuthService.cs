@@ -32,7 +32,7 @@ namespace Identity.API.Services.Interfaces
 
         Task<SetUpTOTPResult> SetUpTOTP(string userId, DeviceInfo deviceInfo);
 
-        Task<ValidateTOTPResult> ValidateTOTP(string email, string code, DeviceInfo deviceInfo);
+        Task<ValidateTOTPResult> ValidateTOTP(string code, string loginAttemptId, DeviceInfo deviceInfo);
 
         Task<SendResetPasswordResult> SendResetPassword(string email);
 

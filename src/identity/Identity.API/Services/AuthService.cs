@@ -662,11 +662,18 @@ namespace Identity.API.Services
             return result;
         }
 
-        public async Task<ValidateTOTPResult> ValidateTOTP(string email, string code, DeviceInfo deviceInfo)
+        public async Task<ValidateTOTPResult> ValidateTOTP(string code, string loginAttemptId, DeviceInfo deviceInfo)
         {
             var result = new ValidateTOTPResult();
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
+            if(!isValid || loginAttempt is null)
+            {
+                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
+                return result;
+            }
+
+            var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null || !user.IsTOTPAuthEnabled()) return result;
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
@@ -683,6 +690,9 @@ namespace Identity.API.Services
             var trueCode = totp.ComputeTotp(); 
 
             if (!string.Equals(trueCode, code)) return result;
+
+            loginAttempt.MarkUsed();
+            _unitOfWork.Repository<LoginAttempt>().Update(loginAttempt);
 
             var tokens = await GenerateAndStoreTokens(user, userDevice);
             result.Tokens = tokens;

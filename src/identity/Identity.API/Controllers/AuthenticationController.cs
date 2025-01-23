@@ -77,7 +77,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-totp")]
         public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
         {
-            var res = await _authService.ValidateTOTP(dto.Email, dto.Code, ComposeDeviceInfo());
+            var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized();
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
