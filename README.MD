@@ -8,5 +8,6 @@
 - JWT auth strategy
 - Device Fingerptining
 - Refresh tokens
+- Magic link auth
 - More on the way
 
