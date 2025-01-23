@@ -497,6 +497,35 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TimeBasedOneTimePassCodeBackupCodes",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    TimeBasedOneTimePassCodeId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeBasedOneTimePassCodeBackupCodes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TimeBasedOneTimePassCodeBackupCodes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TimeBasedOneTimePassCodeBackupCodes_TimeBasedOneTimePassCodes_TimeBasedOneTimePassCodeId",
+                        column: x => x.TimeBasedOneTimePassCodeId,
+                        principalTable: "TimeBasedOneTimePassCodes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserDeviceChallengeAttempts",
                 columns: table => new
                 {
@@ -641,6 +670,16 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TimeBasedOneTimePassCodeBackupCodes_TimeBasedOneTimePassCodeId",
+                table: "TimeBasedOneTimePassCodeBackupCodes",
+                column: "TimeBasedOneTimePassCodeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeBasedOneTimePassCodeBackupCodes_UserId",
+                table: "TimeBasedOneTimePassCodeBackupCodes",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TimeBasedOneTimePassCodes_UserId",
                 table: "TimeBasedOneTimePassCodes",
                 column: "UserId",
@@ -737,7 +776,7 @@ namespace Identity.Infrastructure.Migrations
                 name: "SecurityAudits");
 
             migrationBuilder.DropTable(
-                name: "TimeBasedOneTimePassCodes");
+                name: "TimeBasedOneTimePassCodeBackupCodes");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
@@ -753,6 +792,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "TimeBasedOneTimePassCodes");
 
             migrationBuilder.DropTable(
                 name: "LoginAttempts");

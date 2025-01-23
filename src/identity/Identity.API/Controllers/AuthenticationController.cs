@@ -67,9 +67,9 @@ namespace Identity.API.Controllers
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
             var res = await _authService.SetUpTOTP(userId, ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            return Ok(new { res.TotpSecretQrCodeBytes });
+            return Ok(new { res.TotpSecretQrCodeBytes, backupCodes = res.BackUpCodes });
         }
 
         [AllowAnonymous]
@@ -78,7 +78,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
         {
             var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
             {
@@ -106,7 +106,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
         {
             var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
             {
@@ -134,10 +134,9 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> SendOtp([FromBody] SendOtpDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.OTPCreds.Email) && string.IsNullOrWhiteSpace(dto.OTPCreds.PhoneNumber)) return BadRequest();
-            var info = ComposeDeviceInfo();
 
-            var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, info);
-            if (!res.Succeeded) return Unauthorized();
+            var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, ComposeDeviceInfo());
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
         }
@@ -417,7 +416,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto dto)
         {
             var res = await _authService.ValidateUserDeviceChallenge(dto.Email, dto.Code);
-            if (!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
         }
@@ -428,7 +427,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto dto)
         {
             var res = await _authService.SendUserDeviceChallenge(dto.Email, ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized();
+            if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
         }

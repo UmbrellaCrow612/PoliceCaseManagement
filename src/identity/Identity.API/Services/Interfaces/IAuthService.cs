@@ -49,6 +49,10 @@ namespace Identity.API.Services.Interfaces
         Task<SendPhoneConfirmationResult> SendPhoneConfirmation(string phoneNumber);
 
         Task<ConfirmPhoneNumberResult> ConfirmPhoneNumber(string phoneNumber, string code);
+
+        Task GenerateNewTOTPBackUpCodes(string userId);
+
+        Task ValidateTOTPBackUpCode(string userId, string code);
     }
 
     public class AuthError
@@ -108,6 +112,7 @@ namespace Identity.API.Services.Interfaces
     public class SetUpTOTPResult : AuthResult
     {
         public byte[] TotpSecretQrCodeBytes { get; set; } = [];
+        public ICollection<string> BackUpCodes { get; set; } = [];
     }
 
     public class ValidateTOTPResult : TokenAuthResult { }

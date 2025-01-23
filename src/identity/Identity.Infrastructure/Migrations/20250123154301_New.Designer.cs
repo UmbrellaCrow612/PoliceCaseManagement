@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250122101320_New")]
+    [Migration("20250123154301_New")]
     partial class New
     {
         /// <inheritdoc />
@@ -473,6 +473,41 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("TimeBasedOneTimePassCodes");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCodeBackupCode", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TimeBasedOneTimePassCodeId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TimeBasedOneTimePassCodeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TimeBasedOneTimePassCodeBackupCodes");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
                 {
                     b.Property<string>("Id")
@@ -864,6 +899,25 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCodeBackupCode", b =>
+                {
+                    b.HasOne("Identity.Core.Models.TimeBasedOneTimePassCode", "TimeBasedOneTimePassCode")
+                        .WithMany("TimeBasedOneTimePassCodeBackupCodes")
+                        .HasForeignKey("TimeBasedOneTimePassCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithMany("TimeBasedOneTimePassCodeBackupCodes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TimeBasedOneTimePassCode");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
@@ -1004,6 +1058,8 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("TimeBasedOneTimePassCode");
 
+                    b.Navigation("TimeBasedOneTimePassCodeBackupCodes");
+
                     b.Navigation("Tokens");
 
                     b.Navigation("TwoFactorCodeAttempts");
@@ -1023,6 +1079,11 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("TwoFactorEmailAttempts");
 
                     b.Navigation("TwoFactorSmsAttempts");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
+                {
+                    b.Navigation("TimeBasedOneTimePassCodeBackupCodes");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>

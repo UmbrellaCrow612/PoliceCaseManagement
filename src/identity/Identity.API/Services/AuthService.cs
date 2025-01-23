@@ -644,7 +644,7 @@ namespace Identity.API.Services
             byte[] secretAsQrCodebytes = QRCodeHandler.GenerateQRCodeBytes(
                         base32Secret,
                         user.Email!,  
-                        "YourAppName"  
+                        "PCMS"  
                         );
             result.TotpSecretQrCodeBytes = secretAsQrCodebytes;
 
@@ -655,6 +655,23 @@ namespace Identity.API.Services
             };
 
             await _unitOfWork.Repository<TimeBasedOneTimePassCode>().AddAsync(totp);
+
+            List<TimeBasedOneTimePassCodeBackupCode> backUpCodes = [];
+            int backUpCodeCount = 4;
+
+            for (int i = 0; i < backUpCodeCount; i++)
+            {
+                backUpCodes.Add(new TimeBasedOneTimePassCodeBackupCode
+                {
+                    Code = Guid.NewGuid().ToString()[..8], // sent to user without hashing then hash to store
+                    TimeBasedOneTimePassCodeId = totp.Id,
+                    UserId = user.Id
+                });
+            }
+            result.BackUpCodes = backUpCodes.Select(x => x.Code).ToArray();
+
+            await _unitOfWork.Repository<TimeBasedOneTimePassCodeBackupCode>().AddRangeAsync(backUpCodes);
+
             await _unitOfWork.SaveChangesAsync();
 
             result.Succeeded = true;
@@ -937,6 +954,16 @@ namespace Identity.API.Services
 
             result.Succeeded = true;
             return result;
+        }
+
+        public Task GenerateNewTOTPBackUpCodes(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ValidateTOTPBackUpCode(string userId, string code)
+        {
+            throw new NotImplementedException();
         }
     }
 }

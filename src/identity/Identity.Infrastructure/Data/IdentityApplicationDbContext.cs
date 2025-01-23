@@ -24,6 +24,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
         public DbSet<OTPAttempt> OTPAttempts { get; set; }
         public DbSet<TimeBasedOneTimePassCode> TimeBasedOneTimePassCodes { get; set; }
+        public DbSet<TimeBasedOneTimePassCodeBackupCode> TimeBasedOneTimePassCodeBackupCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

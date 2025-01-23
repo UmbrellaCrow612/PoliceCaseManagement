@@ -25,6 +25,7 @@ namespace Identity.Core.Models
         public ICollection<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; } = [];
         public ICollection<MagicLinkAttempt> MagicLinkAttempts { get; set; } = [];
         public ICollection<OTPAttempt> OTPAttempts { get; set; } = [];
+        public ICollection<TimeBasedOneTimePassCodeBackupCode> TimeBasedOneTimePassCodeBackupCodes { get; set; } = [];
 
         public TimeBasedOneTimePassCode? TimeBasedOneTimePassCode { get; set; } = null;
         public string? TimeBasedOneTimePassCodeId { get; set; } = null;
