@@ -105,7 +105,10 @@ namespace Identity.API.Services.Interfaces
 
     public class ValidateMagicLinkResult : TokenAuthResult { }
 
-    public class SendOTPResult : AuthResult { }
+    public class SendOTPResult : AuthResult
+    {
+        public byte[] QrCodeBytes { get; set; } = [];
+    }
 
     public class ValidateOTPResult : TokenAuthResult { }
 

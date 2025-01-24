@@ -536,6 +536,9 @@ namespace Identity.API.Services
                 await _unitOfWork.Repository<OTPAttempt>().AddAsync(newAttempt);
                 await _unitOfWork.SaveChangesAsync();
 
+                var QRCodeBytes = QRCodeHandler.GenerateOTPQRCodeBytes(newAttempt);
+                result.QrCodeBytes = QRCodeBytes;
+
                 // use email service and send OTP code
                 result.Succeeded = true;
 

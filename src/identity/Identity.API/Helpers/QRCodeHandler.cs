@@ -1,4 +1,6 @@
-﻿using QRCoder;
+﻿using Identity.Core.Models;
+using OtpNet;
+using QRCoder;
 
 namespace Identity.API.Helpers
 {
@@ -10,6 +12,18 @@ namespace Identity.API.Helpers
 
             using QRCodeGenerator qrGenerator = new();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(totpUri, QRCodeGenerator.ECCLevel.Q);
+            using BitmapByteQRCode qrCode = new(qrCodeData);
+            return qrCode.GetGraphic(5);
+        }
+
+        public static byte[] GenerateOTPQRCodeBytes(OTPAttempt otp)
+        {
+            string sep = "::";
+
+            string format = $"otp=Id={otp.Id}{sep}CreatedAt={otp.CreatedAt}{sep}ExpiresAt={otp.ExpiresAt}{sep}Code={otp.Code}";
+
+            using QRCodeGenerator qrGenerator = new();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(format, QRCodeGenerator.ECCLevel.Q);
             using BitmapByteQRCode qrCode = new(qrCodeData);
             return qrCode.GetGraphic(5);
         }

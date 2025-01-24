@@ -138,7 +138,7 @@ namespace Identity.API.Controllers
             var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            return Ok();
+            return Ok(new { res.QrCodeBytes });
         }
 
         [Authorize]
