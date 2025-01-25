@@ -1,4 +1,5 @@
-﻿using Email.Service.Implamentations;
+﻿using Email.Service.Implementations;
+using Email.Service.Interfaces;
 using Email.Service.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,11 +12,15 @@ namespace Email.Service
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddOptionsWithValidateOnStart<EmailSettings>("EmailSettings")
-                .BindConfiguration("EmailSettings")
-                .ValidateDataAnnotations();
+            services.Configure<EmailSettings>(
+            configuration.GetSection("EmailSettings"));
 
-            services.AddScoped<GmailService>();
+            services.AddOptions<EmailSettings>()
+                .Bind(configuration.GetSection("EmailSettings"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddScoped<IEmailService, SendGridEmailService>();
 
             return services;
         }

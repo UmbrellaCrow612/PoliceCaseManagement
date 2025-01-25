@@ -5,17 +5,15 @@ namespace Email.Service.Settings
     public class EmailSettings
     {
         [Required]
-        [EmailAddress]
-        public required string SenderEmail { get; set; }
+        public required string FromEmail { get; set; }
 
         [Required]
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
-        public required string SenderPassword { get; set; }
+        public required SendGridSettings SendGridSettings { get; set; }
+    }
 
+    public class SendGridSettings
+    {
         [Required]
-        public required string SmtpServer { get; set; }
-
-        [Range(1, 65535, ErrorMessage = "Port must be a valid number between 1 and 65535.")]
-        public required int SmtpPort { get; set; }
+        public required string APIKey { get; set; }
     }
 }

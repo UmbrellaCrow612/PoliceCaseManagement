@@ -94,7 +94,7 @@ builder.Services.AddScoped<DeviceManager>();
 builder.Services.AddIdentityApplicationRedirectUrls(config);
 builder.Services.AddTimeWindows(config);
 
-builder.Services.AddEmailService(builder.Configuration);
+builder.Services.AddEmailService(config);
 builder.Services.AddServices(config);
 
 var app = builder.Build();
