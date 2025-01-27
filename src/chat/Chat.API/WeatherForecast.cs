@@ -1,4 +1,4 @@
-namespace Reporting.API
+namespace Chat.API
 {
     public class WeatherForecast
     {

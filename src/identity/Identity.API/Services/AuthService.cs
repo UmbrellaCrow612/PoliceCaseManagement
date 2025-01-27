@@ -324,8 +324,8 @@ namespace Identity.API.Services
                 return result;
             }
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
-            if(device is null || !device.Trusted())
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
+            if(userDevice is null || !isTrusted)
             {
                 result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed");
                 return result;
@@ -357,13 +357,13 @@ namespace Identity.API.Services
                 Id = jwtBearerAcessTokenId,
                 RefreshToken = refreshToken,
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
-                UserDeviceId = device.Id,
+                UserDeviceId = userDevice.Id,
                 UserId = user.Id
             };
 
             await _unitOfWork.Repository<Token>().AddAsync(token);
 
-            user.LastLoginDeviceId = device.Id;
+            user.LastLoginDeviceId = userDevice.Id;
 
             _unitOfWork.Repository<ApplicationUser>().Update(user);
 
@@ -391,14 +391,19 @@ namespace Identity.API.Services
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
+                result.AddError(StatusCodes.Status404NotFound, "User not found");
                 return result;
             }
 
-            var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
-            if (device is null) return result;
+            var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
+            if (userDevice is null || !isTrusted)
+            {
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not found or is trusted");
+                return result;
+            }
 
             var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(tokenId);
-            if (storedToken is null || !storedToken.IsValid(refreshToken, device.Id)) return result;
+            if (storedToken is null || !storedToken.IsValid(refreshToken, userDevice.Id)) return result;
 
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -409,7 +414,7 @@ namespace Identity.API.Services
                 Id = jwtBearerAcessTokenId,
                 RefreshToken = storedToken.RefreshToken,
                 RefreshTokenExpiresAt = storedToken.RefreshTokenExpiresAt, // bind to previous refresh token and time
-                UserDeviceId = device.Id,
+                UserDeviceId = userDevice.Id,
                 UserId = user.Id,
             };
            result.Tokens.JwtBearerToken = jwtBearerToken;

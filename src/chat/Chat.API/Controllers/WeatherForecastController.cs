@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Reporting.API.Controllers
+namespace Chat.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

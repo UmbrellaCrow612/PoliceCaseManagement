@@ -1,4 +1,4 @@
-﻿namespace Cases.Core
+﻿namespace Chat.Core
 {
     public class Class1
     {
