@@ -6,6 +6,9 @@ export default function Layout() {
       screenOptions={{
         headerShown: false,
       }}
-    />
+    >
+      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="scan" options={{ title: "Scan QR Code" }} />
+    </Stack>
   );
 }

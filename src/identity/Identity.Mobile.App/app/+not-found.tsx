@@ -1,14 +1,9 @@
-import { Link } from "expo-router";
-import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function IndexTab() {
+export default function NotFoundTab() {
   return (
     <View style={styles.container}>
-      <Text>Hello World</Text>
-      <Link href="/scan" style={styles.btn}>
-        Go to Scan screen
-      </Link>
+      <Text style={styles.text}>404 not found</Text>
     </View>
   );
 }
@@ -20,8 +15,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  btn: {
-    padding: 2,
-    backgroundColor: "black",
+  text: {
+    fontSize: 30,
+    fontWeight: "bold",
   },
 });
