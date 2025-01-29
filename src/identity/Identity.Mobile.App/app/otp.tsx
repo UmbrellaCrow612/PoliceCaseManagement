@@ -32,7 +32,7 @@ export default function OTPTab() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>OTP Details</Text>
+      <Text style={styles.title}>One Time Password Details</Text>
 
       <View style={styles.card}>
         <View style={styles.row}>
