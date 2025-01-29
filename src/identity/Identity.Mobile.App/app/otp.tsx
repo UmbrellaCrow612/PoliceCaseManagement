@@ -3,12 +3,12 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 
 export default function OTPTab() {
-  const { ExpiresAt, Code } = useLocalSearchParams<any>();
+  const { expiresAt, code } = useLocalSearchParams<any>();
   const [remainingTime, setRemainingTime] = useState("");
 
   useEffect(() => {
-    if (ExpiresAt) {
-      const expirationTime = new Date(ExpiresAt).getTime();
+    if (expiresAt) {
+      const expirationTime = new Date(expiresAt).getTime();
 
       const interval = setInterval(() => {
         const now = new Date().getTime();
@@ -28,7 +28,7 @@ export default function OTPTab() {
 
       return () => clearInterval(interval);
     }
-  }, [ExpiresAt]);
+  }, [expiresAt]);
 
   return (
     <View style={styles.container}>
@@ -37,7 +37,7 @@ export default function OTPTab() {
       <View style={styles.card}>
         <View style={styles.row}>
           <Text style={styles.label}>Code:</Text>
-          <Text style={[styles.value, styles.code]}>{Code}</Text>
+          <Text style={[styles.value, styles.code]}>{code}</Text>
         </View>
 
         <View style={styles.row}>
