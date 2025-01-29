@@ -6,15 +6,68 @@ import {
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
+import { Link, useNavigation } from "expo-router";
+
+interface OtpData {
+  Id: string;
+  CreatedAt: Date;
+  ExpiresAt: Date;
+  Code: string;
+}
+
+function isOtpData(data: any): data is OtpData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    typeof data.Id === "string" &&
+    typeof data.CreatedAt === "string" &&
+    typeof data.ExpiresAt === "string" &&
+    typeof data.Code === "string"
+  );
+}
 
 export default function ScanTab() {
   const [back, _] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  const [barCodeData, setBarcodeData] = useState("");
+  const { navigate } = useNavigation<any>();
+  const [qrData, setQrData] = useState("");
+
+  function processQRCodeData(qrString: string): OtpData | null {
+    try {
+      const data = JSON.parse(qrString);
+
+      if (isOtpData(data)) {
+        return data;
+      }
+
+      // Handle other formats if needed
+
+      return null; // Return null if format is not recognized
+    } catch (error) {
+      console.error("QR Code parsing error:", error);
+      return null;
+    }
+  }
+
+  function CheckDataFormatAndPush(data: string) {
+    const res = processQRCodeData(data);
+
+    if (!res) {
+      throw new Error("QR Code parsing failed: Unsupported format");
+    }
+
+    if (isOtpData(res)) {
+      navigate("otp", {
+        id: res.Id,
+        CreatedAt: res.CreatedAt,
+        ExpiresAt: res.ExpiresAt,
+        Code: res.Code,
+      });
+    }
+  }
 
   function onBarcodeScanned(scanningResult: BarcodeScanningResult) {
-    // Tis is what the identity QR OTP Code will be we will prase it validate it then push the data to stateless otp view which renders the data into it
-    setBarcodeData(scanningResult.data);
+    CheckDataFormatAndPush(scanningResult.data);
   }
 
   if (!permission || !permission.granted) {
@@ -38,7 +91,7 @@ export default function ScanTab() {
       >
         <View style={styles.overlay}>
           <View style={styles.roundedBox}>
-            <Text style={styles.title}>Scan QR Code Data : {barCodeData}</Text>
+            <Text style={styles.title}>Scan QR Code Data: {qrData}</Text>
           </View>
         </View>
       </CameraView>

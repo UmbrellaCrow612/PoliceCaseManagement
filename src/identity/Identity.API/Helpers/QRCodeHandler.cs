@@ -1,6 +1,7 @@
 ﻿using Identity.Core.Models;
 using OtpNet;
 using QRCoder;
+using System.Text.Json;
 
 namespace Identity.API.Helpers
 {
@@ -18,12 +19,16 @@ namespace Identity.API.Helpers
 
         public static byte[] GenerateOTPQRCodeBytes(OTPAttempt otp)
         {
-            string sep = "::";
-
-            string format = $"otp=Id={otp.Id}{sep}CreatedAt={otp.CreatedAt}{sep}ExpiresAt={otp.ExpiresAt}{sep}Code={otp.Code}";
+            string json = JsonSerializer.Serialize(new
+            {
+                otp.Id,
+                otp.CreatedAt,
+                otp.ExpiresAt,
+                otp.Code,
+            });
 
             using QRCodeGenerator qrGenerator = new();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(format, QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(json, QRCodeGenerator.ECCLevel.Q);
             using BitmapByteQRCode qrCode = new(qrCodeData);
             return qrCode.GetGraphic(5);
         }
