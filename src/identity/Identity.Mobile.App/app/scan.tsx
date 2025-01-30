@@ -15,7 +15,7 @@ interface OtpData {
   code: string;
 }
 
-interface TotpData {
+export interface TotpData {
   appName: string;
   userName: string;
   secret: string;
