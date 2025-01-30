@@ -11,3 +11,5 @@
 - Magic link auth
 - More on the way
 
+## Mobile app
+- Dcab QR codes and show OTP or reguster TOTP codes like google authenticator
