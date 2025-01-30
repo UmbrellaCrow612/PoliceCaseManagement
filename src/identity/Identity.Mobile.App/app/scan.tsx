@@ -99,6 +99,8 @@ export default function ScanTab() {
     const parsedData = await processQRCodeData(data);
     if (parsedData && isOtpData(parsedData)) {
       navigate("otp", parsedData);
+    } else if (isTotpData(data)) {
+      navigate("index");
     }
   };
 
