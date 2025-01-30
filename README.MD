@@ -12,4 +12,4 @@
 - More on the way
 
 ## Mobile app
-- Dcab QR codes and show OTP or reguster TOTP codes like google authenticator
+- Scan QR codes and show OTP or register TOTP codes like google authenticator
