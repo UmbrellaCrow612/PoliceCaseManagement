@@ -1,5 +1,11 @@
 import { useState, useCallback } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -45,22 +51,39 @@ export default function TotpListTab() {
     }, [])
   );
 
+  const maskSecret = (secret: string) => {
+    return `${secret.substring(0, 4)}${"*".repeat(secret.length - 4)}`;
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Stored TOTP Codes</Text>
-      <Link href={"/scan"}>Scan</Link>
+      <View style={styles.header}>
+        <Text style={styles.title}>Stored TOTP Codes</Text>
+        <Link href="/scan" asChild>
+          <TouchableOpacity style={styles.scanButton}>
+            <Text style={styles.scanButtonText}>Scan</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+
       <FlatList
         data={totpList}
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
         keyExtractor={(item) => `${item.issuer}-${item.userName}`}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text>Issuer: {item.issuer}</Text>
-            <Text>App Name: {item.appName}</Text>
-            <Text>Username: {item.userName}</Text>
-            <Text>Secret: {item.secret}</Text>
+          <View style={styles.itemContainer}>
+            <View style={styles.itemHeader}>
+              <Text style={styles.issuer}>{item.issuer}</Text>
+              <Text style={styles.appName}>{item.appName}</Text>
+            </View>
+            <Text style={styles.userName}>{item.userName}</Text>
+            <Text style={styles.secret}>Secret: {maskSecret(item.secret)}</Text>
           </View>
         )}
-        ListEmptyComponent={<Text>No TOTP entries found</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No TOTP entries found</Text>
+        }
       />
     </View>
   );
@@ -69,14 +92,74 @@ export default function TotpListTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    display: "flex",
+    padding: 16,
+    backgroundColor: "#f5f5f5",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 20,
   },
-  btn: {
-    padding: 2,
-    backgroundColor: "black",
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
   },
-  title: {},
-  item: {},
+  scanButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  scanButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  list: {
+    flex: 1,
+    width: "100%",
+  },
+  listContent: {
+    paddingBottom: 16,
+  },
+  itemContainer: {
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  itemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  issuer: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#333",
+  },
+  appName: {
+    color: "#666",
+    fontSize: 14,
+  },
+  userName: {
+    color: "#444",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  secret: {
+    color: "#888",
+    fontSize: 12,
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#666",
+    marginTop: 20,
+  },
 });
