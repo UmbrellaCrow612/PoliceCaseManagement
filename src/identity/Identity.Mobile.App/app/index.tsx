@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TOTP } from "otpauth";
 
 interface TotpData {
   issuer: string;
@@ -18,6 +19,34 @@ interface TotpData {
 
 export default function TotpListTab() {
   const [totpList, setTotpList] = useState<TotpData[]>([]);
+  const [codes, setCodes] = useState<Record<string, string>>({});
+
+  const generateTotpCode = (secret: string) => {
+    try {
+      const totp = new TOTP({ secret, digits: 6 });
+      return totp.generate();
+    } catch (error) {
+      console.error("Error generating TOTP code:", error);
+      return "------";
+    }
+  };
+
+  useEffect(() => {
+    const updateCodes = () => {
+      setCodes((prevCodes) => {
+        const newCodes = { ...prevCodes };
+        totpList.forEach((item) => {
+          const key = `${item.issuer}-${item.userName}`;
+          newCodes[key] = generateTotpCode(item.secret);
+        });
+        return newCodes;
+      });
+    };
+
+    updateCodes();
+    const interval = setInterval(updateCodes, 30000);
+    return () => clearInterval(interval);
+  }, [totpList]);
 
   useFocusEffect(
     useCallback(() => {
@@ -51,10 +80,6 @@ export default function TotpListTab() {
     }, [])
   );
 
-  const maskSecret = (secret: string) => {
-    return `${secret.substring(0, 4)}${"*".repeat(secret.length - 4)}`;
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -73,12 +98,16 @@ export default function TotpListTab() {
         keyExtractor={(item) => `${item.issuer}-${item.userName}`}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <View style={styles.itemHeader}>
-              <Text style={styles.issuer}>{item.issuer}</Text>
-              <Text style={styles.appName}>{item.appName}</Text>
+            <View style={styles.itemContent}>
+              <View style={styles.itemHeader}>
+                <Text style={styles.issuer}>{item.issuer}</Text>
+                <Text style={styles.appName}>{item.appName}</Text>
+              </View>
+              <Text style={styles.userName}>{item.userName}</Text>
+              <Text style={styles.secret}>
+                TOTP: {codes[`${item.issuer}-${item.userName}`] || "------"}
+              </Text>
             </View>
-            <Text style={styles.userName}>{item.userName}</Text>
-            <Text style={styles.secret}>Secret: {maskSecret(item.secret)}</Text>
           </View>
         )}
         ListEmptyComponent={
@@ -155,11 +184,15 @@ const styles = StyleSheet.create({
   },
   secret: {
     color: "#888",
-    fontSize: 12,
+    fontSize: 16,
+    fontWeight: "bold",
   },
   emptyText: {
     textAlign: "center",
     color: "#666",
     marginTop: 20,
+  },
+  itemContent: {
+    flex: 1,
   },
 });
