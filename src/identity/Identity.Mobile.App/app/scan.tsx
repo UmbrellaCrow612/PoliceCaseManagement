@@ -1,29 +1,17 @@
 import { useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import {
   CameraView,
-  CameraType,
   useCameraPermissions,
   BarcodeScanningResult,
 } from "expo-camera";
 import { useNavigation } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-/*
-{
-  "id": "123456",
-  "createdAt": "2025-01-29T12:00:00Z",
-  "expiresAt": "2025-01-30T12:00:00Z",
-  "code": "ABC123"
-}
-use https://qr.io/ for testing
-
-*/
-
 interface OtpData {
   id: string;
-  createdAt: Date;
-  expiresAt: Date;
+  createdAt: string;
+  expiresAt: string;
   code: string;
 }
 
@@ -34,154 +22,91 @@ interface TotpData {
   issuer: string;
 }
 
-function isValidURI(string: string) {
+const isValidURI = (string: string) => {
   try {
-    let l = new URL(string);
+    new URL(string);
     return true;
   } catch (_) {
     return false;
   }
-}
+};
 
-function isOtpData(data: any): data is OtpData {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    typeof data.id === "string" &&
-    typeof data.createdAt === "string" &&
-    typeof data.expiresAt === "string" &&
-    typeof data.code === "string"
-  );
-}
+const isOtpData = (data: any): data is OtpData =>
+  typeof data === "object" &&
+  data !== null &&
+  typeof data.id === "string" &&
+  typeof data.createdAt === "string" &&
+  typeof data.expiresAt === "string" &&
+  typeof data.code === "string";
 
-function isTotpData(url: string): TotpData | undefined {
-  if (!isValidURI(url)) {
-    console.log("Invalid URI for totp");
-    return undefined;
-  }
+const isTotpData = (url: string): TotpData | undefined => {
+  if (!isValidURI(url)) return undefined;
 
-  let { protocol, host, searchParams, pathname } = new URL(url);
-
-  let s = searchParams.get("secret");
-  let i = searchParams.get("issuer");
-
-  let info = pathname.substring(1).split(":");
-  let appName = info[0];
-  let userName = info[1];
+  const { protocol, host, searchParams, pathname } = new URL(url);
+  const secret = searchParams.get("secret");
+  const issuer = searchParams.get("issuer");
+  const [appName, userName] = pathname.substring(1).split(":");
 
   if (
     protocol !== "otpauth:" ||
     host !== "totp" ||
-    typeof appName !== "string" ||
-    appName.length < 1 ||
-    typeof userName !== "string" ||
-    userName.length < 1 ||
-    typeof s !== "string" ||
-    typeof i !== "string"
+    !appName ||
+    !userName ||
+    !secret ||
+    !issuer
   ) {
-    console.log(
-      `TOTP bits missing ${protocol} ${host} ${appName} ${userName} ${s} ${i}`
-    );
+    console.log("Invalid TOTP format");
     return undefined;
   }
 
-  let totpData = {
-    appName: appName,
-    issuer: i,
-    secret: s,
-    userName: userName,
-  } as TotpData;
+  return { appName, userName, secret, issuer };
+};
 
-  return totpData;
-}
+const saveTotpData = async (totpData: TotpData) => {
+  try {
+    const key = `totp-${totpData.issuer}-${totpData.userName}`;
+    await AsyncStorage.setItem(key, JSON.stringify(totpData));
+
+    const existingKeys = await AsyncStorage.getItem("totp-keys");
+    const keysArray = existingKeys ? JSON.parse(existingKeys) : [];
+
+    if (!keysArray.includes(key)) {
+      keysArray.push(key);
+      await AsyncStorage.setItem("totp-keys", JSON.stringify(keysArray));
+    }
+  } catch (error) {
+    console.error("Failed to save TOTP:", error);
+  }
+};
+
+const processQRCodeData = async (qrString: string) => {
+  try {
+    const parsedData = JSON.parse(qrString);
+    if (isOtpData(parsedData)) return parsedData;
+  } catch {}
+
+  const totpData = isTotpData(qrString);
+  if (totpData) await saveTotpData(totpData);
+  return null;
+};
 
 export default function ScanTab() {
-  const [back, _] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const { navigate } = useNavigation<any>();
   const [qrData, setQrData] = useState("");
 
-  const handleTotpCreation = async (totpData: TotpData) => {
-    try {
-      const key = `totp-${totpData.issuer}-${totpData.userName}`;
-      const dataString = JSON.stringify(totpData);
-
-      // Save TOTP entry
-      await AsyncStorage.setItem(key, dataString);
-
-      // Update key list
-      const existingKeys = await AsyncStorage.getItem("totp-keys");
-      const keysArray = existingKeys ? JSON.parse(existingKeys) : [];
-
-      if (!keysArray.includes(key)) {
-        keysArray.push(key);
-        await AsyncStorage.setItem("totp-keys", JSON.stringify(keysArray));
-      }
-    } catch (error) {
-      console.error("Failed to save TOTP:", error);
+  const handleScannedData = async (data: string) => {
+    const parsedData = await processQRCodeData(data);
+    if (parsedData && isOtpData(parsedData)) {
+      navigate("otp", parsedData);
     }
   };
-
-  function isValidJSON(string: string) {
-    try {
-      JSON.parse(string);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  async function processQRCodeData(
-    qrString: string
-  ): Promise<OtpData | TotpData | null> {
-    try {
-      if (isValidJSON(qrString)) {
-        if (isOtpData(JSON.parse(qrString))) {
-          return JSON.parse(qrString) as OtpData;
-        }
-        // any other formats that are JSOn we support
-      }
-
-      const totpData = isTotpData(qrString);
-      if (totpData) {
-        await handleTotpCreation(totpData);
-      }
-
-      return null; // not a format we support
-    } catch (error) {
-      console.error("QR Code parsing error:", error);
-      return null;
-    }
-  }
-
-  async function CheckDataFormatAndPush(data: string) {
-    const res = await processQRCodeData(data);
-
-    if (!res) {
-      return;
-    }
-
-    if (isOtpData(res)) {
-      navigate("otp", {
-        id: res.id,
-        createdAt: res.createdAt,
-        expiresAt: res.expiresAt,
-        code: res.code,
-      });
-    }
-  }
-
-  function onBarcodeScanned(scanningResult: BarcodeScanningResult) {
-    CheckDataFormatAndPush(scanningResult.data);
-  }
 
   if (!permission || !permission.granted) {
     return (
       <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>
-          Camera doesn't have permission, please grant it
-        </Text>
-        <Button title="Request permission" onPress={requestPermission} />
+        <Text style={styles.permissionText}>Camera permission required</Text>
+        <Button title="Grant Permission" onPress={requestPermission} />
       </View>
     );
   }
@@ -190,11 +115,11 @@ export default function ScanTab() {
     <View style={styles.container}>
       <CameraView
         style={styles.camera}
-        facing={back}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-        onBarcodeScanned={onBarcodeScanned}
+        facing="back"
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        onBarcodeScanned={({ data }: BarcodeScanningResult) =>
+          handleScannedData(data)
+        }
       >
         <View style={styles.overlay}>
           <View style={styles.roundedBox}>
@@ -208,23 +133,13 @@ export default function ScanTab() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  camera: {
-    flex: 1,
-    width: "100%",
-  },
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  camera: { flex: 1, width: "100%" },
   overlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    inset: 0,
   },
   permissionContainer: {
     flex: 1,
@@ -232,11 +147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
-  permissionText: {
-    color: "white",
-    fontSize: 18,
-    marginBottom: 20,
-  },
+  permissionText: { color: "white", fontSize: 18, marginBottom: 20 },
   roundedBox: {
     width: 280,
     height: 280,
@@ -247,12 +158,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
-  title: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "600",
-    marginBottom: 10,
-  },
+  title: { color: "#fff", fontSize: 22, fontWeight: "600", marginBottom: 10 },
   qrDataText: {
     color: "#fff",
     fontSize: 16,
