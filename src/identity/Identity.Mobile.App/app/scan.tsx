@@ -7,6 +7,7 @@ import {
   BarcodeScanningResult,
 } from "expo-camera";
 import { useNavigation } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /*
 {
@@ -100,6 +101,27 @@ export default function ScanTab() {
   const { navigate } = useNavigation<any>();
   const [qrData, setQrData] = useState("");
 
+  const handleTotpCreation = async (totpData: TotpData) => {
+    try {
+      const key = `totp-${totpData.issuer}-${totpData.userName}`;
+      const dataString = JSON.stringify(totpData);
+
+      // Save TOTP entry
+      await AsyncStorage.setItem(key, dataString);
+
+      // Update key list
+      const existingKeys = await AsyncStorage.getItem("totp-keys");
+      const keysArray = existingKeys ? JSON.parse(existingKeys) : [];
+
+      if (!keysArray.includes(key)) {
+        keysArray.push(key);
+        await AsyncStorage.setItem("totp-keys", JSON.stringify(keysArray));
+      }
+    } catch (error) {
+      console.error("Failed to save TOTP:", error);
+    }
+  };
+
   function isValidJSON(string: string) {
     try {
       JSON.parse(string);
@@ -109,7 +131,9 @@ export default function ScanTab() {
     }
   }
 
-  function processQRCodeData(qrString: string): OtpData | TotpData | null {
+  async function processQRCodeData(
+    qrString: string
+  ): Promise<OtpData | TotpData | null> {
     try {
       if (isValidJSON(qrString)) {
         if (isOtpData(JSON.parse(qrString))) {
@@ -118,9 +142,9 @@ export default function ScanTab() {
         // any other formats that are JSOn we support
       }
 
-      let t = isTotpData(qrString);
-      if (typeof t === "object" && typeof t !== "undefined") {
-        return t;
+      const totpData = isTotpData(qrString);
+      if (totpData) {
+        await handleTotpCreation(totpData);
       }
 
       return null; // not a format we support
@@ -130,8 +154,8 @@ export default function ScanTab() {
     }
   }
 
-  function CheckDataFormatAndPush(data: string) {
-    const res = processQRCodeData(data);
+  async function CheckDataFormatAndPush(data: string) {
+    const res = await processQRCodeData(data);
 
     if (!res) {
       return;
@@ -143,16 +167,6 @@ export default function ScanTab() {
         createdAt: res.createdAt,
         expiresAt: res.expiresAt,
         code: res.code,
-      });
-    }
-
-    let l = isTotpData(data);
-    if (typeof l === "object" && typeof l !== "undefined") {
-      navigate("totp-create", {
-        issuer: l.issuer,
-        appName: l.appName,
-        userName: l.userName,
-        secret: l.secret,
       });
     }
   }
