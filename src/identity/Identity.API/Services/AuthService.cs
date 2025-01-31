@@ -969,9 +969,32 @@ namespace Identity.API.Services
             throw new NotImplementedException();
         }
 
-        public Task ValidateTOTPBackUpCode(string userId, string code)
+        public async Task<ValidateTOTPBackUpCodeResult> ValidateTOTPBackUpCode(string userId, string code)
         {
-            throw new NotImplementedException();
+            var result = new ValidateTOTPBackUpCodeResult();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user is null)
+            {
+                result.AddError(StatusCodes.Status404NotFound, "user not found");
+                return result;
+            }
+
+            var backUpCode = await _unitOfWork.Repository<TimeBasedOneTimePassCodeBackupCode>()
+                .Query
+                .Where(x => x.UserId == user.Id && x.Code == code)
+                .FirstOrDefaultAsync();
+            if(backUpCode is null || !backUpCode.IsValid())
+            {
+                result.AddError(StatusCodes.Status401Unauthorized, "Code not found or is used");
+                return result;
+            }
+            backUpCode.MarkUsed();
+            _unitOfWork.Repository<TimeBasedOneTimePassCodeBackupCode>().Update(backUpCode);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

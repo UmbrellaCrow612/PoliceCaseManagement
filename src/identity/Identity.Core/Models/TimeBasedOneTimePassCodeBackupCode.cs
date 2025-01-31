@@ -12,5 +12,21 @@
 
         public TimeBasedOneTimePassCode? TimeBasedOneTimePassCode { get; set; } = null;
         public required string TimeBasedOneTimePassCodeId { get; set; }
+
+
+        public bool IsValid()
+        {
+            if (IsUsed || UsedAt.HasValue)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public void MarkUsed()
+        {
+            IsUsed = true;
+            UsedAt = DateTime.UtcNow;
+        }
     }
 }

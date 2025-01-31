@@ -52,7 +52,7 @@ namespace Identity.API.Services.Interfaces
 
         Task GenerateNewTOTPBackUpCodes(string userId);
 
-        Task ValidateTOTPBackUpCode(string userId, string code);
+        Task<ValidateTOTPBackUpCodeResult> ValidateTOTPBackUpCode(string userId, string code);
     }
 
     public class AuthError
@@ -77,6 +77,11 @@ namespace Identity.API.Services.Interfaces
                 RedirectUrl = redirectUrl
             });
         }
+    }
+
+    public class ValidateTOTPBackUpCodeResult : AuthResult
+    {
+
     }
 
     public class TokenAuthResult : AuthResult

@@ -9,7 +9,8 @@ export interface TotpData {
   issuer: string;
 }
 
-export default function TotpItem(details: TotpData) {
+export default function TotpItem(props: { details: TotpData }) {
+  const { details } = props;
   const [code, setCode] = useState<string>("------");
   const [timeLeft, setTimeLeft] = useState<number>(30);
 
@@ -46,7 +47,7 @@ export default function TotpItem(details: TotpData) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}  numberOfLines={1}>
+      <Text style={styles.title} numberOfLines={1}>
         {details.appName} : {details.userName}
       </Text>
       <View style={styles.next}>
@@ -60,19 +61,15 @@ export default function TotpItem(details: TotpData) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 120,
+    height: 120,
     backgroundColor: "white",
     padding: 16,
     borderRadius: 8,
-
-    // iOS shadow properties
     shadowColor: "rgba(0, 0, 0, 0.15)",
     shadowOffset: { width: 1.95, height: 1.95 },
     shadowOpacity: 1,
     shadowRadius: 2.6,
-
-    // Android shadow (uses elevation)
-    elevation: 3, // Approximate equivalent for the given shadow
+    elevation: 3,
   },
   title: {
     fontSize: 18,
