@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList, Text } from "react-native";
+import { View, StyleSheet, FlatList, Text, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TotpItem from "@/components/totp-item";
 import ScanBtn from "@/components/scan-btn";
@@ -38,15 +38,63 @@ export default function TotpListTab() {
     }
   };
 
+  const handleDeleteItem = async (item: TotpData) => {
+    try {
+      // Create the key used during storage
+      const key = `totp-${item.issuer}-${item.userName}`;
+
+      // Remove the specific item
+      await AsyncStorage.removeItem(key);
+
+      // Update keys list
+      const keysString = await AsyncStorage.getItem("totp-keys");
+      if (keysString) {
+        const keys = JSON.parse(keysString);
+        const updatedKeys = keys.filter((k: string) => k !== key);
+        await AsyncStorage.setItem("totp-keys", JSON.stringify(updatedKeys));
+      }
+
+      // Update state to remove the item from the list
+      setTotpItems(totpItems.filter(
+        (i) => i.issuer !== item.issuer || i.userName !== item.userName
+      ));
+    } catch (error) {
+      console.error("Failed to delete TOTP item:", error);
+    }
+  };
+
+  const confirmDeleteItem = (item: TotpData) => {
+    Alert.alert(
+      "Delete TOTP Item",
+      `Are you sure you want to delete the TOTP item for ${item.appName} (${item.userName})?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: () => handleDeleteItem(item)
+        }
+      ]
+    );
+  };
+
   const renderTotpItem = ({ item }: { item: TotpData }) => (
-    <TotpItem
-      details={{
-        appName: item.appName,
-        issuer: item.issuer,
-        secret: item.secret,
-        userName: item.userName,
-      }}
-    />
+    <TouchableOpacity 
+      delayLongPress={500}
+      onLongPress={() => confirmDeleteItem(item)}
+    >
+      <TotpItem
+        details={{
+          appName: item.appName,
+          issuer: item.issuer,
+          secret: item.secret,
+          userName: item.userName,
+        }}
+      />
+    </TouchableOpacity>
   );
 
   return (
