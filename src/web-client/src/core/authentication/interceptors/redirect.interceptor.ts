@@ -7,7 +7,8 @@ import {
 import { catchError, Observable, throwError } from 'rxjs';
 import { StatusCodes } from '../../http/codes/status-codes';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import REASONS from '../../server-responses/response';
 
 export function authRedirectsInterceptor(
   req: HttpRequest<unknown>,
@@ -16,19 +17,35 @@ export function authRedirectsInterceptor(
   var router = inject(Router);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      console.log('RedirectsInterceptor Error response:', error.error);
+      console.log('RedirectsInterceptor running for error:', error.error);
 
       if (
         error.status === StatusCodes.UNAUTHORIZED ||
         error.status === StatusCodes.FORBIDDEN
       ) {
-        const redirectUrl = error.error?.redirectUrl;
+        const reason = error.error[0]?.reason;
 
-        if (typeof redirectUrl === 'string') {
-          console.log(`Redirecting to ${redirectUrl}`);
-          router.navigate([redirectUrl]);
+        if (typeof reason === 'string') {
+          console.log(`Redirecting for reason ${reason}`);
+
+          var url = '';
+          switch (reason) {
+            case REASONS.EmailNotConfirmed:
+              url = `authentication/confirm-email`;
+              break;
+            default:
+              break;
+          }
+
+          console.log('URL ' + url);
+          if (url) {
+            console.log('Navigating to  ' + url);
+            router.navigate([url]);
+          } else {
+            console.error(url);
+          }
         } else {
-          console.error('Invalid redirect URL:', redirectUrl);
+          console.error('Invalid response object for re-directing:', error);
         }
         return throwError(() => error);
       }

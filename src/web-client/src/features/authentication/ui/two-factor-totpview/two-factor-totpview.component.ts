@@ -9,21 +9,9 @@ import { Component } from '@angular/core';
 export class TwoFactorTOTPViewComponent {
   qrCodeData: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   fetchQRCode(): void {
-    const url = 'http://localhost:5185/authentication/setup-totp'; // Replace with your endpoint
-    this.http.get(url, { responseType: 'arraybuffer' }).subscribe(
-      (response) => {
-        // Convert byte array to Base64 string
-        const base64String = btoa(
-          String.fromCharCode(...new Uint8Array(response))
-        );
-        this.qrCodeData = `data:image/png;base64,${base64String}`;
-      },
-      (error) => {
-        console.error('Error fetching QR code:', error);
-      }
-    );
+   
   }
 }

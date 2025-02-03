@@ -1,1 +1,23 @@
-<p>confirm-email-view works!</p>
+<div class="container">
+  <form class="box" [formGroup]="emailConfirmation" (ngSubmit)="onSubmit()">
+    <h2>Email confirmation</h2>
+    <mat-form-field class="f">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" required formControlName="email" autofocus/>
+      @if (emailConfirmation.controls.email.hasError("required")) {
+      <mat-error>Required</mat-error>
+      } @else if (emailConfirmation.controls.email.hasError("email")) {
+      <mat-error>Valid email address required </mat-error>
+      }
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      class="btn"
+      type="submit"
+      [disabled]="emailConfirmation.invalid || isSendingRequest"
+    >
+      {{ isSendingRequest ? "Sending..." : "Send" }}
+    </button>
+  </form>
+</div>

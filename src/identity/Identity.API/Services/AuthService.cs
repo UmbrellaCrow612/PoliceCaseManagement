@@ -1,5 +1,6 @@
 ﻿using Authorization.Core;
 using Identity.API.Helpers;
+using Identity.API.Responses;
 using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
 using Identity.Core.Models;
@@ -13,12 +14,11 @@ using System.Security.Cryptography;
 
 namespace Identity.API.Services
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, IOptions<IdentityApplicationRedirectUrls> redirectOptions) : IAuthService
+    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
         private readonly TimeWindows _timeWindows = options.Value;
-        private readonly IdentityApplicationRedirectUrls redirectUrls = redirectOptions.Value;
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -78,7 +78,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Incorrect credentials");
+                result.AddError(StatusCodes.Status401Unauthorized, "Incorrect credentials", LoginResponseReasons.IncorrectCreds);
                 return result;
             }
 
@@ -88,7 +88,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Account locked");
+                result.AddError(StatusCodes.Status401Unauthorized, "Account locked", LoginResponseReasons.AccountLocked);
                 return result;
             }
 
@@ -98,7 +98,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", redirectUrls.EmailConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", LoginResponseReasons.EmailNotConfirmed);
                 return result;
             }
 
@@ -108,7 +108,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", redirectUrls.PhoneConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", LoginResponseReasons.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -119,7 +119,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", redirectUrls.DeviceConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", LoginResponseReasons.DeviceNotConfirmed);
                 return result;
             }
 
@@ -151,7 +151,7 @@ namespace Identity.API.Services
 
             if (!user.IsEmailConfirmed())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", redirectUrls.EmailConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", LoginResponseReasons.EmailNotConfirmed);
                 return result;
             }
 
@@ -205,7 +205,7 @@ namespace Identity.API.Services
 
             if (!user.IsPhoneNumberConfirmed())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", redirectUrls.PhoneConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", LoginResponseReasons.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -271,7 +271,7 @@ namespace Identity.API.Services
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(!isTrusted || userDevice is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", redirectUrls.DeviceConfirmationUrl);
+                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", LoginResponseReasons.DeviceNotConfirmed);
                 return result;
             }
 
@@ -575,7 +575,7 @@ namespace Identity.API.Services
                 await _unitOfWork.Repository<OTPAttempt>().AddAsync(newAttempt);
                 await _unitOfWork.SaveChangesAsync();
 
-                // use sms service and send OTP Code
+                // use sms service and send OTP Status
                 result.Succeeded = true;
 
                 return result;
@@ -793,14 +793,22 @@ namespace Identity.API.Services
             var result = new SendConfirmationEmailResult();
 
             var user = await _userManager.FindByEmailAsync(email);
-            if (user is null || user.IsEmailConfirmed()) return result;
+            if (user is null || user.IsEmailConfirmed())
+            {
+                result.AddError(user is null ? StatusCodes.Status404NotFound : StatusCodes.Status400BadRequest, user is null ? "User not found" : "User email already confirmed", LoginResponseReasons.EmailConfirmation);
+                return result;
+            };
 
             var validRecentEmailConfirmationAttemptExists = await _unitOfWork.Repository<EmailVerificationAttempt>()
                 .Query
                 .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
                 .AnyAsync();
 
-            if (validRecentEmailConfirmationAttemptExists) return result;
+            if (validRecentEmailConfirmationAttemptExists)
+            {
+                result.AddError(StatusCodes.Status400BadRequest, "Valid email verifaction has been sent", LoginResponseReasons.EmailConfirmation);
+                return result;
+            };
 
             var newAttempt = new EmailVerificationAttempt
             {
@@ -986,7 +994,7 @@ namespace Identity.API.Services
                 .FirstOrDefaultAsync();
             if(backUpCode is null || !backUpCode.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Code not found or is used");
+                result.AddError(StatusCodes.Status401Unauthorized, "Status not found or is used");
                 return result;
             }
             backUpCode.MarkUsed();

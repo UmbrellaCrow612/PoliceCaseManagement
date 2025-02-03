@@ -91,7 +91,6 @@ builder.Services.AddInfrastructure(config);
 builder.Services.AddScoped<StringEncryptionHelper>();
 builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
 builder.Services.AddScoped<DeviceManager>();
-builder.Services.AddIdentityApplicationRedirectUrls(config);
 builder.Services.AddTimeWindows(config);
 
 builder.Services.AddEmailService(config);
@@ -99,12 +98,12 @@ builder.Services.AddServices(config);
 
 var app = builder.Build();
 
+app.UseCors("DevelopmentCorsPolicy");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.UseCors("DevelopmentCorsPolicy");
 }
 
 app.UseHttpsRedirection();

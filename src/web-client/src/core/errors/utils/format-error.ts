@@ -3,12 +3,27 @@ export default function formatBackendError(err: any): string {
 
   if (
     err.error &&
+    Array.isArray(err.error) &&
+    err.error.length > 0 &&
+    typeof err.error[0] === 'object' &&
+    'status' in err.error[0] &&
+    'message' in err.error[0] &&
+    'reason' in err.error[0]
+  ) {
+    err.error.forEach((element: any) => {
+      errorMessage += `\nMessage: ${element.message}`;
+    });
+    return errorMessage;
+  }
+
+  if (
+    err.error &&
     typeof Array.isArray(err.error) &&
     typeof err.error[0] == 'string'
   ) {
     const errs: [string] = err.error;
     errs.forEach((element) => {
-      errorMessage += ` ${element} `
+      errorMessage += ` ${element} `;
     });
   }
 

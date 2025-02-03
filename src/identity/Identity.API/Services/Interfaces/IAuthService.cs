@@ -57,9 +57,9 @@ namespace Identity.API.Services.Interfaces
 
     public class AuthError
     {
-        public required int Code { get; set; }
+        public required int Status { get; set; }
         public required string Message { get; set; }
-        public string? RedirectUrl { get; set; }
+        public string? Reason { get; set; }
     }
 
     // Base result class for all authentication results
@@ -68,13 +68,13 @@ namespace Identity.API.Services.Interfaces
         public bool Succeeded { get; set; } = false;
         public ICollection<AuthError> Errors { get; private set; } = [];
 
-        public void AddError(int code, string message, string? redirectUrl = null)
+        public void AddError(int status, string message, string? reason = null)
         {
             Errors.Add(new AuthError
             {
-                Code = code,
+                Status = status,
                 Message = message,
-                RedirectUrl = redirectUrl
+                Reason = reason
             });
         }
     }

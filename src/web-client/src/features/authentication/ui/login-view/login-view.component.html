@@ -28,6 +28,7 @@
         required
         aria-required="true"
         aria-describedby="emailHelp"
+        autofocus
       />
       <mat-hint id="emailHelp">Enter your email address</mat-hint>
       @if (loginForm.get("email")?.hasError("required")) {
