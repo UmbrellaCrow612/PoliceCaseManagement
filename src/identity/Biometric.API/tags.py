@@ -1,2 +1,0 @@
-class Tags:
-    biometrics = "biometrics"

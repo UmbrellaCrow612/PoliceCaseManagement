@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from tags import Tags
-
 app = FastAPI(
     title="Biometrics API",
     description="API for biometric authentication and face ID setup.",
@@ -20,7 +18,7 @@ class SetupResponse(BaseModel):
         "It validates the user ID before starting the process."
     ),
     response_model=SetupResponse,
-    tags=[Tags.biometrics],
+    tags=["Biometrics"],
     responses={
         200: {"description": "Face ID setup initialized successfully"},
         400: {"description": "Invalid user ID provided"},
