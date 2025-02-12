@@ -2,6 +2,13 @@
 
 ## Setting Up the Virtual Environment
 
+### 0. Done once for project on machine
+
+```powershell
+python -m venv .venv
+```
+In directory 
+
 ### 1. Create and Activate the Virtual Environment
 Once the virtual environment is created, activate it before running any commands:
 
