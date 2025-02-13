@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from ..tags.v1_tags import V1tags
 
 router = APIRouter()
 
@@ -14,7 +15,7 @@ class SetupResponse(BaseModel):
         "It validates the user ID before starting the process."
     ),
     response_model=SetupResponse,
-    tags=["Biometrics"],
+    tags=[V1tags.face_id],
     responses={
         200: {"description": "Face ID setup initialized successfully"},
         400: {"description": "Invalid user ID provided"},

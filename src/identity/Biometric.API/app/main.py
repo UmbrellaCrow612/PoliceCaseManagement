@@ -1,13 +1,8 @@
-from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel
-from sqlalchemy import inspect
+from fastapi import FastAPI
 
-from api.v1 import face_id_routes
-from sqlalchemy.orm import Session
-from models.base import Base
-from models.user import User
-from db.engine import engine
-from db.utils import get_db
+from .api.v1 import face_id_routes, user_routes
+from .models.base import Base
+from .db.engine import engine
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,23 +12,5 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(face_id_routes.router, prefix="/v1", tags=["face_id"])
-
-class UserCreate(BaseModel):
-    name: str
-    email: str
-
-class UserResponse(UserCreate):
-    id: int
-
-    class Config:
-        from_attributes = True  # For ORM mode
-
-
-@app.post("/users/", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = User(name=user.name, email=user.email)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+app.include_router(face_id_routes.router, prefix="/v1")
+app.include_router(user_routes.router, prefix="/v1")
