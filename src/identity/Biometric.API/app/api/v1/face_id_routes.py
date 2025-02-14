@@ -39,3 +39,6 @@ async def setup_face_id(userId: int):
         raise HTTPException(status_code=400, detail="Invalid user ID provided")
 
     return {"message": f"Face ID setup initialized for user {userId}"}
+
+# For login in future you could receive a image of user face vector it then compare it with db 
+# but just before that read the meta data of the file and make sure it was taken in the last 5 minutes for security 

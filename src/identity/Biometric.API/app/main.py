@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .api.v1 import face_id_routes, user_routes
+from .api.v1 import face_id_routes, user_routes, face_recognition
 from .models.base import Base
 from .db.engine import engine
 
@@ -14,3 +14,4 @@ app = FastAPI(
 
 app.include_router(face_id_routes.router, prefix="/v1")
 app.include_router(user_routes.router, prefix="/v1")
+app.include_router(face_recognition.router, prefix="/v1")

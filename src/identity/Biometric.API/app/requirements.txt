@@ -1,3 +1,4 @@
 fastapi[standard]==0.113.0
 SQLAlchemy
 pydantic
+deepface

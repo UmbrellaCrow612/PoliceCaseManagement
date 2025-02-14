@@ -1,7 +1,3 @@
 {
-  "cSpell.words": [
-    "autoflush",
-    "pysqlite",
-    "sessionmaker"
-  ]
+  "cSpell.words": ["autoflush", "deepface", "pysqlite", "sessionmaker"]
 }
