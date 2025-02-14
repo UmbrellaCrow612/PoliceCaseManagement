@@ -6,8 +6,13 @@ from deepface import DeepFace
 import numpy as np
 import cv2
 import io
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 router = APIRouter()
+# Create a thread pool executor
+thread_pool = ThreadPoolExecutor(max_workers=4)  # Adjust number based on your CPU cores
 
 class ComparisonResult(BaseModel):
     verified: bool
@@ -15,6 +20,19 @@ class ComparisonResult(BaseModel):
     threshold: float
     model: str
     detector_backend: str
+
+def process_face_comparison(img1: np.ndarray, img2: np.ndarray):
+    """
+    Handle the CPU-intensive face comparison in a separate thread
+    """
+    return DeepFace.verify(
+        img1_path=img1,
+        img2_path=img2,
+        enforce_detection=True,
+        detector_backend="retinaface",
+        model_name="VGG-Face",
+        distance_metric="cosine"
+    )
 
 @router.post(
     "/biometrics/face/compare/",
@@ -40,9 +58,11 @@ async def compare(
         raise HTTPException(status_code=400, detail="Only PNG images are allowed")
     
     try:
-        # Read image files
-        contents1 = await fileOne.read()
-        contents2 = await fileTwo.read()
+        # Read image files asynchronously
+        contents1, contents2 = await asyncio.gather(
+            fileOne.read(),
+            fileTwo.read()
+        )
 
         # Convert to numpy arrays
         nparr1 = np.frombuffer(contents1, np.uint8)
@@ -52,14 +72,11 @@ async def compare(
         img1 = cv2.imdecode(nparr1, cv2.IMREAD_COLOR)
         img2 = cv2.imdecode(nparr2, cv2.IMREAD_COLOR)
 
-        # Verify faces using DeepFace
-        result = DeepFace.verify(
-            img1_path=img1,
-            img2_path=img2,
-            enforce_detection=True,
-            detector_backend="retinaface",
-            model_name="VGG-Face",
-            distance_metric="cosine"
+        # Run face comparison in thread pool
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            thread_pool,
+            partial(process_face_comparison, img1, img2)
         )
 
         return ComparisonResult(
