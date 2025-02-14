@@ -13,3 +13,8 @@
 
 ## Mobile app
 - Scan QR codes and show OTP or register TOTP codes like google authenticator
+
+# Biometrics - part of indetity
+## Features so far
+
+- Endpoint to compare two faces
