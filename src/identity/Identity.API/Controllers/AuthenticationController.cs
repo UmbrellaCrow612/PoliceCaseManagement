@@ -70,7 +70,9 @@ namespace Identity.API.Controllers
             var res = await _authService.SetUpTOTP(userId, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            return Ok(new { res.TotpSecretQrCodeBytes, backupCodes = res.BackUpCodes });
+            var file = File(res.TotpSecretQrCodeBytes, "image/png", "totp-qrcode-image");
+
+            return file;
         }
 
         [AllowAnonymous]
@@ -109,7 +111,9 @@ namespace Identity.API.Controllers
             var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            return Ok(new { res.QrCodeBytes });
+            var file = File(res.QrCodeBytes, "image/png", "otp-qrcode-image");
+
+            return file;
         }
 
         [Authorize]
