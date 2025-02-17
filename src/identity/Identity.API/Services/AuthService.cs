@@ -14,7 +14,7 @@ using System.Security.Cryptography;
 
 namespace Identity.API.Services
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork) : IAuthService
+    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options,  JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
@@ -22,6 +22,7 @@ namespace Identity.API.Services
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly ILogger<AuthService> _logger = logger;
 
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
@@ -51,11 +52,14 @@ namespace Identity.API.Services
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
+            _logger.LogInformation("Login attempt started for email: {Email} from IP: {IpAddress}", email, deviceInfo.IpAddress);
+
             var result = new LoginResult();
             var user = await _userManager.FindByEmailAsync(email);
 
-            if(user is null)
+            if (user is null)
             {
+                _logger.LogWarning("Login failed: User does not exist. Email: {Email}, IP: {IpAddress}", email, deviceInfo.IpAddress);
                 result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
@@ -74,20 +78,18 @@ namespace Identity.API.Services
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
             if (!isPasswordCorrect)
             {
-                loginAttempt.FailureReason = "User credentials";
-
+                loginAttempt.FailureReason = "Incorrect password.";
                 await _unitOfWork.SaveChangesAsync();
-
+                _logger.LogWarning("Login failed: Incorrect credentials. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(Codes.Authentication.IncorrectCredentials);
                 return result;
             }
 
-            if (user.LockoutEnabled is true && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            if (user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
-                loginAttempt.FailureReason = "User account locked.";
-
+                loginAttempt.FailureReason = "Account locked.";
                 await _unitOfWork.SaveChangesAsync();
-
+                _logger.LogWarning("Login failed: Account locked. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(Codes.Authentication.AccountLocked);
                 return result;
             }
@@ -95,39 +97,37 @@ namespace Identity.API.Services
             if (!user.EmailConfirmed)
             {
                 loginAttempt.FailureReason = "Email not confirmed.";
-
                 await _unitOfWork.SaveChangesAsync();
-
+                _logger.LogWarning("Login failed: Email not confirmed. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(Codes.Verification.EmailNotConfirmed);
                 return result;
             }
 
             if (!user.PhoneNumberConfirmed)
             {
-                loginAttempt.FailureReason = "Phone not confirmed.";
-
+                loginAttempt.FailureReason = "Phone number not confirmed.";
                 await _unitOfWork.SaveChangesAsync();
-
+                _logger.LogWarning("Login failed: Phone number not confirmed. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(Codes.Verification.PhoneNumberNotConfirmed);
                 return result;
             }
 
             var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
-            if(device is null || !device.Trusted())
+            if (device is null || !device.Trusted())
             {
-                loginAttempt.FailureReason = "Untrusted Device being used.";
-
+                loginAttempt.FailureReason = "Untrusted device.";
                 await _unitOfWork.SaveChangesAsync();
-
+                _logger.LogWarning("Login failed: Untrusted device. UserId: {UserId}, IP: {IpAddress}, DeviceFingerprint: {DeviceFingerprint}",
+                    user.Id, deviceInfo.IpAddress, deviceInfo.DeviceFingerPrint);
                 result.AddError(Codes.Verification.DeviceNotConfirmed);
                 return result;
             }
 
             loginAttempt.Status = LoginStatus.TwoFactorAuthenticationReached;
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation("Login successful: UserId: {UserId}, IP: {IpAddress}, proceeding to 2FA.", user.Id, deviceInfo.IpAddress);
 
             result.Succeeded = true;
-
             return result;
         }
 
@@ -403,7 +403,11 @@ namespace Identity.API.Services
             }
 
             var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(tokenId);
-            if (storedToken is null || !storedToken.IsValid(refreshToken, userDevice.Id)) return result;
+            if (storedToken is null || !storedToken.IsValid(refreshToken, userDevice.Id))
+            {
+                result.AddError(Codes.Authentication.RefreshToken);
+                return result;
+            }
 
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -431,7 +435,11 @@ namespace Identity.API.Services
             var result = new LogoutResult();
 
             var user = GetUserByIdAsync(userId);
-            if (user is null) return result;
+            if (user is null)
+            {
+                result.AddError(Codes.Validation.UserDoesNotExist);
+                return result;
+            }
 
             var validTokens = await _unitOfWork.Repository<Token>()
                 .Query

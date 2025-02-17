@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Identity.API.Extensions;
 
 namespace Identity.API.Controllers
 {
@@ -80,22 +81,7 @@ namespace Identity.API.Controllers
             var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
-
-
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
-            });
+            this.SetAuthCookies(res.Tokens, _JWTOptions);
 
             return Ok(new { res.Tokens });
         }
@@ -108,22 +94,7 @@ namespace Identity.API.Controllers
             var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
-
-
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
-            });
+            this.SetAuthCookies(res.Tokens, _JWTOptions);
 
             return Ok(new { res.Tokens });
         }
@@ -194,22 +165,7 @@ namespace Identity.API.Controllers
             var res = await _authService.ValidateMagicLink(code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
-            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
-
-
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
-            });
+            this.SetAuthCookies(res.Tokens, _JWTOptions);
 
             return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
         }
@@ -233,22 +189,7 @@ namespace Identity.API.Controllers
             var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
-            Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
-
-
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, result.Tokens.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
-            });
+            this.SetAuthCookies(result.Tokens, _JWTOptions);
 
             return Ok(new { result.Tokens.JwtBearerToken, result.Tokens.RefreshToken });
         }
@@ -271,24 +212,7 @@ namespace Identity.API.Controllers
         {
             var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
-
-            Response.Cookies.Append(CookieNamesConstant.JWT, res.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
-
-
-            Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, res.Tokens.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.RefreshTokenExpiriesInMinutes)
-            });
-
+            this.SetAuthCookies(res.Tokens, _JWTOptions);
 
             return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
         }
@@ -343,6 +267,7 @@ namespace Identity.API.Controllers
             var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
+            /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt
             Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,

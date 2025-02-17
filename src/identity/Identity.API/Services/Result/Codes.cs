@@ -12,6 +12,11 @@
         public static class Authentication
         {
             /// <summary>
+            /// Indicates that there was a issue refreshing jwt tokens for authentication.
+            /// </summary>
+            public const string RefreshToken = "REFRESH_TOKEN";
+
+            /// <summary>
             /// Indicates that the provided credentials are incorrect.
             /// </summary>
             public const string IncorrectCredentials = "INCORRECT_CREDENTIALS";
