@@ -396,7 +396,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
             var res = await _authService.ConfirmEmail(dto.Email, dto.Code);
-            if (!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -406,7 +406,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailDto dto)
         {
             var res = await _authService.SendConfirmationEmail(dto.Email);
-            if (!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -437,7 +437,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> PhoneConfirmation([FromBody] PhoneConfirmationDto dto)
         {
             var res = await _authService.ConfirmPhoneNumber(dto.PhoneNumber, dto.Code);
-            if (!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -447,7 +447,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendPhoneConfirmation([FromBody] SendPhoneConfirmationDto dto)
         {
             var res = await _authService.SendPhoneConfirmation(dto.PhoneNumber);
-            if (!res.Succeeded) return BadRequest();
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }

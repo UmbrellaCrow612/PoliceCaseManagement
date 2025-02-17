@@ -832,13 +832,21 @@ namespace Identity.API.Services
             var result = new ConfirmEmailResult();
 
             var user = await _userManager.FindByEmailAsync(email);
-            if (user is null || user.IsEmailConfirmed()) return result;
+            if (user is null || user.IsEmailConfirmed())
+            {
+                result.AddError(user is null ? Codes.Validation.UserDoesNotExist : Codes.Verification.EmailAlreadyConfirmed);
+                return result;
+            };
 
             var attempt = await _unitOfWork.Repository<EmailVerificationAttempt>()
                 .Query
                 .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Code == code);
 
-            if (attempt is null || !attempt.IsValid()) return result;
+            if (attempt is null || !attempt.IsValid())
+            {
+                result.AddError(Codes.Verification.EmailConfirmation);
+                return result;
+            };
             user.EmailConfirmed = true;
 
             _unitOfWork.Repository<ApplicationUser>().Update(user);
@@ -856,7 +864,11 @@ namespace Identity.API.Services
             var result = new SendUserDeviceChallengeResult();
 
             var user = await _userManager.FindByEmailAsync(email);
-            if (user is null) return result;
+            if (user is null)
+            {
+                result.AddError(Codes.Validation.UserDoesNotExist);
+                return result;
+            };
 
             var deviceId = _deviceManager.GenerateDeviceId(user.Id, info.DeviceFingerPrint, info.UserAgent);
             var deviceExists = await _unitOfWork.Repository<UserDevice>().Query.Where(x => x.Id == deviceId).AnyAsync();
@@ -872,14 +884,22 @@ namespace Identity.API.Services
             }
 
             var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
-            if (device is null || device.IsTrusted) return result;
+            if (device is null || device.IsTrusted)
+            {
+                result.AddError(device is null ? Codes.Verification.DeviceNotConfirmed : Codes.Verification.DeviceAlreadyTrusted);
+                return result;
+            };
 
             var validRecentAttemptExists = await _unitOfWork.Repository<UserDeviceChallengeAttempt>()
                 .Query
                 .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.UserDeviceId == device.Id && x.IsUsed == false)
                 .AnyAsync();
 
-            if (validRecentAttemptExists) return result;
+            if (validRecentAttemptExists)
+            {
+                result.AddError(Codes.Verification.ValidDeviceConfirmationAttemptExists);
+                return result;
+            };
 
             var attempt = new UserDeviceChallengeAttempt
             {
@@ -905,10 +925,18 @@ namespace Identity.API.Services
             var attempt = await _unitOfWork.Repository<UserDeviceChallengeAttempt>()
                 .Query
                 .FirstOrDefaultAsync(x => x.Code == code && x.Email == email);
-            if (attempt is null || !attempt.IsValid()) return result;
+            if (attempt is null || !attempt.IsValid())
+            {
+                result.AddError(Codes.Verification.DeviceConfirmationAttemptDoseNotExists);
+                return result;
+            };
 
             var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(attempt.UserDeviceId);
-            if (device is null || device.IsTrusted) return result;
+            if (device is null || device.IsTrusted)
+            {
+                result.AddError(device is null ? Codes.Verification.DeviceNotConfirmed : Codes.Verification.DeviceAlreadyTrusted);
+                return result;
+            };
 
             attempt.MarkUsed();
             _unitOfWork.Repository<UserDeviceChallengeAttempt>().Update(attempt);
@@ -925,14 +953,22 @@ namespace Identity.API.Services
             var result = new SendPhoneConfirmationResult();
 
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
-            if (user is null || user.PhoneNumberConfirmed) return result;
+            if (user is null || user.PhoneNumberConfirmed)
+            {
+                result.AddError(user is null ? Codes.Validation.UserDoesNotExist : Codes.Verification.PhoneNumberConfirmed);
+                return result;
+            }
 
             var validRecentPhoneConfirmationAttemptExists = await _unitOfWork.Repository<PhoneConfirmationAttempt>()
                 .Query
                 .Where(x => x.ExpiresAt > DateTime.UtcNow && x.UserId == user.Id && x.IsUsed == false)
                 .AnyAsync();
 
-            if (validRecentPhoneConfirmationAttemptExists) return result;
+            if (validRecentPhoneConfirmationAttemptExists)
+            {
+                result.AddError(Codes.Verification.ValidConfirmationPhoneNumberAttemptExists);
+                return result;
+            };
 
             var newAttempt = new PhoneConfirmationAttempt
             {

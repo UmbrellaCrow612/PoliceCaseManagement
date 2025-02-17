@@ -66,6 +66,26 @@
             /// Indicates that a phone number confirmation attempt does not exist.
             /// </summary>
             public const string ConfirmPhoneNumberAttemptDoesNotExist = "PHONE_NUMBER_CONFIRMATION_DOES_NOT_EXIST";
+
+            /// <summary>
+            /// Indicates that valid phone verifaction attempt still exists.
+            /// </summary>
+            public const string ValidConfirmationPhoneNumberAttemptExists = "VALID_PHONE_CONFIRMATION_EXISTS";
+
+            /// <summary>
+            /// Indicates that device is already trusted.
+            /// </summary>
+            public const string DeviceAlreadyTrusted = "DEVICE_ALREADY_TRUSTED";
+
+            /// <summary>
+            /// Indicates that a verifaction attempt for this device already exists.
+            /// </summary>
+            public const string ValidDeviceConfirmationAttemptExists= "VALID_DEVICE_CONFIRMATION_EXISTS";
+
+            /// <summary>
+            /// Indicates that a verifaction attempt for this device dose not exist.
+            /// </summary>
+            public const string DeviceConfirmationAttemptDoseNotExists = "DEVICE_CONFIRMATION_DOSE_NOT_EXIST";
         }
 
         /// <summary>
