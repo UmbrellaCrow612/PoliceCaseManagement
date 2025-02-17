@@ -56,7 +56,7 @@ namespace Identity.API.Services
 
             if(user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
@@ -78,7 +78,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(Codes.IncorrectCreds);
+                result.AddError(Codes.Authentication.IncorrectCredentials);
                 return result;
             }
 
@@ -88,7 +88,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(Codes.AccountLocked);
+                result.AddError(Codes.Authentication.AccountLocked);
                 return result;
             }
 
@@ -98,7 +98,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(Codes.EmailNotConfirmed);
+                result.AddError(Codes.Verification.EmailNotConfirmed);
                 return result;
             }
 
@@ -108,7 +108,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(Codes.PhoneNumberNotConfirmed);
+                result.AddError(Codes.Verification.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -119,7 +119,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(Codes.DeviceNotConfirmed);
+                result.AddError(Codes.Verification.DeviceNotConfirmed);
                 return result;
             }
 
@@ -138,20 +138,20 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(Codes.LoginAttemptNotValid);
+                result.AddError(Codes.Authentication.LoginAttemptNotValid);
                 return result;
             }
      
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsEmailConfirmed())
             {
-                result.AddError(Codes.EmailNotConfirmed);
+                result.AddError(Codes.Verification.EmailNotConfirmed);
                 return result;
             }
 
@@ -163,7 +163,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorEmailAttemptExists)
             {
-                result.AddError(Codes.ValidTwoFactorEmailAttemptExists);
+                result.AddError(Codes.TwoFactor.ValidTwoFactorEmailAttemptExists);
                 return result;
             }
 
@@ -192,20 +192,20 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if(loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(Codes.LoginAttemptNotValid);
+                result.AddError(Codes.Authentication.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsPhoneNumberConfirmed())
             {
-                result.AddError(Codes.PhoneNumberNotConfirmed);
+                result.AddError(Codes.Verification.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -217,7 +217,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorSmsAttemptExist)
             {
-                result.AddError(Codes.ValidTwoFactorSmsAttemptExist);
+                result.AddError(Codes.TwoFactor.ValidTwoFactorSmsAttemptExists);
                 return result;
             }
 
@@ -257,21 +257,21 @@ namespace Identity.API.Services
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if(!isValid || loginAttempt is null)
             {
-                result.AddError(Codes.LoginAttemptNotValid);
+                result.AddError(Codes.Authentication.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await GetUserByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(!isTrusted || userDevice is null)
             {
-                result.AddError(Codes.DeviceNotConfirmed);
+                result.AddError(Codes.Verification.DeviceNotConfirmed);
                 return result;
             }
 
@@ -282,7 +282,7 @@ namespace Identity.API.Services
 
             if (twoFactorEmailAttempt is null || !twoFactorEmailAttempt.IsValid())
             {
-                result.AddError(Codes.TwoFactorEmailAttemptInvalid);
+                result.AddError(Codes.TwoFactor.TwoFactorEmailAttemptInvalid);
                 return result;
             }
 
@@ -313,28 +313,28 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(Codes.LoginAttemptNotValid);
+                result.AddError(Codes.Authentication.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(userDevice is null || !isTrusted)
             {
-                result.AddError(Codes.DeviceNotConfirmed);
+                result.AddError(Codes.Verification.DeviceNotConfirmed);
                 return result;
             }
 
             var smsAttempt = await _unitOfWork.Repository<TwoFactorSmsAttempt>().Query.Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code).FirstOrDefaultAsync();
             if (smsAttempt is null || !smsAttempt.IsValid())
             {
-                result.AddError(Codes.TwoFactorSmsAttemptInvalid);
+                result.AddError(Codes.TwoFactor.TwoFactorSmsAttemptInvalid);
                 return result;
             }
 
@@ -391,14 +391,14 @@ namespace Identity.API.Services
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if (userDevice is null || !isTrusted)
             {
-                result.AddError(Codes.DeviceNotConfirmed);
+                result.AddError(Codes.Verification.DeviceNotConfirmed);
                 return result;
             }
 
@@ -694,7 +694,7 @@ namespace Identity.API.Services
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if(!isValid || loginAttempt is null)
             {
-                result.AddError(Codes.LoginAttemptNotValid);
+                result.AddError(Codes.Authentication.LoginAttemptNotValid);
                 return result;
             }
 
@@ -795,7 +795,7 @@ namespace Identity.API.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || user.IsEmailConfirmed())
             {
-                result.AddError(user is null ? Codes.UserDoesNotExist : Codes.EmailAlreadyConfirmed);
+                result.AddError(user is null ? Codes.Validation.UserDoesNotExist : Codes.Verification.EmailAlreadyConfirmed);
                 return result;
             };
 
@@ -806,7 +806,7 @@ namespace Identity.API.Services
 
             if (validRecentEmailConfirmationAttemptExists)
             {
-                result.AddError(Codes.ValidEmailConfirmationAttemptExists);
+                result.AddError(Codes.TwoFactor.ValidEmailConfirmationAttemptExists);
                 return result;
             };
 
@@ -956,7 +956,7 @@ namespace Identity.API.Services
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
             if (user is null || user.PhoneNumberConfirmed)
             {
-                result.AddError(user is null ? Codes.UserDoesNotExist : Codes.PhoneNumberConfirmed);
+                result.AddError(user is null ? Codes.Validation.UserDoesNotExist : Codes.Verification.PhoneNumberConfirmed);
                 return result;
             };
 
@@ -966,7 +966,7 @@ namespace Identity.API.Services
 
             if (attempt is null || !attempt.IsValid())
             {
-                result.AddError(Codes.ConfirmPhoneNumberAttemptDoseNotExist);
+                result.AddError(Codes.Verification.ConfirmPhoneNumberAttemptDoesNotExist);
                 return result;
             };
 
@@ -992,7 +992,7 @@ namespace Identity.API.Services
             var user = await _userManager.FindByIdAsync(userId);
             if(user is null)
             {
-                result.AddError(Codes.UserDoesNotExist);
+                result.AddError(Codes.Validation.UserDoesNotExist);
                 return result;
             }
 
@@ -1002,7 +1002,7 @@ namespace Identity.API.Services
                 .FirstOrDefaultAsync();
             if(backUpCode is null || !backUpCode.IsValid())
             {
-                result.AddError(Codes.BackupCodeDoesNotExist);
+                result.AddError(Codes.TwoFactor.BackupCodeDoesNotExist);
                 return result;
             }
             backUpCode.MarkUsed();
