@@ -1,4 +1,5 @@
-﻿using Identity.Core.Models;
+﻿using Identity.API.Services.Result;
+using Identity.Core.Models;
 
 namespace Identity.API.Services.Interfaces
 {
@@ -55,27 +56,23 @@ namespace Identity.API.Services.Interfaces
         Task<ValidateTOTPBackUpCodeResult> ValidateTOTPBackUpCode(string userId, string code);
     }
 
-    public class AuthError
+    public class AuthError : IServiceError
     {
-        public required int Status { get; set; }
-        public required string Message { get; set; }
-        public string? Reason { get; set; }
+       public required string Code { get; set; }
+       public string? Message { get; set; } = null;
     }
 
     // Base result class for all authentication results
-    public class AuthResult
+    public class AuthResult : IServiceResult
     {
         public bool Succeeded { get; set; } = false;
-        public ICollection<AuthError> Errors { get; private set; } = [];
 
-        public void AddError(int status, string message, string? reason = null)
+        public ICollection<IServiceError> Errors { get; set; } = [];
+
+        /// <param name="code">Could be a <see cref="Result.Codes"/></param>
+        public void AddError(string code, string? message = null)
         {
-            Errors.Add(new AuthError
-            {
-                Status = status,
-                Message = message,
-                Reason = reason
-            });
+            Errors.Add(new AuthError { Code = code, Message = message });
         }
     }
 

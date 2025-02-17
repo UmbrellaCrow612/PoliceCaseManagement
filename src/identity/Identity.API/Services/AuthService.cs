@@ -1,7 +1,7 @@
 ﻿using Authorization.Core;
 using Identity.API.Helpers;
-using Identity.API.Responses;
 using Identity.API.Services.Interfaces;
+using Identity.API.Services.Result;
 using Identity.API.Settings;
 using Identity.Core.Models;
 using Identity.Core.Repositorys;
@@ -56,7 +56,7 @@ namespace Identity.API.Services
 
             if(user is null)
             {
-                result.AddError(StatusCodes.Status404NotFound, "user not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
@@ -78,7 +78,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Incorrect credentials", LoginResponseReasons.IncorrectCreds);
+                result.AddError(Codes.IncorrectCreds);
                 return result;
             }
 
@@ -88,7 +88,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Account locked", LoginResponseReasons.AccountLocked);
+                result.AddError(Codes.AccountLocked);
                 return result;
             }
 
@@ -98,7 +98,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", LoginResponseReasons.EmailNotConfirmed);
+                result.AddError(Codes.EmailNotConfirmed);
                 return result;
             }
 
@@ -108,7 +108,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", LoginResponseReasons.PhoneNumberNotConfirmed);
+                result.AddError(Codes.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -119,7 +119,7 @@ namespace Identity.API.Services
 
                 await _unitOfWork.SaveChangesAsync();
 
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", LoginResponseReasons.DeviceNotConfirmed);
+                result.AddError(Codes.DeviceNotConfirmed);
                 return result;
             }
 
@@ -138,20 +138,20 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
+                result.AddError(Codes.LoginAttemptNotValid);
                 return result;
             }
      
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsEmailConfirmed())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Email not confirmed", LoginResponseReasons.EmailNotConfirmed);
+                result.AddError(Codes.EmailNotConfirmed);
                 return result;
             }
 
@@ -163,7 +163,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorEmailAttemptExists)
             {
-                result.AddError(StatusCodes.Status400BadRequest, "Valid recent attempt already issued");
+                result.AddError(Codes.ValidTwoFactorEmailAttemptExists);
                 return result;
             }
 
@@ -192,20 +192,20 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if(loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
+                result.AddError(Codes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsPhoneNumberConfirmed())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Phone number not confirmed", LoginResponseReasons.PhoneNumberNotConfirmed);
+                result.AddError(Codes.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -217,7 +217,7 @@ namespace Identity.API.Services
 
             if (validRecentTwoFactorSmsAttemptExist)
             {
-                result.AddError(StatusCodes.Status400BadRequest, "Valid recent attempt already issued");
+                result.AddError(Codes.ValidTwoFactorSmsAttemptExist);
                 return result;
             }
 
@@ -257,21 +257,21 @@ namespace Identity.API.Services
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if(!isValid || loginAttempt is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Valid recent attempt issued");
+                result.AddError(Codes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await GetUserByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "User not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(!isTrusted || userDevice is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed", LoginResponseReasons.DeviceNotConfirmed);
+                result.AddError(Codes.DeviceNotConfirmed);
                 return result;
             }
 
@@ -282,7 +282,7 @@ namespace Identity.API.Services
 
             if (twoFactorEmailAttempt is null || !twoFactorEmailAttempt.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
+                result.AddError(Codes.TwoFactorEmailAttemptInvalid);
                 return result;
             }
 
@@ -313,28 +313,28 @@ namespace Identity.API.Services
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
+                result.AddError(Codes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if(user is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "user not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if(userDevice is null || !isTrusted)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not confirmed");
+                result.AddError(Codes.DeviceNotConfirmed);
                 return result;
             }
 
             var smsAttempt = await _unitOfWork.Repository<TwoFactorSmsAttempt>().Query.Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code).FirstOrDefaultAsync();
             if (smsAttempt is null || !smsAttempt.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Attempt not found or is invalid");
+                result.AddError(Codes.TwoFactorSmsAttemptInvalid);
                 return result;
             }
 
@@ -391,14 +391,14 @@ namespace Identity.API.Services
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(StatusCodes.Status404NotFound, "User not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if (userDevice is null || !isTrusted)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Device not found or is trusted");
+                result.AddError(Codes.DeviceNotConfirmed);
                 return result;
             }
 
@@ -694,7 +694,7 @@ namespace Identity.API.Services
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if(!isValid || loginAttempt is null)
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Login attempt not found or is invalid");
+                result.AddError(Codes.LoginAttemptNotValid);
                 return result;
             }
 
@@ -795,7 +795,7 @@ namespace Identity.API.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || user.IsEmailConfirmed())
             {
-                result.AddError(user is null ? StatusCodes.Status404NotFound : StatusCodes.Status400BadRequest, user is null ? "User not found" : "User email already confirmed", LoginResponseReasons.EmailConfirmation);
+                result.AddError(user is null ? Codes.UserDoesNotExist : Codes.EmailAlreadyConfirmed);
                 return result;
             };
 
@@ -806,7 +806,7 @@ namespace Identity.API.Services
 
             if (validRecentEmailConfirmationAttemptExists)
             {
-                result.AddError(StatusCodes.Status400BadRequest, "Valid email verifaction has been sent", LoginResponseReasons.EmailConfirmation);
+                result.AddError(Codes.ValidEmailConfirmationAttemptExists);
                 return result;
             };
 
@@ -954,13 +954,21 @@ namespace Identity.API.Services
             var result = new ConfirmPhoneNumberResult();
 
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
-            if (user is null || user.PhoneNumberConfirmed) return result;
+            if (user is null || user.PhoneNumberConfirmed)
+            {
+                result.AddError(user is null ? Codes.UserDoesNotExist : Codes.PhoneNumberConfirmed);
+                return result;
+            };
 
             var attempt = await _unitOfWork.Repository<PhoneConfirmationAttempt>()
                 .Query
                 .FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber && x.Code == code);
 
-            if (attempt is null || !attempt.IsValid()) return result;
+            if (attempt is null || !attempt.IsValid())
+            {
+                result.AddError(Codes.ConfirmPhoneNumberAttemptDoseNotExist);
+                return result;
+            };
 
             user.PhoneNumberConfirmed = true;
             _unitOfWork.Repository<ApplicationUser>().Update(user);
@@ -984,7 +992,7 @@ namespace Identity.API.Services
             var user = await _userManager.FindByIdAsync(userId);
             if(user is null)
             {
-                result.AddError(StatusCodes.Status404NotFound, "user not found");
+                result.AddError(Codes.UserDoesNotExist);
                 return result;
             }
 
@@ -994,7 +1002,7 @@ namespace Identity.API.Services
                 .FirstOrDefaultAsync();
             if(backUpCode is null || !backUpCode.IsValid())
             {
-                result.AddError(StatusCodes.Status401Unauthorized, "Status not found or is used");
+                result.AddError(Codes.BackupCodeDoesNotExist);
                 return result;
             }
             backUpCode.MarkUsed();
