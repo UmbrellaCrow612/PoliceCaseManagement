@@ -34,9 +34,10 @@ namespace Identity.API.Extensions
         /// </summary>
         public static DeviceInfo ComposeDeviceInfo(this ControllerBase controller)
         {
+            /// we assume that <see cref="Annotations.RequireDeviceInformationAttribute"/> has been run on the endpoint
             return new DeviceInfo
             {
-                DeviceFingerPrint = controller.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!,
+                DeviceFingerPrint = controller.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!, 
                 IpAddress = controller.Request.HttpContext.Connection.RemoteIpAddress?.ToString()
                                 ?? controller.Request.Headers["X-Forwarded-For"].FirstOrDefault()
                                 ?? "Unknown",

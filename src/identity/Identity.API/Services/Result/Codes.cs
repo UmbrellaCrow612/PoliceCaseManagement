@@ -143,6 +143,27 @@
             /// Indicates that the specified user does not exist.
             /// </summary>
             public const string UserDoesNotExist = "USER_DOES_NOT_EXIST";
+
+            /// <summary>
+            ///  Indicates that a user already has TOTP auth enabled.
+            /// </summary>
+            public const string TotpAuthAlreadyEnabled = "TOTP_AUTH_ALREADY_ENABLED";
+
+            /// <summary>
+            ///  Indicates that a user already has OTP auth enabled.
+            /// </summary>
+            public const string OTPAuthAlreadyEnabled = "OTP_AUTH_ALREADY_ENABLED";
+
+            /// <summary>
+            ///  Indicates that a user already has Magic link auth enabled.
+            /// </summary>
+            public const string MagicLinkAuthAlreadyEnabled = "MAGIC_LINK_AUTH_ALREADY_ENABLED";
+
+            /// <summary>
+            ///  Indicates that the user you tryed to create there phonenumber was the same as one in the database, as phonenumber is a primary field.
+            /// </summary>
+            public const string PhoneNumberAlreadyTaken = "PHONE_NUMBER_ALREADY_TAKEN";
+
         }
     }
 }

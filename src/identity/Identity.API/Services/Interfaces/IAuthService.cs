@@ -19,7 +19,7 @@ namespace Identity.API.Services.Interfaces
 
         Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info);
 
-        Task<RefreshTokenResult> RefreshTokens(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo);
+        Task<RefreshTokenResult> RefreshTokensAsync(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo);
 
         Task<LogoutResult> LogoutAsync(string userId);
 
@@ -54,6 +54,14 @@ namespace Identity.API.Services.Interfaces
         Task GenerateNewTOTPBackUpCodes(string userId);
 
         Task<ValidateTOTPBackUpCodeResult> ValidateTOTPBackUpCode(string userId, string code);
+
+        Task<TurnOnTOTPResult> TurnOnTOTP(string userId);
+
+        Task<TurnOnOTPResult> TurnOnOTP(string userId);
+
+        Task<TurnOnMagicLinkResult> TurnOnMagicLink(string userId);
+
+        Task<RegisterUserResult> RegisterUserAsync(ApplicationUser userToCreate);
     }
 
     public class AuthError : IServiceError
@@ -74,6 +82,25 @@ namespace Identity.API.Services.Interfaces
         {
             Errors.Add(new AuthError { Code = code, Message = message });
         }
+
+        public void MarkSucceeded()
+        {
+            Succeeded = true;
+        }
+    }
+
+    public class RegisterUserResult : AuthResult { }
+
+    public class TurnOnMagicLinkResult : AuthResult { }
+
+    public class TurnOnOTPResult : AuthResult
+    {
+
+    }
+
+    public class TurnOnTOTPResult : AuthResult
+    {
+
     }
 
     public class ValidateTOTPBackUpCodeResult : AuthResult
@@ -148,6 +175,9 @@ namespace Identity.API.Services.Interfaces
         public required string DeviceFingerPrint { get; set; }
     }
 
+    /// <summary>
+    /// API level model - used to sotre the JWT tokens to send to the UI
+    /// </summary>
     public class Tokens
     {
         public string JwtBearerToken { get; set; } = string.Empty;

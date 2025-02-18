@@ -384,7 +384,7 @@ namespace Identity.API.Services
             return (true, device);
         }
 
-        public async Task<RefreshTokenResult> RefreshTokens(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo)
+        public async Task<RefreshTokenResult> RefreshTokensAsync(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo)
         {
             var result = new RefreshTokenResult();
 
@@ -1054,6 +1054,97 @@ namespace Identity.API.Services
             await _unitOfWork.SaveChangesAsync();
 
             result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<TurnOnTOTPResult> TurnOnTOTP(string userId)
+        {
+            var result = new TurnOnTOTPResult();
+            var user = await GetUserByIdAsync(userId);
+            if(user is null)
+            {
+                result.AddError(Codes.Validation.UserDoesNotExist);
+                return result;
+            }
+            if (user.IsTOTPAuthEnabled())
+            {
+                result.AddError(Codes.Validation.TotpAuthAlreadyEnabled, "Time base one time passcodes are already turned on for this user.");
+                return result;
+            }
+            user.TimeBasedOneTimePassCodeEnabled = true;
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<TurnOnOTPResult> TurnOnOTP(string userId)
+        {
+            var result = new TurnOnOTPResult();
+            var user = await GetUserByIdAsync(userId);
+            if(user is null)
+            {
+                result.AddError(Codes.Validation.UserDoesNotExist);
+                return result;
+            }
+            if (user.IsOTPAuthEnabled())
+            {
+                result.AddError(Codes.Validation.OTPAuthAlreadyEnabled);
+                return result;
+            }
+            user.OTPAuthEnabled = true;
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.MarkSucceeded();
+            return result;
+        }
+
+        public async Task<TurnOnMagicLinkResult> TurnOnMagicLink(string userId)
+        {
+            var result = new TurnOnMagicLinkResult();
+            var user = await GetUserByIdAsync(userId);
+            if(user is null)
+            {
+                result.AddError(Codes.Validation.UserDoesNotExist);
+                return result;
+            }
+            if (user.IsMagicLinkAuthEnabled())
+            {
+                result.AddError(Codes.Validation.MagicLinkAuthAlreadyEnabled);
+                return result;
+            }
+            user.MagicLinkAuthEnabled = true;
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            result.MarkSucceeded();
+            return result;
+        }
+
+        public async Task<RegisterUserResult> RegisterUserAsync(ApplicationUser userToCreate)
+        {
+            var result = new RegisterUserResult();
+            var isPhoneNumberAlreadyTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == userToCreate.PhoneNumber);
+            if (isPhoneNumberAlreadyTaken)
+            {
+                result.AddError(Codes.Validation.PhoneNumberAlreadyTaken);
+                return result;
+            }
+            var r = await _userManager.CreateAsync(userToCreate);
+            if (!r.Succeeded)
+            {
+               foreach(var err in r.Errors)
+               {
+                    var mess = $@"Identity error code: ${err.Code} description: ${err.Description}";
+
+                    result.AddError(Codes.Validation.ValidationError, mess);
+               }
+                return result;
+            }
+
+            result.MarkSucceeded();
             return result;
         }
     }

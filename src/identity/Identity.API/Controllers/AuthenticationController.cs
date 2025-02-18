@@ -8,7 +8,6 @@ using Identity.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,11 +18,10 @@ namespace Identity.API.Controllers
     [ApiController]
     [Route("authentication")]
     public class AuthenticationController(
-        UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> JWTOptions,
+        IOptions<JwtBearerOptions> JWTOptions,
         IAuthService authService
         ) : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
@@ -35,13 +33,8 @@ namespace Identity.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
-
-            user.TimeBasedOneTimePassCodeEnabled = true;
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            var result = await _authService.TurnOnTOTP(userId);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok();
         }
@@ -111,29 +104,21 @@ namespace Identity.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
-
-            user.OTPAuthEnabled = true;
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            var result = await _authService.TurnOnOTP(userId);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok();
         }
 
-        [HttpPost("turn-on-magic-link")]
         [Authorize]
+        [HttpPost("turn-on-magic-link")]
         public async Task<ActionResult> TunrnOnMagicLinkAuth()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return Unauthorized();
-
-            user.MagicLinkAuthEnabled = true;
-            var res = await _userManager.UpdateAsync(user);
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            var result = await _authService.TurnOnMagicLink(userId);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok();
         }
@@ -224,14 +209,9 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
             var userToCreate = userMapping.Create(registerRequestDto);
-            var phoneNumberTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == registerRequestDto.PhoneNumber);
-            if (phoneNumberTaken) return BadRequest(new { message = "Phone number taken" });
 
-            var result = await _userManager.CreateAsync(userToCreate, registerRequestDto.Password);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var result = await _authService.RegisterUserAsync(userToCreate);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             var dto = userMapping.ToDto(userToCreate);
 
@@ -256,7 +236,7 @@ namespace Identity.API.Controllers
                 return Unauthorized("Jti ID not found in token.");
             }
 
-            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, this.ComposeDeviceInfo());
+            var result = await _authService.RefreshTokensAsync(userId, tokenId, dto.RefreshToken, this.ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt
