@@ -28,18 +28,6 @@ namespace Identity.API.Controllers
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
-        private DeviceInfo ComposeDeviceInfo()
-        {
-            return new DeviceInfo
-            {
-                DeviceFingerPrint = Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!,
-                IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString()
-                                ?? Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                                ?? "Unknown",
-                UserAgent = Request.Headers.UserAgent.ToString()
-            };
-        }
-
         [Authorize]
         [HttpPost("turn-on-totp")]
         public async Task<ActionResult> TurnOnTOTP()
@@ -67,7 +55,7 @@ namespace Identity.API.Controllers
 
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var res = await _authService.SetUpTOTP(userId, ComposeDeviceInfo());
+            var res = await _authService.SetUpTOTP(userId, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             var file = File(res.TotpSecretQrCodeBytes, "image/png", "totp-qrcode-image");
@@ -80,7 +68,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-totp")]
         public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
         {
-            var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, ComposeDeviceInfo());
+            var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
@@ -93,7 +81,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-otp")]
         public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
         {
-            var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, ComposeDeviceInfo());
+            var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
@@ -108,7 +96,7 @@ namespace Identity.API.Controllers
         {
             if (string.IsNullOrWhiteSpace(dto.OTPCreds.Email) && string.IsNullOrWhiteSpace(dto.OTPCreds.PhoneNumber)) return BadRequest();
 
-            var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, ComposeDeviceInfo());
+            var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             var file = File(res.QrCodeBytes, "image/png", "otp-qrcode-image");
@@ -155,7 +143,7 @@ namespace Identity.API.Controllers
         [HttpPost("send-magic-link")]
         public async Task<ActionResult> SendMagicLink([FromBody] string email)
         {
-            var res = await _authService.SendMagicLink(email, ComposeDeviceInfo());
+            var res = await _authService.SendMagicLink(email, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();
@@ -166,7 +154,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-magic-link")]
         public async Task<ActionResult> ValidateMagicLink([FromBody] string code)
         {
-            var res = await _authService.ValidateMagicLink(code, ComposeDeviceInfo());
+            var res = await _authService.ValidateMagicLink(code, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
@@ -179,7 +167,7 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var res = await _authService.LoginAsync(dto.Email, dto.Password, ComposeDeviceInfo());
+            var res = await _authService.LoginAsync(dto.Email, dto.Password, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok(new { res.LoginAttemptId });
@@ -190,7 +178,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-two-factor-sms")]
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
         {
-            var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
+            var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, this.ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             this.SetAuthCookies(result.Tokens, _JWTOptions);
@@ -214,7 +202,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-two-factor-email")]
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
-            var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, ComposeDeviceInfo());
+            var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
@@ -268,7 +256,7 @@ namespace Identity.API.Controllers
                 return Unauthorized("Jti ID not found in token.");
             }
 
-            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, ComposeDeviceInfo());
+            var result = await _authService.RefreshTokens(userId, tokenId, dto.RefreshToken, this.ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt
@@ -355,7 +343,7 @@ namespace Identity.API.Controllers
         [HttpPost("send-user-device-challenge")]
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto dto)
         {
-            var res = await _authService.SendUserDeviceChallenge(dto.Email, ComposeDeviceInfo());
+            var res = await _authService.SendUserDeviceChallenge(dto.Email, this.ComposeDeviceInfo());
             if (!res.Succeeded) return Unauthorized(res.Errors);
 
             return Ok();

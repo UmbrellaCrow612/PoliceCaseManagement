@@ -28,6 +28,21 @@ namespace Identity.API.Extensions
                 Expires = DateTime.UtcNow.AddMinutes(options.RefreshTokenExpiriesInMinutes)
             });
         }
+
+        /// <summary>
+        /// Return the current requesting device information to a <see cref="DeviceInfo"/>
+        /// </summary>
+        public static DeviceInfo ComposeDeviceInfo(this ControllerBase controller)
+        {
+            return new DeviceInfo
+            {
+                DeviceFingerPrint = controller.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!,
+                IpAddress = controller.Request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                                ?? controller.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                                ?? "Unknown",
+                UserAgent = controller.Request.Headers.UserAgent.ToString()
+            };
+        }
     }
 
 }

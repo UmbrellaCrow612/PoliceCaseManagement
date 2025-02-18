@@ -138,7 +138,9 @@ namespace Identity.API.Services.Interfaces
 
     public class ConfirmPhoneNumberResult : AuthResult { }
 
-
+    /// <summary>
+    /// API level model - used to store device info so we dont bind API concerns with business logic
+    /// </summary>
     public class DeviceInfo
     {
         public required string IpAddress { get; set; }
