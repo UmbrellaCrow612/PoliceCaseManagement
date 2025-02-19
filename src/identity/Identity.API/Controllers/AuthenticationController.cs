@@ -2,16 +2,14 @@
 using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
-using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
-using Identity.Core.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Identity.API.Extensions;
+using Identity.Core.Services;
 
 namespace Identity.API.Controllers
 {
@@ -206,16 +204,16 @@ namespace Identity.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
+        public async Task<ActionResult> Register([FromBody] RegisterRequestDto dto)
         {
-            var userToCreate = userMapping.Create(registerRequestDto);
+            var userToCreate = userMapping.Create(dto);
 
-            var result = await _authService.RegisterUserAsync(userToCreate);
+            var result = await _authService.RegisterUserAsync(userToCreate, dto.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            var dto = userMapping.ToDto(userToCreate);
+            var returnDto = userMapping.ToDto(userToCreate);
 
-            return Ok(dto);
+            return Ok(returnDto);
         }
 
         [RequireDeviceInformation]

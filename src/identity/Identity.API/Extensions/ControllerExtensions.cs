@@ -1,6 +1,7 @@
 ﻿using Authorization.Core;
-using Identity.API.Services.Interfaces;
 using Identity.API.Settings;
+using Identity.Application.Constants;
+using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Extensions

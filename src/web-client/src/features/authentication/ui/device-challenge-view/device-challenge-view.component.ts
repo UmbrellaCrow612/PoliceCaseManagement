@@ -13,9 +13,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { DeviceService } from '../../../../core/user/device/services/device.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import formatBackendError from '../../../../core/errors/utils/format-error';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
+import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
 
 @Component({
   selector: 'app-device-challenge-view',

@@ -8,7 +8,8 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { StatusCodes } from '../../http/codes/status-codes';
 import { inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import REASONS from '../../server-responses/response';
+import CODES from '../../server-responses/codes';
+import { appPaths } from '../../app/constants/appPaths';
 
 export function authRedirectsInterceptor(
   req: HttpRequest<unknown>,
@@ -23,15 +24,15 @@ export function authRedirectsInterceptor(
         error.status === StatusCodes.UNAUTHORIZED ||
         error.status === StatusCodes.FORBIDDEN
       ) {
-        const reason = error.error[0]?.reason;
+        const code = error.error[0]?.code;
 
-        if (typeof reason === 'string') {
-          console.log(`Redirecting for reason ${reason}`);
+        if (typeof code === 'string') {
+          console.log(`Redirecting for code ${code}`);
 
           var url = '';
-          switch (reason) {
-            case REASONS.EmailNotConfirmed:
-              url = `authentication/confirm-email`;
+          switch (code) {
+            case CODES.EmailNotConfirmed:
+              url = `${appPaths.AUTHENTICATION}/${appPaths.CONFIRM_EMAIL}`;
               break;
             default:
               break;

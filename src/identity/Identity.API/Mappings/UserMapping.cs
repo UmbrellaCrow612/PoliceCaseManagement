@@ -8,7 +8,7 @@ namespace Identity.API.Mappings
     {
         public ApplicationUser Create(RegisterRequestDto createDto)
         {
-            return new ApplicationUser { UserName = createDto.UserName, Email = createDto.Email , PhoneNumber = createDto.PhoneNumber, PasswordHash = createDto.Password};
+            return new ApplicationUser { UserName = createDto.UserName, Email = createDto.Email, PhoneNumber = createDto.PhoneNumber };
         }
 
         public UserDto ToDto(ApplicationUser @base)

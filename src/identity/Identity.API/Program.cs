@@ -1,17 +1,16 @@
-using Identity.API.Helpers;
 using Email.Service;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Identity.API.Settings;
 using Identity.Core.Models;
 using Challenge.Core;
 using Identity.Infrastructure.Data;
 using Authorization.Core;
 using Logging.Core;
-using Identity.API.Extensions;
+using Identity.Application.Constants;
+using Identity.Application;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -87,14 +86,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddChallenges(config);
 builder.Services.AddInfrastructure(config);
-
-builder.Services.AddScoped<StringEncryptionHelper>();
-builder.Services.AddScoped<IDeviceIdentification, DeviceIdentification>();
-builder.Services.AddScoped<DeviceManager>();
-builder.Services.AddTimeWindows(config);
-
+builder.Services.AddApplicationServices(config);
 builder.Services.AddEmailService(config);
-builder.Services.AddServices(config);
 
 var app = builder.Build();
 

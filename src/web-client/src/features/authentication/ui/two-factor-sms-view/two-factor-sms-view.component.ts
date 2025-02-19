@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 import { SmsCodeRequest } from '../../../../core/authentication/types';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import formatBackendError from '../../../../core/errors/utils/format-error';
+import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
 
 @Component({
   selector: 'app-two-factor-sms-view',

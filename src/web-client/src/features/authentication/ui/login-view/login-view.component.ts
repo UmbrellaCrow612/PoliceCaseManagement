@@ -15,7 +15,7 @@ import { LoginCredentials } from '../../../../core/authentication/types';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import formatBackendError from '../../../../core/errors/utils/format-error';
+import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
 
 @Component({
   selector: 'app-login-view',

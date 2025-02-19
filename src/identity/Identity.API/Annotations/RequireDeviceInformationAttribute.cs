@@ -1,4 +1,4 @@
-﻿using Identity.API.Helpers;
+﻿using Identity.Application.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -12,26 +12,10 @@ namespace Identity.API.Annotations
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var services = context.HttpContext.RequestServices;
-
-            var deviceService = services.GetService<DeviceManager>();
-            if (deviceService is null)
-            {
-                context.Result = new ObjectResult("DeviceManager service not found")
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
-                return;
-            }
-
-            var (isValid, errors) = deviceService.VerifyRequestHasRequiredProperties(context.HttpContext.Request);
+            var (isValid, errors) = DeviceManager.VerifyRequestHasRequiredProperties(context.HttpContext.Request);
             if (!isValid)
             {
-                context.Result = new BadRequestObjectResult(new
-                {
-                    Message = "Device request validation failed.",
-                    Errors = errors
-                });
+                context.Result = new BadRequestObjectResult(errors); // we expect at least one error if not somthing wrong with verify process to lead here
                 return;
             }
         }
