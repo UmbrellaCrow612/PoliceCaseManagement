@@ -49,6 +49,9 @@
   color: #333; /* Darker text for contrast */
 }
 
+.error_message {
+  color: red;
+}
 @media (max-width: 768px) {
   .form {
     padding: 1.5rem;

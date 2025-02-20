@@ -17,6 +17,10 @@
     <!-- Form Title -->
     <h1 id="loginFormTitle" class="form-title">Police Case System Login</h1>
 
+    @if (incorrectCredentialsError) {
+    <p class="error_message">Email or password incorrect</p>
+    }
+
     <!-- Email Field -->
     <mat-form-field appearance="fill" class="full-width">
       <mat-label for="email">Email</mat-label>

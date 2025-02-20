@@ -24,30 +24,7 @@ export function authRedirectsInterceptor(
         error.status === StatusCodes.UNAUTHORIZED ||
         error.status === StatusCodes.FORBIDDEN
       ) {
-        const code = error.error[0]?.code;
-
-        if (typeof code === 'string') {
-          console.log(`Redirecting for code ${code}`);
-
-          var url = '';
-          switch (code) {
-            case CODES.EmailNotConfirmed:
-              url = `${appPaths.AUTHENTICATION}/${appPaths.CONFIRM_EMAIL}`;
-              break;
-            default:
-              break;
-          }
-
-          console.log('URL ' + url);
-          if (url) {
-            console.log('Navigating to  ' + url);
-            router.navigate([url]);
-          } else {
-            console.error(url);
-          }
-        } else {
-          console.error('Invalid response object for re-directing:', error);
-        }
+        // here could send to login page and clear cookies
         return throwError(() => error);
       }
       return throwError(() => error);

@@ -13,9 +13,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 import { LoginCredentials } from '../../../../core/authentication/types';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { ErrorDialogComponent } from '../../../../core/components/error-dialog/error-dialog.component';
+import CODES from '../../../../core/server-responses/codes';
 
 @Component({
   selector: 'app-login-view',
@@ -33,12 +36,13 @@ import formatBackendError from '../../../../core/server-responses/errors/utils/f
 export class LoginViewComponent {
   constructor(
     private authService: AuthenticationService,
-    private snackBar: MatSnackBar,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   isLoggingIn = false;
+  incorrectCredentialsError = false;
 
   loginCredentials: LoginCredentials = {
     email: '',
@@ -56,6 +60,7 @@ export class LoginViewComponent {
       this.loginCredentials.password = this.loginForm.value.password!;
 
       this.isLoggingIn = true;
+      this.incorrectCredentialsError = false;
 
       this.authService.Login(this.loginCredentials).subscribe({
         next: (config) => {
@@ -65,14 +70,20 @@ export class LoginViewComponent {
             queryParams: { loginAttemptId: config.id },
           });
         },
-        error: (err) => {
+        error: (err: HttpErrorResponse) => {
           this.isLoggingIn = false;
-          let errorMessage = formatBackendError(err);
 
-          this.snackBar.open(errorMessage, 'Close', {
-            duration: 5000,
-            horizontalPosition: 'center',
-          });
+          if (
+            err.error[0]?.code == CODES.IncorrectCreds || // we expect these codes
+            err.error[0]?.code == CODES.UserDoseNotExist
+          ) {
+            this.incorrectCredentialsError = true;
+          } else {
+            let errorMessage = formatBackendError(err);
+            this.dialog.open(ErrorDialogComponent, {
+              data: errorMessage,
+            });
+          }
         },
       });
     }
