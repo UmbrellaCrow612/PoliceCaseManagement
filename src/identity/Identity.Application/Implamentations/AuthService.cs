@@ -62,7 +62,7 @@ namespace Identity.Application.Implamentations
             if (user is null)
             {
                 _logger.LogWarning("Login failed: User does not exist. Email: {Email}, IP: {IpAddress}", email, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.IncorrectCredentials);
                 return result;
             }
 
