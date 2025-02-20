@@ -62,7 +62,7 @@ namespace Identity.Application.Implamentations
             if (user is null)
             {
                 _logger.LogWarning("Login failed: User does not exist. Email: {Email}, IP: {IpAddress}", email, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
@@ -83,7 +83,7 @@ namespace Identity.Application.Implamentations
                 loginAttempt.FailureReason = "Incorrect password.";
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Incorrect credentials. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.Authentication.IncorrectCredentials);
+                result.AddError(BusinessRuleCodes.IncorrectCredentials);
                 return result;
             }
 
@@ -92,7 +92,7 @@ namespace Identity.Application.Implamentations
                 loginAttempt.FailureReason = "Account locked.";
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Account locked. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.Authentication.AccountLocked);
+                result.AddError(BusinessRuleCodes.AccountLocked);
                 return result;
             }
 
@@ -101,7 +101,7 @@ namespace Identity.Application.Implamentations
                 loginAttempt.FailureReason = "Email not confirmed.";
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Email not confirmed. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.Verification.EmailNotConfirmed);
+                result.AddError(BusinessRuleCodes.EmailNotConfirmed);
                 return result;
             }
 
@@ -110,7 +110,7 @@ namespace Identity.Application.Implamentations
                 loginAttempt.FailureReason = "Phone number not confirmed.";
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Phone number not confirmed. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.Verification.PhoneNumberNotConfirmed);
+                result.AddError(BusinessRuleCodes.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -121,7 +121,7 @@ namespace Identity.Application.Implamentations
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Untrusted device. UserId: {UserId}, IP: {IpAddress}, DeviceFingerprint: {DeviceFingerprint}",
                     user.Id, deviceInfo.IpAddress, deviceInfo.DeviceFingerPrint);
-                result.AddError(BusinessRuleCodes.Verification.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
                 return result;
             }
 
@@ -140,20 +140,20 @@ namespace Identity.Application.Implamentations
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Authentication.LoginAttemptNotValid);
+                result.AddError(BusinessRuleCodes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsEmailConfirmed())
             {
-                result.AddError(BusinessRuleCodes.Verification.EmailNotConfirmed);
+                result.AddError(BusinessRuleCodes.EmailNotConfirmed);
                 return result;
             }
 
@@ -165,7 +165,7 @@ namespace Identity.Application.Implamentations
 
             if (validRecentTwoFactorEmailAttemptExists)
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.ValidTwoFactorEmailAttemptExists);
+                result.AddError(BusinessRuleCodes.ValidTwoFactorEmailAttemptExists);
                 return result;
             }
 
@@ -194,20 +194,20 @@ namespace Identity.Application.Implamentations
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Authentication.LoginAttemptNotValid);
+                result.AddError(BusinessRuleCodes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
             if (!user.IsPhoneNumberConfirmed())
             {
-                result.AddError(BusinessRuleCodes.Verification.PhoneNumberNotConfirmed);
+                result.AddError(BusinessRuleCodes.PhoneNumberNotConfirmed);
                 return result;
             }
 
@@ -219,7 +219,7 @@ namespace Identity.Application.Implamentations
 
             if (validRecentTwoFactorSmsAttemptExist)
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.ValidTwoFactorSmsAttemptExists);
+                result.AddError(BusinessRuleCodes.ValidTwoFactorSmsAttemptExists);
                 return result;
             }
 
@@ -259,21 +259,21 @@ namespace Identity.Application.Implamentations
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if (!isValid || loginAttempt is null)
             {
-                result.AddError(BusinessRuleCodes.Authentication.LoginAttemptNotValid);
+                result.AddError(BusinessRuleCodes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await GetUserByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if (!isTrusted || userDevice is null)
             {
-                result.AddError(BusinessRuleCodes.Verification.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
                 return result;
             }
 
@@ -284,7 +284,7 @@ namespace Identity.Application.Implamentations
 
             if (twoFactorEmailAttempt is null || !twoFactorEmailAttempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.TwoFactorEmailAttemptInvalid);
+                result.AddError(BusinessRuleCodes.TwoFactorEmailAttemptInvalid);
                 return result;
             }
 
@@ -315,28 +315,28 @@ namespace Identity.Application.Implamentations
             var loginAttempt = await _unitOfWork.Repository<LoginAttempt>().FindByIdAsync(loginAttemptId);
             if (loginAttempt is null || !loginAttempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Authentication.LoginAttemptNotValid);
+                result.AddError(BusinessRuleCodes.LoginAttemptNotValid);
                 return result;
             }
 
             var user = await _userManager.FindByIdAsync(loginAttempt.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if (userDevice is null || !isTrusted)
             {
-                result.AddError(BusinessRuleCodes.Verification.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
                 return result;
             }
 
             var smsAttempt = await _unitOfWork.Repository<TwoFactorSmsAttempt>().Query.Where(x => x.LoginAttemptId == loginAttemptId && x.Code == code).FirstOrDefaultAsync();
             if (smsAttempt is null || !smsAttempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.TwoFactorSmsAttemptInvalid);
+                result.AddError(BusinessRuleCodes.TwoFactorSmsAttemptInvalid);
                 return result;
             }
 
@@ -393,21 +393,21 @@ namespace Identity.Application.Implamentations
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
             var (isTrusted, userDevice) = await ValidateDeviceAsync(user.Id, deviceInfo);
             if (userDevice is null || !isTrusted)
             {
-                result.AddError(BusinessRuleCodes.Verification.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
                 return result;
             }
 
             var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(tokenId);
             if (storedToken is null || !storedToken.IsValid(refreshToken, userDevice.Id))
             {
-                result.AddError(BusinessRuleCodes.Authentication.RefreshToken);
+                result.AddError(BusinessRuleCodes.RefreshToken);
                 return result;
             }
 
@@ -439,7 +439,7 @@ namespace Identity.Application.Implamentations
             var user = GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
@@ -704,7 +704,7 @@ namespace Identity.Application.Implamentations
             var (isValid, loginAttempt) = await ValidateLoginAttemptAsync(loginAttemptId);
             if (!isValid || loginAttempt is null)
             {
-                result.AddError(BusinessRuleCodes.Authentication.LoginAttemptNotValid);
+                result.AddError(BusinessRuleCodes.LoginAttemptNotValid);
                 return result;
             }
 
@@ -805,7 +805,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || user.IsEmailConfirmed())
             {
-                result.AddError(user is null ? BusinessRuleCodes.Validation.UserDoesNotExist : BusinessRuleCodes.Verification.EmailAlreadyConfirmed);
+                result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.EmailAlreadyConfirmed);
                 return result;
             };
 
@@ -816,7 +816,7 @@ namespace Identity.Application.Implamentations
 
             if (validRecentEmailConfirmationAttemptExists)
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.ValidEmailConfirmationAttemptExists);
+                result.AddError(BusinessRuleCodes.ValidEmailConfirmationAttemptExists);
                 return result;
             };
 
@@ -844,7 +844,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || user.IsEmailConfirmed())
             {
-                result.AddError(user is null ? BusinessRuleCodes.Validation.UserDoesNotExist : BusinessRuleCodes.Verification.EmailAlreadyConfirmed);
+                result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.EmailAlreadyConfirmed);
                 return result;
             };
 
@@ -854,7 +854,7 @@ namespace Identity.Application.Implamentations
 
             if (attempt is null || !attempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Verification.EmailConfirmation);
+                result.AddError(BusinessRuleCodes.EmailConfirmation);
                 return result;
             };
             user.EmailConfirmed = true;
@@ -876,7 +876,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             };
 
@@ -896,7 +896,7 @@ namespace Identity.Application.Implamentations
             var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
             if (device is null || device.IsTrusted)
             {
-                result.AddError(device is null ? BusinessRuleCodes.Verification.DeviceNotConfirmed : BusinessRuleCodes.Verification.DeviceAlreadyTrusted);
+                result.AddError(device is null ? BusinessRuleCodes.DeviceNotConfirmed : BusinessRuleCodes.DeviceAlreadyTrusted);
                 return result;
             };
 
@@ -907,7 +907,7 @@ namespace Identity.Application.Implamentations
 
             if (validRecentAttemptExists)
             {
-                result.AddError(BusinessRuleCodes.Verification.ValidDeviceConfirmationAttemptExists);
+                result.AddError(BusinessRuleCodes.ValidDeviceConfirmationAttemptExists);
                 return result;
             };
 
@@ -937,14 +937,14 @@ namespace Identity.Application.Implamentations
                 .FirstOrDefaultAsync(x => x.Code == code && x.Email == email);
             if (attempt is null || !attempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Verification.DeviceConfirmationAttemptDoseNotExists);
+                result.AddError(BusinessRuleCodes.DeviceConfirmationAttemptDoesNotExist);
                 return result;
             };
 
             var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(attempt.UserDeviceId);
             if (device is null || device.IsTrusted)
             {
-                result.AddError(device is null ? BusinessRuleCodes.Verification.DeviceNotConfirmed : BusinessRuleCodes.Verification.DeviceAlreadyTrusted);
+                result.AddError(device is null ? BusinessRuleCodes.DeviceNotConfirmed : BusinessRuleCodes.DeviceAlreadyTrusted);
                 return result;
             };
 
@@ -965,7 +965,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
             if (user is null || user.PhoneNumberConfirmed)
             {
-                result.AddError(user is null ? BusinessRuleCodes.Validation.UserDoesNotExist : BusinessRuleCodes.Verification.PhoneNumberConfirmed);
+                result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.PhoneNumberAlreadyConfirmed);
                 return result;
             }
 
@@ -976,7 +976,7 @@ namespace Identity.Application.Implamentations
 
             if (validRecentPhoneConfirmationAttemptExists)
             {
-                result.AddError(BusinessRuleCodes.Verification.ValidConfirmationPhoneNumberAttemptExists);
+                result.AddError(BusinessRuleCodes.ValidConfirmationPhoneNumberAttemptExists);
                 return result;
             };
 
@@ -1002,7 +1002,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
             if (user is null || user.PhoneNumberConfirmed)
             {
-                result.AddError(user is null ? BusinessRuleCodes.Validation.UserDoesNotExist : BusinessRuleCodes.Verification.PhoneNumberConfirmed);
+                result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.PhoneNumberAlreadyConfirmed);
                 return result;
             };
 
@@ -1012,7 +1012,7 @@ namespace Identity.Application.Implamentations
 
             if (attempt is null || !attempt.IsValid())
             {
-                result.AddError(BusinessRuleCodes.Verification.ConfirmPhoneNumberAttemptDoesNotExist);
+                result.AddError(BusinessRuleCodes.ConfirmPhoneNumberAttemptDoesNotExist);
                 return result;
             };
 
@@ -1038,7 +1038,7 @@ namespace Identity.Application.Implamentations
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
@@ -1048,7 +1048,7 @@ namespace Identity.Application.Implamentations
                 .FirstOrDefaultAsync();
             if (backUpCode is null || !backUpCode.IsValid())
             {
-                result.AddError(BusinessRuleCodes.TwoFactor.BackupCodeDoesNotExist);
+                result.AddError(BusinessRuleCodes.BackupCodeDoesNotExist);
                 return result;
             }
             backUpCode.MarkUsed();
@@ -1065,12 +1065,12 @@ namespace Identity.Application.Implamentations
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
             if (user.IsTOTPAuthEnabled())
             {
-                result.AddError(BusinessRuleCodes.Validation.TotpAuthAlreadyEnabled, "Time base one time passcodes are already turned on for this user.");
+                result.AddError(BusinessRuleCodes.TotpAuthAlreadyEnabled, "Time base one time passcodes are already turned on for this user.");
                 return result;
             }
             user.TimeBasedOneTimePassCodeEnabled = true;
@@ -1087,12 +1087,12 @@ namespace Identity.Application.Implamentations
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
             if (user.IsOTPAuthEnabled())
             {
-                result.AddError(BusinessRuleCodes.Validation.OTPAuthAlreadyEnabled);
+                result.AddError(BusinessRuleCodes.OneTimePasswordAuthAlreadyEnabled);
                 return result;
             }
             user.OTPAuthEnabled = true;
@@ -1109,12 +1109,12 @@ namespace Identity.Application.Implamentations
             var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.Validation.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
             if (user.IsMagicLinkAuthEnabled())
             {
-                result.AddError(BusinessRuleCodes.Validation.MagicLinkAuthAlreadyEnabled);
+                result.AddError(BusinessRuleCodes.MagicLinkAuthAlreadyEnabled);
                 return result;
             }
             user.MagicLinkAuthEnabled = true;
@@ -1131,7 +1131,7 @@ namespace Identity.Application.Implamentations
             var isPhoneNumberAlreadyTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == userToCreate.PhoneNumber);
             if (isPhoneNumberAlreadyTaken)
             {
-                result.AddError(BusinessRuleCodes.Validation.PhoneNumberAlreadyTaken);
+                result.AddError(BusinessRuleCodes.PhoneNumberAlreadyTaken);
                 return result;
             }
             var r = await _userManager.CreateAsync(userToCreate, password);
@@ -1141,7 +1141,7 @@ namespace Identity.Application.Implamentations
                 {
                     var mess = $@"Identity error code: ${err.Code} description: ${err.Description}";
 
-                    result.AddError(BusinessRuleCodes.Validation.ValidationError, mess);
+                    result.AddError(BusinessRuleCodes.ValidationError, mess);
                 }
                 return result;
             }

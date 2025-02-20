@@ -68,7 +68,7 @@ namespace Identity.Application.Helpers
             {
                 errors.Add(new Err
                 {
-                    Code = BusinessRuleCodes.Validation.ValidationError,
+                    Code = BusinessRuleCodes.ValidationError,
                     Message = "User agent malformed"
                 });
             }
@@ -77,7 +77,7 @@ namespace Identity.Application.Helpers
             {
                 errors.Add(new Err
                 {
-                    Code = BusinessRuleCodes.Validation.DeviceFingerPrintMissing,
+                    Code = BusinessRuleCodes.DeviceFingerprintMissing,
                     Message = "Device fingerprint missing"
                 });
             }
