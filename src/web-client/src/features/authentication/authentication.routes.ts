@@ -10,11 +10,18 @@ export const AUTHENTICATION_ROUTES: Routes = [
       ),
   },
   {
-    path: appPaths.CONFIRM_EMAIL, 
+    path: appPaths.CONFIRM_EMAIL,
     loadComponent: () =>
       import('./ui/confirm-email-view/confirm-email-view.component').then(
         (c) => c.ConfirmEmailViewComponent
       ),
+  },
+  {
+    path: appPaths.CONFIRM_EMAIL_WITH_CODE, // has a query ?code=123 from click from email link
+    loadComponent: () =>
+      import(
+        './ui/confirm-email-with-code-view/confirm-email-with-code-view.component'
+      ).then((c) => c.ConfirmEmailWithCodeViewComponent),
   },
   {
     path: appPaths.DEVICE_CHALLENGE,
@@ -26,12 +33,12 @@ export const AUTHENTICATION_ROUTES: Routes = [
   {
     path: appPaths.CONFIRM_DEVICE_CHALLENGE,
     loadComponent: () =>
-      import('./ui/confirm-device-challenge-view/confirm-device-challenge-view.component').then(
-        (c) => c.ConfirmDeviceChallengeViewComponent
-      ),
+      import(
+        './ui/confirm-device-challenge-view/confirm-device-challenge-view.component'
+      ).then((c) => c.ConfirmDeviceChallengeViewComponent),
   },
   {
-    path: appPaths.PHONE_CONFIRMATION, 
+    path: appPaths.PHONE_CONFIRMATION,
     loadComponent: () =>
       import(
         './ui/phone-confirmation-view/phone-confirmation-view.component'
@@ -71,5 +78,5 @@ export const AUTHENTICATION_ROUTES: Routes = [
       import('./ui/two-factor-totpview/two-factor-totpview.component').then(
         (c) => c.TwoFactorTOTPViewComponent
       ),
-  }
+  },
 ];

@@ -828,7 +828,7 @@ namespace Identity.Application.Implamentations
                 UserId = user.Id,
             };
 
-            // send email using email service domain/confirm-email?code=newAttempt.code
+            // send email using email service domain/confirm-email?code=newAttempt.code&email=user.Email
 
             await _unitOfWork.Repository<EmailVerificationAttempt>().AddAsync(newAttempt);
             await _unitOfWork.SaveChangesAsync();

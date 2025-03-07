@@ -46,3 +46,12 @@ export interface SmsCodeRequest {
 export interface SmsCodeResponse {
   code: string;
 }
+
+export interface SendEmailConfirmationRequest {
+  email: string;
+}
+
+export interface SendEmailConfirmationCodeRequest {
+  email: string;
+  code: string;
+}

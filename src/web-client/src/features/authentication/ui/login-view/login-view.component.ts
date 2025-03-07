@@ -19,6 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorDialogComponent } from '../../../../core/components/error-dialog/error-dialog.component';
 import CODES from '../../../../core/server-responses/codes';
+import { appPaths } from '../../../../core/app/constants/appPaths';
 
 @Component({
   selector: 'app-login-view',
@@ -78,6 +79,10 @@ export class LoginViewComponent {
             err.error[0]?.code == CODES.UserDoseNotExist
           ) {
             this.incorrectCredentialsError = true;
+          } else if (err.error[0]?.code == CODES.EmailNotConfirmed) {
+            this.router.navigate([`../${appPaths.CONFIRM_EMAIL}`], {
+              relativeTo: this.route,
+            });
           } else {
             let errorMessage = formatBackendError(err);
             this.dialog.open(ErrorDialogComponent, {

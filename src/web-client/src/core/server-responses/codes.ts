@@ -1,11 +1,15 @@
 // Mapped from backend
 const CODES = {
   DeviceNotConfirmed: 'DEVICE_NOT_CONFIRMED',
-  PhoneNumberNotConfirmed: "PHONE_NOT_CONFIRMED",
-  EmailNotConfirmed: "EMAIL_NOT_CONFIRMED",
-  AccountLocked: "ACCOUNT_LOCKED",
-  IncorrectCreds: "INCORRECT_CREDENTIALS",
-  UserDoseNotExist: "USER_DOES_NOT_EXIST"
+  PhoneNumberNotConfirmed: 'PHONE_NOT_CONFIRMED',
+  EmailNotConfirmed: 'EMAIL_NOT_CONFIRMED',
+  AccountLocked: 'ACCOUNT_LOCKED',
+  IncorrectCreds: 'INCORRECT_CREDENTIALS',
+  UserDoseNotExist: 'USER_DOES_NOT_EXIST',
+  VALID_EMAIL_CONFIRMATION_EXISTS: 'VALID_EMAIL_CONFIRMATION_EXISTS',
+  EMAIL_ALREADY_CONFIRMED: 'EMAIL_ALREADY_CONFIRMED',
+  USER_DOES_NOT_EXIST: "USER_DOES_NOT_EXIST",
+  EMAIL_CONFIRMATION: "EMAIL_CONFIRMATION"
 } as const;
 
 export default CODES;
