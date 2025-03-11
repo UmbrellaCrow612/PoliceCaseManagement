@@ -11,6 +11,7 @@ using Authorization.Core;
 using Logging.Core;
 using Identity.Application.Constants;
 using Identity.Application;
+using Identity.Application.Settings;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -72,8 +73,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddAppCors(config);
-
+builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddChallenges(config);
 builder.Services.AddInfrastructure(config);
@@ -82,7 +82,7 @@ builder.Services.AddEmailService(config);
 
 var app = builder.Build();
 
-app.UseCors("DevelopmentCorsPolicy");
+app.UseApplicationCors(builder.Configuration.GetSection("Cors").Get<CORSConfigSettings>() ?? throw new ApplicationException("Cors mising from settings"));
 
 if (app.Environment.IsDevelopment())
 {

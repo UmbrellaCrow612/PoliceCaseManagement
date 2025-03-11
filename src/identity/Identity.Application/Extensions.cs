@@ -32,7 +32,7 @@ namespace Identity.Application
             return services;
         }
 
-        public static IServiceCollection AddAppCors(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationCors(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions<CORSConfigSettings>()
                  .Bind(configuration.GetSection("Cors"))
@@ -73,7 +73,6 @@ namespace Identity.Application
                     });
                 });
             }
-
 
             return services;
         }
