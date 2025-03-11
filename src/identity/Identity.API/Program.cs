@@ -72,16 +72,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("DevelopmentCorsPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200") // Specify your frontend's URL
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // Allow cookies and credentials if necessary
-    });
-});
+builder.Services.AddAppCors(config);
 
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddChallenges(config);
