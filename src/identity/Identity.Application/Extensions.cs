@@ -22,6 +22,11 @@ namespace Identity.Application
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            services.AddOptions<PasswordConfigSettings>()
+                .Bind(configuration.GetSection("PasswordSettings"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             services.AddScoped<IAuthService, AuthService>();
 
             return services;

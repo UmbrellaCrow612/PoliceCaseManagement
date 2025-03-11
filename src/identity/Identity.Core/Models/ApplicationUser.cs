@@ -4,6 +4,12 @@ namespace Identity.Core.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        /// <summary>
+        /// Used to indicate when a password should be roated - checked on login and if so reject the login and require a new 
+        /// password change - after all steps after this will be updated when there password changes so we can use it again 
+        /// for the same thing
+        /// </summary>
+        public DateTime PasswordCreatedAt { get; set; } = DateTime.UtcNow;
         public override bool LockoutEnabled { get; set; } = true;
         public override bool TwoFactorEnabled { get; set; } = true;
 
@@ -26,6 +32,7 @@ namespace Identity.Core.Models
         public ICollection<MagicLinkAttempt> MagicLinkAttempts { get; set; } = [];
         public ICollection<OTPAttempt> OTPAttempts { get; set; } = [];
         public ICollection<TimeBasedOneTimePassCodeBackupCode> TimeBasedOneTimePassCodeBackupCodes { get; set; } = [];
+        public ICollection<PreviousPassword> PreviousPasswords { get; set; } = [];
 
         public TimeBasedOneTimePassCode? TimeBasedOneTimePassCode { get; set; } = null;
         public string? TimeBasedOneTimePassCodeId { get; set; } = null;

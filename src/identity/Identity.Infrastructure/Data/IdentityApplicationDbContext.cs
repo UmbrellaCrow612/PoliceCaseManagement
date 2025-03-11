@@ -25,6 +25,7 @@ namespace Identity.Infrastructure.Data
         public DbSet<OTPAttempt> OTPAttempts { get; set; }
         public DbSet<TimeBasedOneTimePassCode> TimeBasedOneTimePassCodes { get; set; }
         public DbSet<TimeBasedOneTimePassCodeBackupCode> TimeBasedOneTimePassCodeBackupCodes { get; set; }
+        public DbSet<PreviousPassword> PreviousPasswords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -36,6 +36,7 @@ export class ConfirmEmailViewComponent {
   ) {}
   isSendingRequest = false;
   errorMessage: string | null = '';
+  sentEmailConfirmationSuccessfully = false;
 
   emailConfirmation = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -45,6 +46,7 @@ export class ConfirmEmailViewComponent {
     if (this.emailConfirmation.valid) {
       this.isSendingRequest = true;
       this.errorMessage = null;
+      this.sentEmailConfirmationSuccessfully = false;
 
       let body: SendEmailConfirmationRequest = {
         email: this.emailConfirmation.controls.email.getRawValue()!,
@@ -53,9 +55,11 @@ export class ConfirmEmailViewComponent {
       this.authService.SendConfirmationEmail(body).subscribe({
         next: () => {
           this.isSendingRequest = false;
+          this.sentEmailConfirmationSuccessfully = true;
         },
         error: (error: HttpErrorResponse) => {
           this.isSendingRequest = false;
+          this.sentEmailConfirmationSuccessfully = false;
 
           let code = error.error[0]?.code;
 

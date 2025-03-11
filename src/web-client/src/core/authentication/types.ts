@@ -55,3 +55,7 @@ export interface SendEmailConfirmationCodeRequest {
   email: string;
   code: string;
 }
+
+export interface SendPhoneConfirmationRequest {
+  phoneNumber: string;
+}

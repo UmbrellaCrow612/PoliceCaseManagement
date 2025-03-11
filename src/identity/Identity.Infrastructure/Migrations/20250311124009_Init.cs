@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Identity.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class New : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,6 +90,7 @@ namespace Identity.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
+                    PasswordCreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     DepartmentId = table.Column<string>(type: "TEXT", nullable: true),
@@ -342,6 +343,26 @@ namespace Identity.Infrastructure.Migrations
                     table.PrimaryKey("PK_PhoneConfirmationAttempts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PhoneConfirmationAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PreviousPasswords",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PreviousPasswords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PreviousPasswords_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -665,6 +686,11 @@ namespace Identity.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PreviousPasswords_UserId",
+                table: "PreviousPasswords",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SecurityAudits_UserId",
                 table: "SecurityAudits",
                 column: "UserId");
@@ -771,6 +797,9 @@ namespace Identity.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PhoneConfirmationAttempts");
+
+            migrationBuilder.DropTable(
+                name: "PreviousPasswords");
 
             migrationBuilder.DropTable(
                 name: "SecurityAudits");

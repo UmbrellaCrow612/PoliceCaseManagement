@@ -8,6 +8,7 @@ import {
   SmsCodeResponse,
   SendEmailConfirmationRequest,
   SendEmailConfirmationCodeRequest,
+  SendPhoneConfirmationRequest,
 } from '../types';
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -55,6 +56,13 @@ export class AuthenticationService extends BaseService {
 
   SendConfirmationEmailCode(body: SendEmailConfirmationCodeRequest) {
     return this.post(`${this.BASE_URL}/authentication/confirm-email`, body);
+  }
+
+  SendPhoneConfirmation(body: SendPhoneConfirmationRequest) {
+    return this.post(
+      `${this.BASE_URL}/authentication/send-phone-confirmation`,
+      body
+    );
   }
 
   Logout() {

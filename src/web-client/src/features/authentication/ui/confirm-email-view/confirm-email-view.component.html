@@ -12,6 +12,9 @@
     </mat-form-field>
 
     <div>
+      @if (sentEmailConfirmationSuccessfully) {
+      <div>Sent email confirmation check your inbox</div>
+      }
       {{ errorMessage }}
     </div>
     <button

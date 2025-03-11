@@ -39,6 +39,8 @@ namespace Identity.Core.Services
 
         Task<ValidateResetPasswordResult> ValidateResetPassword(string code, string newPassword);
 
+        Task<ChangePasswordResult> ChangePassword(DeviceInfo deviceInfo, string email, string password, string newPassword);
+
         Task<SendConfirmationEmailResult> SendConfirmationEmail(string email);
 
         Task<ConfirmEmailResult> ConfirmEmail(string email, string code);
@@ -152,6 +154,7 @@ namespace Identity.Core.Services
     public class SendResetPasswordResult : AuthResult { }
 
     public class ValidateResetPasswordResult : AuthResult { }
+    public class ChangePasswordResult : AuthResult { }
 
     public class SendConfirmationEmailResult : AuthResult { }
 

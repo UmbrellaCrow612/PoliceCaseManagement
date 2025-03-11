@@ -16,7 +16,9 @@ using Identity.Core.ValueObjects;
 
 namespace Identity.Application.Implamentations
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger) : IAuthService
+    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, 
+        IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IOptions<PasswordConfigSettings> passwordConfigSettings
+        , IPasswordHasher<ApplicationUser> passwordHasher) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
@@ -25,6 +27,8 @@ namespace Identity.Application.Implamentations
         private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly ILogger<AuthService> _logger = logger;
+        private readonly PasswordConfigSettings _passwordConfigSettings = passwordConfigSettings.Value;
+        private readonly IPasswordHasher<ApplicationUser> _passwordHasher = passwordHasher;
 
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
@@ -93,6 +97,15 @@ namespace Identity.Application.Implamentations
                 await _unitOfWork.SaveChangesAsync();
                 _logger.LogWarning("Login failed: Account locked. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(BusinessRuleCodes.AccountLocked);
+                return result;
+            }
+
+            if (user.PasswordCreatedAt.AddDays(_passwordConfigSettings.RoationPeriodInDays) < DateTime.UtcNow)
+            {
+                loginAttempt.FailureReason = "Expired password being used.";
+                await _unitOfWork.SaveChangesAsync();
+                _logger.LogWarning("Login failed: Expired password being used. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
+                result.AddError(BusinessRuleCodes.ExpiredPasswordBeingUsed);
                 return result;
             }
 
@@ -787,12 +800,25 @@ namespace Identity.Application.Implamentations
             if (user is null) return result;
 
             attempt.MarkUsed();
-
             _unitOfWork.Repository<PasswordResetAttempt>().Update(attempt);
+
+            var previousPassword = new PreviousPassword
+            {
+                PasswordHash = user.PasswordHash!, // should not be null here if so bug
+                UserId = user.Id,
+            };
+            await _unitOfWork.Repository<PreviousPassword>().AddAsync(previousPassword);
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var changePasswordResult = await _userManager.ResetPasswordAsync(user, token, newPassword);
-            if (!changePasswordResult.Succeeded) return result;
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var err in changePasswordResult.Errors)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, $@"Code: ${err.Code} Description: ${err.Description}" );
+                }
+                return result;
+            }
 
             result.Succeeded = true;
             return result;
@@ -1147,6 +1173,73 @@ namespace Identity.Application.Implamentations
             }
 
             result.MarkSucceeded();
+            return result;
+        }
+
+        public async Task<ChangePasswordResult> ChangePassword(DeviceInfo deviceInfo,string email, string password, string newPassword)
+        {
+            var result = new ChangePasswordResult();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user is null)
+            {
+                result.AddError(BusinessRuleCodes.IncorrectCredentials);
+                return result;
+            }
+
+            var device = await _deviceManager.GetRequestingDevice(user.Id, deviceInfo.DeviceFingerPrint, deviceInfo.UserAgent);
+            if (device is null || !device.Trusted())
+            {
+                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
+                return result;
+            }
+
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
+            if (!isPasswordCorrect)
+            {
+                result.AddError(BusinessRuleCodes.IncorrectCredentials);
+                return result;
+            }
+
+            if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, newPassword) == PasswordVerificationResult.Success)
+            {
+                result.AddError(BusinessRuleCodes.PasswordUsedBefore); // new password same as current
+                return result;
+            }
+
+            var previousPasswords = await _unitOfWork.Repository<PreviousPassword>()
+                .Query
+                .Where(x => x.UserId == user.Id)
+                .ToListAsync();
+
+            foreach (var pass in previousPasswords)
+            {
+                if (_passwordHasher.VerifyHashedPassword(user, pass.PasswordHash, newPassword) == PasswordVerificationResult.Success)
+                {
+                    result.AddError(BusinessRuleCodes.PasswordUsedBefore); // stored pass hash same as new password meaning used before
+                    return result;
+                }
+            }
+
+            var previousPassword = new PreviousPassword
+            {
+                PasswordHash = user.PasswordHash!,
+                UserId = user.Id,
+            };
+            await _unitOfWork.Repository<PreviousPassword>().AddAsync(previousPassword);
+
+            user.PasswordCreatedAt = DateTime.UtcNow;
+            var changeResult = await _userManager.ChangePasswordAsync(user, password, newPassword);
+            if (!changeResult.Succeeded)
+            {
+                foreach (var err in changeResult.Errors)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, $"Code: ${err.Code} Description: ${err.Description}");
+                }
+                return result;
+            }
+
+            result.Succeeded = true;
             return result;
         }
     }

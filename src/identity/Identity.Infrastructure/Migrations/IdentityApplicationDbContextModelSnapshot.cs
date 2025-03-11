@@ -127,6 +127,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("OTPAuthEnabled")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("PasswordCreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -402,6 +405,29 @@ namespace Identity.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("PhoneConfirmationAttempts");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.PreviousPassword", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PreviousPasswords");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.SecurityAudit", b =>
@@ -876,6 +902,17 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Core.Models.PreviousPassword", b =>
+                {
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithMany("PreviousPasswords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Identity.Core.Models.SecurityAudit", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
@@ -1050,6 +1087,8 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("PasswordResetAttempts");
 
                     b.Navigation("PhoneConfirmationAttempts");
+
+                    b.Navigation("PreviousPasswords");
 
                     b.Navigation("SecurityAudits");
 

@@ -24,6 +24,17 @@ namespace Identity.API.Controllers
         private readonly UserMapping userMapping = new();
         private readonly IAuthService _authService = authService;
 
+        [RequireDeviceInformation]
+        [AllowAnonymous]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var result = await _authService.ChangePassword(this.ComposeDeviceInfo(), dto.Email, dto.Password, dto.NewPassword);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok();
+        }
+
         [Authorize]
         [HttpPost("turn-on-totp")]
         public async Task<ActionResult> TurnOnTOTP()

@@ -1,1 +1,50 @@
-<p>phone-confirmation-view works!</p>
+<div class="container">
+  <mat-card appearance="outlined" class="card_container">
+    <mat-card-header>
+      <mat-card-title> Confirm your phone number </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (showEnterPhoneConfirmationCodeInput) {
+      <mat-form-field appearance="fill" class="full">
+        <mat-label>Code</mat-label>
+        <input matInput [formControl]="codeInput" />
+        @if (codeInput.hasError("required")) {
+        <mat-error> Required code</mat-error>
+        }
+      </mat-form-field>
+      } @else {
+      <mat-form-field appearance="fill" class="full">
+        <mat-label>Phone number</mat-label>
+        <input matInput type="number" [formControl]="phoneNumberInput" />
+        @if (phoneNumberInput.hasError("required")) {
+        <mat-error> Required phone number </mat-error>
+        }
+      </mat-form-field>
+      } @if (errorMessage) {
+      <div>
+        {{ errorMessage }}
+      </div>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      @if (showEnterPhoneConfirmationCodeInput) {
+      <button mat-raised-button>Validate code</button>
+      <button mat-raised-button (click)="sendPhoneConfirmation()">
+        Resent code
+      </button>
+      } @else {
+      <button
+        mat-raised-button
+        [disabled]="!phoneNumberInput.valid"
+        (click)="sendPhoneConfirmation()"
+      >
+        @if (isSendPhoneConfirmationRequest) {
+        <span>Sending...</span>
+        } @else {
+        <span>Send</span>
+        }
+      </button>
+      }
+    </mat-card-actions>
+  </mat-card>
+</div>

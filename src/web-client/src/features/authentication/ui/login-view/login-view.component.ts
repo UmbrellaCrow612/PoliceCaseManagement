@@ -74,20 +74,30 @@ export class LoginViewComponent {
         error: (err: HttpErrorResponse) => {
           this.isLoggingIn = false;
 
-          if (
-            err.error[0]?.code == CODES.IncorrectCreds || // we expect these codes
-            err.error[0]?.code == CODES.UserDoseNotExist
-          ) {
-            this.incorrectCredentialsError = true;
-          } else if (err.error[0]?.code == CODES.EmailNotConfirmed) {
-            this.router.navigate([`../${appPaths.CONFIRM_EMAIL}`], {
-              relativeTo: this.route,
-            });
-          } else {
-            let errorMessage = formatBackendError(err);
-            this.dialog.open(ErrorDialogComponent, {
-              data: errorMessage,
-            });
+          let code = err.error[0]?.code;
+
+          switch (code) {
+            case CODES.IncorrectCreds || CODES.UserDoseNotExist:
+              this.incorrectCredentialsError = true;
+              break;
+
+            case CODES.EmailNotConfirmed:
+              this.router.navigate([`../${appPaths.CONFIRM_EMAIL}`], {
+                relativeTo: this.route,
+              });
+              break;
+
+            case CODES.PhoneNumberNotConfirmed:
+              this.router.navigate([`../${appPaths.PHONE_CONFIRMATION}`], {
+                relativeTo: this.route,
+              });
+              break;
+            default:
+              let errorMessage = formatBackendError(err);
+              this.dialog.open(ErrorDialogComponent, {
+                data: errorMessage,
+              });
+              break;
           }
         },
       });

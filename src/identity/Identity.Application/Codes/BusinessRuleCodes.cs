@@ -48,6 +48,16 @@
         /// Indicates that a valid email confirmation attempt already exists, preventing a new request.
         /// </summary>
         public const string ValidEmailConfirmationAttemptExists = "VALID_EMAIL_CONFIRMATION_EXISTS";
+
+        /// <summary>
+        /// Indicates that expired password is being used, informs clients that said password needs to be changed.
+        /// </summary>
+        public const string ExpiredPasswordBeingUsed = "EXPIRED_PASSWORD_BEING_USED";
+
+        /// <summary>
+        /// Indicates that a new password provided has been used beofre on this account, meaning it should be changed.
+        /// </summary>
+        public const string PasswordUsedBefore = "PASSWORD_USED_BEFORE";
         #endregion
 
         #region Phone Verification
