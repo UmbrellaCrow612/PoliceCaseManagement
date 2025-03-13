@@ -5,6 +5,10 @@ import CookieNames from '../../../browser/cookie/constants/names';
 import { BaseService } from '../../../http/services/BaseService.service';
 import { HttpClient } from '@angular/common/http';
 import env from '../../../../environments/environment';
+import {
+  SendDeviceChallengeAttemptRequestBody,
+  ValidateDeviceChallengeCode,
+} from '../type';
 
 @Injectable({
   providedIn: 'root',
@@ -22,10 +26,17 @@ export class DeviceService extends BaseService {
     super(http);
   }
 
-  SendDeviceChallengeAttempt(email: string | null) {
+  SendDeviceChallengeAttempt(body: SendDeviceChallengeAttemptRequestBody) {
     return this.post(
-      `${this.BASE_URL}/authentication/resend-user-device-challenge`,
-      { email: email }
+      `${this.BASE_URL}/authentication/send-user-device-challenge`,
+      body
+    );
+  }
+
+  ValidateDeviceChallengeCode(body: ValidateDeviceChallengeCode) {
+    return this.post(
+      `${this.BASE_URL}/authentication/validate-user-device-challenge`,
+      body
     );
   }
 

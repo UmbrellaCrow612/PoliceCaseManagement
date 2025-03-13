@@ -28,14 +28,17 @@
     </mat-card-content>
     <mat-card-actions>
       @if (showEnterPhoneConfirmationCodeInput) {
-      <button mat-raised-button>Validate code</button>
+      <button mat-raised-button (click)="validateCode()" [disabled]="!codeInput.valid">Validate code</button>
       <button mat-raised-button (click)="sendPhoneConfirmation()">
         Resent code
+      </button>
+      <button mat-raised-button (click)="changePhoneNumber()">
+        Change number
       </button>
       } @else {
       <button
         mat-raised-button
-        [disabled]="!phoneNumberInput.valid"
+        [disabled]="!phoneNumberInput.valid || isSendPhoneConfirmationRequest"
         (click)="sendPhoneConfirmation()"
       >
         @if (isSendPhoneConfirmationRequest) {

@@ -27,6 +27,12 @@
           <mat-error>Email address required</mat-error>
           }
         </mat-form-field>
+
+        @if (errorMessage) {
+        <span>{{ errorMessage }}</span>
+        } @if (successfullySentDeviceChallenge) {
+        <span> Sent device challenge </span>
+        }
       </mat-card-content>
       <mat-card-actions align="end">
         <button

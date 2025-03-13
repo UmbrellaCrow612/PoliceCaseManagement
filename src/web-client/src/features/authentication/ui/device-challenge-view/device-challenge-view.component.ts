@@ -16,6 +16,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
+import { SendDeviceChallengeAttemptRequestBody } from '../../../../core/user/device/type';
+import { HttpErrorResponse } from '@angular/common/http';
+import CODES from '../../../../core/server-responses/codes';
+import { appPaths } from '../../../../core/app/constants/appPaths';
 
 @Component({
   selector: 'app-device-challenge-view',
@@ -35,7 +39,6 @@ import formatBackendError from '../../../../core/server-responses/errors/utils/f
 export class DeviceChallengeViewComponent {
   constructor(
     private deviceService: DeviceService,
-    private snackBar: MatSnackBar,
     private router: Router,
     private active: ActivatedRoute
   ) {}
@@ -44,29 +47,59 @@ export class DeviceChallengeViewComponent {
   deviceChallengeForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
+  errorMessage: string | null = null;
+  successfullySentDeviceChallenge = false;
 
   onSubmit() {
     if (this.deviceChallengeForm.valid) {
       this.isSendingRequestInProgress = true;
-      this.deviceService
-        .SendDeviceChallengeAttempt(
-          this.deviceChallengeForm.controls.email.value
-        )
-        .subscribe({
-          next: (res) => {
-            this.isSendingRequestInProgress = false;
-            this.router.navigate(['../confirm-device-challenge'], {
-              relativeTo: this.active,
-            });
-          },
-          error: (err) => {
-            this.isSendingRequestInProgress = false;
-            const errorMessage = formatBackendError(err);
-            this.snackBar.open(errorMessage, 'Close', {
-              duration: 5000,
-            });
-          },
-        });
+      this.successfullySentDeviceChallenge = false;
+      this.errorMessage = null;
+
+      let body: SendDeviceChallengeAttemptRequestBody = {
+        email: this.deviceChallengeForm.controls.email.getRawValue()!,
+      };
+
+      this.deviceService.SendDeviceChallengeAttempt(body).subscribe({
+        next: () => {
+          this.isSendingRequestInProgress = false;
+          this.router.navigate(['../confirm-device-challenge'], {
+            relativeTo: this.active,
+            queryParams: {
+              email: this.deviceChallengeForm.controls.email.getRawValue()!,
+            },
+            queryParamsHandling: 'merge',
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isSendingRequestInProgress = false;
+
+          let code = err.error[0]?.code;
+
+          switch (code) {
+            case CODES.DEVICE_ALREADY_TRUSTED:
+              this.router.navigate([`../${appPaths.LOGIN}`], {
+                relativeTo: this.active,
+              });
+              break;
+
+            case CODES.USER_DOES_NOT_EXIST:
+              this.successfullySentDeviceChallenge = true;
+              break;
+
+            case CODES.VALID_DEVICE_CONFIRMATION_EXISTS:
+              this.errorMessage = 'Valid attempt sent wait for 2 minutes';
+              break;
+
+            case CODES.DEVICE_NOT_CONFIRMED:
+              this.errorMessage = "Couldn't register device for registration";
+              break;
+
+            default:
+              break;
+          }
+        },
+      });
     }
   }
 }

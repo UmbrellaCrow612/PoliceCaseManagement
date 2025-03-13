@@ -939,7 +939,7 @@ namespace Identity.Application.Implamentations
 
             var attempt = new UserDeviceChallengeAttempt
             {
-                Code = Guid.NewGuid().ToString(),
+                Code = Guid.NewGuid().ToString()[..8].ToUpper(),
                 Email = user.Email!,
                 UserDeviceId = device.Id,
                 UserId = user.Id,

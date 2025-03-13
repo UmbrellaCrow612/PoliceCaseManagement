@@ -16,6 +16,8 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { ErrorDialogComponent } from '../../../../core/components/error-dialog/error-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { appPaths } from '../../../../core/app/constants/appPaths';
 
 @Component({
   selector: 'app-confirm-email-view',
@@ -32,7 +34,9 @@ import { MatDialog } from '@angular/material/dialog';
 export class ConfirmEmailViewComponent {
   constructor(
     private authService: AuthenticationService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router,
+    private active: ActivatedRoute
   ) {}
   isSendingRequest = false;
   errorMessage: string | null = '';
@@ -63,18 +67,29 @@ export class ConfirmEmailViewComponent {
 
           let code = error.error[0]?.code;
 
-          if (code === CODES.VALID_EMAIL_CONFIRMATION_EXISTS) {
-            this.errorMessage = 'Valid email attempt sent wait for 2 minutes';
-            return;
+          switch (code) {
+            case CODES.USER_DOES_NOT_EXIST:
+              this.sentEmailConfirmationSuccessfully = true;
+              break;
+
+            case CODES.VALID_EMAIL_CONFIRMATION_EXISTS:
+              this.errorMessage = 'Valid email attempt sent wait for 2 minutes';
+              break;
+
+            case CODES.EMAIL_ALREADY_CONFIRMED:
+              this.router.navigate([`../${appPaths.LOGIN}`], {
+                relativeTo: this.active,
+              });
+              break;
+
+            default:
+              this.dialog.open(ErrorDialogComponent, {
+                data: `Unhandled error occurred ${JSON.stringify(
+                  error.error
+                )} `,
+              });
+              break;
           }
-
-          let errMessage = `Status: ${error.status} codes: ${JSON.stringify(
-            error.error
-          )}`;
-
-          this.dialog.open(ErrorDialogComponent, {
-            data: errMessage,
-          });
         },
       });
     }

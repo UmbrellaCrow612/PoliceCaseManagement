@@ -1,18 +1,48 @@
 <div class="container">
-  <form class="card">
-    <mat-card appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>Confirm your device</mat-card-title>
-        <mat-card-subtitle>Enter the code you received</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-actions class="btns">
-        <button mat-button [disabled]="true" mat-raised-button type="button">
-          Resend code
-        </button>
-        <button mat-button [disabled]="true" mat-raised-button type="submit">
-          Confirm
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </form>
+  <mat-card appearance="outlined" class="card">
+    <mat-card-header>
+      <mat-card-title>Confirm your device</mat-card-title>
+      <mat-card-subtitle>Enter the code you received</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill" class="full">
+        <mat-label>Code</mat-label>
+        <input matInput [formControl]="codeInput" />
+        <mat-hint>Enter the code you received </mat-hint>
+        @if (codeInput.hasError("required")) {
+        <mat-error> Required </mat-error>
+        }
+      </mat-form-field>
+
+      @if (errorMessage) {
+      <span class="error_message">
+        {{ errorMessage }}
+      </span>
+      }
+    </mat-card-content>
+    <mat-card-actions class="btns">
+      <button
+        mat-button
+        [disabled]="!codeInput.valid"
+        mat-raised-button
+        type="button"
+        (click)="confirmCode()"
+      >
+        Confirm
+      </button>
+      <button
+        mat-button
+        [disabled]="isResendCodeButtonDisabled"
+        mat-raised-button
+        type="button"
+        (click)="resendCode()"
+      >
+        @if (isResendCodeButtonDisabled) {
+        <span>Wait for {{ countDown }} seconds</span>
+        } @else {
+        <span>Resend Code</span>
+        }
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>

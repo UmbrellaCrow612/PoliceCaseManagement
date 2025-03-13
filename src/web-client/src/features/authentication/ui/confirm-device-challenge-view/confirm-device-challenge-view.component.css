@@ -8,6 +8,19 @@
   background-color: #e8f1fa; /* Light blue background */
 }
 
+.full {
+  width: 100%;
+}
+
+.error_message {
+  padding: 10px;
+  color: red;
+}
+
+.content {
+  padding: 10px;
+}
+
 .card {
   width: 90%;
   max-width: 500px;

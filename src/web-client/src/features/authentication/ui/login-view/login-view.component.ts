@@ -68,7 +68,7 @@ export class LoginViewComponent {
           this.isLoggingIn = false;
           this.router.navigate(['../two-factor'], {
             relativeTo: this.route,
-            queryParams: { loginAttemptId: config.id },
+            queryParams: { loginAttemptId: config.loginAttemptId },
           });
         },
         error: (err: HttpErrorResponse) => {
@@ -89,6 +89,12 @@ export class LoginViewComponent {
 
             case CODES.PhoneNumberNotConfirmed:
               this.router.navigate([`../${appPaths.PHONE_CONFIRMATION}`], {
+                relativeTo: this.route,
+              });
+              break;
+
+            case CODES.DEVICE_NOT_CONFIRMED:
+              this.router.navigate([`../${appPaths.DEVICE_CHALLENGE}`], {
                 relativeTo: this.route,
               });
               break;

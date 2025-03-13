@@ -9,6 +9,7 @@ import {
   SendEmailConfirmationRequest,
   SendEmailConfirmationCodeRequest,
   SendPhoneConfirmationRequest,
+  ValidatePhoneConfirmationCodeRequestBody,
 } from '../types';
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -61,6 +62,19 @@ export class AuthenticationService extends BaseService {
   SendPhoneConfirmation(body: SendPhoneConfirmationRequest) {
     return this.post(
       `${this.BASE_URL}/authentication/send-phone-confirmation`,
+      body
+    );
+  }
+
+  /**
+   * Used to send the code sent to users device which they type into a field - this is used to confirm there phone number
+   * using said code attempt
+   */
+  ValidatePhoneConfirmationCode(
+    body: ValidatePhoneConfirmationCodeRequestBody
+  ) {
+    return this.post(
+      `${this.BASE_URL}/authentication/validate-phone-confirmation`,
       body
     );
   }

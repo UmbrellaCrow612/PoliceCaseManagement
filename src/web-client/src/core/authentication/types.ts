@@ -35,7 +35,7 @@ export interface JwtPayload {
  * Represents the standard response you receive after a successful login
  */
 export interface LoginResponse {
-  id: string;
+  loginAttemptId: string;
 }
 
 export interface SmsCodeRequest {
@@ -58,4 +58,9 @@ export interface SendEmailConfirmationCodeRequest {
 
 export interface SendPhoneConfirmationRequest {
   phoneNumber: string;
+}
+
+export interface ValidatePhoneConfirmationCodeRequestBody {
+  phoneNumber: string;
+  code: string;
 }
