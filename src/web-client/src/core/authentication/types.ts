@@ -38,12 +38,12 @@ export interface LoginResponse {
   loginAttemptId: string;
 }
 
-export interface SmsCodeRequest {
+export interface SendTwoFactorSmsCodeRequestBody {
   loginAttemptId: string;
-  code: string | null | undefined;
 }
 
-export interface SmsCodeResponse {
+export interface ValidateTwoFactorSmsCodeRequestBody {
+  loginAttemptId: string;
   code: string;
 }
 

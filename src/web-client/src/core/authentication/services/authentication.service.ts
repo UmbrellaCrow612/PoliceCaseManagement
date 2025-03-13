@@ -4,12 +4,12 @@ import { BaseService } from '../../http/services/BaseService.service';
 import {
   LoginResponse,
   LoginCredentials,
-  SmsCodeRequest,
-  SmsCodeResponse,
   SendEmailConfirmationRequest,
   SendEmailConfirmationCodeRequest,
   SendPhoneConfirmationRequest,
   ValidatePhoneConfirmationCodeRequestBody,
+  SendTwoFactorSmsCodeRequestBody,
+  ValidateTwoFactorSmsCodeRequestBody,
 } from '../types';
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -34,17 +34,17 @@ export class AuthenticationService extends BaseService {
     return this.post(`${this.BASE_URL}/authentication/login`, credentials);
   }
 
-  SendSmsCode(details: SmsCodeRequest): Observable<SmsCodeResponse> {
+  SendTwoFactorSmsCode(body: SendTwoFactorSmsCodeRequestBody) {
     return this.post(
-      `${this.BASE_URL}/authentication/resend-two-factor-sms-authentication`,
-      details
+      `${this.BASE_URL}/authentication/send-two-factor-sms`,
+      body
     );
   }
 
-  ValidateSmsCode(details: SmsCodeRequest): Observable<SmsCodeResponse> {
+  ValidateTwoFactorSmsCode(body: ValidateTwoFactorSmsCodeRequestBody) {
     return this.post(
-      `${this.BASE_URL}/authentication/validate-two-factor-sms-authentication`,
-      details
+      `${this.BASE_URL}/authentication/validate-two-factor-sms`,
+      body
     );
   }
 

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
@@ -13,9 +12,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { SmsCodeRequest } from '../../../../core/authentication/types';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
+import { appPaths } from '../../../../core/app/constants/appPaths';
+import {
+  SendTwoFactorSmsCodeRequestBody,
+  ValidateTwoFactorSmsCodeRequestBody,
+} from '../../../../core/authentication/types';
+import { HttpErrorResponse } from '@angular/common/http';
+import CODES from '../../../../core/server-responses/codes';
+import { interval, Subscription, timer } from 'rxjs';
 
 @Component({
   selector: 'app-two-factor-sms-view',
@@ -39,96 +44,134 @@ export class TwoFactorSmsViewComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
-  resendCount = 1;
+  loginAttemptId: string | null = null;
+  codeInput = new FormControl(null, {
+    validators: [Validators.required],
+  });
+  disableConfirmButton = false;
+  disableResendCodeButton = false;
+  countDown = 60;
+  countDownSub: null | Subscription = null;
 
   ngOnInit(): void {
-    this.sendCode();
-    this.startCountdown();
-  }
+    this.active.queryParamMap.subscribe((val) => {
+      this.loginAttemptId = val.get('loginAttemptId');
 
-  private sendCode() {
-    this.SmsCodeRequest.loginAttemptId =
-      this.active.snapshot.queryParams['loginAttemptId'];
-
-    if (
-      typeof this.SmsCodeRequest.loginAttemptId !== 'string' ||
-      this.SmsCodeRequest.loginAttemptId.trim() === ''
-    ) {
-      this.router.navigate(['../../login'], { relativeTo: this.active });
-      return;
-    }
-
-    this.authService.SendSmsCode(this.SmsCodeRequest).subscribe({
-      next: (config) => {
-        console.log(`SMS code sent successfully code : ${config.code}`);
-      },
-      error: (err) => {
-        let errorMessage = formatBackendError(err);
-        this.snackBar.open(errorMessage, 'close', { duration: 7000 });
-      },
+      if (!this.loginAttemptId) {
+        this.router.navigate([`../../${appPaths.LOGIN}`], {
+          relativeTo: this.active,
+        });
+      }
     });
+    this.sendCode();
   }
 
-  isResendDisabled = true;
-  countdown = 60;
-  private countdownInterval: any;
+  sendCode() {
+    if (this.loginAttemptId) {
+      this.countDown = 60;
 
-  resendCode() {
-    this.resendCount += 1;
+      this.disableResendCodeButton = true;
 
-    if (this.resendCount > 3) {
-      this.snackBar.open('Limit reached. Redirecting to login...', 'Close', {
-        duration: 4000,
-        horizontalPosition: 'center',
+      this.countDownSub = interval(1000).subscribe(() => {
+        this.countDown--;
       });
 
-      setTimeout(() => {
-        this.router.navigate(['/authentication/login']);
-      }, 4000);
+      timer(60000).subscribe(() => {
+        this.disableResendCodeButton = false;
+        if (this.countDownSub) {
+          this.countDownSub.unsubscribe();
+        }
+      });
+
+      let body: SendTwoFactorSmsCodeRequestBody = {
+        loginAttemptId: this.loginAttemptId,
+      };
+
+      this.authService.SendTwoFactorSmsCode(body).subscribe({
+        next: () => {
+          this.snackBar.open('Sms code sent', 'Close', {
+            duration: 4500,
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          let code = err.error[0]?.code;
+
+          switch (code) {
+            case CODES.LOGIN_ATTEMPT_NOT_VALID:
+              this.router.navigate([`../../${appPaths.LOGIN}`], {
+                relativeTo: this.active,
+              });
+              break;
+
+            case CODES.USER_DOES_NOT_EXIST:
+              this.router.navigate([`../../${appPaths.LOGIN}`], {
+                relativeTo: this.active,
+              });
+              break;
+
+            case CODES.PHONE_NOT_CONFIRMED:
+              this.router.navigate([`../../${appPaths.PHONE_CONFIRMATION}`], {
+                relativeTo: this.active,
+              });
+              break;
+
+            case CODES.VALID_TWO_FACTOR_SMS_ATTEMPT_EXISTS:
+              this.snackBar.open(
+                'Valid two factor code sent, wait for 2 minutes to send a new one',
+                'Close',
+                {
+                  duration: 5000,
+                }
+              );
+              break;
+
+            default:
+              this.snackBar.open(`Unhandled error ${err.error}`, 'Close', {
+                duration: 10000,
+              });
+              break;
+          }
+        },
+      });
     }
-    this.sendCode();
-    this.isResendDisabled = true;
-    this.countdown = 60;
-    this.startCountdown();
   }
 
-  startCountdown() {
-    this.countdownInterval = setInterval(() => {
-      if (this.countdown > 0) {
-        this.countdown--;
-      } else {
-        this.isResendDisabled = false;
-        clearInterval(this.countdownInterval);
-      }
-    }, 1000);
-  }
+  validateCode() {
+    if (this.codeInput.valid) {
+      this.disableConfirmButton = true;
 
-  ngOnDestroy() {
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
-  }
-
-  SmsCodeRequest: SmsCodeRequest = {
-    loginAttemptId: '',
-    code: '',
-  };
-
-  smsForm = new FormGroup({
-    code: new FormControl('', [Validators.required]),
-  });
-
-  onSubmit() {
-    if (this.smsForm.valid) {
-      this.SmsCodeRequest.code = this.smsForm.get('code')?.value;
-
-      this.authService.ValidateSmsCode(this.SmsCodeRequest).subscribe({
-        next: (config) => {
+      let body: ValidateTwoFactorSmsCodeRequestBody = {
+        loginAttemptId: this.loginAttemptId!,
+        code: this.codeInput.getRawValue()!,
+      };
+      this.authService.ValidateTwoFactorSmsCode(body).subscribe({
+        next: () => {
           this.router.navigate(['/']);
         },
-        error: (err) => {
-          let errorMessage = formatBackendError(err);
-          this.snackBar.open(errorMessage, 'close', { duration: 7000 });
+        error: (err: HttpErrorResponse) => {
+          this.disableConfirmButton = false;
+
+          let code = err.error[0]?.code;
+
+          switch (code) {
+            case CODES.LOGIN_ATTEMPT_NOT_VALID:
+              this.router.navigate([`../../../${appPaths.LOGIN}`]);
+              break;
+
+            case CODES.USER_DOES_NOT_EXIST:
+              this.router.navigate([`../../../${appPaths.LOGIN}`]);
+              break;
+
+            case CODES.TWO_FACTOR_SMS_ATTEMPT_INVALID:
+              this.snackBar.open('Incorrect code', 'close', {
+                duration: 5500,
+              });
+              break;
+
+            default:
+              this.snackBar.open(`Unhandled error: ${err.error}`);
+              break;
+          }
         },
       });
     }

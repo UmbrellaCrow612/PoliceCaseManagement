@@ -238,7 +238,7 @@ namespace Identity.Application.Implamentations
 
             var twoFactorSmsAttempt = new TwoFactorSmsAttempt
             {
-                Code = Guid.NewGuid().ToString()[..5],
+                Code = Guid.NewGuid().ToString()[..8].ToUpper(),
                 LoginAttemptId = loginAttemptId,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.TwoFactorSmsTime),
                 PhoneNumber = user.PhoneNumber!,

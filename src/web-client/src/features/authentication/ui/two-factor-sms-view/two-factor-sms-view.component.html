@@ -1,25 +1,36 @@
 <div class="container">
-  <form [formGroup]="smsForm" (ngSubmit)="onSubmit()">
-    <mat-card appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>SMS Code</mat-card-title>
-        <mat-card-subtitle
-          >Enter the code sent to your phone number</mat-card-subtitle
-        >
-      </mat-card-header>
-      <mat-card-content class="card-content">
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Code</mat-label>
-          <input matInput formControlName="code" class="full-width" />
-          @if (smsForm.controls.code.hasError("required")) {
-          <mat-error>Code is required</mat-error>
-          }
-        </mat-form-field>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button type="button" (click)="resendCode()" [disabled]="isResendDisabled"> {{ countdown > 0 ? countdown : 'Resend Code' }}</button>
-        <button mat-button [disabled]="smsForm.invalid">Submit</button>
-      </mat-card-actions>
-    </mat-card>
-  </form>
+  <mat-card appearance="outlined" class="card">
+    <mat-card-header>
+      <mat-card-title> Enter SMS code </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill" class="full">
+        <mat-label>Enter SMS code</mat-label>
+        <input matInput [formControl]="codeInput" />
+        @if (codeInput.hasError("required")) {
+        <mat-error> Required </mat-error>
+        }
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions class="space_btns">
+      <button
+        mat-raised-button
+        (click)="validateCode()"
+        [disabled]="!codeInput.valid || disableConfirmButton"
+      >
+        Confirm
+      </button>
+      <button
+        mat-raised-button
+        (click)="sendCode()"
+        [disabled]="disableResendCodeButton"
+      >
+        @if (disableResendCodeButton) {
+        <span>Wait for {{ countDown }} to resend code</span>
+        } @else {
+        <span>Resend code</span>
+        }
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>

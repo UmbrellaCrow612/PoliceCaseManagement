@@ -2,14 +2,22 @@
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.card-content {
-  padding: 1em;
-}
-
-.full-width {
+.full {
   width: 100%;
+  padding: 10px;
+}
+
+.card {
+  width: 100%;
+  max-width: 600px;
+}
+
+.space_btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
