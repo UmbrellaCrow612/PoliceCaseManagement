@@ -23,6 +23,7 @@ export class BaseService {
       .get<T>(url, {
         params: params,
         headers: headers,
+        withCredentials: true
       })
   }
 

@@ -13,7 +13,6 @@ import {
 } from '../types';
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { JwtService } from './jwt.service';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -24,7 +23,6 @@ export class AuthenticationService extends BaseService {
 
   constructor(
     protected override http: HttpClient,
-    private jwtService: JwtService,
     private router: Router
   ) {
     super(http);
@@ -80,7 +78,6 @@ export class AuthenticationService extends BaseService {
   }
 
   Logout() {
-    this.jwtService.clearTokens();
     this.router.navigate(['/authentication/login']);
   }
 }

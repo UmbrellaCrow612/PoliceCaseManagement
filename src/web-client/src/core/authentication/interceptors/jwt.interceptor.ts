@@ -9,10 +9,11 @@ export function JwtInterceptor(
 ): Observable<HttpEvent<unknown>> {
   var jwtService = inject(JwtService);
 
-  var token = jwtService.getRawJwtToken();
-
+  /**
+   * TODO add append raw token value from cookie
+   */
   const newReq = req.clone({
-    headers: req.headers.append('Authorization', `Bearer ${token}`),
+    headers: req.headers.append('Authorization', `Bearer `),
   });
 
   return next(newReq);

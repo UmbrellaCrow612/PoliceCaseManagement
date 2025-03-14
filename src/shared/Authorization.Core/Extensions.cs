@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -37,7 +38,21 @@ namespace Authorization.Core
 
                             ClockSkew = TimeSpan.Zero
                         };
+
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = context =>
+                            {
+                                if (context.Request.Cookies.TryGetValue(CookieNamesConstant.JWT, out var token))
+                                {
+                                    context.Token = token;
+                                }
+                                return Task.CompletedTask;
+                            }
+                        };
                     });
+
 
             return services;
         }

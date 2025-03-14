@@ -2,7 +2,6 @@
 using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
-using Identity.API.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -227,13 +226,19 @@ namespace Identity.API.Controllers
             return Ok(returnDto);
         }
 
-        [RequireDeviceInformation]
         [Authorize]
-        [HttpPost("refresh-token")]
-        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        [RequireDeviceInformation]
+        [HttpGet("refresh-token")]
+        public async Task<ActionResult> RefreshToken()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+            Request.Cookies.TryGetValue(CookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return Unauthorized("Refresh cookie missing");
+            }
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -245,7 +250,7 @@ namespace Identity.API.Controllers
                 return Unauthorized("Jti ID not found in token.");
             }
 
-            var result = await _authService.RefreshTokensAsync(userId, tokenId, dto.RefreshToken, this.ComposeDeviceInfo());
+            var result = await _authService.RefreshTokensAsync(userId, tokenId, refreshToken, this.ComposeDeviceInfo());
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt

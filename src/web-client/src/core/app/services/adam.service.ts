@@ -22,7 +22,7 @@ export class AdamService {
    * Initializes the application-wide logic or state.
    */
   initialize() {
-    this.jwtService.StartTokenValidationThroughoutLifetime();
+    this.jwtService.startTokenValidationThroughoutLifeTimeOfApp()
     this.deviceService.GetDeviceFingerPrint();
   }
 
@@ -30,6 +30,6 @@ export class AdamService {
    * Destroy the application-wide logic or state.
    */
   destroy() {
-    this.jwtService.DestroyAndStop();
+    this.jwtService.stopTokenValidationThroughoutLifeTimeOfApp()
   }
 }
