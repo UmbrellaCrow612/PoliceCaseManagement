@@ -1,0 +1,16 @@
+<button
+  mat-icon-button
+  [matMenuTriggerFor]="profileMenu"
+  aria-label="Example icon-button with a menu"
+>
+  <mat-icon>person</mat-icon>
+</button>
+<mat-menu #profileMenu="matMenu">
+  @for (link of links; track $index) { @if
+  (hasRequiredRole(link.authorizedRoles, ROLES)) {
+  <a mat-menu-item [routerLink]="link.href">
+    <mat-icon>{{ link.iconName }}</mat-icon>
+    <span>{{ link.name }} </span>
+  </a>
+  } }
+</mat-menu>

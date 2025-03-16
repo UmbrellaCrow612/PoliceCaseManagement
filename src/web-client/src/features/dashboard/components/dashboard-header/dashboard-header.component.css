@@ -44,9 +44,3 @@
 .header_link.active {
   color: #0f172a;
 }
-
-@media (max-width: 1100px) {
-  .links_container {
-    display: none;
-  }
-}

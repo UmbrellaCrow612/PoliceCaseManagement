@@ -3,15 +3,20 @@
     <mat-icon
       aria-hidden="false"
       aria-label="Shied icon"
-      fontIcon="shield"
+      fontIcon="dashboard"
     ></mat-icon>
     <a [routerLink]="dashboardUrl"> Dashboard </a>
   </div>
 
+  @if (windowWidth > 1200) {
+  <!-- Doing it this way to actually remove the HTML from DOM-->
   <div class="links_container">
     @for (link of links; track $index) { @if
     (hasRequiredRole(link.authorizedRoles, ROLES)) {
     <a [routerLink]="link.href" class="header_link"> {{ link.name }} </a>
     } }
   </div>
+  }
+
+  <app-dashboard-profile></app-dashboard-profile>
 </div>
