@@ -1,12 +1,9 @@
-import { CookieService } from './../../browser/cookie/services/cookie.service';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../../http/services/BaseService.service';
 import { Subscription, timer } from 'rxjs';
 import env from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import CookieNames from '../../browser/cookie/constants/names';
 import { AuthenticationService } from './authentication.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -14,9 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class JwtService extends BaseService {
   constructor(
     httpClient: HttpClient,
-    private authService: AuthenticationService,
-    private router: Router,
-    private active: ActivatedRoute
+    private authService: AuthenticationService
   ) {
     super(httpClient);
   }

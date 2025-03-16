@@ -19,12 +19,11 @@ export class BaseService {
     params?: HttpParams | { [param: string]: string | string[] },
     headers?: HttpHeaders | { [header: string]: string | string[] }
   ): Observable<T> {
-    return this.http
-      .get<T>(url, {
-        params: params,
-        headers: headers,
-        withCredentials: true
-      })
+    return this.http.get<T>(url, {
+      params: params,
+      headers: headers,
+      withCredentials: true,
+    });
   }
 
   /**
@@ -40,7 +39,7 @@ export class BaseService {
   ): Observable<T> {
     return this.http.post<T>(url, body, {
       headers,
-      withCredentials: true, 
+      withCredentials: true,
     });
   }
 
@@ -55,8 +54,7 @@ export class BaseService {
     body: any,
     headers?: HttpHeaders | { [header: string]: string | string[] }
   ): Observable<T> {
-    return this.http
-      .put<T>(url, body, { headers })
+    return this.http.put<T>(url, body, { headers });
   }
 
   /**
@@ -70,10 +68,10 @@ export class BaseService {
     params?: HttpParams | { [param: string]: string | string[] },
     headers?: HttpHeaders | { [header: string]: string | string[] }
   ): Observable<T> {
-    return this.http
-      .delete<T>(url, {
-        params: params,
-        headers: headers,
-      })
+    return this.http.delete<T>(url, {
+      params: params,
+      headers: headers,
+      withCredentials: true,
+    });
   }
 }

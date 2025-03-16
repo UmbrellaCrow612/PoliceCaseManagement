@@ -51,11 +51,6 @@ namespace Identity.Application.Implamentations
             return new Tokens { JwtBearerToken = jwtBearerAcessToken, RefreshToken = refreshToken };
         }
 
-        private async Task<ApplicationUser?> GetUserByIdAsync(string userId)
-        {
-            return await _userManager.FindByIdAsync(userId);
-        }
-
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
             _logger.LogInformation("Login attempt started for email: {Email} from IP: {IpAddress}", email, deviceInfo.IpAddress);
@@ -1241,6 +1236,19 @@ namespace Identity.Application.Implamentations
 
             result.Succeeded = true;
             return result;
+        }
+
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<ICollection<string>> GetUserRolesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return [];
+
+            return await _userManager.GetRolesAsync(user);
         }
     }
 }

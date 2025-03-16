@@ -12,12 +12,14 @@ namespace Identity.API.Extensions
         /// </summary>
         public static void SetAuthCookies(this ControllerBase controller, Tokens tokens, JwtBearerOptions options)
         {
+
             controller.Response.Cookies.Append(CookieNamesConstant.JWT, tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true, 
                 SameSite =  SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(options.ExpiresInMinutes)
+                Expires = DateTime.UtcNow.AddMinutes(options.ExpiresInMinutes),
+                IsEssential = true,
             });
 
             controller.Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, tokens.RefreshToken, new CookieOptions
@@ -25,7 +27,8 @@ namespace Identity.API.Extensions
                 HttpOnly = true,
                 Secure = true,  
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(options.RefreshTokenExpiriesInMinutes)
+                Expires = DateTime.UtcNow.AddMinutes(options.RefreshTokenExpiriesInMinutes),
+                IsEssential = true,
             });
 
 

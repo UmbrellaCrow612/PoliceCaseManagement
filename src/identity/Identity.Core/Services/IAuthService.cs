@@ -64,6 +64,10 @@ namespace Identity.Core.Services
         Task<TurnOnMagicLinkResult> TurnOnMagicLink(string userId);
 
         Task<RegisterUserResult> RegisterUserAsync(ApplicationUser userToCreate, string password);
+
+        Task<ApplicationUser?> GetUserByIdAsync(string userId);
+
+        Task<ICollection<string>> GetUserRolesAsync(string userId);
     }
 
     public class AuthError : IServiceError

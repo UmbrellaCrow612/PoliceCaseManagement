@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { appPaths } from '../../core/app/constants/appPaths';
+import { rolesAuthorizationGuard } from '../../core/authentication/guards/roles-authorization.guard';
+import { UserRoles } from '../../core/authentication/roles';
 
 export const AUTHENTICATION_ROUTES: Routes = [
   {
@@ -78,5 +80,16 @@ export const AUTHENTICATION_ROUTES: Routes = [
       import('./ui/two-factor-totpview/two-factor-totpview.component').then(
         (c) => c.TwoFactorTOTPViewComponent
       ),
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./ui/login-view/login-view.component').then(
+        (c) => c.LoginViewComponent
+      ),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [UserRoles.Admin],
+    },
   },
 ];

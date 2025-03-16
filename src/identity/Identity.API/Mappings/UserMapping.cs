@@ -11,11 +11,13 @@ namespace Identity.API.Mappings
             return new ApplicationUser { UserName = createDto.UserName, Email = createDto.Email, PhoneNumber = createDto.PhoneNumber };
         }
 
-        public UserDto ToDto(ApplicationUser @base)
+        public UserDto ToDto(ApplicationUser user)
         {
             return new UserDto
             {
-                Id = @base.Id,
+                Id = user.Id,
+                Email= user.Email!,
+                UserName = user.UserName!
             };
         }
 
