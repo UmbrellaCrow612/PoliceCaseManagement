@@ -9,4 +9,11 @@ export const routes: Routes = [
         (m) => m.AUTHENTICATION_ROUTES
       ),
   },
+  {
+    path: appPaths.DASHBOARD,
+    loadChildren: () =>
+      import('../features/dashboard/dashboard.routes').then(
+        (r) => r.DASHBOARD_ROUTES
+      ),
+  },
 ];

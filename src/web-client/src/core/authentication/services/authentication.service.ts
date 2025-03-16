@@ -21,10 +21,7 @@ import { Router } from '@angular/router';
 export class AuthenticationService extends BaseService {
   private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
 
-  constructor(
-    protected override http: HttpClient,
-    private router: Router
-  ) {
+  constructor(protected override http: HttpClient, private router: Router) {
     super(http);
   }
 
@@ -78,6 +75,7 @@ export class AuthenticationService extends BaseService {
   }
 
   Logout() {
+    // todo hit backend logout to remove http only cookies
     this.router.navigate(['/authentication/login']);
   }
 }

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { UserService } from '../../user/services/user.service';
+import { hasRequiredRole } from '../utils';
 
 /**
  * This will make sure:
@@ -46,7 +47,3 @@ export const rolesAuthorizationGuard: CanActivateFn = (route) => {
 
   return true;
 };
-
-function hasRequiredRole(requiredRoles: string[], userRoles: string[]) {
-  return requiredRoles.some((role) => userRoles.includes(role));
-}

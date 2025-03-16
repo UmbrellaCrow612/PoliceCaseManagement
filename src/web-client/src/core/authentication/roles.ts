@@ -2,5 +2,5 @@
  * Backend roles
  */
 export const UserRoles = {
-  Admin: 'admin',
+  Admin: 'Admin',
 } as const;

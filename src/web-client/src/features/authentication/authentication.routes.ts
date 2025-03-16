@@ -81,15 +81,4 @@ export const AUTHENTICATION_ROUTES: Routes = [
         (c) => c.TwoFactorTOTPViewComponent
       ),
   },
-  {
-    path: 'admin',
-    loadComponent: () =>
-      import('./ui/login-view/login-view.component').then(
-        (c) => c.LoginViewComponent
-      ),
-    canActivate: [rolesAuthorizationGuard],
-    data: {
-      requiredRoles: [UserRoles.Admin],
-    },
-  },
 ];

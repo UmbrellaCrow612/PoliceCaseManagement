@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="title_with_icon">
+    <mat-icon
+      aria-hidden="false"
+      aria-label="Shied icon"
+      fontIcon="shield"
+    ></mat-icon>
+    <a [routerLink]="dashboardUrl"> Dashboard </a>
+  </div>
+
+  <div class="links_container">
+    @for (link of links; track $index) { @if
+    (hasRequiredRole(link.authorizedRoles, ROLES)) {
+    <a [routerLink]="link.href" class="header_link"> {{ link.name }} </a>
+    } }
+  </div>
+</div>

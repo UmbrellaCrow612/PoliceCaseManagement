@@ -1,0 +1,15 @@
+@if (isLoading) {
+<div class="dashboard_loading_shell">
+  <mat-spinner></mat-spinner>
+</div>
+} @else {
+<div class="dashboard_shell">
+  <div class="header_shell">
+    <app-dashboard-header></app-dashboard-header>
+  </div>
+  <div class="page_content_shell">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+}

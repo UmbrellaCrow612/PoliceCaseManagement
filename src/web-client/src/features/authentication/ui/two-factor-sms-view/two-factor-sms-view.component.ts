@@ -146,7 +146,7 @@ export class TwoFactorSmsViewComponent implements OnInit {
       };
       this.authService.ValidateTwoFactorSmsCode(body).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          this.router.navigate([`/${appPaths.DASHBOARD}`]);
         },
         error: (err: HttpErrorResponse) => {
           this.disableConfirmButton = false;
