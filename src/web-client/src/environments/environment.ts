@@ -2,7 +2,7 @@ import { LogLevel } from '../core/app/services/loggingService.service';
 
 const env = {
   BaseUrls: {
-    authenticationBaseUrl: 'https://localhost:7058',
+    authenticationBaseUrl: 'http://localhost:5185',
   },
   JwtTokenValidationPeriodInMinutes: 3 * 60 * 1000,
   LogLevel: LogLevel.Error,

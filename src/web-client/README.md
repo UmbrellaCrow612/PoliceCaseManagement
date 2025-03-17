@@ -1,77 +1,84 @@
-# WebClient
+# Running 
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.1.
+Set up 
 
-## Development server
+To run your Angular frontend over HTTPS locally, you need to set up a self-signed SSL certificate and configure Angular CLI to serve the app over HTTPS.
 
-To start a local development server, run:
+Here’s a step-by-step guide on how to do this:
 
-```bash
-ng serve
-```
+### 1. **Generate a Self-Signed SSL Certificate**
+To serve your Angular app over HTTPS, you'll need a certificate. If you don't already have one, you can generate a self-signed certificate using OpenSSL.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+#### On Windows (using Git Bash or Command Prompt):
+1. Open **Git Bash** or **Command Prompt**.
+2. Run the following commands to generate the SSL certificate and key files:
 
 ```bash
-ng generate component component-name
+openssl genpkey -algorithm RSA -out ssl/private.key
+openssl req -new -key ssl/private.key -out ssl/csr.csr
+openssl x509 -req -in ssl/csr.csr -signkey ssl/private.key -out ssl/certificate.crt
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+This will generate:
+- `ssl/private.key` (the private key)
+- `ssl/certificate.crt` (the certificate)
+
+#### On macOS or Linux:
+1. Open a terminal.
+2. Run the following commands to generate the SSL certificate and key files:
 
 ```bash
-ng generate --help
+mkdir -p ssl
+openssl genpkey -algorithm RSA -out ssl/private.key
+openssl req -new -key ssl/private.key -out ssl/csr.csr
+openssl x509 -req -in ssl/csr.csr -signkey ssl/private.key -out ssl/certificate.crt
 ```
 
-## Building
+### 2. **Configure Angular to Use the SSL Certificate**
+1. Place the `certificate.crt` and `private.key` files in your Angular project folder (e.g., in a folder called `ssl`).
+2. Open your `angular.json` file.
+3. Find the `serve` options under the `architect` configuration of your Angular application.
+4. Modify the `serve` section to include HTTPS configuration:
 
-To build the project run:
+```json
+"options": {
+  "ssl": true,
+  "sslKey": "ssl/private.key",
+  "sslCert": "ssl/certificate.crt",
+  "port": 4200,  // Make sure the port is correct
+  "host": "localhost"
+}
+```
+
+### 3. **Run the Angular App Over HTTPS**
+Now that you've configured Angular CLI to use SSL, you can start your Angular app with HTTPS:
+
+1. Run the following command in your terminal:
 
 ```bash
-ng build
+ng serve --ssl true --ssl-key ssl/private.key --ssl-cert ssl/certificate.crt
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+This will serve your Angular app over HTTPS on `https://localhost:4200`.
 
-## Running unit tests
+### 4. **Trust the Self-Signed Certificate (Optional)**
+Since you’re using a self-signed certificate, your browser might show a warning about the certificate being untrusted. You can either ignore this warning (for development purposes) or manually trust the certificate in your system:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- **On Windows**: Double-click the certificate file (`certificate.crt`) and install it into your trusted root certificates store.
+- **On macOS**: Double-click the certificate file and add it to the keychain as a trusted root certificate.
 
-```bash
-ng test
-```
+### 5. **Verify the Setup**
+Once your Angular app is running, navigate to `https://localhost:4200` in your browser. You should be able to access your Angular app over HTTPS.
 
-## Running end-to-end tests
+### Troubleshooting:
+- **CORS Issues**: If you face CORS issues while communicating with your .NET API, ensure that your API is configured to allow HTTPS and handle cookies appropriately for cross-origin requests.
+- **Certificate Warnings**: If you see certificate warnings in your browser, it's because the certificate is self-signed. You can ignore it for development purposes.
 
-For end-to-end (e2e) testing, run:
+Let me know if you need any further clarification!
 
-```bash
-ng e2e
-```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Then run `npm start`
 
-## Additional Resources
+Issues:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-
-## Run and add docker img
-
-```docker
-docker build -t pcms-WebClient .
-docker run -d -p 80:80 --name pcms-WebClient-container pcms-WebClient
-```
-
-delete old img
-
-```docker
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-```
-
-## Making requests
-
-- Use rxjs `observable` pattern instead of `async` when you can.
+- Use cmd prompt in admin mode and install `choco install openssl`
