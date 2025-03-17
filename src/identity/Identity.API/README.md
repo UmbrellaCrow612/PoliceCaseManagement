@@ -3,8 +3,8 @@ README.md
 # To run app:
 
 - Open terminal in folder `Identity.API`
-- run `dotnet run watch`
-- go to URL defined and `/swagger/index.html` for swagger UI
+- run `dotnet run --launch-profile https`
+- go to URL defined and `/swagger/index.html` for swagger UI for example `https://localhost:7058/swagger/index.html`
 
 
 Problems and solutions:
