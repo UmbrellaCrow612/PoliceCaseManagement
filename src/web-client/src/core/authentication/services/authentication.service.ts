@@ -74,8 +74,16 @@ export class AuthenticationService extends BaseService {
     );
   }
 
+  /**
+   * Hits the backend to remove http cookies and go to login page
+   */
   Logout() {
     // todo hit backend logout to remove http only cookies
     this.router.navigate(['/authentication/login']);
   }
+
+  /**
+   * Helper to navigate to unauthorized page
+   */
+  UnAuthorized() {}
 }

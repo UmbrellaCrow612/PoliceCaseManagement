@@ -247,10 +247,6 @@ namespace Identity.Application.Implamentations
             // use sms service and send it
 
             result.Succeeded = true;
-          
-          #if DEBUG
-            Console.WriteLine("Two factor sms code: " + twoFactorSmsAttempt.Code);
-          #endif
 
             return result;
         }

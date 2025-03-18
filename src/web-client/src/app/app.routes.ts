@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { appPaths } from '../core/app/constants/appPaths';
+import { rolesAuthorizationGuard } from '../core/authentication/guards/roles-authorization.guard';
 
 export const routes: Routes = [
   {
@@ -15,5 +16,9 @@ export const routes: Routes = [
       import('../features/dashboard/dashboard.routes').then(
         (r) => r.DASHBOARD_ROUTES
       ),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [], // Means they have to be at least authenticated
+    },
   },
 ];

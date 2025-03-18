@@ -16,7 +16,10 @@ export class JwtService extends BaseService {
     super(httpClient);
   }
 
-  validationSubscriptionTimer = timer(0, env.JwtTokenValidationPeriodInMinutes);
+  validationSubscriptionTimer = timer(
+    env.JWTTokenValidationInitialWaitTimeInMilliSeconds,
+    env.JwtTokenValidationPeriodInMinutes
+  );
   validationSubscription: null | Subscription = null;
   BASE_URL = env.BaseUrls.authenticationBaseUrl;
 

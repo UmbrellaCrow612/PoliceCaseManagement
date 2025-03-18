@@ -1,3 +1,4 @@
+import { AuthenticationService } from './../services/authentication.service';
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { UserService } from '../../user/services/user.service';
@@ -27,7 +28,10 @@ import { hasRequiredRole } from '../utils';
      },
    },
  */
-export const rolesAuthorizationGuard: CanActivateFn = (route) => {
+export const rolesAuthorizationGuard: CanActivateFn = (
+  route,
+  state
+): boolean => {
   const requiredRoles = route.data['requiredRoles'];
   if (!requiredRoles) {
     console.error('Roles not passed to rolesAuthorizationGuard guard');
@@ -37,11 +41,14 @@ export const rolesAuthorizationGuard: CanActivateFn = (route) => {
   let userService = inject(UserService);
   if (userService.USER === null || userService.ROLES === null) {
     console.log('Current user not authenticated cannot access this route');
+    inject(AuthenticationService).Logout();
     return false;
   }
 
   if (!hasRequiredRole(requiredRoles, userService.ROLES)) {
     console.log('Current user dose not have required roles for this view');
+
+    // TODO go to UnAuthorized page using auth service function
     return false;
   }
 

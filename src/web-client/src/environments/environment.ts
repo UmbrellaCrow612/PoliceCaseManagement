@@ -5,6 +5,7 @@ const env = {
     authenticationBaseUrl: 'https://localhost:7058',
   },
   JwtTokenValidationPeriodInMinutes: 3 * 60 * 1000,
+  JWTTokenValidationInitialWaitTimeInMilliSeconds: 25000,
   LogLevel: LogLevel.Error,
 } as const;
 

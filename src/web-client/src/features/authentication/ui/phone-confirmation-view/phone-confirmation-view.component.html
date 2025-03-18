@@ -15,7 +15,7 @@
       } @else {
       <mat-form-field appearance="fill" class="full">
         <mat-label>Phone number</mat-label>
-        <input matInput type="number" [formControl]="phoneNumberInput" />
+        <input matInput [formControl]="phoneNumberInput" />
         @if (phoneNumberInput.hasError("required")) {
         <mat-error> Required phone number </mat-error>
         }

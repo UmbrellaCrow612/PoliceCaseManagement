@@ -25,7 +25,6 @@ export class AdamService {
    */
   initialize() {
     this.jwtService.startTokenValidationThroughoutLifeTimeOfApp()
-    this.deviceService.GetDeviceFingerPrint();
     this.userService.setCurrentUser()
   }
 
