@@ -25,9 +25,7 @@ export class UserService extends BaseService {
   }
 
   /**
-   * Run at the initialization of the app to set the current user in context so it's values can be accessed across the
-   * application with the USER and ROLES fields as well on successful login when we redirect to x page
-   * call set user there so in the whole app it should be in two places.
+   * Used to set the user in the ctx to access it values and or to see if the current user is authenticated if the user and or roles exists
    */
   setCurrentUser() {
     this.get<FetchUserResponseBody>(`${this.BASE_URL}/users/me`).subscribe({
@@ -39,5 +37,9 @@ export class UserService extends BaseService {
         console.error('Failed to set current user in context');
       },
     });
+  }
+
+  getCurrentUser() {
+    return this.get<FetchUserResponseBody>(`${this.BASE_URL}/users/me`);
   }
 }

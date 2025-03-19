@@ -20,6 +20,5 @@ export class DashboardSkeletonComponent implements OnInit {
     timer(500).subscribe(() => {
       this.isLoading = false;
     });
-    this.userService.setCurrentUser(); // second call now user obj should not be null throughout the app
   }
 }

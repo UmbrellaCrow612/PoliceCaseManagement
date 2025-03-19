@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthenticationService } from '../../authentication/services/authentication.service';
 import { JwtService } from '../../authentication/services/jwt.service';
-import { DeviceService } from '../../user/device/services/device.service';
 import { UserService } from '../../user/services/user.service';
 
 /**
@@ -16,7 +14,6 @@ import { UserService } from '../../user/services/user.service';
 export class AdamService {
   constructor(
     private jwtService: JwtService,
-    private deviceService: DeviceService,
     private userService: UserService
   ) {}
 

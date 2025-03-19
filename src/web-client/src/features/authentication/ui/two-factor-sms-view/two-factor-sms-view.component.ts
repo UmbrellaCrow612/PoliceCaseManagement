@@ -21,6 +21,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { interval, Subscription, timer } from 'rxjs';
+import { UserService } from '../../../../core/user/services/user.service';
 
 @Component({
   selector: 'app-two-factor-sms-view',
@@ -41,7 +42,8 @@ export class TwoFactorSmsViewComponent implements OnInit {
     private router: Router,
     private active: ActivatedRoute,
     private authService: AuthenticationService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private userService: UserService
   ) {}
 
   loginAttemptId: string | null = null;
@@ -146,7 +148,23 @@ export class TwoFactorSmsViewComponent implements OnInit {
       };
       this.authService.ValidateTwoFactorSmsCode(body).subscribe({
         next: () => {
-          this.router.navigate([`/${appPaths.DASHBOARD}`]);
+          this.userService.setCurrentUser();
+          this.userService.getCurrentUser().subscribe({
+            complete: () => {
+              this.router.navigate([`/${appPaths.DASHBOARD}`]);
+            },
+            error: (err: HttpErrorResponse) => {
+              this.snackBar.open(
+                `Failed to set current user context err: ${JSON.stringify(
+                  err
+                )}`,
+                'Close',
+                {
+                  duration: 10000,
+                }
+              );
+            },
+          });
         },
         error: (err: HttpErrorResponse) => {
           this.disableConfirmButton = false;

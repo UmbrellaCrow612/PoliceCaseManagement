@@ -9,10 +9,7 @@ import { AuthenticationService } from './authentication.service';
   providedIn: 'root',
 })
 export class JwtService extends BaseService {
-  constructor(
-    httpClient: HttpClient,
-    private authService: AuthenticationService
-  ) {
+  constructor(httpClient: HttpClient) {
     super(httpClient);
   }
 
@@ -43,7 +40,6 @@ export class JwtService extends BaseService {
           },
           error: () => {
             console.warn('JWT token stale');
-            this.authService.Logout();
           },
         });
       }
