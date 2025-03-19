@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { appPaths } from '../../core/app/constants/appPaths';
-import { rolesAuthorizationGuard } from '../../core/authentication/guards/roles-authorization.guard';
-import { UserRoles } from '../../core/authentication/roles';
 
 export const AUTHENTICATION_ROUTES: Routes = [
   {

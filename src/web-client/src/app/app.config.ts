@@ -1,10 +1,17 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DeviceFingerPrintInterceptor } from '../core/user/device/interceptors/device.interceptor';
 import { authRedirectsInterceptor } from '../core/authentication/interceptors/redirect.interceptor';
+import { UserService } from '../core/user/services/user.service';
+import { catchError, firstValueFrom, of } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,7 +19,17 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(
-      withInterceptors([DeviceFingerPrintInterceptor, authRedirectsInterceptor]),
-    )
+      withInterceptors([DeviceFingerPrintInterceptor, authRedirectsInterceptor])
+    ),
+    provideAppInitializer(() => {
+      const userService = inject(UserService);
+      return firstValueFrom(
+        userService.getCurrentUser().pipe(
+          catchError(() => {
+            return of(null);
+          })
+        )
+      );
+    }),
   ],
 };

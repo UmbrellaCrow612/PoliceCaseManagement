@@ -148,7 +148,6 @@ export class TwoFactorSmsViewComponent implements OnInit {
       };
       this.authService.ValidateTwoFactorSmsCode(body).subscribe({
         next: () => {
-          this.userService.setCurrentUser();
           this.userService.getCurrentUser().subscribe({
             complete: () => {
               this.router.navigate([`/${appPaths.DASHBOARD}`]);

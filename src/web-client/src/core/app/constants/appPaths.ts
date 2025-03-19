@@ -49,4 +49,6 @@ export const appPaths = {
   DASHBOARD_ADMIN() {
     return `${this.DASHBOARD}/admin`;
   },
+
+  ADMINISTRATION: 'administration',
 } as const;

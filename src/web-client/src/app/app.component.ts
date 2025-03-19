@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AdamService } from '../core/app/services/adam.service';
+import { JwtService } from '../core/authentication/services/jwt.service';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +10,14 @@ import { AdamService } from '../core/app/services/adam.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit, OnDestroy {
-  constructor(private adamService: AdamService) {}
+  constructor(private jwtService: JwtService) {}
 
   ngOnInit(): void {
-    this.adamService.initialize();
+    this.jwtService.startTokenValidationThroughoutLifeTimeOfApp();
+    
   }
 
   ngOnDestroy(): void {
-    this.adamService.destroy();
+    this.jwtService.stopTokenValidation();
   }
 }
