@@ -11,6 +11,7 @@ using Logging.Core;
 using Identity.Application;
 using Identity.Application.Settings;
 using Identity.API.Extensions;
+using Scalar.AspNetCore;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -21,8 +22,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApiUI();
+builder.Services.AddOpenApi();
 
 builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
@@ -37,8 +37,8 @@ app.UseApplicationCors(builder.Configuration.GetSection("Cors").Get<CORSConfigSe
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
