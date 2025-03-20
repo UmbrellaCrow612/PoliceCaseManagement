@@ -7,6 +7,7 @@ import { UserService } from '../../../../core/user/services/user.service';
 import { hasRequiredRole } from '../../../../core/authentication/utils';
 import { UserRoles } from '../../../../core/authentication/roles';
 import { RouterModule } from '@angular/router';
+import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 
 interface DashboardProfileLink extends AppLink {
   /**
@@ -22,7 +23,8 @@ interface DashboardProfileLink extends AppLink {
   styleUrl: './dashboard-profile.component.css',
 })
 export class DashboardProfileComponent {
-  constructor() {}
+  constructor(private authService: AuthenticationService) {}
+
   ROLES: string[] = inject(UserService).ROLES!;
   hasRequiredRole = hasRequiredRole;
 
@@ -34,4 +36,8 @@ export class DashboardProfileComponent {
       iconName: 'shield_person', // from material icons
     },
   ];
+
+  logout() {
+    this.authService.Logout();
+  }
 }

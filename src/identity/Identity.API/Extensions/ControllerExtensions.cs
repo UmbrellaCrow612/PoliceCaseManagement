@@ -2,6 +2,8 @@
 using Identity.Application.Constants;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using SendGrid;
 
 namespace Identity.API.Extensions
 {
@@ -32,6 +34,42 @@ namespace Identity.API.Extensions
             });
 
 
+        }
+
+        /// <summary>
+        /// Used when logging out a user to remove the HTTP only cookies from the user browser as this cannot be done through JS
+        /// </summary>
+        public static void RemoveAuthCookies(this ControllerBase controller)
+        {
+            controller.Request.Cookies.TryGetValue(CookieNamesConstant.JWT, out string? jwtCookie);
+            controller.Request.Cookies.TryGetValue(CookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
+
+            if (!string.IsNullOrWhiteSpace(jwtCookie))
+            {
+               
+                var expiredCookie = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(-1),
+                    IsEssential = true
+                };
+                controller.Response.Cookies.Append(CookieNamesConstant.JWT, "", expiredCookie);
+            }
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+            {
+                var expiredCookie = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(-1),
+                    IsEssential = true
+                };
+                controller.Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, "", expiredCookie);
+            }
         }
 
         /// <summary>

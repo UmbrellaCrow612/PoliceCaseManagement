@@ -266,7 +266,7 @@ namespace Identity.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("logout")]
+        [HttpGet("logout")]
         public async Task<ActionResult> Logout()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -278,6 +278,8 @@ namespace Identity.API.Controllers
 
             var res = await _authService.LogoutAsync(userId);
             if (!res.Succeeded) return Unauthorized(res.Errors);
+
+            this.RemoveAuthCookies();
 
             return Ok();
         }

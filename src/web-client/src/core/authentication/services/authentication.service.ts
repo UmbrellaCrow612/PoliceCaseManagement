@@ -14,6 +14,7 @@ import {
 import env from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { appPaths } from '../../app/constants/appPaths';
 
 @Injectable({
   providedIn: 'root',
@@ -78,14 +79,20 @@ export class AuthenticationService extends BaseService {
    * Hits the backend to remove http cookies and go to login page
    */
   Logout() {
-    // todo hit backend logout to remove http only cookies
-    this.router.navigate(['/authentication/login']);
+    this.get(`${this.BASE_URL}/authentication/logout`).subscribe({
+      next: () => {
+        this.router.navigate([appPaths.AUTHENTICATION, appPaths.LOGIN]);
+      },
+      error: () => {
+        this.router.navigate([appPaths.AUTHENTICATION, appPaths.LOGIN]);
+      },
+    });
   }
 
   /**
    * Helper to navigate to unauthorized page
    */
   UnAuthorized() {
-    this.router.navigate(['/authentication/unauthorized']);
+    this.router.navigate([appPaths.AUTHENTICATION, appPaths.UNAUTHORIZED]);
   }
 }
