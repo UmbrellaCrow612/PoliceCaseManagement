@@ -79,4 +79,11 @@ export const AUTHENTICATION_ROUTES: Routes = [
         (c) => c.TwoFactorTOTPViewComponent
       ),
   },
+  {
+    path: appPaths.UNAUTHORIZED,
+    loadComponent: () =>
+      import('./ui/unauthorized-view/unauthorized-view.component').then(
+        (c) => c.UnauthorizedViewComponent
+      ),
+  },
 ];

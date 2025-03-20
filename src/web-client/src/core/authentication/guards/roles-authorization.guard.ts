@@ -47,8 +47,7 @@ export const rolesAuthorizationGuard: CanActivateFn = (
 
   if (!hasRequiredRole(requiredRoles, userService.ROLES)) {
     console.log('Current user dose not have required roles for this view');
-
-    // TODO go to UnAuthorized page using auth service function
+    inject(AuthenticationService).UnAuthorized();
     return false;
   }
 

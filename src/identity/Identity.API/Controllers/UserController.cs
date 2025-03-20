@@ -14,13 +14,18 @@ namespace Identity.API.Controllers
         private readonly IAuthService _authService = authService;
         private readonly UserMapping _userMapping = new();
 
-        [Authorize]
+        /// <summary>
+        /// This way to stop 401 being sent on load of app and getting stuck on login page
+        /// other endpoints send 401 as normal this endpoint in uniuque for it.
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserByIdAsync()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if(userId is null) return Unauthorized("User id missing");
+            if(userId is null) return BadRequest("User id missing");
 
             var user = await _authService.GetUserByIdAsync(userId);
             if(user is null) return NotFound();

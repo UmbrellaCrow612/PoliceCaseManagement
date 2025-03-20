@@ -21,10 +21,15 @@ export function authRedirectsInterceptor(
       console.log('RedirectsInterceptor running for error:', error.error);
 
       if (error.status === StatusCodes.UNAUTHORIZED) {
-        // handle other like 403
         authS.Logout();
         return throwError(() => error);
       }
+
+      if (error.status === StatusCodes.FORBIDDEN) {
+        authS.UnAuthorized();
+        return throwError(() => error);
+      }
+
       return throwError(() => error);
     })
   );

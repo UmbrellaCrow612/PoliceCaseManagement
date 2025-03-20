@@ -85,5 +85,7 @@ export class AuthenticationService extends BaseService {
   /**
    * Helper to navigate to unauthorized page
    */
-  UnAuthorized() {}
+  UnAuthorized() {
+    this.router.navigate(['/authentication/unauthorized']);
+  }
 }

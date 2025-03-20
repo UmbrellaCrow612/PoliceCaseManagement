@@ -50,5 +50,7 @@ export const appPaths = {
     return `${this.DASHBOARD}/admin`;
   },
 
+  UNAUTHORIZED: "unauthorized",
+
   ADMINISTRATION: 'administration',
 } as const;
