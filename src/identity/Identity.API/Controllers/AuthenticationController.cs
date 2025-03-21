@@ -40,7 +40,7 @@ namespace Identity.API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId)) return BadRequest();
             var result = await _authService.TurnOnTOTP(userId);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -54,10 +54,10 @@ namespace Identity.API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId)) return BadRequest();
 
             var res = await _authService.SetUpTOTP(userId, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             var file = File(res.TotpSecretQrCodeBytes, "image/png", "totp-qrcode-image");
 
@@ -70,7 +70,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
         {
             var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
@@ -83,7 +83,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateOtp([FromBody] ValidateOtpDto dto)
         {
             var res = await _authService.ValidateOTP(dto.OTPMethod, dto.OTPCreds, dto.Code, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
@@ -98,7 +98,7 @@ namespace Identity.API.Controllers
             if (string.IsNullOrWhiteSpace(dto.OTPCreds.Email) && string.IsNullOrWhiteSpace(dto.OTPCreds.PhoneNumber)) return BadRequest();
 
             var res = await _authService.SendOTP(dto.OTPMethod, dto.OTPCreds, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             var file = File(res.QrCodeBytes, "image/png", "otp-qrcode-image");
 
@@ -110,7 +110,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> TurnOnOTP()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId)) return BadRequest();
 
             var result = await _authService.TurnOnOTP(userId);
             if (!result.Succeeded) return BadRequest(result.Errors);
@@ -123,7 +123,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> TunrnOnMagicLinkAuth()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId)) return BadRequest();
 
             var result = await _authService.TurnOnMagicLink(userId);
             if (!result.Succeeded) return BadRequest(result.Errors);
@@ -137,7 +137,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> SendMagicLink([FromBody] string email)
         {
             var res = await _authService.SendMagicLink(email, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -148,7 +148,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateMagicLink([FromBody] string code)
         {
             var res = await _authService.ValidateMagicLink(code, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
@@ -161,7 +161,7 @@ namespace Identity.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
             var res = await _authService.LoginAsync(dto.Email, dto.Password, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok(new { res.LoginAttemptId });
         }
@@ -172,7 +172,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateTwoFactorAuthentication(ValidateTwoFactorSmsAttemptDto dto)
         {
             var result = await _authService.ValidateTwoFactorSmsCodeAsync(dto.LoginAttemptId, dto.Code, this.ComposeDeviceInfo());
-            if (!result.Succeeded) return Unauthorized(result.Errors);
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             this.SetAuthCookies(result.Tokens, _JWTOptions);
 
@@ -196,7 +196,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ValidateTwoFactorEmailAuth([FromBody] ValidateTwoFactorEmailAttemptDto dto)
         {
             var res = await _authService.ValidateTwoFactorEmailCodeAsync(dto.LoginAttemptId, dto.Code, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
             return Ok(new { res.Tokens.JwtBearerToken, res.Tokens.RefreshToken });
@@ -237,7 +237,7 @@ namespace Identity.API.Controllers
 
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
-                return Unauthorized("Refresh cookie missing");
+                return Unauthorized("Refresh cookie missing"); // we send 401 here as if it cannoit refresh it means they should be logged out 
             }
 
             if (string.IsNullOrEmpty(userId))
@@ -334,7 +334,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> Challenge([FromBody] UserDeviceChallengeDto dto)
         {
             var res = await _authService.ValidateUserDeviceChallenge(dto.Email, dto.Code);
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }
@@ -345,7 +345,7 @@ namespace Identity.API.Controllers
         public async Task<ActionResult> ReSendChallenge([FromBody] ReSendUserDeviceChallengeDto dto)
         {
             var res = await _authService.SendUserDeviceChallenge(dto.Email, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             return Ok();
         }

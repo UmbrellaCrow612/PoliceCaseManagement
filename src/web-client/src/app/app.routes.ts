@@ -5,6 +5,12 @@ import { UserRoles } from '../core/authentication/roles';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full',
+  },
+
+  {
     path: appPaths.AUTHENTICATION,
     loadChildren: () =>
       import('../features/authentication/authentication.routes').then(
