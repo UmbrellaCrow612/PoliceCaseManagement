@@ -32,6 +32,7 @@ export const rolesAuthorizationGuard: CanActivateFn = (
   route,
   state
 ): boolean => {
+  let authService = inject(AuthenticationService);
   const requiredRoles = route.data['requiredRoles'];
   if (!requiredRoles) {
     console.error('Roles not passed to rolesAuthorizationGuard guard');
@@ -41,13 +42,13 @@ export const rolesAuthorizationGuard: CanActivateFn = (
   let userService = inject(UserService);
   if (userService.USER === null || userService.ROLES === null) {
     console.log('Current user not authenticated cannot access this route');
-    inject(AuthenticationService).Logout();
+    authService.Logout();
     return false;
   }
 
   if (!hasRequiredRole(requiredRoles, userService.ROLES)) {
     console.log('Current user dose not have required roles for this view');
-    inject(AuthenticationService).UnAuthorized();
+    authService.UnAuthorized();
     return false;
   }
 

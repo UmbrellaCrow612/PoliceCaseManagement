@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BaseService } from '../../http/services/BaseService.service';
 import {
   LoginResponse,
   LoginCredentials,
@@ -12,51 +11,55 @@ import {
   ValidateTwoFactorSmsCodeRequestBody,
 } from '../types';
 import env from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { appPaths } from '../../app/constants/appPaths';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthenticationService extends BaseService {
+export class AuthenticationService {
   private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
 
-  constructor(protected override http: HttpClient, private router: Router) {
-    super(http);
-  }
+  constructor(private http: HttpClient, private router: Router) {}
 
   Login(credentials: LoginCredentials): Observable<LoginResponse> {
-    return this.post(`${this.BASE_URL}/authentication/login`, credentials);
+    return this.http.post<LoginResponse>(
+      `${this.BASE_URL}/authentication/login`,
+      credentials
+    );
   }
 
   SendTwoFactorSmsCode(body: SendTwoFactorSmsCodeRequestBody) {
-    return this.post(
+    return this.http.post(
       `${this.BASE_URL}/authentication/send-two-factor-sms`,
       body
     );
   }
 
   ValidateTwoFactorSmsCode(body: ValidateTwoFactorSmsCodeRequestBody) {
-    return this.post(
+    return this.http.post(
       `${this.BASE_URL}/authentication/validate-two-factor-sms`,
       body
     );
   }
 
   SendConfirmationEmail(details: SendEmailConfirmationRequest) {
-    return this.post(
+    return this.http.post(
       `${this.BASE_URL}/authentication/send-confirmation-email`,
       details
     );
   }
 
   SendConfirmationEmailCode(body: SendEmailConfirmationCodeRequest) {
-    return this.post(`${this.BASE_URL}/authentication/confirm-email`, body);
+    return this.http.post(
+      `${this.BASE_URL}/authentication/confirm-email`,
+      body
+    );
   }
 
   SendPhoneConfirmation(body: SendPhoneConfirmationRequest) {
-    return this.post(
+    return this.http.post(
       `${this.BASE_URL}/authentication/send-phone-confirmation`,
       body
     );
@@ -69,7 +72,7 @@ export class AuthenticationService extends BaseService {
   ValidatePhoneConfirmationCode(
     body: ValidatePhoneConfirmationCodeRequestBody
   ) {
-    return this.post(
+    return this.http.post(
       `${this.BASE_URL}/authentication/validate-phone-confirmation`,
       body
     );
@@ -79,7 +82,7 @@ export class AuthenticationService extends BaseService {
    * Hits the backend to remove http cookies and go to login page
    */
   Logout() {
-    this.get(`${this.BASE_URL}/authentication/logout`).subscribe({
+    this.http.get(`${this.BASE_URL}/authentication/logout`).subscribe({
       next: () => {
         this.router.navigate([appPaths.AUTHENTICATION, appPaths.LOGIN]);
       },

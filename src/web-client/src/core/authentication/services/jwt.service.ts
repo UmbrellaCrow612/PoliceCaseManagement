@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BaseService } from '../../http/services/BaseService.service';
-import { filter, Subscription, timer } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import env from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { AuthenticationService } from './authentication.service';
 import { appPaths } from '../../app/constants/appPaths';
-import { Location } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
-export class JwtService extends BaseService {
-  constructor(httpClient: HttpClient, private router: Router) {
-    super(httpClient);
-  }
+export class JwtService {
+  constructor(private httpClient: HttpClient, private router: Router) {}
 
   validationSubscriptionTimer = timer(
     env.JWTTokenValidationInitialWaitTimeInMilliSeconds,
@@ -39,7 +34,7 @@ export class JwtService extends BaseService {
           this.validationSubscriptionTimer.subscribe(() => {
             console.log('JWT token validation running');
 
-            this.get(`${this.BASE_URL}/authentication/refresh-token`).subscribe(
+            this.httpClient.get(`${this.BASE_URL}/authentication/refresh-token`).subscribe(
               {
                 next: () => {
                   console.log('JWT token refreshed');

@@ -4,7 +4,6 @@ import { UserService } from '../../../../core/user/services/user.service';
 import { DashboardHeaderComponent } from '../dashboard-header/dashboard-header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { timer } from 'rxjs';
-import { JwtService } from '../../../../core/authentication/services/jwt.service';
 
 @Component({
   selector: 'app-dashboard-skeleton',
@@ -13,7 +12,7 @@ import { JwtService } from '../../../../core/authentication/services/jwt.service
   styleUrl: './dashboard-skeleton.component.css',
 })
 export class DashboardSkeletonComponent implements OnInit {
-  constructor(private jwtService: JwtService) {}
+  constructor() {}
   isLoading = true;
 
   ngOnInit(): void {

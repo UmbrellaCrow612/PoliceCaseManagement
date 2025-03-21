@@ -265,7 +265,12 @@ namespace Identity.API.Controllers
             return Ok(new { result.Tokens.JwtBearerToken });
         }
 
-        [Authorize]
+        /// <summary>
+        /// Done thiwa way as front end calls this when logging out and listens to 401 and calls logout etc
+        /// meaning if we send 401 it calls recusive calls
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("logout")]
         public async Task<ActionResult> Logout()
         {
@@ -273,11 +278,11 @@ namespace Identity.API.Controllers
 
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized("User ID not found in token.");
+                return BadRequest("User ID not found in token.");
             }
 
             var res = await _authService.LogoutAsync(userId);
-            if (!res.Succeeded) return Unauthorized(res.Errors);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
             this.RemoveAuthCookies();
 
