@@ -1,0 +1,19 @@
+.administration_shell {
+  width: 100%;
+  height: 100%;
+}
+
+.administration_content_shell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.administration_content_header_shell {
+  flex: 1;
+}
+
+.administration_content_page_shell {
+  flex: 5;
+}
