@@ -1,1 +1,17 @@
-<p>administration-header works!</p>
+<div class="header">
+  <button mat-icon-button aria-label="Open side bar" (click)="toggle()">
+    @if (isOpen) {
+    <mat-icon fontIcon="close" />
+    } @else {
+    <mat-icon fontIcon="menu_open" />
+    }
+  </button>
+  <div class="title">
+    <span> Administration </span>
+    <mat-icon fontIcon="admin_panel_settings" />
+  </div>
+
+  <button mat-icon-button aria-label="Profile">
+    <mat-icon fontIcon="person" />
+  </button>
+</div>
