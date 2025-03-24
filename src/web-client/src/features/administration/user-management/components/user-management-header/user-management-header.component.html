@@ -1,0 +1,7 @@
+<div class="container">
+  @for (link of links; track $index) {
+  <a mat-flat-button [routerLink]="link.href">
+    {{ link.name }}
+  </a>
+  }
+</div>

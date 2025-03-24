@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './user-management-home-view.component.css'
 })
 export class UserManagementHomeViewComponent {
-// Have a table like v0 design made then push to other routes
+// Have a table like v0 design made then push to other routes like edit or the user login history etc 
 }

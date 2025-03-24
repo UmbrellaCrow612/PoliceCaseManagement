@@ -18,6 +18,12 @@ interface SideNavLink extends AppLink {
 export class AdministrationSideNavComponent {
   links: Array<SideNavLink> = [
     {
+      href: `/${appPaths.ADMINISTRATION}`,
+      authorizedRoles: [],
+      name: 'Home',
+      iconName: 'home',
+    },
+    {
       href: appPaths.A_USER_MANAGEMENT,
       authorizedRoles: [],
       name: 'User management',

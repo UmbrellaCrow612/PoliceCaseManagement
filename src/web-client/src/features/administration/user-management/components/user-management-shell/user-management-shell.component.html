@@ -1,4 +1,10 @@
 <div class="container">
-  <!-- Could add some stuff future for every user management view -->
-  <router-outlet></router-outlet>
+  <div class="header_shell">
+    <app-user-management-header></app-user-management-header>
+  </div>
+
+  <div class="page_shell">
+    <!-- Page content-->
+    <router-outlet></router-outlet>
+  </div>
 </div>

@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { UserManagementEditUserViewComponent } from './ui/user-management-edit-user-view/user-management-edit-user-view.component';
+import { canDeactivateGuard } from '../../../core/app/guards/canDeactivateGuard';
 
 export const USER_MANAGEMENT_ROUTES: Routes = [
   {
@@ -22,6 +24,14 @@ export const USER_MANAGEMENT_ROUTES: Routes = [
           import(
             './ui/user-management-create-view/user-management-create-view.component'
           ).then((c) => c.UserManagementCreateViewComponent),
+      },
+      {
+        path: 'users/:userId/edit',
+        loadComponent: () =>
+          import(
+            './ui/user-management-edit-user-view/user-management-edit-user-view.component'
+          ).then((c) => c.UserManagementEditUserViewComponent),
+        canDeactivate: [canDeactivateGuard],
       },
     ],
   },
