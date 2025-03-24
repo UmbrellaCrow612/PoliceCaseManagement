@@ -4,10 +4,11 @@ import { fromEvent, Subscription, throttleTime } from 'rxjs';
 import { AdministrationSideNavService } from '../../services/administration-side-nav-service.service';
 import { RouterOutlet } from '@angular/router';
 import { AdministrationHeaderComponent } from '../administration-header/administration-header.component';
+import { AdministrationSideNavComponent } from "../administration-side-nav/administration-side-nav.component";
 
 @Component({
   selector: 'app-administration-shell',
-  imports: [MatSidenavModule, RouterOutlet, AdministrationHeaderComponent],
+  imports: [MatSidenavModule, RouterOutlet, AdministrationHeaderComponent, AdministrationSideNavComponent],
   templateUrl: './administration-shell.component.html',
   styleUrl: './administration-shell.component.css',
 })

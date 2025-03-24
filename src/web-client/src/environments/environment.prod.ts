@@ -1,14 +1,9 @@
-import { LogLevel } from '../core/app/services/loggingService.service';
-
-export const env = {
-  production: true,
-  config: {
-    EncryptionKey: 'production-key',
-    EncryptionAlgorithm: 'SHA-512',
-    BaseUrls: {
-      authenticationBaseUrl: 'https://api.example.com',
-    },
-    TokenCheckInterval: 3000,
-    LogLevel: LogLevel.Warn,
+const env = {
+  BaseUrls: {
+    authenticationBaseUrl: 'https://localhost:7058',
   },
-};
+  JwtTokenValidationPeriodInMinutesInMilliSeconds: 3 * 60 * 1000,
+  JWTTokenValidationInitialWaitTimeInMilliSeconds: 25000,
+} as const;
+
+export default env;

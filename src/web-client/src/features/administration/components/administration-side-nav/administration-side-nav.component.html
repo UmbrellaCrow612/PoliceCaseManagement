@@ -1,0 +1,8 @@
+<div class="shell">
+  @for (link of links; track $index) {
+  <a [routerLink]="link.href" mat-raised-button class="full">
+    <mat-icon>{{ link.iconName }}</mat-icon>
+    {{ link.name }}
+  </a>
+  }
+</div>

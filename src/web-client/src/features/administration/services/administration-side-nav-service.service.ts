@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, timer } from 'rxjs';
 import { CookieService } from '../../../core/browser/cookie/services/cookie.service';
 import CookieNames from '../../../core/browser/cookie/constants/names';
 
@@ -9,7 +9,9 @@ import CookieNames from '../../../core/browser/cookie/constants/names';
 export class AdministrationSideNavService {
   constructor(private cookieService: CookieService) {
     let value = this.getDefaultOpenState();
-    this.isOpenSubject.next(value);
+    timer(250).subscribe(() => {
+      this.toggle(value);
+    });
   }
 
   /**

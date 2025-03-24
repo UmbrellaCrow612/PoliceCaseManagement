@@ -53,4 +53,5 @@ export const appPaths = {
   UNAUTHORIZED: "unauthorized",
 
   ADMINISTRATION: 'administration',
+  A_USER_MANAGEMENT: "user-management"
 } as const;

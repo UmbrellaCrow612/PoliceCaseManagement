@@ -13,7 +13,7 @@ export class JwtService {
 
   validationSubscriptionTimer = timer(
     env.JWTTokenValidationInitialWaitTimeInMilliSeconds,
-    env.JwtTokenValidationPeriodInMinutes
+    env.JwtTokenValidationPeriodInMinutesInMilliSeconds
   );
   validationSubscription: null | Subscription = null;
   BASE_URL = env.BaseUrls.authenticationBaseUrl;

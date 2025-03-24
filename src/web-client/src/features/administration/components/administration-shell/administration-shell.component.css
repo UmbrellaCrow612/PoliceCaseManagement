@@ -1,6 +1,7 @@
 .administration_shell {
   width: 100%;
   height: 100%;
+  background-color: #ffffff;
 }
 
 .administration_content_shell {
@@ -16,4 +17,10 @@
 
 .administration_content_page_shell {
   flex: 5;
+}
+
+.drawer_shell {
+  width: 250px;
+  padding: 10px 10px;
+  background-color: white;
 }

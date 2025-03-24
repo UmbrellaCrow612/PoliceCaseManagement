@@ -1,6 +1,11 @@
 <mat-drawer-container class="administration_shell" (backdropClick)="toggle()">
-  <mat-drawer #drawer [mode]="sideNavMode" [opened]="isOpen">
-    <p>Auto-resizing sidenav</p>
+  <mat-drawer
+    #drawer
+    [mode]="sideNavMode"
+    [opened]="isOpen"
+    class="drawer_shell"
+  >
+    <app-administration-side-nav></app-administration-side-nav>
   </mat-drawer>
 
   <div class="administration_content_shell">
