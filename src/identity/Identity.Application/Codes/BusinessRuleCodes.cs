@@ -166,6 +166,16 @@
         /// Indicates that the specified user does not exist.
         /// </summary>
         public const string UserDoesNotExist = "USER_DOES_NOT_EXIST";
+
+        /// <summary>
+        /// Indicates that a username is taken.
+        /// </summary>
+        public const string UsernameAlreadyTaken = "USERNAME_ALREADY_TAKEN";
+
+        /// <summary>
+        /// Indicates that a email is already used by another user.
+        /// </summary>
+        public const string EmailAreadyUsed = "EMAIL_ALREADY_USED";
         #endregion
     }
 }

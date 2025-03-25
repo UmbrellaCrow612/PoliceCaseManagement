@@ -1,1 +1,73 @@
-<p>user-management-create-view works!</p>
+<div class="container">
+  <div class="forms_container">
+    <form class="form" [formGroup]="createUserForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="userName" />
+        <mat-hint>Enter a username for the user</mat-hint>
+
+        @if (createUserForm.controls.userName.hasError("required")) {
+        <mat-error> Required </mat-error>
+        } @else if (createUserForm.controls.userName.hasError("maxlength")) {
+        <mat-error> Username cannot be more than 30 characters </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" />
+        <mat-hint>Enter a email for the user</mat-hint>
+
+        @if (createUserForm.controls.email.hasError("required")) {
+        <mat-error> Required </mat-error>
+        } @else if (createUserForm.controls.email.hasError("email")) {
+        <mat-error> Provide a valid email </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phoneNumber" />
+        <mat-hint>Enter a phone number for the user</mat-hint>
+
+        @if (createUserForm.controls.phoneNumber.hasError("required")) {
+        <mat-error> Required </mat-error>
+        } @else if (createUserForm.controls.phoneNumber.hasError("numeric")) {
+        <mat-error> Phone number should only contain numbers </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" [type]="passwordInputType" />
+        <mat-hint
+          >Enter a temporary password for the user to use (Write down)</mat-hint
+        >
+
+        <button
+          matSuffix
+          mat-icon-button
+          (click)="togglePasswordInputVis()"
+          type="button"
+        >
+          <mat-icon>
+            @if (showPassword) { visibility_off } @else { visibility }
+          </mat-icon>
+        </button>
+        @if (createUserForm.controls.password.hasError("required")) {
+        <mat-error> Required </mat-error>
+        } @else if (createUserForm.controls.password.hasError("password")) {
+        <mat-error>
+          A valid password must be 8+ characters with at least one lowercase,
+          uppercase, digit, and special character.
+        </mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div class="bottom">
+    <button mat-raised-button (click)="cancelClick()">Cancel</button>
+    <button mat-raised-button [disabled]="!createUserForm.valid">Create</button>
+  </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using Identity.API.DTOs;
+﻿using Authorization.Core;
+using Identity.API.DTOs;
 using Identity.API.Mappings;
 using Identity.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +41,58 @@ namespace Identity.API.Controllers
             };
 
             return Ok(returnDto);
+        }
+
+        /// <summary>
+        /// Used when creating a user to be hit while a admin types to create a user in the system
+        /// typically during there typing so they can know early on without having to hit the register endpoint
+        /// </summary>
+        [HttpPost("username/is-taken")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> IsUsernameTaken([FromBody] IsUsernameTakenDto dto)
+        {
+            var result = await _authService.IsUsernameTaken(dto.Username);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Used when creating a user to be hit while a admin types to create a user in the system
+        /// typically during there typing so they can know early on without having to hit the register endpoint
+        /// </summary>
+        [HttpPost("email/is-taken")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> IsEmailTaken([FromBody] IsEmailTakenDto dto)
+        {
+            var result = await _authService.IsEmailTaken(dto.Email);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Used when creating a user to be hit while a admin types to create a user in the system
+        /// typically during there typing so they can know early on without having to hit the register endpoint
+        /// </summary>
+        [HttpPost("phone-number/is-taken")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
+        {
+            var result = await _authService.IsPhoneNumberTaken(dto.PhoneNumber);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
         }
     }
 }

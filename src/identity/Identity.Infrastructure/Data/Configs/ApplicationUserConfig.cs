@@ -12,6 +12,7 @@ namespace Identity.Infrastructure.Data.Configs
             builder.HasIndex(x => x.Id).IsUnique();
 
             builder.HasIndex(x => x.PhoneNumber).IsUnique();
+            builder.HasIndex(x => x.UserName).IsUnique();
 
             builder.HasOne(x => x.TimeBasedOneTimePassCode).WithOne(x => x.User).HasForeignKey<TimeBasedOneTimePassCode>(e => e.UserId);
         }

@@ -1149,12 +1149,21 @@ namespace Identity.Application.Implamentations
         public async Task<RegisterUserResult> RegisterUserAsync(ApplicationUser userToCreate, string password)
         {
             var result = new RegisterUserResult();
+
             var isPhoneNumberAlreadyTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == userToCreate.PhoneNumber);
             if (isPhoneNumberAlreadyTaken)
             {
                 result.AddError(BusinessRuleCodes.PhoneNumberAlreadyTaken);
-                return result;
             }
+
+            var isUsernameTaken = await _userManager.Users.AnyAsync(x => x.UserName == userToCreate.UserName);
+            if (isUsernameTaken)
+            {
+                result.AddError(BusinessRuleCodes.UsernameAlreadyTaken, "Username already in use, please use another one.");
+            }
+
+            if (result.Errors.Count > 0) return result;
+
             var r = await _userManager.CreateAsync(userToCreate, password);
             if (!r.Succeeded)
             {
@@ -1249,6 +1258,57 @@ namespace Identity.Application.Implamentations
             if (user is null) return [];
 
             return await _userManager.GetRolesAsync(user);
+        }
+
+        public async Task<AuthResult> IsUsernameTaken(string username)
+        {
+            var result = new AuthResult();
+
+            var isTaken = await _unitOfWork.Repository<ApplicationUser>()
+                .Query
+                .AnyAsync(x => x.UserName == username);
+
+            if (isTaken)
+            {
+                result.AddError(BusinessRuleCodes.UsernameAlreadyTaken);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<AuthResult> IsEmailTaken(string email)
+        {
+            var result = new AuthResult();
+
+            var isTaken = await _unitOfWork.Repository<ApplicationUser>()
+                .Query
+                .AnyAsync(x => x.Email == email);
+
+            if (isTaken)
+            {
+                result.AddError(BusinessRuleCodes.EmailAreadyUsed);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<AuthResult> IsPhoneNumberTaken(string phoneNumber)
+        {
+            var result = new AuthResult();
+
+            var isTaken = await _userManager.Users.AnyAsync(x => x.PhoneNumber == phoneNumber);
+            if (isTaken)
+            {
+                result.AddError(BusinessRuleCodes.PhoneNumberAlreadyTaken);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

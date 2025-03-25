@@ -68,6 +68,12 @@ namespace Identity.Core.Services
         Task<ApplicationUser?> GetUserByIdAsync(string userId);
 
         Task<ICollection<string>> GetUserRolesAsync(string userId);
+
+        Task<AuthResult> IsUsernameTaken(string username);
+
+        Task<AuthResult> IsEmailTaken(string email);
+
+        Task<AuthResult> IsPhoneNumberTaken(string phoneNumber);
     }
 
     public class AuthError : IServiceError

@@ -17,3 +17,16 @@ run the cmd again:
 and if it lists it out kill it `taskkill /PID 3596 /F`
 
 then rerun the start cmd
+
+
+# Migrations
+
+From the `Identity.API` project in terminal 
+
+```bash
+Project/Identity.API> dotnet ef migrations add InitialCreate --project ../Identity.Infrastructure --startup-project .
+```
+
+```
+dotnet ed database update
+```
