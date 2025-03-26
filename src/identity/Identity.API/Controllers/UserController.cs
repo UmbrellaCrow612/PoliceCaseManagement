@@ -47,7 +47,7 @@ namespace Identity.API.Controllers
         /// Used when creating a user to be hit while a admin types to create a user in the system
         /// typically during there typing so they can know early on without having to hit the register endpoint
         /// </summary>
-        [HttpPost("username/is-taken")]
+        [HttpPost("usernames/is-taken")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> IsUsernameTaken([FromBody] IsUsernameTakenDto dto)
         {
@@ -65,7 +65,7 @@ namespace Identity.API.Controllers
         /// Used when creating a user to be hit while a admin types to create a user in the system
         /// typically during there typing so they can know early on without having to hit the register endpoint
         /// </summary>
-        [HttpPost("email/is-taken")]
+        [HttpPost("emails/is-taken")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> IsEmailTaken([FromBody] IsEmailTakenDto dto)
         {
@@ -82,7 +82,7 @@ namespace Identity.API.Controllers
         /// Used when creating a user to be hit while a admin types to create a user in the system
         /// typically during there typing so they can know early on without having to hit the register endpoint
         /// </summary>
-        [HttpPost("phone-number/is-taken")]
+        [HttpPost("phone-numbers/is-taken")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
         {

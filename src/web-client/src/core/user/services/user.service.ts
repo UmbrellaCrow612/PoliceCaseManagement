@@ -34,4 +34,32 @@ export class UserService {
         })
       );
   }
+
+  /**
+   * Helper method to see if a username is taken - typically used when creating a user and need to validate that
+   * the typed username is not taken
+   */
+  isUsernameTaken(body: { username: string }) {
+    return this.httpClient.post(
+      `${this.BASE_URL}/users/usernames/is-taken`,
+      body
+    );
+  }
+
+  /**
+   * Helper method to see if a users email is taken already by another user
+   */
+  isEmailTaken(body: { email: string }) {
+    return this.httpClient.post(`${this.BASE_URL}/users/emails/is-taken`, body);
+  }
+
+  /**
+   * Helper method to see if a users phone number is taken by another
+   */
+  isPhoneNumberTaken(body: { phoneNumber: string }) {
+    return this.httpClient.post(
+      `${this.BASE_URL}/users/phone-numbers/is-taken`,
+      body
+    );
+  }
 }

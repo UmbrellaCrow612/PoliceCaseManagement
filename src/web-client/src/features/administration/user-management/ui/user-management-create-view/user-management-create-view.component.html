@@ -10,6 +10,9 @@
         <mat-error> Required </mat-error>
         } @else if (createUserForm.controls.userName.hasError("maxlength")) {
         <mat-error> Username cannot be more than 30 characters </mat-error>
+        } @else if (createUserForm.controls.userName.hasError("usernameTaken"))
+        {
+        <mat-error> Username is taken</mat-error>
         }
       </mat-form-field>
 
@@ -22,6 +25,8 @@
         <mat-error> Required </mat-error>
         } @else if (createUserForm.controls.email.hasError("email")) {
         <mat-error> Provide a valid email </mat-error>
+        } @else if (createUserForm.controls.email.hasError("emailTaken")) {
+        <mat-error> Email already taken </mat-error>
         }
       </mat-form-field>
 
@@ -34,6 +39,9 @@
         <mat-error> Required </mat-error>
         } @else if (createUserForm.controls.phoneNumber.hasError("numeric")) {
         <mat-error> Phone number should only contain numbers </mat-error>
+        } @else if
+        (createUserForm.controls.phoneNumber.hasError("phoneNumberTaken")) {
+        <mat-error> Phone number taken </mat-error>
         }
       </mat-form-field>
 

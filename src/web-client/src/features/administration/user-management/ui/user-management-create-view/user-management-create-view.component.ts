@@ -5,6 +5,7 @@ import {
   PristineChangeEvent,
   ReactiveFormsModule,
   Validators,
+  ValueChangeEvent,
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,8 +15,20 @@ import {
   Validator_password,
 } from '../../../../../core/app/validators/controls';
 import { MatButtonModule } from '@angular/material/button';
-import { Observable, Subscription } from 'rxjs';
+import {
+  debounceTime,
+  filter,
+  map,
+  merge,
+  Observable,
+  Subscription,
+  throttle,
+  throttleTime,
+} from 'rxjs';
 import { CanComponentDeactivate } from '../../../../../core/app/guards/canDeactivateGuard';
+import { UserService } from '../../../../../core/user/services/user.service';
+import { isEmail } from '../../../../../core/app/validators/isEmail';
+import { isNumeric } from '../../../../../core/app/validators/isNumeric';
 
 @Component({
   selector: 'app-user-management-create-view',
@@ -32,10 +45,14 @@ import { CanComponentDeactivate } from '../../../../../core/app/guards/canDeacti
 export class UserManagementCreateViewComponent
   implements OnInit, OnDestroy, CanComponentDeactivate
 {
+  constructor(private userService: UserService) {}
   hasUnsavedChanges = false;
   showPassword = false;
   passwordInputType = 'password';
   userFormValueChangeSubscription: Subscription | null = null;
+  userFormUserNameInputChangeSubscription: Subscription | null = null;
+  userFormEmailInputChangeSubscription: Subscription | null = null;
+  userFormPhoneNumberInputChangeSubscription: Subscription | null = null;
 
   createUserForm = new FormGroup({
     userName: new FormControl<string | null>(null, [
@@ -56,10 +73,6 @@ export class UserManagementCreateViewComponent
     ]),
   });
 
-  /**
-   * TODO link to backend and endpoints for checking if certain stuff are taken etc
-   */
-
   ngOnInit(): void {
     this.userFormValueChangeSubscription = this.createUserForm.events.subscribe(
       (event) => {
@@ -72,6 +85,63 @@ export class UserManagementCreateViewComponent
         }
       }
     );
+
+    this.userFormUserNameInputChangeSubscription =
+      this.createUserForm.controls.userName.valueChanges
+        .pipe(
+          debounceTime(500),
+          filter((val) => val?.length! > 1)
+        )
+        .subscribe((val) => {
+          this.userService.isUsernameTaken({ username: val! }).subscribe({
+            next: () => {
+              this.createUserForm.controls.userName.setErrors(null);
+            },
+            error: () => {
+              this.createUserForm.controls.userName.setErrors({
+                usernameTaken: true,
+              });
+            },
+          });
+        });
+
+    this.userFormEmailInputChangeSubscription =
+      this.createUserForm.controls.email.valueChanges
+        .pipe(
+          debounceTime(500),
+          filter((val) => val?.length! > 1 && isEmail(val ?? ''))
+        )
+        .subscribe((val) => {
+          this.userService.isEmailTaken({ email: val! }).subscribe({
+            next: () => {
+              this.createUserForm.controls.email.setErrors(null);
+            },
+            error: () => {
+              this.createUserForm.controls.email.setErrors({
+                emailTaken: true,
+              });
+            },
+          });
+        });
+
+    this.userFormPhoneNumberInputChangeSubscription =
+      this.createUserForm.controls.phoneNumber.valueChanges
+        .pipe(
+          debounceTime(500),
+          filter((val) => val?.length! > 1 && isNumeric(val ?? ''))
+        )
+        .subscribe((val) => {
+          this.userService.isPhoneNumberTaken({ phoneNumber: val! }).subscribe({
+            next: () => {
+              this.createUserForm.controls.phoneNumber.setErrors(null);
+            },
+            error: () => {
+              this.createUserForm.controls.phoneNumber.setErrors({
+                phoneNumberTaken: true,
+              });
+            },
+          });
+        });
   }
 
   togglePasswordInputVis() {
@@ -107,6 +177,15 @@ export class UserManagementCreateViewComponent
   ngOnDestroy(): void {
     if (this.userFormValueChangeSubscription) {
       this.userFormValueChangeSubscription.unsubscribe();
+    }
+    if (this.userFormUserNameInputChangeSubscription) {
+      this.userFormUserNameInputChangeSubscription.unsubscribe();
+    }
+    if (this.userFormEmailInputChangeSubscription) {
+      this.userFormEmailInputChangeSubscription.unsubscribe();
+    }
+    if (this.userFormPhoneNumberInputChangeSubscription) {
+      this.userFormPhoneNumberInputChangeSubscription.unsubscribe();
     }
   }
 }
