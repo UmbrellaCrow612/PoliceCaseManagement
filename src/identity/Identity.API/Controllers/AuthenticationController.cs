@@ -213,6 +213,7 @@ namespace Identity.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto dto)
         {

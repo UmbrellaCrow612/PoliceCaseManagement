@@ -1,6 +1,5 @@
 using Email.Service;
 using Identity.Infrastructure;
-using Identity.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Identity.Core.Models;
@@ -10,8 +9,8 @@ using Authorization.Core;
 using Logging.Core;
 using Identity.Application;
 using Identity.Application.Settings;
-using Identity.API.Extensions;
 using Scalar.AspNetCore;
+using Identity.Infrastructure.Data.Seeding;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -56,14 +55,12 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityApplicationDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    var rs = new RoleSeeding(roleManager);
-    var claimSeeder = new ChallengeClaimSeeding(dbContext);
+    var seeder = new Seeder(userManager, roleManager);
 
-    await claimSeeder.Seed();
-
-    rs.SeedRoles();
+    await seeder.SeeRolesAsync();
+    await seeder.SeedUsersAndThereRolesAsync();
 }
 
 try

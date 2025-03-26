@@ -24,11 +24,15 @@ import {
   Subscription,
   throttle,
   throttleTime,
+  timer,
 } from 'rxjs';
 import { CanComponentDeactivate } from '../../../../../core/app/guards/canDeactivateGuard';
 import { UserService } from '../../../../../core/user/services/user.service';
 import { isEmail } from '../../../../../core/app/validators/isEmail';
 import { isNumeric } from '../../../../../core/app/validators/isNumeric';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-management-create-view',
@@ -45,7 +49,12 @@ import { isNumeric } from '../../../../../core/app/validators/isNumeric';
 export class UserManagementCreateViewComponent
   implements OnInit, OnDestroy, CanComponentDeactivate
 {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private snackBar: MatSnackBar,
+    private active: ActivatedRoute,
+    private router: Router
+  ) {}
   hasUnsavedChanges = false;
   showPassword = false;
   passwordInputType = 'password';
@@ -53,6 +62,7 @@ export class UserManagementCreateViewComponent
   userFormUserNameInputChangeSubscription: Subscription | null = null;
   userFormEmailInputChangeSubscription: Subscription | null = null;
   userFormPhoneNumberInputChangeSubscription: Subscription | null = null;
+  isSendingCreatingUserRequest = false;
 
   createUserForm = new FormGroup({
     userName: new FormControl<string | null>(null, [
@@ -165,6 +175,45 @@ export class UserManagementCreateViewComponent
         emitEvent: true,
       }
     );
+  }
+
+  createClick() {
+    if (this.createUserForm.valid) {
+      this.isSendingCreatingUserRequest = true;
+
+      this.userService
+        .createUser({
+          email: this.createUserForm.controls.email.getRawValue()!,
+          password: this.createUserForm.controls.password.getRawValue()!,
+          phoneNumber: this.createUserForm.controls.phoneNumber.getRawValue()!,
+          userName: this.createUserForm.controls.userName.getRawValue()!,
+        })
+        .subscribe({
+          next: (response) => {
+            this.snackBar.open(
+              'Created user successfully. Navigating...',
+              'Close',
+              {
+                duration: 3000,
+              }
+            );
+            this.isSendingCreatingUserRequest = false;
+            this.cancelClick();
+            timer(3000).subscribe(() => {
+              this.router.navigate(['../', 'users', response.id], {
+                relativeTo: this.active,
+              });
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            let code = err.error[0]?.code;
+            this.snackBar.open(`Failed to create user code: ${code}`, 'Close', {
+              duration: 10000,
+            });
+            this.isSendingCreatingUserRequest = false;
+          },
+        });
+    }
   }
 
   canDeactivate(): boolean | Observable<boolean> {

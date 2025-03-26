@@ -1,8 +1,9 @@
+import { CreateUserResponseBody } from './../type';
 import { Injectable } from '@angular/core';
 import { FetchUserResponseBody, User } from '../type';
 import { HttpClient } from '@angular/common/http';
 import env from '../../../environments/environment';
-import { catchError, of, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,21 @@ export class UserService {
   isPhoneNumberTaken(body: { phoneNumber: string }) {
     return this.httpClient.post(
       `${this.BASE_URL}/users/phone-numbers/is-taken`,
+      body
+    );
+  }
+
+  /**
+   * Creates a user into the system - only admins can do this.
+   */
+  createUser(body: {
+    userName: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+  }) {
+    return this.httpClient.post<CreateUserResponseBody>(
+      `${this.BASE_URL}/authentication/register`,
       body
     );
   }

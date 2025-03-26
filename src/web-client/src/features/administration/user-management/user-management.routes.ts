@@ -24,7 +24,14 @@ export const USER_MANAGEMENT_ROUTES: Routes = [
           import(
             './ui/user-management-create-view/user-management-create-view.component'
           ).then((c) => c.UserManagementCreateViewComponent),
-          canDeactivate: [canDeactivateGuard],
+        canDeactivate: [canDeactivateGuard],
+      },
+      {
+        path: 'users/:userId',
+        loadComponent: () =>
+          import(
+            './ui/user-management-user-id-view/user-management-user-id-view.component'
+          ).then((c) => c.UserManagementUserIdViewComponent),
       },
       {
         path: 'users/:userId/edit',

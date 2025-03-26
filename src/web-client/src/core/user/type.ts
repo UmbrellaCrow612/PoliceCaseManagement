@@ -13,3 +13,9 @@ export interface FetchUserResponseBody {
   user: User;
   roles: string[];
 }
+
+export interface CreateUserResponseBody {
+  id: string;
+  username: string;
+  email: string;
+}

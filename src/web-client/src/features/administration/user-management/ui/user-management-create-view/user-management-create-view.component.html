@@ -76,6 +76,12 @@
 
   <div class="bottom">
     <button mat-raised-button (click)="cancelClick()">Cancel</button>
-    <button mat-raised-button [disabled]="!createUserForm.valid">Create</button>
+    <button
+      mat-raised-button
+      [disabled]="!createUserForm.valid || isSendingCreatingUserRequest"
+      (click)="createClick()"
+    >
+      Create
+    </button>
   </div>
 </div>
