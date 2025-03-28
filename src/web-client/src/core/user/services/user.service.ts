@@ -85,4 +85,13 @@ export class UserService {
   getUserById(body: { userId: string }) {
     return this.httpClient.get<User>(`${this.BASE_URL}/users/${body.userId}`);
   }
+
+  /**
+   * Get a users roles by there ID
+   */
+  getUserRolesById(body: { userId: string }) {
+    return this.httpClient.get<{ roles: string[] }>(
+      `${this.BASE_URL}/users/${body.userId}/roles`
+    );
+  }
 }

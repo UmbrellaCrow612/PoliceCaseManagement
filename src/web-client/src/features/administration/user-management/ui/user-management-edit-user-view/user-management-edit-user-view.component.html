@@ -18,22 +18,22 @@
       ></app-user-management-edit-user-details-view>
     </mat-tab>
     <mat-tab label="Roles">
+      <app-user-management-edit-user-roles-view
+        [(roles)]="userRolesData"
+        (selectionChangedEvent)="roleChangedListener()"
+      ></app-user-management-edit-user-roles-view>
+    </mat-tab>
+
+    <mat-tab label="Settings">
       <div>
-        {{ userDetailsData?.email }}
-        {{ isFormsValid["userDetailsFormValid"] }}
+        {{ userRolesData }}
       </div>
     </mat-tab>
-    <mat-tab label="Settings"> <div>tab</div> </mat-tab>
   </mat-tab-group>
 
   <div class="bottom">
     <button mat-raised-button (click)="cancelClick()">Cancel</button>
-    <button
-      mat-raised-button
-      (click)="saveClick()"
-    >
-      Save
-    </button>
+    <button mat-raised-button (click)="saveClick()">Save</button>
   </div>
 </div>
 

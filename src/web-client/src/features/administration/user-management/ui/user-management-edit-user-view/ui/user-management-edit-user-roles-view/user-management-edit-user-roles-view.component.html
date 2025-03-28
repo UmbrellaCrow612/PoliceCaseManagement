@@ -1,0 +1,21 @@
+<div>
+  <mat-selection-list
+    #rolesList
+    aria-label="User Roles"
+    (selectionChange)="onSelectionChange($event)"
+  >
+    @for (role of allSystemRoles; track role) {
+    <mat-list-option
+      [value]="role"
+      [selected]="roles().includes(role)"
+      [attr.aria-label]="'Role ' + role"
+    >
+      {{ role }}
+    </mat-list-option>
+    } @empty {
+    <mat-list-option disabled>No system roles defined.</mat-list-option>
+    }
+  </mat-selection-list>
+
+  <p>Roles selected: {{ roles() }}</p>
+</div>

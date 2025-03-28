@@ -108,5 +108,17 @@ namespace Identity.API.Controllers
 
             return Ok(dto);
         }
+
+
+        [HttpGet("{userId}/roles")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetUserRolesAsync(string userId)
+        {
+            var roles = await _authService.GetUserRolesAsync(userId);
+
+            var dto = new { roles };
+
+            return Ok(dto);
+        }
     }
 }

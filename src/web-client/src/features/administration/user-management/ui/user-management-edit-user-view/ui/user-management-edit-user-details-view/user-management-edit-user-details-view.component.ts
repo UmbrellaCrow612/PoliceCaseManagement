@@ -5,7 +5,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { User } from './../../../../../../../core/user/type';
-import { Component, input, model, OnInit, output } from '@angular/core';
+import { Component, model, OnInit, output } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 
@@ -32,8 +32,17 @@ export class UserManagementEditUserDetailsViewComponent implements OnInit {
 
     this.userEditForm.enable();
 
+    this.userDataChangesMadeEvent.emit({
+      emitFirst: true,
+      valid: this.userEditForm.valid,
+    });
+    console.log(this.userEditForm.valid);
     this.userEditForm.valueChanges.subscribe((newData) => {
-      this.userDataChangesMadeEvent.emit(this.userEditForm.valid);
+      this.userDataChangesMadeEvent.emit({
+        emitFirst: false,
+        valid: this.userEditForm.valid,
+      });
+      console.log(this.userEditForm.valid);
 
       this.userData.update((current: any) => {
         return { ...current, ...newData }; // replace with form data value
@@ -46,7 +55,7 @@ export class UserManagementEditUserDetailsViewComponent implements OnInit {
   /**
    * Emits if the user data changes and if the form is still valid
    */
-  userDataChangesMadeEvent = output<boolean>();
+  userDataChangesMadeEvent = output<{ emitFirst: boolean; valid: boolean }>();
 
   userEditForm = new FormGroup({
     userName: new FormControl<string>('', [Validators.required]),

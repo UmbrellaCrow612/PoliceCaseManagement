@@ -6,4 +6,12 @@
  */
 export const UserRoles = {
   Admin: 'Admin',
+
+  /**
+   * Get All roles in the system
+   * @returns List of all the system roles mapped from the backend
+   */
+  all() {
+    return [this.Admin];
+  },
 } as const;
