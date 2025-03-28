@@ -1,0 +1,23 @@
+<div class="container">
+  <form [formGroup]="userEditForm" class="form">
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="userName" />
+      <mat-hint>Username</mat-hint>
+      @if (userEditForm.controls.userName.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+      <mat-hint>Email</mat-hint>
+      @if (userEditForm.controls.email.hasError("required")) {
+      <mat-error> Required </mat-error>
+      } @else if (userEditForm.controls.email.hasError("email")) {
+      <mat-error> Enter a valid email address </mat-error>
+      }
+    </mat-form-field>
+  </form>
+</div>

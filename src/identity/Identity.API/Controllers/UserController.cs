@@ -84,7 +84,7 @@ namespace Identity.API.Controllers
         /// </summary>
         [HttpPost("phone-numbers/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
+        public async Task<ActionResult<UserDto>> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
         {
             var result = await _authService.IsPhoneNumberTaken(dto.PhoneNumber);
             if (!result.Succeeded)
@@ -93,6 +93,20 @@ namespace Identity.API.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet("{userId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetUserByIdAsync(string userId)
+        {
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+            var dto = _userMapping.ToDto(user);
+
+            return Ok(dto);
         }
     }
 }

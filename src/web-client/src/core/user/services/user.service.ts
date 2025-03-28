@@ -78,4 +78,11 @@ export class UserService {
       body
     );
   }
+
+  /**
+   * Get a users detail by there ID - done by a admin.
+   */
+  getUserById(body: { userId: string }) {
+    return this.httpClient.get<User>(`${this.BASE_URL}/users/${body.userId}`);
+  }
 }
