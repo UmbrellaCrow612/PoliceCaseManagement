@@ -1393,5 +1393,28 @@ namespace Identity.Application.Implamentations
             result.Succeeded = true;
             return result;
         }
+
+        public async Task<List<ApplicationUser>> SearchUsersByQuery(SearchUserQuery query)
+        {
+            var queryBuilder = _userManager.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.UserName))
+            {
+                queryBuilder = queryBuilder.Where(x => x.UserName!.Contains(query.UserName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Email))
+            {
+                queryBuilder = queryBuilder.Where(x => x.Email!.Contains(query.Email));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.PhoneNumber))
+            {
+                queryBuilder = queryBuilder.Where(x => x.PhoneNumber!.Contains(query.PhoneNumber));
+            }
+
+            var users = await queryBuilder.AsNoTracking().ToListAsync();
+            return users;
+        }
     }
 }

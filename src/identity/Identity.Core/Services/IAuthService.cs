@@ -83,6 +83,8 @@ namespace Identity.Core.Services
         /// Here cause we need to do both in one operation as it causes concurrency bugs
         /// </summary>
         Task<AuthResult> UpdateUserAndRolesAsync(ApplicationUser user, string[] newRoles);
+
+        Task<List<ApplicationUser>> SearchUsersByQuery(SearchUserQuery query);
     }
 
     public class AuthError : IServiceError

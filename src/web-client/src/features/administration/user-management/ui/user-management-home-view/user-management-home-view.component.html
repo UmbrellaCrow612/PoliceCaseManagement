@@ -1,1 +1,84 @@
-<p>user-management-home-view works!</p>
+<div class="container">
+  <div class="top">
+    <form
+      class="search_form"
+      [formGroup]="searchUsersForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <div class="inputs">
+        <mat-form-field appearance="fill">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="userName" />
+          <mat-hint>Username contains (abc)</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+          <mat-hint>Email contains (abc)</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Phone number</mat-label>
+          <input matInput formControlName="phoneNumber" />
+          <mat-hint>Phone number contains (123)</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="buttons">
+        <button type="submit" mat-raised-button [disabled]="isLoading">
+          <!--Loading -->
+
+          @if (isLoading) {
+          <span>Loading...</span>
+          }
+
+          <!--Not Loading -->
+
+          @if (!isLoading) {
+          <span> Search </span>
+          }
+        </button>
+        <button type="reset" mat-raised-button>Clear</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="bottom">
+    <!-- Loading -->
+
+    @if (isLoading) {
+    <div class="loading">
+      <mat-spinner></mat-spinner>
+    </div>
+    }
+
+    <!-- Error message -->
+
+    @if (errorMessage) {
+    <div class="error">
+      <span class="error_message">
+        {{ errorMessage }}
+      </span>
+    </div>
+    }
+
+    <!--No Error message or loading state -->
+
+    @if (!isLoading && !errorMessage) {
+    <mat-list role="list">
+      @for (user of users; track $index) {
+      <a [routerLink]="['users', user.id]">
+        <mat-list-item class="clickable_list_item">
+          <span matListItemTitle>{{ user.userName }}</span>
+          <span matListItemLine
+            >Email: {{ user.email }} phone number: {{ user.phoneNumber }}</span
+          >
+        </mat-list-item>
+      </a>
+      } @empty {
+      <mat-list-item>
+        <span matListItemTitle>Nothing found for search terms ...</span>
+      </mat-list-item>
+      }
+    </mat-list>
+    }
+  </div>
+</div>

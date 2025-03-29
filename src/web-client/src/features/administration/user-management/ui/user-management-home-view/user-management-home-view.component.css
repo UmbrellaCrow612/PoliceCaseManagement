@@ -1,0 +1,68 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom {
+  overflow-y: scroll;
+  max-height: 250px;
+  flex: 1;
+}
+
+.clickable_list_item {
+  cursor: pointer;
+}
+
+.clickable_list_item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error_message {
+  color: red;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.search_form {
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputs {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  padding: 5px;
+  align-items: start;
+  justify-content: start;
+  flex-wrap: wrap;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: end;
+  padding: 5px;
+}

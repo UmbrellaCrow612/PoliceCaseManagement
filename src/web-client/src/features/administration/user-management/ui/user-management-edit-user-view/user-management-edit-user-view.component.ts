@@ -117,6 +117,9 @@ export class UserManagementEditUserViewComponent
         .subscribe({
           next: () => {
             this.fetchData();
+            this.snackBar.open('Updated user details', 'Close', {
+              duration: 10000,
+            });
           },
           error: (err: HttpErrorResponse) => {
             this.errorMessage = `Failed to update user and roles code: ${err.error[0]?.code}`;

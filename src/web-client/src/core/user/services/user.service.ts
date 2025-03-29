@@ -122,4 +122,29 @@ export class UserService {
       body
     );
   }
+
+  /**
+   * Search for users by conditions - note only for admins
+   */
+  searchUsersByQuery(body: {
+    userName: string | null;
+    email: string | null;
+    phoneNumber: string | null;
+  }) {
+    let url = new URL(`${this.BASE_URL}/users/search`);
+
+    if (body.userName) {
+      url.searchParams.append('username', body.userName);
+    }
+
+    if (body.email) {
+      url.searchParams.append('email', body.email);
+    }
+
+    if (body.phoneNumber) {
+      url.searchParams.append('phoneNumber', body.phoneNumber);
+    }
+
+    return this.httpClient.get<User[]>(url.toString());
+  }
 }

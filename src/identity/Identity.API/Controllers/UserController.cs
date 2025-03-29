@@ -2,6 +2,7 @@
 using Identity.API.DTOs;
 using Identity.API.Mappings;
 using Identity.Core.Services;
+using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -189,6 +190,21 @@ namespace Identity.API.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet("search")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult<List<UserDto>>> SearchUsersAsync([FromQuery] SearchUserQuery query)
+        {
+            var users = await _authService.SearchUsersByQuery(query);
+
+            List<UserDto> dto = [];
+            foreach (var user in users)
+            {
+                dto.Add(_userMapping.ToDto(user));
+            }
+
+            return Ok(dto);
         }
     }
 }
