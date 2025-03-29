@@ -176,6 +176,11 @@
         /// Indicates that a email is already used by another user.
         /// </summary>
         public const string EmailAreadyUsed = "EMAIL_ALREADY_USED";
+
+        /// <summary>
+        /// Indicates that a role that you are trying to assign to does not exist.
+        /// </summary>
+        public const string RoleDoesNotExist = "ROLE_DOES_NOT_EXIST";
         #endregion
     }
 }

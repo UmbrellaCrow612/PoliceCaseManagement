@@ -109,6 +109,29 @@ namespace Identity.API.Controllers
             return Ok(dto);
         }
 
+        /// <summary>
+        /// Update a users details like username , email etc
+        /// </summary>
+        /// <returns></returns>
+        [HttpPatch("{userId}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UpdateUserByIdAsync(string userId, [FromBody] UpdateUserDto dto)
+        {
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            _userMapping.Update(user, dto);
+            var result = await _authService.UpdateUserAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return NoContent();
+        }
 
         [HttpGet("{userId}/roles")]
         [Authorize(Roles = Roles.Admin)]
@@ -119,6 +142,53 @@ namespace Identity.API.Controllers
             var dto = new { roles };
 
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Update a users roles
+        /// </summary>
+        /// <returns></returns>
+        [HttpPatch("{userId}/roles")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UpdateUserRolesByIdAsync(string userId, UpdateUserRolesDto dto)
+        {
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _authService.UpdateUserRolesAsync(user, dto.Roles);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Endpoint to update a user and there roles - Doing sep causes concurrency bugs
+        /// </summary>
+        [HttpPatch("{userId}/user-and-roles")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UpdateUserAndRolesAsync(string userId, [FromBody] UpdateUserAndRolesDto dto)
+        {
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            _userMapping.Update(user, dto.User);
+
+            var result = await _authService.UpdateUserAndRolesAsync(user, dto.Roles);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
         }
     }
 }

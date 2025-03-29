@@ -74,6 +74,15 @@ namespace Identity.Core.Services
         Task<AuthResult> IsEmailTaken(string email);
 
         Task<AuthResult> IsPhoneNumberTaken(string phoneNumber);
+
+        Task<AuthResult> UpdateUserAsync(ApplicationUser user);
+
+        Task<AuthResult> UpdateUserRolesAsync(ApplicationUser user, string[] newRoles);
+
+        /// <summary>
+        /// Here cause we need to do both in one operation as it causes concurrency bugs
+        /// </summary>
+        Task<AuthResult> UpdateUserAndRolesAsync(ApplicationUser user, string[] newRoles);
     }
 
     public class AuthError : IServiceError

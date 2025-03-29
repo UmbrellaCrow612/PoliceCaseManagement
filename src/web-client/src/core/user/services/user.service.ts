@@ -94,4 +94,32 @@ export class UserService {
       `${this.BASE_URL}/users/${body.userId}/roles`
     );
   }
+
+  /**
+   * Update a user details like there username and email etc - Note only admins can do this.
+   */
+  updateUserDetails(body: User) {
+    return this.httpClient.patch(`${this.BASE_URL}/users/${body.id}`, body);
+  }
+
+  /**
+   * Update a user roles - Note only done by an admin
+   * @param user The user fetched from the backend
+   * @param newRoles List of new selected roles for them
+   */
+  updateUserRoles(user: User, newRoles: string[]) {
+    return this.httpClient.patch(`${this.BASE_URL}/users/${user.id}/roles`, {
+      roles: newRoles,
+    });
+  }
+
+  /**
+   * Update both in same thread to not cause bugs
+   */
+  updateUserAndRoles(body: { user: User; roles: string[] }) {
+    return this.httpClient.patch(
+      `${this.BASE_URL}/users/${body.user.id}/user-and-roles`,
+      body
+    );
+  }
 }

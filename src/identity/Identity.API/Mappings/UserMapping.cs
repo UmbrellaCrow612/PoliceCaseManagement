@@ -17,7 +17,9 @@ namespace Identity.API.Mappings
             {
                 Id = user.Id,
                 Email= user.Email!,
-                UserName = user.UserName!
+                UserName = user.UserName!,
+                PhoneNumber = user.PhoneNumber!
+                
             };
         }
 

@@ -5,6 +5,7 @@ export interface User {
   id: string;
   userName: string;
   email: string;
+  phoneNumber: string;
 }
 /**
  * Response from server shape dto for /me endpoint
@@ -18,4 +19,5 @@ export interface CreateUserResponseBody {
   id: string;
   username: string;
   email: string;
+  phoneNumber: string;
 }

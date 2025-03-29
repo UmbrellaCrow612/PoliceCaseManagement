@@ -8,6 +8,7 @@ import { User } from './../../../../../../../core/user/type';
 import { Component, model, OnInit, output } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
+import { Validator_containsOnlyNumeric } from '../../../../../../../core/app/validators/controls';
 
 @Component({
   selector: 'app-user-management-edit-user-details-view',
@@ -23,6 +24,7 @@ export class UserManagementEditUserDetailsViewComponent implements OnInit {
       {
         userName: this.userData()?.userName,
         email: this.userData()?.email,
+        phoneNumber: this.userData()?.phoneNumber,
       },
       {
         emitEvent: false,
@@ -60,5 +62,9 @@ export class UserManagementEditUserDetailsViewComponent implements OnInit {
   userEditForm = new FormGroup({
     userName: new FormControl<string>('', [Validators.required]),
     email: new FormControl<string>('', [Validators.required, Validators.email]),
+    phoneNumber: new FormControl<string>('', [
+      Validators.required,
+      Validator_containsOnlyNumeric,
+    ]),
   });
 }

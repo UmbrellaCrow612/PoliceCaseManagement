@@ -27,6 +27,9 @@
     <mat-tab label="Settings">
       <div>
         {{ userRolesData }}
+        <span>
+          {{ userDetailsData | json }}
+        </span>
       </div>
     </mat-tab>
   </mat-tab-group>

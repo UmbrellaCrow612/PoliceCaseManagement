@@ -18,7 +18,7 @@ namespace Identity.Application.Implamentations
 {
     internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, 
         IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IOptions<PasswordConfigSettings> passwordConfigSettings
-        , IPasswordHasher<ApplicationUser> passwordHasher) : IAuthService
+        , IPasswordHasher<ApplicationUser> passwordHasher, RoleManager<ApplicationRole> roleManager) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
@@ -29,6 +29,7 @@ namespace Identity.Application.Implamentations
         private readonly ILogger<AuthService> _logger = logger;
         private readonly PasswordConfigSettings _passwordConfigSettings = passwordConfigSettings.Value;
         private readonly IPasswordHasher<ApplicationUser> _passwordHasher = passwordHasher;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
 
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
@@ -1306,6 +1307,86 @@ namespace Identity.Application.Implamentations
             if (isTaken)
             {
                 result.AddError(BusinessRuleCodes.PhoneNumberAlreadyTaken);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<AuthResult> UpdateUserAsync(ApplicationUser user)
+        {
+            var result = new AuthResult();
+
+            var updateUserResult = await _userManager.UpdateAsync(user);
+            if (!updateUserResult.Succeeded)
+            {
+                foreach(var err in updateUserResult.Errors)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, $@"Identity Error message: ${err.Description} Code: ${err.Code}");
+                }
+                return result;
+            }
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<AuthResult> UpdateUserRolesAsync(ApplicationUser user, string[] newRoles)
+        {
+            var result = new AuthResult();
+
+            foreach (var role in newRoles)
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    result.AddError(BusinessRuleCodes.RoleDoesNotExist);
+                    return result;
+                }
+            }
+
+            var currentRoles = await _userManager.GetRolesAsync(user!);
+            if (currentRoles.Count > 0)
+            {
+                var removeCurrentRolesResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeCurrentRolesResult.Succeeded)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, "Failed to remove te current roles of the user.");
+                    return result;
+                }
+            }
+
+            var assignNewRolesResult = await _userManager.AddToRolesAsync(user, newRoles);
+            if (!assignNewRolesResult.Succeeded)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Failed to assign user to new roles.");
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<AuthResult> UpdateUserAndRolesAsync(ApplicationUser user, string[] newRoles)
+        {
+            var result = new AuthResult();
+
+            var updateUserResult = await UpdateUserAsync(user);
+            if (!updateUserResult.Succeeded)
+            {
+                foreach (var err in updateUserResult.Errors)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, err.Message);
+                }
+                return result;
+            }
+
+            var updateRolesResult = await UpdateUserRolesAsync(user, newRoles);
+            if (!updateRolesResult.Succeeded)
+            {
+                foreach (var err in updateRolesResult.Errors)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, err.Message);
+                }
                 return result;
             }
 

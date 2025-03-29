@@ -19,5 +19,16 @@
       <mat-error> Enter a valid email address </mat-error>
       }
     </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Phone Number</mat-label>
+      <input matInput formControlName="phoneNumber" />
+      <mat-hint>Phone number</mat-hint>
+      @if (userEditForm.controls.phoneNumber.hasError("required")) {
+      <mat-error> Required </mat-error>
+      } @else if (userEditForm.controls.phoneNumber.hasError("numeric")) {
+      <mat-error> Phone number can only contain numbers </mat-error>
+      }
+    </mat-form-field>
   </form>
 </div>

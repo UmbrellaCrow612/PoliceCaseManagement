@@ -10,6 +10,8 @@ import { UserService } from '../../../../../core/user/services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserManagementEditUserRolesViewComponent } from './ui/user-management-edit-user-roles-view/user-management-edit-user-roles-view.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-management-edit-user-view',
@@ -19,6 +21,7 @@ import { UserManagementEditUserRolesViewComponent } from './ui/user-management-e
     UserManagementEditUserDetailsViewComponent,
     MatProgressSpinnerModule,
     UserManagementEditUserRolesViewComponent,
+    JsonPipe,
   ],
   templateUrl: './user-management-edit-user-view.component.html',
   styleUrl: './user-management-edit-user-view.component.css',
@@ -104,7 +107,23 @@ export class UserManagementEditUserViewComponent
     }
 
     if (this.hasUnsavedChanges && this.areAllFormsValid(this.isFormsValid)) {
-      this.snackBar.open('Saved changes', 'Close', { duration: 10000 });
+      this.isLoading = true;
+
+      this.userService
+        .updateUserAndRoles({
+          user: this.userDetailsData!,
+          roles: this.userRolesData,
+        })
+        .subscribe({
+          next: () => {
+            this.fetchData();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.errorMessage = `Failed to update user and roles code: ${err.error[0]?.code}`;
+            this.isLoading = false;
+          },
+        });
+
       this.cancelClick();
     } else {
       this.snackBar.open(
