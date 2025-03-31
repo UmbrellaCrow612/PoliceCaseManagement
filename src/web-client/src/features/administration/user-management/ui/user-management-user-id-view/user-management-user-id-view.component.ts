@@ -43,9 +43,11 @@ export class UserManagementUserIdViewComponent implements OnInit {
     });
   }
 
-  editClick() {
-    this.router.navigate(['edit'], { relativeTo: this.active });
+  editDetailsClicked() {
+    this.router.navigate(['edit/details'], { relativeTo: this.active });
   }
 
-  // if user then get there roles from endpoint and also department etc
+  editRolesClicked() {
+    this.router.navigate(['edit/roles'], { relativeTo: this.active });
+  }
 }

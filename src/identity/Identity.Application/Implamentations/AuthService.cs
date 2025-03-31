@@ -1318,6 +1318,18 @@ namespace Identity.Application.Implamentations
         {
             var result = new AuthResult();
 
+            if (await _userManager.Users.AnyAsync(x => x.UserName == user.UserName && x.Id != user.Id))
+            {
+                result.AddError(BusinessRuleCodes.UsernameAlreadyTaken);
+                return result;
+            }
+
+            if (await _userManager.Users.AnyAsync(x => x.Email == user.Email && x.Id != user.Id))
+            {
+                result.AddError(BusinessRuleCodes.EmailAreadyUsed);
+                return result;
+            }
+
             var updateUserResult = await _userManager.UpdateAsync(user);
             if (!updateUserResult.Succeeded)
             {
@@ -1359,34 +1371,6 @@ namespace Identity.Application.Implamentations
             if (!assignNewRolesResult.Succeeded)
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Failed to assign user to new roles.");
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<AuthResult> UpdateUserAndRolesAsync(ApplicationUser user, string[] newRoles)
-        {
-            var result = new AuthResult();
-
-            var updateUserResult = await UpdateUserAsync(user);
-            if (!updateUserResult.Succeeded)
-            {
-                foreach (var err in updateUserResult.Errors)
-                {
-                    result.AddError(BusinessRuleCodes.ValidationError, err.Message);
-                }
-                return result;
-            }
-
-            var updateRolesResult = await UpdateUserRolesAsync(user, newRoles);
-            if (!updateRolesResult.Succeeded)
-            {
-                foreach (var err in updateRolesResult.Errors)
-                {
-                    result.AddError(BusinessRuleCodes.ValidationError, err.Message);
-                }
                 return result;
             }
 

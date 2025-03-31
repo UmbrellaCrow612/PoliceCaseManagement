@@ -114,16 +114,6 @@ export class UserService {
   }
 
   /**
-   * Update both in same thread to not cause bugs
-   */
-  updateUserAndRoles(body: { user: User; roles: string[] }) {
-    return this.httpClient.patch(
-      `${this.BASE_URL}/users/${body.user.id}/user-and-roles`,
-      body
-    );
-  }
-
-  /**
    * Search for users by conditions - note only for admins
    */
   searchUsersByQuery(body: {

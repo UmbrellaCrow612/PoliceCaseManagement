@@ -5,6 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { AppLink } from '../../../../../core/app/type';
 import { RouterModule } from '@angular/router';
 import { appPaths } from '../../../../../core/app/constants/appPaths';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-user-management-header',
@@ -13,6 +14,7 @@ import { appPaths } from '../../../../../core/app/constants/appPaths';
   styleUrl: './user-management-header.component.css',
 })
 export class UserManagementHeaderComponent {
+  constructor(private location: Location) {}
   links: Array<AppLink> = [
     {
       href: `/${appPaths.ADMINISTRATION}/${appPaths.A_USER_MANAGEMENT}`,
@@ -25,4 +27,8 @@ export class UserManagementHeaderComponent {
       name: 'Add new user',
     },
   ];
+
+  goBack() {
+    this.location.back();
+  }
 }

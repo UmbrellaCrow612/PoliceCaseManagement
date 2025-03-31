@@ -1,4 +1,7 @@
 <div class="container">
+  <button (click)="goBack()" mat-icon-button>
+    <mat-icon> arrow_back </mat-icon>
+  </button>
   @for (link of links; track $index) {
   <a mat-flat-button [routerLink]="link.href">
     {{ link.name }}

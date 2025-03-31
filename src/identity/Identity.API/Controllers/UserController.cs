@@ -110,10 +110,6 @@ namespace Identity.API.Controllers
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Update a users details like username , email etc
-        /// </summary>
-        /// <returns></returns>
         [HttpPatch("{userId}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserByIdAsync(string userId, [FromBody] UpdateUserDto dto)
@@ -145,10 +141,6 @@ namespace Identity.API.Controllers
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Update a users roles
-        /// </summary>
-        /// <returns></returns>
         [HttpPatch("{userId}/roles")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserRolesByIdAsync(string userId, UpdateUserRolesDto dto)
@@ -166,30 +158,6 @@ namespace Identity.API.Controllers
             }
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Endpoint to update a user and there roles - Doing sep causes concurrency bugs
-        /// </summary>
-        [HttpPatch("{userId}/user-and-roles")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> UpdateUserAndRolesAsync(string userId, [FromBody] UpdateUserAndRolesDto dto)
-        {
-            var user = await _authService.GetUserByIdAsync(userId);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            _userMapping.Update(user, dto.User);
-
-            var result = await _authService.UpdateUserAndRolesAsync(user, dto.Roles);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok();
         }
 
         [HttpGet("search")]

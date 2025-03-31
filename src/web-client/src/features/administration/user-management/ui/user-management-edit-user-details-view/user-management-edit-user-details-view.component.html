@@ -1,0 +1,71 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+<!---->
+
+@if (!isLoading && errorMessage) {
+<div>
+  {{ errorMessage }}
+  <button mat-raised-button (click)="fetchData()">Refresh</button>
+</div>
+}
+
+<!---->
+
+@if (!isLoading && !errorMessage) {
+<form class="form" [formGroup]="userForm">
+  <div class="inputs">
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="userName" />
+      <mat-hint>Username</mat-hint>
+
+      @if (userForm.controls.userName.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" />
+      <mat-hint>Email</mat-hint>
+
+      @if (userForm.controls.email.hasError("required")) {
+      <mat-error> Required </mat-error>
+      } @else if (userForm.controls.email.hasError("email")) {
+      <mat-error> Invalid email </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Phone number</mat-label>
+      <input matInput formControlName="phoneNumber" type="phoneNumber" />
+      <mat-hint>Phone number</mat-hint>
+
+      @if (userForm.controls.phoneNumber.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="buttons">
+    <button
+      mat-raised-button
+      (click)="saveClicked()"
+      [disabled]="userForm.invalid || !userForm.dirty"
+      type="submit"
+    >
+      Save
+    </button>
+    <button
+      mat-raised-button
+      (click)="fetchData()"
+      type="button"
+      [disabled]="!userForm.dirty"
+    >
+      Cancel
+    </button>
+  </div>
+</form>
+
+}

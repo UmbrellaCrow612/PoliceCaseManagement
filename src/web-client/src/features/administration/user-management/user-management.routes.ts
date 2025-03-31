@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { UserManagementEditUserViewComponent } from './ui/user-management-edit-user-view/user-management-edit-user-view.component';
 import { canDeactivateGuard } from '../../../core/app/guards/canDeactivateGuard';
 
 export const USER_MANAGEMENT_ROUTES: Routes = [
@@ -34,12 +33,19 @@ export const USER_MANAGEMENT_ROUTES: Routes = [
           ).then((c) => c.UserManagementUserIdViewComponent),
       },
       {
-        path: 'users/:userId/edit',
+        path: 'users/:userId/edit/details',
         loadComponent: () =>
           import(
-            './ui/user-management-edit-user-view/user-management-edit-user-view.component'
-          ).then((c) => c.UserManagementEditUserViewComponent),
+            './ui/user-management-edit-user-details-view/user-management-edit-user-details-view.component'
+          ).then((c) => c.UserManagementEditUserDetailsViewComponent),
         canDeactivate: [canDeactivateGuard],
+      },
+      {
+        path: 'users/:userId/edit/roles',
+        loadComponent: () =>
+          import(
+            './ui/user-management-edit-user-roles-view/user-management-edit-user-roles-view.component'
+          ).then((c) => c.UserManagementEditUserRolesViewComponent),
       },
     ],
   },

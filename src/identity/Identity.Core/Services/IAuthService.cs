@@ -79,11 +79,6 @@ namespace Identity.Core.Services
 
         Task<AuthResult> UpdateUserRolesAsync(ApplicationUser user, string[] newRoles);
 
-        /// <summary>
-        /// Here cause we need to do both in one operation as it causes concurrency bugs
-        /// </summary>
-        Task<AuthResult> UpdateUserAndRolesAsync(ApplicationUser user, string[] newRoles);
-
         Task<List<ApplicationUser>> SearchUsersByQuery(SearchUserQuery query);
     }
 
