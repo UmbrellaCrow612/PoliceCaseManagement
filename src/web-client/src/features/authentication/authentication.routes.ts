@@ -86,4 +86,11 @@ export const AUTHENTICATION_ROUTES: Routes = [
         (c) => c.UnauthorizedViewComponent
       ),
   },
+  {
+    path: appPaths.CHANGE_PASSWORD,
+    loadComponent: () =>
+      import('./ui/change-password-view/change-password-view.component').then(
+        (c) => c.ChangePasswordViewComponent
+      ),
+  },
 ];

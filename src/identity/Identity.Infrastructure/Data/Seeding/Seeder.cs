@@ -17,7 +17,8 @@ namespace Identity.Infrastructure.Data.Seeding
                 {
                     Email = "admin@example.com",
                     PhoneNumber = "987654321",
-                    UserName = "admin"
+                    UserName = "admin",
+                    RequiresPasswordChange = false
                 }
             }
         };

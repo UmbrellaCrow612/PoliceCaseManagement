@@ -98,4 +98,20 @@ export class AuthenticationService {
   UnAuthorized() {
     this.router.navigate([appPaths.AUTHENTICATION, appPaths.UNAUTHORIZED]);
   }
+
+  /**
+   * Change a users password - provide the current password and new password
+   */
+  ChangePassword(
+    body: Partial<{
+      email: string | null;
+      password: string | null;
+      newPassword: string | null;
+    }>
+  ) {
+    return this.http.post(
+      `${this.BASE_URL}/authentication/change-password`,
+      body
+    );
+  }
 }

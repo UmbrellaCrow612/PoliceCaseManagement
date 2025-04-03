@@ -98,6 +98,19 @@ export class LoginViewComponent {
                 relativeTo: this.route,
               });
               break;
+
+            case CODES.REQUIRES_PASSWORD_CHANGE:
+              this.router.navigate([`../`, appPaths.CHANGE_PASSWORD], {
+                relativeTo: this.route,
+              });
+              break;
+
+            case CODES.EXPIRED_PASSWORD_BEING_USED:
+              this.router.navigate([`../`, appPaths.CHANGE_PASSWORD], {
+                relativeTo: this.route,
+              });
+              break;
+
             default:
               let errorMessage = formatBackendError(err);
               this.dialog.open(ErrorDialogComponent, {

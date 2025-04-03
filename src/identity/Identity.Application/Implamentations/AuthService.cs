@@ -134,6 +134,16 @@ namespace Identity.Application.Implamentations
                 return result;
             }
 
+            if (user.RequiresPasswordChange)
+            {
+                loginAttempt.FailureReason = "Requires password change.";
+                await _unitOfWork.SaveChangesAsync();
+                _logger.LogWarning("Login failed: Requres password change. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
+                result.AddError(BusinessRuleCodes.RequiresPasswordChange);
+
+                return result;
+            }
+
             loginAttempt.Status = LoginStatus.TwoFactorAuthenticationReached;
             await _unitOfWork.SaveChangesAsync();
             _logger.LogInformation("Login successful: UserId: {UserId}, IP: {IpAddress}, proceeding to 2FA.", user.Id, deviceInfo.IpAddress);
@@ -1234,6 +1244,7 @@ namespace Identity.Application.Implamentations
             await _unitOfWork.Repository<PreviousPassword>().AddAsync(previousPassword);
 
             user.PasswordCreatedAt = DateTime.UtcNow;
+            user.RequiresPasswordChange = false;
             var changeResult = await _userManager.ChangePasswordAsync(user, password, newPassword);
             if (!changeResult.Succeeded)
             {

@@ -97,6 +97,7 @@ namespace Identity.Infrastructure.Migrations
                     LastLoginDeviceId = table.Column<string>(type: "TEXT", nullable: true),
                     MagicLinkAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     OTPAuthEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    RequiresPasswordChange = table.Column<bool>(type: "INTEGER", nullable: false),
                     TimeBasedOneTimePassCodeId = table.Column<string>(type: "TEXT", nullable: true),
                     TimeBasedOneTimePassCodeEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),

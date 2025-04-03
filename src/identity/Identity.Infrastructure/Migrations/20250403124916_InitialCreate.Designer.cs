@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250325112443_InitialCreate")]
+    [Migration("20250403124916_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -140,6 +140,9 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RequiresPasswordChange")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SecurityStamp")

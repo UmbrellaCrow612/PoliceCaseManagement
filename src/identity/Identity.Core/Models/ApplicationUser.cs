@@ -19,6 +19,7 @@ namespace Identity.Core.Models
 
         public bool MagicLinkAuthEnabled { get; set; } = false;
         public bool OTPAuthEnabled { get; set; } = false;
+        public bool RequiresPasswordChange { get; set; } = true;
 
         public ICollection<TwoFactorSmsAttempt> TwoFactorCodeAttempts { get; set; } = [];
         public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];

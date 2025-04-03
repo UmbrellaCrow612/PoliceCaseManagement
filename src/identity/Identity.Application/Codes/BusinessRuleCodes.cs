@@ -181,6 +181,12 @@
         /// Indicates that a role that you are trying to assign to does not exist.
         /// </summary>
         public const string RoleDoesNotExist = "ROLE_DOES_NOT_EXIST";
+
+        /// <summary>
+        /// Indicates that a user needs to change there password, typically after being provished with a temporay password
+        /// they use to set there stuff up.
+        /// </summary>
+        public const string RequiresPasswordChange = "REQUIRES_PASSWORD_CHANGE";
         #endregion
     }
 }
