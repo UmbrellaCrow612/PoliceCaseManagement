@@ -46,6 +46,7 @@ export const USER_MANAGEMENT_ROUTES: Routes = [
           import(
             './ui/user-management-edit-user-roles-view/user-management-edit-user-roles-view.component'
           ).then((c) => c.UserManagementEditUserRolesViewComponent),
+        canDeactivate: [canDeactivateGuard],
       },
     ],
   },

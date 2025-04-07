@@ -4,6 +4,8 @@ import { UserService } from '../../../../../core/user/services/user.service';
 import { User } from '../../../../../core/user/type';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { forkJoin } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-management-user-id-view',
@@ -14,8 +16,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class UserManagementUserIdViewComponent implements OnInit {
   userId: string | null = null;
   user: User | null = null;
-  userNotFound = false;
-  isLoadingData = true;
+  roles: string[] = [];
+  isLoading = true;
+  errorMessage: string | null = null;
 
   constructor(
     private active: ActivatedRoute,
@@ -25,20 +28,27 @@ export class UserManagementUserIdViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.active.snapshot.paramMap.get('userId');
-    if (!this.userId) {
-      this.userNotFound = true;
-    }
-    this.isLoadingData = true;
+    this.fetchData();
+  }
 
-    this.userService.getUserById({ userId: this.userId! }).subscribe({
-      next: (val) => {
-        this.userNotFound = false;
-        this.user = val;
-        this.isLoadingData = false;
+  fetchData() {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    forkJoin({
+      user: this.userService.getUserById({ userId: this.userId! }),
+      rolesResponse: this.userService.getUserRolesById({
+        userId: this.userId!,
+      }),
+    }).subscribe({
+      next: (response) => {
+        this.user = response.user;
+        this.roles = response.rolesResponse.roles;
+        this.isLoading = false;
       },
-      error: () => {
-        this.userNotFound = true;
-        this.isLoadingData = false;
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage = `Failed to fetch user data code: ${err.error[0]?.code}`;
+        this.isLoading = false;
       },
     });
   }

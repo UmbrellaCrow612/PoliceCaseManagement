@@ -1264,14 +1264,14 @@ namespace Identity.Application.Implamentations
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<ICollection<string>> GetUserRolesAsync(string userId)
+        public async Task<string[]> GetUserRolesAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null) return [];
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            return roles.Count > 0 ? roles : [];
+            return [.. roles];
         }
 
         public async Task<AuthResult> IsUsernameTaken(string username)

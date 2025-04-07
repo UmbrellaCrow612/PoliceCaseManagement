@@ -67,7 +67,7 @@ namespace Identity.Core.Services
 
         Task<ApplicationUser?> GetUserByIdAsync(string userId);
 
-        Task<ICollection<string>> GetUserRolesAsync(string userId);
+        Task<string[]> GetUserRolesAsync(string userId);
 
         Task<AuthResult> IsUsernameTaken(string username);
 

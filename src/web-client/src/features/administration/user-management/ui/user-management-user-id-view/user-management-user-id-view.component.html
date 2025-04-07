@@ -1,22 +1,40 @@
-@if (userNotFound) {
-<div class="not_found_container">
-  <span> User with ID: {{ userId }} not found. </span>
-</div>
-} @else { @if (isLoadingData) {
+@if (isLoading) {
 <div class="loading_container">
   <mat-spinner></mat-spinner>
 </div>
-} @else {
+}
+<!---->
+
+@if (errorMessage && !isLoading) {
+<div class="not_found_container">
+  <span> {{ errorMessage }} </span>
+</div>
+}
+<!---->
+
+@if (!isLoading && !errorMessage) {
 <div class="container">
   <div class="details">
     <span>Username: {{ user?.userName }}</span>
     <span>Email: {{ user?.email }}</span>
+    <span> Phone number: {{ user?.phoneNumber }} </span>
+    <span>
+      Roles: @for (role of roles; track $index) {
+      <span>
+        {{ role }}
+      </span>
+      } @empty {
+      <span>No Roles</span>
+      }
+    </span>
   </div>
 
   <div class="bottom">
     <button mat-raised-button (click)="editRolesClicked()">Edit roles</button>
-    <button mat-raised-button (click)="editDetailsClicked()">Edit details</button>
+    <button mat-raised-button (click)="editDetailsClicked()">
+      Edit details
+    </button>
     <button mat-raised-button>Delete</button>
   </div>
 </div>
-} }
+}

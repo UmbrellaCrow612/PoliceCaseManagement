@@ -1,1 +1,47 @@
-<p>user-management-edit-user-roles-view works!</p>
+@if (isLoading) {
+<div>Loading</div>
+}
+<!---->
+
+@if (errorMessage && !isLoading) {
+<div>
+  Failed ot fetch data {{ errorMessage }}
+  <button (click)="fetchData()">Try again</button>
+</div>
+}
+<!---->
+
+@if (!errorMessage && !isLoading) {
+<div class="container">
+  <div class="details">
+    <h2>Assign Roles:</h2>
+    @for (role of systemRoles; track role) {
+    <mat-checkbox
+      [checked]="selectedRoles.has(role)"
+      (change)="onRoleChange(role, $event)"
+    >
+      {{ role }}
+    </mat-checkbox>
+    } @empty {
+    <p>No system roles defined.</p>
+    }
+  </div>
+
+  <div class="buttons">
+    <button
+      mat-raised-button
+      [disabled]="!hasUnsavedChanges"
+      (click)="fetchData()"
+    >
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      [disabled]="!hasUnsavedChanges"
+      (click)="saveClicked()"
+    >
+      Save
+    </button>
+  </div>
+</div>
+}
