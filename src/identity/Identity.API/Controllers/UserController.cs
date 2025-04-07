@@ -1,4 +1,4 @@
-﻿using Authorization.Core;
+﻿using Authorization;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
 using Identity.Core.Services;

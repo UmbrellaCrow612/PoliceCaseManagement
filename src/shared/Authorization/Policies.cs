@@ -1,4 +1,4 @@
-﻿namespace Authorization.Core
+﻿namespace Authorization
 {
     /// <summary>
     /// Authorization policies used throughout the system 

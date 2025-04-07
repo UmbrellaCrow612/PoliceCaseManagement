@@ -1,5 +1,4 @@
-﻿using Authorization.Core;
-using Identity.Application.Helpers;
+﻿using Identity.Application.Helpers;
 using Identity.Application.Settings;
 using Identity.Application.Codes;
 using Identity.Core.Models;
@@ -13,6 +12,7 @@ using OtpNet;
 using System.Data;
 using System.Security.Cryptography;
 using Identity.Core.ValueObjects;
+using Authorization;
 
 namespace Identity.Application.Implamentations
 {

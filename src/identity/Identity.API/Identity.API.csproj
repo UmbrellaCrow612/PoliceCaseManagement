@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\Mapper.Core\Mapper.Core.csproj" />
     <ProjectReference Include="..\..\infra\Email.Service\Email.Service.csproj" />
+    <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
     <ProjectReference Include="..\..\shared\Logging.Core\Logging.Core.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />

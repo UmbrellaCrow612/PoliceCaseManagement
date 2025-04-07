@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Authorization.Core
+namespace Authorization
 {
     /// <summary>
     /// Configuration options for JSON Web Token (JWT) authentication and authorization.

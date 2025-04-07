@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\shared\Authorization.Core\Authorization.Core.csproj" />
+    <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
   </ItemGroup>
 </Project>

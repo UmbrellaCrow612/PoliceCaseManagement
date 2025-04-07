@@ -1,4 +1,4 @@
-﻿using Authorization.Core;
+﻿using Authorization;
 using Identity.Application.Constants;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-﻿namespace Authorization.Core
+﻿namespace Authorization
 {
     public static class CookieNamesConstant
     {

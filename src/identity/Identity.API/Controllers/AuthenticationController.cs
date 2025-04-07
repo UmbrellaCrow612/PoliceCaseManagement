@@ -1,5 +1,4 @@
-﻿using Authorization.Core;
-using Identity.API.Annotations;
+﻿using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Identity.API.Extensions;
 using Identity.Core.Services;
+using Authorization;
 
 namespace Identity.API.Controllers
 {
