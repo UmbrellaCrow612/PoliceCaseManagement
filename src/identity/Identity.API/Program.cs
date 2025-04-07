@@ -3,8 +3,6 @@ using Identity.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Identity.Core.Models;
-using Challenge.Core;
-using Identity.Infrastructure.Data;
 using Authorization.Core;
 using Logging.Core;
 using Identity.Application;
@@ -25,7 +23,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
-builder.Services.AddChallenges(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
 builder.Services.AddEmailService(config);

@@ -16,8 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\shared\Authorization.Core\Authorization.Core.csproj" />
-    <ProjectReference Include="..\..\shared\Challenge.Core\Challenge.Core.csproj" />
-    <ProjectReference Include="..\..\shared\Utils\Utils.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
   </ItemGroup>
 </Project>

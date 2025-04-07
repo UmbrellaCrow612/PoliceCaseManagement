@@ -1,5 +1,4 @@
-﻿using Challenge.Core.Models;
-using Identity.Core.Models;
+﻿using Identity.Core.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -19,8 +18,6 @@ namespace Identity.Infrastructure.Data
         public DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
         public DbSet<SecurityAudit> SecurityAudits { get; set; }
         public DbSet<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; }
-        public DbSet<ChallengeClaim> ChallengeClaims { get; set; }
-        public DbSet<ChallengeToken> ChallengeTokens { get; set; }
         public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
         public DbSet<OTPAttempt> OTPAttempts { get; set; }
         public DbSet<TimeBasedOneTimePassCode> TimeBasedOneTimePassCodes { get; set; }
