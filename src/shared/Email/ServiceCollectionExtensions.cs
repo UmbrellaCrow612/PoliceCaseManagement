@@ -1,10 +1,10 @@
-﻿using Email.Service.Implementations;
-using Email.Service.Interfaces;
-using Email.Service.Settings;
+﻿using Email.Implementations;
+using Email.Interfaces;
+using Email.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Email.Service
+namespace Email
 {
     public static class ServiceCollectionExtensions
     {

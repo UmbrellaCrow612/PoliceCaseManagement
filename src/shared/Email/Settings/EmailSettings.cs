@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Email.Service.Settings
+namespace Email.Settings
 {
     public class EmailSettings
     {

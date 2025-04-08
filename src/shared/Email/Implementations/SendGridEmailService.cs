@@ -1,11 +1,11 @@
-﻿using Email.Service.Interfaces;
-using Email.Service.Models;
-using Email.Service.Settings;
+﻿using Email.Interfaces;
+using Email.Models;
+using Email.Settings;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace Email.Service.Implementations
+namespace Email.Implementations
 {
     internal class SendGridEmailService(IOptions<EmailSettings> options) : IEmailService
     {

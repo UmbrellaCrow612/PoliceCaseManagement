@@ -1,14 +1,14 @@
-using Email.Service;
 using Identity.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Identity.Core.Models;
-using Logging.Core;
 using Identity.Application;
 using Identity.Application.Settings;
 using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
 using Authorization;
+using Logging;
+using Email;
 
 SerilogExtensions.ConfigureSerilog();
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SMS.Service.Settings
+namespace SMS.Settings
 {
     public class SmsSettings
     {

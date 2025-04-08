@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SMS.Service.Implementations;
-using SMS.Service.Settings;
+using SMS.Implementations;
+using SMS.Settings;
 
-namespace SMS.Service
+namespace SMS
 {
     public static class Extensions
     {

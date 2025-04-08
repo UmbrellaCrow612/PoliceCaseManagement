@@ -1,4 +1,4 @@
-﻿namespace Email.Service.Models
+﻿namespace Email.Models
 {
     public record EmailMessage(
     string To,

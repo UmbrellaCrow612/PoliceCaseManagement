@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
-using SMS.Service.Interfaces;
-using SMS.Service.Models;
-using SMS.Service.Settings;
 using Twilio;
 using Twilio.Types;
 using Twilio.Rest.Api.V2010.Account;
+using SMS.Interfaces;
+using SMS.Models;
+using SMS.Settings;
 
-namespace SMS.Service.Implementations
+namespace SMS.Implementations
 {
     public class TwilioSmsService : ISmsService
     {

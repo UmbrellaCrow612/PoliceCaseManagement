@@ -1,4 +1,4 @@
-﻿namespace Mapper.Core
+﻿namespace Mapper
 {
     /// <summary>
     /// Our way of mapping - inherit this and pass the mapping props and implement it

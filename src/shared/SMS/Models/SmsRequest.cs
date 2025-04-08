@@ -1,4 +1,4 @@
-﻿namespace SMS.Service.Models
+﻿namespace SMS.Models
 {
     public class SmsRequest
     {

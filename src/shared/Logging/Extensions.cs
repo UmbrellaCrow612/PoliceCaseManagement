@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using Serilog.Events;
 
-namespace Logging.Core
+namespace Logging
 {
     public static class SerilogExtensions
     {

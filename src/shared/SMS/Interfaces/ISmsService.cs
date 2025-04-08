@@ -1,4 +1,4 @@
-﻿namespace SMS.Service.Interfaces
+﻿namespace SMS.Interfaces
 {
     internal interface ISmsService
     {
