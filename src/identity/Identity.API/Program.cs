@@ -7,8 +7,8 @@ using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Email;
-using Identity.API.Settings;
 using Identity.API.Extensions;
+using CORS;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -29,7 +29,7 @@ builder.Services.AddEmailService(config);
 
 var app = builder.Build();
 
-app.UseApplicationCors(builder.Configuration.GetSection("Cors").Get<CORSConfigSettings>() ?? throw new ApplicationException("Cors mising from settings"));
+app.UseApplicationCors(config);
 
 if (app.Environment.IsDevelopment())
 {

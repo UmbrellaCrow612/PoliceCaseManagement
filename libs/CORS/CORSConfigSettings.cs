@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Settings
+namespace CORS
 {
     /// <summary>
     /// Config options from the app.config with the same name
