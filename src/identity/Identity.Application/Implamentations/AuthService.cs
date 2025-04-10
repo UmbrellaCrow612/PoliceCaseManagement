@@ -12,7 +12,6 @@ using OtpNet;
 using System.Data;
 using System.Security.Cryptography;
 using Identity.Core.ValueObjects;
-using Authorization;
 
 namespace Identity.Application.Implamentations
 {

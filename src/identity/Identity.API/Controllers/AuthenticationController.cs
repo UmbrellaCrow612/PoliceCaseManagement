@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Identity.API.Extensions;
 using Identity.Core.Services;
 using Authorization;
+using Identity.Application.Helpers;
 
 namespace Identity.API.Controllers
 {
@@ -158,10 +159,10 @@ namespace Identity.API.Controllers
 
         [RequireDeviceInformation]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
+        public async Task<ActionResult<LoginResult>> Login([FromBody] LoginRequestDto dto)
         {
             var res = await _authService.LoginAsync(dto.Email, dto.Password, this.ComposeDeviceInfo());
-            if (!res.Succeeded) return BadRequest(res.Errors);
+            if (!res.Succeeded) return BadRequest(res);
 
             return Ok(new { res.LoginAttemptId });
         }
@@ -234,7 +235,7 @@ namespace Identity.API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-            Request.Cookies.TryGetValue(CookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
+            Request.Cookies.TryGetValue(AuthCookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
 
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -255,7 +256,7 @@ namespace Identity.API.Controllers
             if (!result.Succeeded) return Unauthorized(result.Errors);
 
             /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt
-            Response.Cookies.Append(CookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
+            Response.Cookies.Append(AuthCookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,

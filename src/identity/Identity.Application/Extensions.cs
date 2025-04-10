@@ -14,6 +14,13 @@ namespace Identity.Application
         /// </summary>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddOptions<JwtBearerOptions>()
+               .Bind(configuration.GetSection("Jwt"))
+               .ValidateDataAnnotations()
+               .ValidateOnStart();
+
+            services.AddScoped<JwtBearerHelper>();
+
             services.AddScoped<IDeviceIdentification, DeviceIdentification>();
             services.AddScoped<DeviceManager>();
 

@@ -1,6 +1,6 @@
 ﻿namespace Authorization
 {
-    public static class CookieNamesConstant
+    public static class AuthCookieNamesConstant
     {
         public static readonly string JWT = "jwt";
 

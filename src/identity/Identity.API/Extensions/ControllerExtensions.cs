@@ -1,5 +1,6 @@
 ﻿using Authorization;
 using Identity.Application.Constants;
+using Identity.Application.Helpers;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ namespace Identity.API.Extensions
         public static void SetAuthCookies(this ControllerBase controller, Tokens tokens, JwtBearerOptions options)
         {
             // TODO make it secure for HTTPS future
-            controller.Response.Cookies.Append(CookieNamesConstant.JWT, tokens.JwtBearerToken, new CookieOptions
+            controller.Response.Cookies.Append(AuthCookieNamesConstant.JWT, tokens.JwtBearerToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true, 
@@ -24,7 +25,7 @@ namespace Identity.API.Extensions
                 IsEssential = true
             });
 
-            controller.Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, tokens.RefreshToken, new CookieOptions
+            controller.Response.Cookies.Append(AuthCookieNamesConstant.REFRESH_TOKEN, tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,  
@@ -41,8 +42,8 @@ namespace Identity.API.Extensions
         /// </summary>
         public static void RemoveAuthCookies(this ControllerBase controller)
         {
-            controller.Request.Cookies.TryGetValue(CookieNamesConstant.JWT, out string? jwtCookie);
-            controller.Request.Cookies.TryGetValue(CookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
+            controller.Request.Cookies.TryGetValue(AuthCookieNamesConstant.JWT, out string? jwtCookie);
+            controller.Request.Cookies.TryGetValue(AuthCookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
 
             if (!string.IsNullOrWhiteSpace(jwtCookie))
             {
@@ -55,7 +56,7 @@ namespace Identity.API.Extensions
                     Expires = DateTime.UtcNow.AddDays(-1),
                     IsEssential = true
                 };
-                controller.Response.Cookies.Append(CookieNamesConstant.JWT, "", expiredCookie);
+                controller.Response.Cookies.Append(AuthCookieNamesConstant.JWT, "", expiredCookie);
             }
 
             if (!string.IsNullOrWhiteSpace(refreshToken))
@@ -68,7 +69,7 @@ namespace Identity.API.Extensions
                     Expires = DateTime.UtcNow.AddDays(-1),
                     IsEssential = true
                 };
-                controller.Response.Cookies.Append(CookieNamesConstant.REFRESH_TOKEN, "", expiredCookie);
+                controller.Response.Cookies.Append(AuthCookieNamesConstant.REFRESH_TOKEN, "", expiredCookie);
             }
         }
 

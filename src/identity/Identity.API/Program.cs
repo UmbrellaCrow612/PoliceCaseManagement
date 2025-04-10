@@ -6,9 +6,9 @@ using Identity.Application;
 using Identity.Application.Settings;
 using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
-using Authorization;
 using Logging;
 using Email;
+using Identity.API;
 
 SerilogExtensions.ConfigureSerilog();
 

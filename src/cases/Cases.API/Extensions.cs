@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Authorization
+namespace Cases.API
 {
     public static class Extensions
     {
-        /// <summary>
-        /// Adds the Authorization to a project
-        /// </summary>
         public static IServiceCollection AddBaseAuthorization(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddOptions<JwtBearerOptions>()
-                .Bind(configuration.GetSection("Jwt"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
-            services.AddScoped<JwtBearerHelper>();
+            var jwtSettings = configuration.GetSection("Jwt");
+            var key = jwtSettings["Key"] ?? throw new ApplicationException("Jwt Key not provided");
+            var issuer = jwtSettings["Issuer"] ?? throw new ApplicationException("Jwt Issuer not provided");
+            var audiences = jwtSettings.GetSection("Audiences").Get<string[]>() ?? throw new ApplicationException("Jwt Audiences not provided");
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -30,20 +24,18 @@ namespace Authorization
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
 
-                            ValidIssuer = configuration["Jwt:Issuer"] ?? throw new ApplicationException("Jwt Issuer not provided"),
-                            ValidAudiences = configuration.GetSection("Jwt:Audiences").Get<string[]>(),
-                            IssuerSigningKey = new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))),
+                            ValidIssuer = issuer,
+                            ValidAudiences = audiences,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
 
                             ClockSkew = TimeSpan.Zero
                         };
-
 
                         options.Events = new JwtBearerEvents
                         {
                             OnMessageReceived = context =>
                             {
-                                if (context.Request.Cookies.TryGetValue(CookieNamesConstant.JWT, out var token))
+                                if (context.Request.Cookies.TryGetValue(AuthCookieNamesConstant.JWT, out var token))
                                 {
                                     context.Token = token;
                                 }
@@ -52,6 +44,7 @@ namespace Authorization
                         };
                     });
 
+            services.AddAuthorization();
 
             return services;
         }

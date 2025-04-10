@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Authorization
+namespace Identity.Application.Helpers
 {
     public class JwtBearerHelper(IOptions<JwtBearerOptions> JWTOptions)
     {
