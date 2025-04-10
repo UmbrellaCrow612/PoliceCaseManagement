@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Identity.Application.Settings
+namespace Identity.API.Settings
 {
     /// <summary>
     /// Config options from the app.config with the same name

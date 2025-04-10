@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Identity.Core.Models;
 using Identity.Application;
-using Identity.Application.Settings;
 using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Email;
-using Identity.API;
+using Identity.API.Settings;
+using Identity.API.Extensions;
 
 SerilogExtensions.ConfigureSerilog();
 

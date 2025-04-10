@@ -78,6 +78,18 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_CaseIncidentTypes_IncidentTypeId",
                 table: "CaseIncidentTypes",
                 column: "IncidentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cases_CaseNumber",
+                table: "Cases",
+                column: "CaseNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cases_Id",
+                table: "Cases",
+                column: "Id",
+                unique: true);
         }
 
         /// <inheritdoc />

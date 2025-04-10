@@ -51,6 +51,12 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CaseNumber")
+                        .IsUnique();
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("Cases");
                 });
 

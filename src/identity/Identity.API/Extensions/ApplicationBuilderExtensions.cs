@@ -1,7 +1,6 @@
-﻿using Identity.Application.Settings;
-using Microsoft.AspNetCore.Builder;
+﻿using Identity.API.Settings;
 
-namespace Identity.Application
+namespace Identity.API.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

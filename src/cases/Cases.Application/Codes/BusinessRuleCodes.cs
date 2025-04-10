@@ -10,5 +10,11 @@
         /// one that has the same name.
         /// </summary>
         public const string IncidentTypeAlreadyExists = "INCIDENT_TYPE_ALREADY_EXISTS";
+
+        /// <summary>
+        /// Indicates that a case number is taken when you are trying to create a <see cref="Case"/> as they should be unique.
+        /// </summary>
+        public const string CaseNumberTaken = "CASE_NUMBER_TAKEN";
+
     }
 }

@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{A95667ED-3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{17B9A340-66A6-4AF6-BE06-DD67CADF7AC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Infrastructure.Tests", "tests\Identity.Infrastructure.Tests\Identity.Infrastructure.Tests.csproj", "{0AE7763C-7AFF-4C14-BE23-4C751114AA6D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "identity", "identity", "{0BFDE38E-F7BF-434B-8E85-E17FFD526D23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Core", "src\identity\Identity.Core\Identity.Core.csproj", "{FC4CD09F-CDD0-4E6E-AE0F-DBB07CFC3F31}"
@@ -49,10 +47,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0AE7763C-7AFF-4C14-BE23-4C751114AA6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0AE7763C-7AFF-4C14-BE23-4C751114AA6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0AE7763C-7AFF-4C14-BE23-4C751114AA6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0AE7763C-7AFF-4C14-BE23-4C751114AA6D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FC4CD09F-CDD0-4E6E-AE0F-DBB07CFC3F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FC4CD09F-CDD0-4E6E-AE0F-DBB07CFC3F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC4CD09F-CDD0-4E6E-AE0F-DBB07CFC3F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -110,7 +104,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0AE7763C-7AFF-4C14-BE23-4C751114AA6D} = {17B9A340-66A6-4AF6-BE06-DD67CADF7AC8}
 		{0BFDE38E-F7BF-434B-8E85-E17FFD526D23} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{FC4CD09F-CDD0-4E6E-AE0F-DBB07CFC3F31} = {0BFDE38E-F7BF-434B-8E85-E17FFD526D23}
 		{75448657-3849-4DEA-9935-4F9726E93AEA} = {0BFDE38E-F7BF-434B-8E85-E17FFD526D23}

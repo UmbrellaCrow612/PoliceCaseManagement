@@ -61,7 +61,7 @@ namespace Identity.Application.Helpers
         {
             List<IServiceError> errors = [];
 
-            string userAgent = request.Headers.UserAgent.ToString();
+            string userAgent = request.Headers["User-Agent"].ToString();
             var deviceFingerprint = request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();
 
             if (!UserAgentValid(userAgent))
