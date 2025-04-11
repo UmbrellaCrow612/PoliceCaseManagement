@@ -31,6 +31,36 @@ namespace Cases.API.Controllers
             return Ok(returnDto);
         }
 
+        /// <summary>
+        /// Link a case to a incident type by there ID's
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <param name="incidentTypeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("{caseId}/incident-types/{incidentTypeId}")]
+        public async Task<IActionResult> AddIncidentTypeToCase(string caseId, string incidentTypeId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+            if (incidentType is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.AddToIncidentType(_case, incidentType);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok();
+        }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPost("incident-types")]

@@ -16,5 +16,10 @@
         /// </summary>
         public const string CaseNumberTaken = "CASE_NUMBER_TAKEN";
 
+        /// <summary>
+        /// Indicates that a IncidentType is already linked to a case.
+        /// </summary>
+        public const string IncidentTypeAlreadyLinkedToCase = "INCIDENT_TYPE_ALREADY_LINKED_TO_CASE";
+
     }
 }

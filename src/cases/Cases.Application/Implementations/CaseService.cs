@@ -1,5 +1,6 @@
 ﻿using Cases.Application.Codes;
 using Cases.Core.Models;
+using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,29 @@ namespace Cases.Application.Implementations
     internal class CaseService(CasesApplicationDbContext dbContext) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
+
+        public async Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType)
+        {
+            var result = new CaseResult();
+
+            var isIncidentTypeAlreadyLinkedToCase = await _dbcontext.CaseIncidentTypes.AnyAsync(x => x.CaseId == @case.Id && x.IncidentTypeId == incidentType.Id);
+            if (isIncidentTypeAlreadyLinkedToCase)
+            {
+                result.AddError(BusinessRuleCodes.IncidentTypeAlreadyLinkedToCase, $@"Incident type ${incidentType.Name} already linked to case.");
+                return result;
+            }
+
+            var join = new CaseIncidentType
+            {
+                CaseId = @case.Id,
+                IncidentTypeId = incidentType.Id
+            };
+            await _dbcontext.CaseIncidentTypes.AddAsync(join);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
 
         public async Task<CaseResult> CreateAsync(Case caseToCreate)
         {
@@ -47,6 +71,16 @@ namespace Cases.Application.Implementations
 
             result.Succeeded = true;
             return result;
+        }
+
+        public async Task<Case?> FindById(string caseId)
+        {
+            return await _dbcontext.Cases.FindAsync(caseId);
+        }
+
+        public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
+        {
+            return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
         }
     }
 }

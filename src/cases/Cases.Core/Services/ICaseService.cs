@@ -14,6 +14,24 @@ namespace Cases.Core.Services
         /// Create a IncidentType that cases can link to.
         /// </summary>
         Task<CaseResult> CreateIncidentType(IncidentType incidentType);
+
+        /// <summary>
+        /// Link a <see cref="Case"/> to a <see cref="IncidentType"/> through the join table <see cref="Cases.Core.Models.Joins.CaseIncidentType"/>
+        /// </summary>
+        /// <returns></returns>
+        Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType);
+
+        /// <summary>
+        /// Find a case by it's <see cref="Case.Id"/>
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <returns></returns>
+        Task<Case?> FindById(string caseId);
+
+        /// <summary>
+        /// Find a incident type by it's ID.
+        /// </summary>
+        Task<IncidentType?> FindIncidentTypeById(string incidentTypeId);
     }
 
     /// <summary>
