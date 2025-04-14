@@ -8,7 +8,7 @@
 <mat-menu #profileMenu="matMenu">
   @for (link of links; track $index) { @if
   (hasRequiredRole(link.authorizedRoles, ROLES)) {
-  <a mat-menu-item [routerLink]="link.href">
+  <a mat-menu-item [routerLink]="link.href" routerLinkActive="hide">
     <mat-icon>{{ link.iconName }}</mat-icon>
     <span>{{ link.name }} </span>
   </a>

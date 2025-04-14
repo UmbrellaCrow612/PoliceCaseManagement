@@ -3,10 +3,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { AdministrationSideNavService } from '../../services/administration-side-nav-service.service';
 import { Subscription } from 'rxjs';
+import { HeaderProfileComponent } from "../../../../core/components/header-profile/header-profile.component";
 
 @Component({
   selector: 'app-administration-header',
-  imports: [MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule, HeaderProfileComponent],
   templateUrl: './administration-header.component.html',
   styleUrl: './administration-header.component.css',
 })

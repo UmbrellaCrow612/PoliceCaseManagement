@@ -32,6 +32,12 @@ namespace Cases.Core.Services
         /// Find a incident type by it's ID.
         /// </summary>
         Task<IncidentType?> FindIncidentTypeById(string incidentTypeId);
+
+        /// <summary>
+        /// Get all <see cref="IncidentType"/> defined in the system that a <see cref="Case"/> can link to.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<IncidentType>> GetAllIncidentTypes();
     }
 
     /// <summary>

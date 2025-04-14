@@ -10,7 +10,7 @@ namespace CORS
         /// </summary>
         public static IApplicationBuilder UseApplicationCors(this IApplicationBuilder app, IConfiguration configuration)
         {
-            var config = configuration.GetSection(CORSConfigNamesConstant.Name).Get<CORSConfigSettings>() ?? throw new ApplicationException("Cors mising from settings");
+            var config = configuration.GetSection(CORSConfigNamesConstant.Name).Get<CORSConfigSettings>() ?? throw new ApplicationException("Cors missing from settings");
 
             foreach (var policy in config.Policies)
             {

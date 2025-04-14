@@ -82,5 +82,10 @@ namespace Cases.Application.Implementations
         {
             return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
         }
+
+        public async Task<List<IncidentType>> GetAllIncidentTypes()
+        {
+            return await _dbcontext.IncidentTypes.ToListAsync();
+        }
     }
 }

@@ -74,7 +74,7 @@ export class LoginViewComponent {
         error: (err: HttpErrorResponse) => {
           this.isLoggingIn = false;
 
-          let code = err.error[0]?.code;
+          let code = err.error.errors[0]?.code;
 
           switch (code) {
             case CODES.IncorrectCreds || CODES.UserDoseNotExist:

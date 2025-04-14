@@ -55,4 +55,6 @@ export const appPaths = {
   ADMINISTRATION: 'administration',
   A_USER_MANAGEMENT: 'user-management',
   CHANGE_PASSWORD: 'change-password',
+
+  SYSTEM: "system"
 } as const;

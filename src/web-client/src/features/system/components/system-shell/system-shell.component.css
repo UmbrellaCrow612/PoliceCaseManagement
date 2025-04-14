@@ -1,0 +1,14 @@
+.system_shell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header_shell {
+  flex: 1;
+}
+
+.system_page_shell {
+  flex: 5;
+}

@@ -76,5 +76,40 @@ namespace Cases.API.Controllers
 
             return Ok(returnDto);
         }
+
+        /// <summary>
+        /// Get all incident types a case can be linked to.
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("incident-types")]
+        public async Task<IActionResult> GetAllCaseIncidentTypes()
+        {
+            var incidentTypes = await _caseService.GetAllIncidentTypes();
+            List<IncidentTypeDto> dto = [];
+            foreach (var incidentType in incidentTypes)
+            {
+                dto.Add(_incidentTypeMapping.ToDto(incidentType));
+            }
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Get details about a incident type bby there ID
+        /// </summary>
+        [Authorize]
+        [HttpGet("incident-types/{incidentTypeId}")]
+        public async Task<IActionResult> GetIncidentTypeDetailsById(string incidentTypeId)
+        {
+            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+            if (incidentType is null)
+            {
+                return NotFound();
+            }
+
+            var dto = _incidentTypeMapping.ToDto(incidentType);
+
+            return Ok(dto);
+        }
     }
 }

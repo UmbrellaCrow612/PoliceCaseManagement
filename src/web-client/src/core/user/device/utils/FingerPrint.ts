@@ -35,7 +35,6 @@ export function ComputeFingerPrint(): string {
   // Navigator properties
   // Note: deviceMemory is non-standard and might not exist. Casting to 'any' to access.
   const ram = safeGet(() => (navigator as any)?.deviceMemory);
-  const cpuCores = safeGet(() => navigator?.hardwareConcurrency);
   const platform = safeGet(() => navigator?.platform);
 
   // Timezone
@@ -91,7 +90,6 @@ export function ComputeFingerPrint(): string {
     screenPixelDepth,
     screenColorDepth,
     ram,
-    cpuCores,
     platform,
     gpuVendor,
     gpuRenderer,

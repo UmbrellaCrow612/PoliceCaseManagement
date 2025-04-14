@@ -1,0 +1,32 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (errorMessage && !isLoading) {
+<div>Error: {{ errorMessage }} refresh</div>
+}
+
+<!---->
+
+@if (!errorMessage && !isLoading) {
+<div class="shell">
+  <div class="flex">
+    <app-system-incident-type-display-all
+      [incidentTypes]="incidentTypes"
+      (clickedIncidentTypeEvent)="IncidentTypeClickListener($event)"
+    ></app-system-incident-type-display-all>
+  </div>
+  @if (selectedIncidentTypeId) {
+  <div class="flex">
+    <app-system-incident-type-display-by-id
+      [incidentTypeId]="selectedIncidentTypeId"
+    ></app-system-incident-type-display-by-id>
+  </div>
+  }
+  <div class="flex">
+    <app-system-incident-type-create></app-system-incident-type-create>
+  </div>
+</div>
+}

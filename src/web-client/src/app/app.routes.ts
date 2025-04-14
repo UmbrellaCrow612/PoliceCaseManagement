@@ -38,4 +38,13 @@ export const routes: Routes = [
       requiredRoles: [UserRoles.Admin], // Means there authenticated and have admin role
     },
   },
+  {
+    path: appPaths.SYSTEM,
+    loadChildren: () =>
+      import('../features/system/system.routes').then((r) => r.SYSTEM_ROUTES),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [UserRoles.Admin], // Means there authenticated and have admin role
+    },
+  },
 ];

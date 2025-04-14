@@ -1,0 +1,28 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (errorMessage && !isLoading) {
+<div>Error fetching data about incident type</div>
+}
+
+<!---->
+@if (!errorMessage && !isLoading) {
+<div class="container">
+  <div class="details">
+    <h2>Incident type details</h2>
+    <span>Name: {{ incidentTypeDetails?.name }}</span>
+    <span
+      >Description: @if (incidentTypeDetails?.description) {
+      {{ incidentTypeDetails?.description }}} @else {<span>None</span>}</span
+    >
+  </div>
+
+  <div class="buttons">
+    <button mat-raised-button>Edit</button>
+    <button mat-raised-button>Delete</button>
+  </div>
+</div>
+}

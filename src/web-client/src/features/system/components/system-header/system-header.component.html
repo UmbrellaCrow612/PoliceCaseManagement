@@ -1,0 +1,40 @@
+<div class="header">
+  <button mat-icon-button [matMenuTriggerFor]="mainMenu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #mainMenu="matMenu">
+    <!-- Loop through top-level items -->
+    @for (item of links; track item.name) {
+
+    <!-- Option 1: Item WITH children (acts as a sub-menu trigger) -->
+    @if (item.children && item.children.length > 0) {
+    <button mat-menu-item [matMenuTriggerFor]="subMenu">
+      @if(item.icon) { <mat-icon>{{ item.icon }}</mat-icon> }
+      <span>{{ item.name }}</span>
+    </button>
+
+    <!-- === Sub-Menu Definition (associated with the item above) === -->
+    <mat-menu #subMenu="matMenu">
+      <!-- Loop through children -->
+      @for (child of item.children; track child.name) {
+      <a mat-menu-item [routerLink]="child.href">
+        @if(child.icon) { <mat-icon>{{ child.icon }}</mat-icon> }
+        <span>{{ child.name }}</span>
+      </a>
+      }
+    </mat-menu>
+    }
+
+    <!-- Option 2: Item WITHOUT children (acts as a direct link/action) -->
+    @else {
+    <a mat-menu-item [routerLink]="item.href">
+      @if(item.icon) { <mat-icon>{{ item.icon }}</mat-icon> }
+      <span>{{ item.name }}</span>
+    </a>
+    } }
+  </mat-menu>
+
+  <span class="title"> System <mat-icon>settings</mat-icon> </span>
+
+  <app-header-profile></app-header-profile>
+</div>

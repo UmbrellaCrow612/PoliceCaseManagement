@@ -6,12 +6,12 @@ import { AppLink } from '../../../../core/app/type';
 import { UserService } from '../../../../core/user/services/user.service';
 import { hasRequiredRole } from '../../../../core/authentication/utils';
 import { UserRoles } from '../../../../core/authentication/roles';
-import { DashboardProfileComponent } from '../dashboard-profile/dashboard-profile.component';
 import { fromEvent, Subscription } from 'rxjs';
+import { HeaderProfileComponent } from '../../../../core/components/header-profile/header-profile.component';
 
 @Component({
   selector: 'app-dashboard-header',
-  imports: [MatIconModule, RouterLink, DashboardProfileComponent],
+  imports: [MatIconModule, RouterLink, HeaderProfileComponent],
   templateUrl: './dashboard-header.component.html',
   styleUrl: './dashboard-header.component.css',
 })
