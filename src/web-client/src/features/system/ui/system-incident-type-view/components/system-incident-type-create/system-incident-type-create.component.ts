@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -39,6 +39,11 @@ export class SystemIncidentTypeCreateComponent {
   isSendingRequest = false;
   errorMessage: string | null = null;
 
+  /**
+   * Fired off when a incident type is created successfully
+   */
+  createdIncidentTypeEvent = output<void>();
+
   onSubmit() {
     if (this.createIncidentTypeForm.valid) {
       this.isSendingRequest = true;
@@ -51,11 +56,12 @@ export class SystemIncidentTypeCreateComponent {
           this.snackBar.open('created incident type', 'Close', {
             duration: 10000,
           });
+          this.createdIncidentTypeEvent.emit();
           this.isSendingRequest = false;
         },
         error: (err: HttpErrorResponse) => {
           this.snackBar.open(
-            `Error: code: ${err.error[0]?.code} Description: ${err.error[0]?.description}`,
+            `Description: ${err.error.errors[0]?.message}`,
             'Close',
             {
               duration: 10000,

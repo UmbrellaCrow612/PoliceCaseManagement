@@ -9,11 +9,13 @@
 }
 
 .list {
+  max-width: 300px;
   height: 300px;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: scroll;
 }
 
 .list_item {
@@ -33,6 +35,6 @@
   background-color: lightblue;
 }
 
-.focused:hover{
+.focused:hover {
   background: rgba(20, 118, 184, 0.5);
 }

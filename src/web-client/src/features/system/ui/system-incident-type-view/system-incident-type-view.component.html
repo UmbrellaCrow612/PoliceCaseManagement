@@ -18,15 +18,19 @@
       (clickedIncidentTypeEvent)="IncidentTypeClickListener($event)"
     ></app-system-incident-type-display-all>
   </div>
-  @if (selectedIncidentTypeId) {
+  @for (incidentTypeId of _selectedIncidentTypeIdChangeDectection; track
+  incidentTypeId) {
   <div class="flex">
     <app-system-incident-type-display-by-id
-      [incidentTypeId]="selectedIncidentTypeId"
+      [incidentTypeId]="incidentTypeId"
     ></app-system-incident-type-display-by-id>
   </div>
   }
+
   <div class="flex">
-    <app-system-incident-type-create></app-system-incident-type-create>
+    <app-system-incident-type-create
+      (createdIncidentTypeEvent)="IncidentTypeCreatedListener()"
+    ></app-system-incident-type-create>
   </div>
 </div>
 }

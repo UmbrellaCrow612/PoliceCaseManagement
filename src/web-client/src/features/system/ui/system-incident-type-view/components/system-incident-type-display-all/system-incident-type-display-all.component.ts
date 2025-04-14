@@ -63,15 +63,9 @@ export class SystemIncidentTypeDisplayAllComponent implements OnInit {
    * Logic to run when a incident type list item is clicked
    */
   listItemClicked(clickedIncidentType: IncidentType) {
-    if (this.internalCurrentSelectedIncidentTypeId) {
-      if (
-        clickedIncidentType.id === this.internalCurrentSelectedIncidentTypeId
-      ) {
-        // here they clicked the same item so they de select it
-        this.internalCurrentSelectedIncidentTypeId = null;
-      } else {
-        this.internalCurrentSelectedIncidentTypeId = clickedIncidentType.id;
-      }
+    if (clickedIncidentType.id === this.internalCurrentSelectedIncidentTypeId) {
+      // here they clicked the same item so they de select it
+      this.internalCurrentSelectedIncidentTypeId = null;
     } else {
       this.internalCurrentSelectedIncidentTypeId = clickedIncidentType.id;
     }
