@@ -1,1 +1,52 @@
-<p>system-incident-type-home-view works!</p>
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if(!isLoading && errorMessage){
+<div>
+  {{ errorMessage }}
+</div>
+}
+
+<!---->
+
+@if(!isLoading && !errorMessage){
+<div class="container">
+  <h2>Incident types in the system</h2>
+
+  <form class="inputs" [formGroup]="searchForm">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Placeholder" formControlName="name" />
+      <mat-hint>Filter by name</mat-hint>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput placeholder="Placeholder" formControlName="description" />
+      <mat-hint>Filter by description</mat-hint>
+    </mat-form-field>
+  </form>
+  <div class="list">
+    <h3>Incident types:</h3>
+    @for(item of filteredIncidentTypes; track item.id){
+    <mat-card appearance="outlined">
+      <mat-card-content class="card_content">
+        <span
+          >Name: {{ item.name }} @if (item.description) {Description:
+          {{ item.description }}}</span
+        >
+        <button mat-raised-button>View</button>
+      </mat-card-content>
+    </mat-card>
+    }@empty {
+    <span>No incident types in the system</span>
+    }
+  </div>
+
+  <div class="buttons">
+    <button mat-raised-button>Create</button>
+  </div>
+</div>
+}
