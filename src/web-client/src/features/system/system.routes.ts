@@ -8,7 +8,6 @@ export const SYSTEM_ROUTES: Routes = [
         (c) => c.SystemShellComponent
       ),
     title: 'System',
-
     children: [
       {
         path: '',
@@ -17,12 +16,16 @@ export const SYSTEM_ROUTES: Routes = [
             (c) => c.SystemHomeViewComponent
           ),
       },
+
+      /**
+       * Sub feature of system - all system incident type routes
+       */
       {
-        path: 'cases/incident-type',
-        loadComponent: () =>
-          import(
-            './ui/system-incident-type-view/system-incident-type-view.component'
-          ).then((c) => c.SystemIncidentTypeViewComponent),
+        path: 'cases/incident-types',
+        loadChildren: () =>
+          import('./incident-type/system-incident-type.routes').then(
+            (m) => m.SYSTEM_INCIDENT_TYPE_ROUTES
+          ),
       },
     ],
   },

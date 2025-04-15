@@ -43,7 +43,7 @@ export class SystemHeaderComponent {
         {
           authorizedRoles: [],
           children: [],
-          href: 'cases/incident-type',
+          href: 'cases/incident-types',
           icon: 'description',
           name: 'Incident Types',
         },
