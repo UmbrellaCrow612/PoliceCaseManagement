@@ -1,0 +1,37 @@
+<div class="container">
+  <form class="form" [formGroup]="createIncidentTypeForm" (ngSubmit)="onSubmit()">
+    <h2 class="title">Create a incident type:</h2>
+    <div class="inputs">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+        <mat-hint>Required</mat-hint>
+
+        @if (createIncidentTypeForm.controls.name.hasError("required")) {
+        <mat-error> Required </mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" />
+        <mat-hint>Optional</mat-hint>
+      </mat-form-field>
+    </div>
+    <div class="btns">
+      <button
+        mat-raised-button
+        [disabled]="createIncidentTypeForm.invalid"
+        type="submit"
+      >
+        Create
+      </button>
+      <button
+        mat-raised-button
+        (click)="createIncidentTypeForm.reset()"
+        type="button"
+      >
+        Clear
+      </button>
+    </div>
+  </form>
+</div>

@@ -9,4 +9,19 @@ export const SYSTEM_INCIDENT_TYPE_ROUTES: Routes = [
       ).then((c) => c.SystemIncidentTypeHomeViewComponent),
     title: 'System incident types',
   },
+  {
+    path: 'create',
+    loadComponent: () =>
+      import(
+        './ui/system-incident-type-create-view/system-incident-type-create-view.component'
+      ).then((c) => c.SystemIncidentTypeCreateViewComponent),
+    title: 'System create a incident type',
+  },
+  {
+    path: ':incidentTypeId',
+    loadComponent: () =>
+      import(
+        './ui/system-incident-type-id-view/system-incident-type-id-view.component'
+      ).then((c) => c.SystemIncidentTypeIdViewComponent),
+  },
 ];

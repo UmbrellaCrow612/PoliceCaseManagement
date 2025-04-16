@@ -40,7 +40,7 @@ export class IncidentTypeService {
     name: string | null;
     description: string | null;
   }>) {
-    return this.httpClient.post(`${this.BASE_URL}/cases/incident-types`, {
+    return this.httpClient.post<IncidentType>(`${this.BASE_URL}/cases/incident-types`, {
       name,
       description,
     });
