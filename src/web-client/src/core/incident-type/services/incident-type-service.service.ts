@@ -40,9 +40,21 @@ export class IncidentTypeService {
     name: string | null;
     description: string | null;
   }>) {
-    return this.httpClient.post<IncidentType>(`${this.BASE_URL}/cases/incident-types`, {
-      name,
-      description,
-    });
+    return this.httpClient.post<IncidentType>(
+      `${this.BASE_URL}/cases/incident-types`,
+      {
+        name,
+        description,
+      }
+    );
+  }
+
+  /**
+   * Get the amount of times this incident type is linked to x amount of cases.
+   */
+  getCaseIncidentTypeCount(incidentTypeId: string) {
+    return this.httpClient.get<{count:number}>(
+      `${this.BASE_URL}/cases/incident-types/${incidentTypeId}/case-incidents/count`
+    );
   }
 }

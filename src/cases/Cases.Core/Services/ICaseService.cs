@@ -38,6 +38,13 @@ namespace Cases.Core.Services
         /// </summary>
         /// <returns></returns>
         Task<List<IncidentType>> GetAllIncidentTypes();
+
+        /// <summary>
+        /// Get the number of times a <see cref="IncidentType"/> is linked to x many cases through the join table <see cref="Models.Joins.CaseIncidentType"/>
+        /// </summary>
+        /// <param name="incidentType">The incident type you want to know how many cases it is linked to.</param>
+        /// <returns></returns>
+        Task<int> GetCaseIncidentCount(IncidentType incidentType);
     }
 
     /// <summary>

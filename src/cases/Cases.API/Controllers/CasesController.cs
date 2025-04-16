@@ -111,5 +111,24 @@ namespace Cases.API.Controllers
 
             return Ok(dto);
         }
+
+        /// <summary>
+        /// Get the amount of time a incident type is linked to how many cases.
+        /// </summary>
+        /// <returns>The count as a number</returns>
+        [Authorize]
+        [HttpGet("incident-types/{incidentTypeId}/case-incidents/count")]
+        public async Task<IActionResult> GetCaseIncidentTypeCount(string incidentTypeId)
+        {
+            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+            if (incidentType is null)
+            {
+                return NotFound();
+            }
+
+            var count = await _caseService.GetCaseIncidentCount(incidentType);
+
+            return Ok(new { count });
+        }
     }
 }

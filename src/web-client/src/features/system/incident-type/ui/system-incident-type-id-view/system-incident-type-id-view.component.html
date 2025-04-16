@@ -1,1 +1,29 @@
-<p>system-incident-type-id-view works!</p>
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (!isLoading && errorMessage) {
+<div>
+  {{ errorMessage }}
+</div>
+}
+
+<!---->
+
+@if (!isLoading && !errorMessage) {
+<div class="container">
+  <h2>Incident type details:</h2>
+
+  <div class="details">
+    <span>Name: {{ incidentType?.name }}</span>
+    <span
+      >Description: @if (incidentType?.description) {
+      {{ incidentType?.description }}} @else { No description }</span
+    >
+
+    <span> Linked to: {{ caseIncidentTypeCount }} cases</span>
+  </div>
+</div>
+}
