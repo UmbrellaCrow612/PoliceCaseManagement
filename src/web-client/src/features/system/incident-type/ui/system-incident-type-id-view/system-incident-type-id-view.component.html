@@ -25,5 +25,10 @@
 
     <span> Linked to: {{ caseIncidentTypeCount }} cases</span>
   </div>
+
+  <div class="buttons">
+    <a mat-raised-button routerLink="edit">Edit</a>
+    <button mat-raised-button (click)="deleteClicked()">Delete</button>
+  </div>
 </div>
 }

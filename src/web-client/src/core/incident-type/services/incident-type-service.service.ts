@@ -53,8 +53,17 @@ export class IncidentTypeService {
    * Get the amount of times this incident type is linked to x amount of cases.
    */
   getCaseIncidentTypeCount(incidentTypeId: string) {
-    return this.httpClient.get<{count:number}>(
+    return this.httpClient.get<{ count: number }>(
       `${this.BASE_URL}/cases/incident-types/${incidentTypeId}/case-incidents/count`
+    );
+  }
+
+  /**
+   * Delete a incident type by there ID - Only a admin can do this.
+   */
+  delete(incidentTypeId: string) {
+    return this.httpClient.delete(
+      `${this.BASE_URL}/cases/incident-types/${incidentTypeId}`
     );
   }
 }

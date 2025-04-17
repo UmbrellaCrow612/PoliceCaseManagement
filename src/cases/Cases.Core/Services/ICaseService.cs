@@ -45,6 +45,11 @@ namespace Cases.Core.Services
         /// <param name="incidentType">The incident type you want to know how many cases it is linked to.</param>
         /// <returns></returns>
         Task<int> GetCaseIncidentCount(IncidentType incidentType);
+
+        /// <summary>
+        /// Delete a incident type - unlinks it from any cases it's linked to and then deleted.
+        /// </summary>
+        Task<CaseResult> DeleteIncidentType(IncidentType incidentType);
     }
 
     /// <summary>

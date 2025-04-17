@@ -73,6 +73,20 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<CaseResult> DeleteIncidentType(IncidentType incidentType)
+        {
+            var result = new CaseResult();
+
+            var joins = await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).ToListAsync();
+            _dbcontext.RemoveRange(joins);
+            _dbcontext.Remove(incidentType);
+
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<Case?> FindById(string caseId)
         {
             return await _dbcontext.Cases.FindAsync(caseId);

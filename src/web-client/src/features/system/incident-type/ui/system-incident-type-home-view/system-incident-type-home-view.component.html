@@ -37,7 +37,7 @@
           >Name: {{ item.name }} @if (item.description) {Description:
           {{ item.description }}}</span
         >
-        <button mat-raised-button>View</button>
+        <a mat-raised-button [routerLink]="item.id">View</a>
       </mat-card-content>
     </mat-card>
     }@empty {

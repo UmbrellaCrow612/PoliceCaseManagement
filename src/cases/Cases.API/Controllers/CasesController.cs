@@ -130,5 +130,28 @@ namespace Cases.API.Controllers
 
             return Ok(new { count });
         }
+
+
+        /// <summary>
+        /// Admin can delete a incident type - unlinks it from cases and the incident type itself is deleted.
+        /// </summary>
+        [Authorize(Roles = Roles.Admin)]
+        [HttpDelete("incident-types/{incidentTypeId}")]
+        public async Task<IActionResult> DeleteIncidentType(string incidentTypeId)
+        {
+            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+            if (incidentType is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.DeleteIncidentType(incidentType);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
     }
 }

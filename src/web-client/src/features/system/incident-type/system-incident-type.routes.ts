@@ -24,4 +24,11 @@ export const SYSTEM_INCIDENT_TYPE_ROUTES: Routes = [
         './ui/system-incident-type-id-view/system-incident-type-id-view.component'
       ).then((c) => c.SystemIncidentTypeIdViewComponent),
   },
+  {
+    path: ':incidentTypeId/edit',
+    loadComponent: () =>
+      import(
+        './ui/system-incident-type-id-edit-view/system-incident-type-id-edit-view.component'
+      ).then((c) => c.SystemIncidentTypeIdEditViewComponent),
+  },
 ];

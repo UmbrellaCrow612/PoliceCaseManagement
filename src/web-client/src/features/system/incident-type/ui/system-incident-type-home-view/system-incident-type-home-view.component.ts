@@ -13,7 +13,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { RouterLink, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-system-incident-type-home-view',
