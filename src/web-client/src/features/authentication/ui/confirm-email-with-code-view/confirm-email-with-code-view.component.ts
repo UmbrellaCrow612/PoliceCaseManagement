@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { SendEmailConfirmationCodeRequest } from '../../../../core/authentication/types';
 import { HttpErrorResponse } from '@angular/common/http';
 import { appPaths } from '../../../../core/app/constants/appPaths';
 import CODES from '../../../../core/server-responses/codes';
@@ -49,36 +48,34 @@ export class ConfirmEmailWithCodeViewComponent implements OnInit {
    */
   sendConfirmationEmailCode() {
     if (this.code && this.email) {
-      let body: SendEmailConfirmationCodeRequest = {
-        code: this.code,
-        email: this.email,
-      };
-      this.authService.SendConfirmationEmailCode(body).subscribe({
-        next: () => {
-          this.router.navigate([`../${appPaths.LOGIN}`], {
-            relativeTo: this.route,
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          let code = err.error[0]?.code;
-
-          if (code == CODES.EMAIL_ALREADY_CONFIRMED) {
+      this.authService
+        .SendConfirmationEmailCode(this.email, this.code)
+        .subscribe({
+          next: () => {
             this.router.navigate([`../${appPaths.LOGIN}`], {
               relativeTo: this.route,
             });
-            return;
-          }
+          },
+          error: (err: HttpErrorResponse) => {
+            let code = err.error[0]?.code;
 
-          if (code == CODES.USER_DOES_NOT_EXIST || CODES.EMAIL_CONFIRMATION) {
-            this.errorMessage = 'Invalid confirmation attempt';
-            return;
-          }
+            if (code == CODES.EMAIL_ALREADY_CONFIRMED) {
+              this.router.navigate([`../${appPaths.LOGIN}`], {
+                relativeTo: this.route,
+              });
+              return;
+            }
 
-          this.errorMessage = `Unknown error message status: ${
-            err.status
-          } error: ${JSON.stringify(err.error)}`;
-        },
-      });
+            if (code == CODES.USER_DOES_NOT_EXIST || CODES.EMAIL_CONFIRMATION) {
+              this.errorMessage = 'Invalid confirmation attempt';
+              return;
+            }
+
+            this.errorMessage = `Unknown error message status: ${
+              err.status
+            } error: ${JSON.stringify(err.error)}`;
+          },
+        });
     } else {
       this.errorMessage = `Invalid URL format missing ${
         this.code ? '' : 'code'

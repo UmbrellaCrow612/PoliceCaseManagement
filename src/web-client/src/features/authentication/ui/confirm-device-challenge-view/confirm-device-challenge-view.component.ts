@@ -5,14 +5,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { interval, Subscription, timer } from 'rxjs';
-import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 import { DeviceService } from '../../../../core/user/device/services/device.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { appPaths } from '../../../../core/app/constants/appPaths';
-import {
-  SendDeviceChallengeAttemptRequestBody,
-  ValidateDeviceChallengeCode,
-} from '../../../../core/user/device/type';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -56,38 +51,35 @@ export class ConfirmDeviceChallengeViewComponent implements OnInit {
   confirmCode() {
     this.errorMessage = null;
     if (this.codeInput.valid && this.email && isEmail(this.email)) {
-      let body: ValidateDeviceChallengeCode = {
-        email: this.email,
-        code: this.codeInput.getRawValue()!,
-      };
-
-      this.deviceService.ValidateDeviceChallengeCode(body).subscribe({
-        next: () => {
-          timer(2000).subscribe(() => {
-            this.router.navigate([`../${appPaths.LOGIN}`], {
-              relativeTo: this.active,
+      this.deviceService
+        .ValidateDeviceChallengeCode(this.email, this.codeInput.getRawValue()!)
+        .subscribe({
+          next: () => {
+            timer(2000).subscribe(() => {
+              this.router.navigate([`../${appPaths.LOGIN}`], {
+                relativeTo: this.active,
+              });
             });
-          });
-          this.snackbar.open('Device confirmed', 'Close', {
-            duration: 1500,
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          let code = err.error[0]?.code;
+            this.snackbar.open('Device confirmed', 'Close', {
+              duration: 1500,
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            let code = err.error[0]?.code;
 
-          switch (code) {
-            case CODES.DEVICE_CONFIRMATION_DOES_NOT_EXIST:
-              this.errorMessage = 'Incorrect code';
-              break;
+            switch (code) {
+              case CODES.DEVICE_CONFIRMATION_DOES_NOT_EXIST:
+                this.errorMessage = 'Incorrect code';
+                break;
 
-            default:
-              this.errorMessage = `Unhandled error code: ${code} err: ${JSON.stringify(
-                err
-              )}`;
-              break;
-          }
-        },
-      });
+              default:
+                this.errorMessage = `Unhandled error code: ${code} err: ${JSON.stringify(
+                  err
+                )}`;
+                break;
+            }
+          },
+        });
     } else {
       this.codeInput.setErrors({
         required: true,
@@ -111,10 +103,7 @@ export class ConfirmDeviceChallengeViewComponent implements OnInit {
         }
       });
 
-      let body: SendDeviceChallengeAttemptRequestBody = {
-        email: this.email,
-      };
-      this.deviceService.SendDeviceChallengeAttempt(body).subscribe({
+      this.deviceService.SendDeviceChallengeAttempt(this.email).subscribe({
         next: () => {
           this.snackbar.open('Sent new code !', 'close', {
             duration: 5000,

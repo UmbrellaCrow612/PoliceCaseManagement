@@ -1,6 +1,5 @@
-import { CreateUserResponseBody } from './../type';
 import { Injectable } from '@angular/core';
-import { FetchUserResponseBody, User } from '../type';
+import { User } from '../type';
 import { HttpClient } from '@angular/common/http';
 import env from '../../../environments/environment';
 import { tap } from 'rxjs';
@@ -25,7 +24,7 @@ export class UserService {
 
   getCurrentUser() {
     return this.httpClient
-      .get<FetchUserResponseBody>(`${this.BASE_URL}/users/me`)
+      .get<{ user: User; roles: string[] }>(`${this.BASE_URL}/users/me`)
       .pipe(
         tap({
           next: (val) => {
@@ -73,7 +72,7 @@ export class UserService {
     phoneNumber: string;
     password: string;
   }) {
-    return this.httpClient.post<CreateUserResponseBody>(
+    return this.httpClient.post<User>(
       `${this.BASE_URL}/authentication/register`,
       body
     );

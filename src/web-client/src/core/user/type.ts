@@ -7,17 +7,3 @@ export interface User {
   email: string;
   phoneNumber: string;
 }
-/**
- * Response from server shape dto for /me endpoint
- */
-export interface FetchUserResponseBody {
-  user: User;
-  roles: string[];
-}
-
-export interface CreateUserResponseBody {
-  id: string;
-  username: string;
-  email: string;
-  phoneNumber: string;
-}

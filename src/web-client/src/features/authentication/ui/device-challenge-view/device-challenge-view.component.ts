@@ -12,11 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { DeviceService } from '../../../../core/user/device/services/device.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
-import formatBackendError from '../../../../core/server-responses/errors/utils/format-error';
-import { SendDeviceChallengeAttemptRequestBody } from '../../../../core/user/device/type';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { appPaths } from '../../../../core/app/constants/appPaths';
@@ -56,50 +53,50 @@ export class DeviceChallengeViewComponent {
       this.successfullySentDeviceChallenge = false;
       this.errorMessage = null;
 
-      let body: SendDeviceChallengeAttemptRequestBody = {
-        email: this.deviceChallengeForm.controls.email.getRawValue()!,
-      };
+      this.deviceService
+        .SendDeviceChallengeAttempt(
+          this.deviceChallengeForm.controls.email.getRawValue()!
+        )
+        .subscribe({
+          next: () => {
+            this.isSendingRequestInProgress = false;
+            this.router.navigate(['../confirm-device-challenge'], {
+              relativeTo: this.active,
+              queryParams: {
+                email: this.deviceChallengeForm.controls.email.getRawValue()!,
+              },
+              queryParamsHandling: 'merge',
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            this.isSendingRequestInProgress = false;
 
-      this.deviceService.SendDeviceChallengeAttempt(body).subscribe({
-        next: () => {
-          this.isSendingRequestInProgress = false;
-          this.router.navigate(['../confirm-device-challenge'], {
-            relativeTo: this.active,
-            queryParams: {
-              email: this.deviceChallengeForm.controls.email.getRawValue()!,
-            },
-            queryParamsHandling: 'merge',
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          this.isSendingRequestInProgress = false;
+            let code = err.error[0]?.code;
 
-          let code = err.error[0]?.code;
+            switch (code) {
+              case CODES.DEVICE_ALREADY_TRUSTED:
+                this.router.navigate([`../${appPaths.LOGIN}`], {
+                  relativeTo: this.active,
+                });
+                break;
 
-          switch (code) {
-            case CODES.DEVICE_ALREADY_TRUSTED:
-              this.router.navigate([`../${appPaths.LOGIN}`], {
-                relativeTo: this.active,
-              });
-              break;
+              case CODES.USER_DOES_NOT_EXIST:
+                this.successfullySentDeviceChallenge = true;
+                break;
 
-            case CODES.USER_DOES_NOT_EXIST:
-              this.successfullySentDeviceChallenge = true;
-              break;
+              case CODES.VALID_DEVICE_CONFIRMATION_EXISTS:
+                this.errorMessage = 'Valid attempt sent wait for 2 minutes';
+                break;
 
-            case CODES.VALID_DEVICE_CONFIRMATION_EXISTS:
-              this.errorMessage = 'Valid attempt sent wait for 2 minutes';
-              break;
+              case CODES.DEVICE_NOT_CONFIRMED:
+                this.errorMessage = "Couldn't register device for registration";
+                break;
 
-            case CODES.DEVICE_NOT_CONFIRMED:
-              this.errorMessage = "Couldn't register device for registration";
-              break;
-
-            default:
-              break;
-          }
-        },
-      });
+              default:
+                break;
+            }
+          },
+        });
     }
   }
 }

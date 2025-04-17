@@ -1,17 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  LoginResponse,
-  LoginCredentials,
-  SendEmailConfirmationRequest,
-  SendEmailConfirmationCodeRequest,
-  SendPhoneConfirmationRequest,
-  ValidatePhoneConfirmationCodeRequestBody,
-  SendTwoFactorSmsCodeRequestBody,
-  ValidateTwoFactorSmsCodeRequestBody,
-} from '../types';
 import env from '../../../environments/environment';
-import { Observable, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { appPaths } from '../../app/constants/appPaths';
 
@@ -23,45 +12,45 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  Login(credentials: LoginCredentials): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
+  Login(email: string, password: string) {
+    return this.http.post<{ loginAttemptId: string }>(
       `${this.BASE_URL}/authentication/login`,
-      credentials
+      { email: email, password: password }
     );
   }
 
-  SendTwoFactorSmsCode(body: SendTwoFactorSmsCodeRequestBody) {
+  SendTwoFactorSmsCode(loginAttemptId: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/send-two-factor-sms`,
-      body
+      { loginAttemptId: loginAttemptId }
     );
   }
 
-  ValidateTwoFactorSmsCode(body: ValidateTwoFactorSmsCodeRequestBody) {
+  ValidateTwoFactorSmsCode(loginAttemptId: string, code: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/validate-two-factor-sms`,
-      body
+      { loginAttemptId: loginAttemptId, code: code }
     );
   }
 
-  SendConfirmationEmail(details: SendEmailConfirmationRequest) {
+  SendConfirmationEmail(email: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/send-confirmation-email`,
-      details
+      { email: email }
     );
   }
 
-  SendConfirmationEmailCode(body: SendEmailConfirmationCodeRequest) {
-    return this.http.post(
-      `${this.BASE_URL}/authentication/confirm-email`,
-      body
-    );
+  SendConfirmationEmailCode(email: string, code: string) {
+    return this.http.post(`${this.BASE_URL}/authentication/confirm-email`, {
+      email: email,
+      code: code,
+    });
   }
 
-  SendPhoneConfirmation(body: SendPhoneConfirmationRequest) {
+  SendPhoneConfirmation(phoneNumber: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/send-phone-confirmation`,
-      body
+      { phoneNumber: phoneNumber }
     );
   }
 
@@ -69,12 +58,10 @@ export class AuthenticationService {
    * Used to send the code sent to users device which they type into a field - this is used to confirm there phone number
    * using said code attempt
    */
-  ValidatePhoneConfirmationCode(
-    body: ValidatePhoneConfirmationCodeRequestBody
-  ) {
+  ValidatePhoneConfirmationCode(phoneNumber: string, code: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/validate-phone-confirmation`,
-      body
+      { phoneNumber: phoneNumber, code: code }
     );
   }
 

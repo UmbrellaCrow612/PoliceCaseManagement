@@ -4,33 +4,28 @@ import { CookieService } from '../../../browser/cookie/services/cookie.service';
 import CookieNames from '../../../browser/cookie/constants/names';
 import { HttpClient } from '@angular/common/http';
 import env from '../../../../environments/environment';
-import {
-  SendDeviceChallengeAttemptRequestBody,
-  ValidateDeviceChallengeCode,
-} from '../type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DeviceService {
   private readonly COOKIE_NAME = CookieNames.DEVICE_FINGERPRINT;
-  private readonly EXPIRATION_DAYS = 2;
 
   private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  SendDeviceChallengeAttempt(body: SendDeviceChallengeAttemptRequestBody) {
+  SendDeviceChallengeAttempt(email: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/send-user-device-challenge`,
-      body
+      { email: email }
     );
   }
 
-  ValidateDeviceChallengeCode(body: ValidateDeviceChallengeCode) {
+  ValidateDeviceChallengeCode(email: string, code: string) {
     return this.http.post(
       `${this.BASE_URL}/authentication/validate-user-device-challenge`,
-      body
+      { email: email, code: code }
     );
   }
 

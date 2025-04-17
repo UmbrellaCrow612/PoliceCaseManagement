@@ -1,5 +1,3 @@
-import { SendEmailConfirmationRequest } from './../../../../core/authentication/types';
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
   FormControl,
@@ -14,10 +12,9 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
-import { ErrorDialogComponent } from '../../../../core/components/error-dialog/error-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { appPaths } from '../../../../core/app/constants/appPaths';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-confirm-email-view',
@@ -34,7 +31,7 @@ import { appPaths } from '../../../../core/app/constants/appPaths';
 export class ConfirmEmailViewComponent {
   constructor(
     private authService: AuthenticationService,
-    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private router: Router,
     private active: ActivatedRoute
   ) {}
@@ -52,46 +49,43 @@ export class ConfirmEmailViewComponent {
       this.errorMessage = null;
       this.sentEmailConfirmationSuccessfully = false;
 
-      let body: SendEmailConfirmationRequest = {
-        email: this.emailConfirmation.controls.email.getRawValue()!,
-      };
+      this.authService
+        .SendConfirmationEmail(
+          this.emailConfirmation.controls.email.getRawValue()!
+        )
+        .subscribe({
+          next: () => {
+            this.isSendingRequest = false;
+            this.sentEmailConfirmationSuccessfully = true;
+          },
+          error: (error: HttpErrorResponse) => {
+            this.isSendingRequest = false;
+            this.sentEmailConfirmationSuccessfully = false;
 
-      this.authService.SendConfirmationEmail(body).subscribe({
-        next: () => {
-          this.isSendingRequest = false;
-          this.sentEmailConfirmationSuccessfully = true;
-        },
-        error: (error: HttpErrorResponse) => {
-          this.isSendingRequest = false;
-          this.sentEmailConfirmationSuccessfully = false;
+            let code = error.error[0]?.code;
 
-          let code = error.error[0]?.code;
+            switch (code) {
+              case CODES.USER_DOES_NOT_EXIST:
+                this.sentEmailConfirmationSuccessfully = true;
+                break;
 
-          switch (code) {
-            case CODES.USER_DOES_NOT_EXIST:
-              this.sentEmailConfirmationSuccessfully = true;
-              break;
+              case CODES.VALID_EMAIL_CONFIRMATION_EXISTS:
+                this.errorMessage =
+                  'Valid email attempt sent wait for 2 minutes';
+                break;
 
-            case CODES.VALID_EMAIL_CONFIRMATION_EXISTS:
-              this.errorMessage = 'Valid email attempt sent wait for 2 minutes';
-              break;
+              case CODES.EMAIL_ALREADY_CONFIRMED:
+                this.router.navigate([`../${appPaths.LOGIN}`], {
+                  relativeTo: this.active,
+                });
+                break;
 
-            case CODES.EMAIL_ALREADY_CONFIRMED:
-              this.router.navigate([`../${appPaths.LOGIN}`], {
-                relativeTo: this.active,
-              });
-              break;
-
-            default:
-              this.dialog.open(ErrorDialogComponent, {
-                data: `Unhandled error occurred ${JSON.stringify(
-                  error.error
-                )} `,
-              });
-              break;
-          }
-        },
-      });
+              default:
+                this.snackBar.open(`Failed: ${code}`);
+                break;
+            }
+          },
+        });
     }
   }
 }

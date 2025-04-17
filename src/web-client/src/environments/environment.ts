@@ -3,7 +3,7 @@ const env = {
     authenticationBaseUrl: 'https://localhost:7058',
     casesBaseUrl: 'https://localhost:7123',
   },
-  JwtTokenValidationPeriodInMinutesInMilliSeconds: 3 * 60 * 1000,
+  JwtTokenValidationPeriodInMinutesInMilliSeconds: 5 * 60 * 1000,
   JWTTokenValidationInitialWaitTimeInMilliSeconds: 25000,
 } as const;
 

@@ -14,10 +14,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { appPaths } from '../../../../core/app/constants/appPaths';
-import {
-  SendTwoFactorSmsCodeRequestBody,
-  ValidateTwoFactorSmsCodeRequestBody,
-} from '../../../../core/authentication/types';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { interval, Subscription, timer } from 'rxjs';
@@ -85,11 +81,7 @@ export class TwoFactorSmsViewComponent implements OnInit {
         }
       });
 
-      let body: SendTwoFactorSmsCodeRequestBody = {
-        loginAttemptId: this.loginAttemptId,
-      };
-
-      this.authService.SendTwoFactorSmsCode(body).subscribe({
+      this.authService.SendTwoFactorSmsCode(this.loginAttemptId).subscribe({
         next: () => {
           this.snackBar.open('Sms code sent', 'Close', {
             duration: 4500,
@@ -142,55 +134,56 @@ export class TwoFactorSmsViewComponent implements OnInit {
     if (this.codeInput.valid) {
       this.disableConfirmButton = true;
 
-      let body: ValidateTwoFactorSmsCodeRequestBody = {
-        loginAttemptId: this.loginAttemptId!,
-        code: this.codeInput.getRawValue()!,
-      };
-      this.authService.ValidateTwoFactorSmsCode(body).subscribe({
-        next: () => {
-          this.userService.getCurrentUser().subscribe({
-            complete: () => {
-              this.router.navigate([`/${appPaths.DASHBOARD}`]);
-            },
-            error: (err: HttpErrorResponse) => {
-              this.snackBar.open(
-                `Failed to set current user context err: ${JSON.stringify(
-                  err
-                )}`,
-                'Close',
-                {
-                  duration: 10000,
-                }
-              );
-            },
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          this.disableConfirmButton = false;
+      this.authService
+        .ValidateTwoFactorSmsCode(
+          this.loginAttemptId!,
+          this.codeInput.getRawValue()!
+        )
+        .subscribe({
+          next: () => {
+            this.userService.getCurrentUser().subscribe({
+              complete: () => {
+                this.router.navigate([`/${appPaths.DASHBOARD}`]);
+              },
+              error: (err: HttpErrorResponse) => {
+                this.snackBar.open(
+                  `Failed to set current user context err: ${JSON.stringify(
+                    err
+                  )}`,
+                  'Close',
+                  {
+                    duration: 10000,
+                  }
+                );
+              },
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            this.disableConfirmButton = false;
 
-          let code = err.error[0]?.code;
+            let code = err.error[0]?.code;
 
-          switch (code) {
-            case CODES.LOGIN_ATTEMPT_NOT_VALID:
-              this.router.navigate([`../../../${appPaths.LOGIN}`]);
-              break;
+            switch (code) {
+              case CODES.LOGIN_ATTEMPT_NOT_VALID:
+                this.router.navigate([`../../../${appPaths.LOGIN}`]);
+                break;
 
-            case CODES.USER_DOES_NOT_EXIST:
-              this.router.navigate([`../../../${appPaths.LOGIN}`]);
-              break;
+              case CODES.USER_DOES_NOT_EXIST:
+                this.router.navigate([`../../../${appPaths.LOGIN}`]);
+                break;
 
-            case CODES.TWO_FACTOR_SMS_ATTEMPT_INVALID:
-              this.snackBar.open('Incorrect code', 'close', {
-                duration: 5500,
-              });
-              break;
+              case CODES.TWO_FACTOR_SMS_ATTEMPT_INVALID:
+                this.snackBar.open('Incorrect code', 'close', {
+                  duration: 5500,
+                });
+                break;
 
-            default:
-              this.snackBar.open(`Unhandled error: ${err.error}`);
-              break;
-          }
-        },
-      });
+              default:
+                this.snackBar.open(`Unhandled error: ${err.error}`);
+                break;
+            }
+          },
+        });
     }
   }
 }
