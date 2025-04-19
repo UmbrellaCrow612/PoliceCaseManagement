@@ -153,5 +153,29 @@ namespace Cases.API.Controllers
 
             return NoContent();
         }
+
+        /// <summary>
+        /// Update a incident type - only admins can do this.
+        /// </summary>
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPatch("incident-types/{incidentTypeId}")]
+        public async Task<IActionResult> UpdateIncidentType(string incidentTypeId, [FromBody] UpdateIncidentTypeDto dto)
+        {
+            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+            if (incidentType is null)
+            {
+                return NotFound();
+            }
+
+            _incidentTypeMapping.Update(incidentType, dto);
+
+            var result = await _caseService.UpdateIncidentType(incidentType);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
     }
 }

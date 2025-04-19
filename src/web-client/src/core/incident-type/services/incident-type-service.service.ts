@@ -66,4 +66,20 @@ export class IncidentTypeService {
       `${this.BASE_URL}/cases/incident-types/${incidentTypeId}`
     );
   }
+
+  /**
+   * Update a incident type by there.
+   */
+  update(
+    updatedIncidentType: Partial<{
+      id: string | null;
+      name: string | null;
+      description: string | null;
+    }>
+  ) {
+    return this.httpClient.patch(
+      `${this.BASE_URL}/cases/incident-types/${updatedIncidentType.id}`,
+      updatedIncidentType
+    );
+  }
 }

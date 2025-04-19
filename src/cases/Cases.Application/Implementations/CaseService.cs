@@ -106,5 +106,23 @@ namespace Cases.Application.Implementations
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
         }
+
+        public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
+        {
+            var result = new CaseResult();
+
+            var isIncidentTypeNameTaken = await _dbcontext.IncidentTypes.AnyAsync(x => x.Name == incidentType.Name && x.Id != incidentType.Id);
+            if (isIncidentTypeNameTaken)
+            {
+                result.AddError(BusinessRuleCodes.IncidentTypeAlreadyExists, $@"Incident type {incidentType.Name} is already taken, try another.");
+                return result;
+            }
+
+            _dbcontext.IncidentTypes.Update(incidentType);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded= true;
+            return result;
+        }
     }
 }

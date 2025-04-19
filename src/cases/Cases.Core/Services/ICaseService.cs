@@ -50,6 +50,11 @@ namespace Cases.Core.Services
         /// Delete a incident type - unlinks it from any cases it's linked to and then deleted.
         /// </summary>
         Task<CaseResult> DeleteIncidentType(IncidentType incidentType);
+
+        /// <summary>
+        /// Update a incident type.
+        /// </summary>
+        Task<CaseResult> UpdateIncidentType(IncidentType incidentType);
     }
 
     /// <summary>

@@ -13,5 +13,35 @@
 <!---->
 
 @if (!isLoading && !errorMessage) {
-<div>content</div>
+<form class="form" [formGroup]="editIncidentTypeForm" (ngSubmit)="onSubmit()">
+  <h2>Edit incident type details</h2>
+
+  <div class="inputs">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+
+      @if (editIncidentTypeForm.controls.name.hasError("required")) {
+      <mat-error> Required field </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" />
+    </mat-form-field>
+  </div>
+
+  <div class="btns">
+    <button
+      mat-raised-button
+      [disabled]="editIncidentTypeForm.invalid && editIncidentTypeForm.dirty"
+      type="submit"
+    >
+      Save
+    </button>
+    <button mat-raised-button type="button" (click)="fetchData()">
+      Cancel
+    </button>
+  </div>
+</form>
 }

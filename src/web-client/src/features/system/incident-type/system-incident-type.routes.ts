@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { canDeactivateGuard } from '../../../core/app/guards/canDeactivateGuard';
 
 export const SYSTEM_INCIDENT_TYPE_ROUTES: Routes = [
   {
@@ -30,5 +31,6 @@ export const SYSTEM_INCIDENT_TYPE_ROUTES: Routes = [
       import(
         './ui/system-incident-type-id-edit-view/system-incident-type-id-edit-view.component'
       ).then((c) => c.SystemIncidentTypeIdEditViewComponent),
+    canDeactivate: [canDeactivateGuard],
   },
 ];
