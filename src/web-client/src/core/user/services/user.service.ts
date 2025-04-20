@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User } from '../type';
+import { RestrictedUser, User } from '../type';
 import { HttpClient } from '@angular/common/http';
 import env from '../../../environments/environment';
 import { tap } from 'rxjs';
@@ -115,12 +115,12 @@ export class UserService {
   /**
    * Search for users by conditions - note only for admins
    */
-  searchUsersByQuery(body: {
+  adminSearchUsersByQuery(body: {
     userName: string | null;
     email: string | null;
     phoneNumber: string | null;
   }) {
-    let url = new URL(`${this.BASE_URL}/users/search`);
+    let url = new URL(`${this.BASE_URL}/admin/users/search`);
 
     if (body.userName) {
       url.searchParams.append('username', body.userName);
@@ -135,5 +135,18 @@ export class UserService {
     }
 
     return this.httpClient.get<User[]>(url.toString());
+  }
+
+  /**
+   * Search a user by there username - for restricted users who don't have a admin role - returns restricted user details
+   * @param username The username of the user to search for
+   * @returns observable call to the backend
+   */
+  searchUsersByUsername(username: string) {
+    let url = new URL(`${this.BASE_URL}/users/search`);
+
+    url.searchParams.append('username', username);
+
+    return this.httpClient.get<RestrictedUser[]>(url.toString());
   }
 }

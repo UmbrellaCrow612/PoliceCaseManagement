@@ -19,7 +19,7 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    RouterModule
+    RouterModule,
   ],
   templateUrl: './user-management-home-view.component.html',
   styleUrl: './user-management-home-view.component.css',
@@ -47,7 +47,7 @@ export class UserManagementHomeViewComponent {
     this.users = [];
 
     this.userService
-      .searchUsersByQuery({
+      .adminSearchUsersByQuery({
         email: this.searchUsersForm.controls.email.getRawValue(),
         phoneNumber: this.searchUsersForm.controls.phoneNumber.getRawValue(),
         userName: this.searchUsersForm.controls.userName.getRawValue(),

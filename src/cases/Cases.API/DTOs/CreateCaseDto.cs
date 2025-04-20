@@ -10,5 +10,8 @@ namespace Cases.API.DTOs
 
         [Required]
         public required DateTime IncidentDateTime { get; set; }
+
+        [Required]
+        public required string ReportingOfficerId { get; set; }
     }
 }

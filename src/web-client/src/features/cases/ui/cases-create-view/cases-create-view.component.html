@@ -1,0 +1,82 @@
+<form class="form" [formGroup]="createCaseForm">
+  <h2>Create a case</h2>
+  <div class="inputs">
+    <mat-form-field appearance="fill">
+      <mat-label>Case number</mat-label>
+      <input matInput formControlName="caseNumber" />
+      <mat-hint>Optional field: Make it human readable</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Summary</mat-label>
+      <textarea matInput formControlName="summary"></textarea>
+      <mat-hint>Optional</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+      <mat-hint>Optional</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Incident data time</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="incidentDateTime"
+      />
+      @if (createCaseForm.controls.incidentDateTime.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <mat-label>Reporting officer</mat-label>
+      <input
+        #input
+        type="text"
+        matInput
+        formControlName="reportingOfficerUserName"
+        [matAutocomplete]="auto"
+        (input)="filter()"
+      />
+      <mat-hint> Search users by there username </mat-hint>
+      @if
+      (createCaseForm.controls.reportingOfficerUserName.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <mat-autocomplete requireSelection #auto="matAutocomplete">
+        @if (fetchingUsers) {
+        <mat-option disabled>Fetching users...</mat-option>
+        }
+
+        <!---->
+
+        @if (!fetchingUsers) {
+        <!---->
+        @for (option of filteredUsers; track option) {
+        <mat-option [value]="option.userName">{{ option.userName }}</mat-option>
+        } @empty {
+        <mat-option>No Officer found for search term</mat-option>
+        }
+        <!---->
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+  <div class="btns">
+    <button mat-raised-button [disabled]="createCaseForm.invalid" type="submit">
+      Create
+    </button>
+    <button mat-raised-button type="button" (click)="createCaseForm.reset()">
+      Clear
+    </button>
+  </div>
+</form>

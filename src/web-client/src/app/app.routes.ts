@@ -47,4 +47,13 @@ export const routes: Routes = [
       requiredRoles: [UserRoles.Admin], // Means there authenticated and have admin role
     },
   },
+  {
+    path: appPaths.CASES,
+    loadChildren: () =>
+      import('../features/cases/cases.routes').then((r) => r.CASES_ROUTES),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [], // Means there authenticated
+    },
+  },
 ];

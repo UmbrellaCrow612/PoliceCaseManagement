@@ -1,0 +1,32 @@
+<mat-toolbar class="tool-bar">
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    @for (link of menuLinks; track link.name) {
+    <!---->
+    @if (link.children.length > 0) {
+    <button mat-menu-item [matMenuTriggerFor]="subMenu">{{ link.name }}</button>
+
+    <mat-menu #subMenu="matMenu">
+      @for (subLink of link.children; track $index) {
+      <a mat-menu-item [routerLink]="subLink.href">{{ subLink.name }}</a>
+      }
+    </mat-menu>
+
+    } @else {
+    <a mat-menu-item [routerLink]="link.href">
+      <mat-icon>{{ link.icon }}</mat-icon>
+      <span>{{ link.name }}</span>
+    </a>
+    }
+    <!---->
+    }
+  </mat-menu>
+  <span class="title">
+    <span>Cases</span>
+    <mat-icon> cases </mat-icon>
+  </span>
+  <app-header-profile></app-header-profile>
+</mat-toolbar>

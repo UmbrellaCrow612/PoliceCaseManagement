@@ -13,7 +13,8 @@ namespace Cases.API.Mappings
                 IncidentDateTime = createDto.IncidentDateTime, 
                 CaseNumber = createDto.CaseNumber, 
                 Summary = createDto.Summary, 
-                Description = createDto.Description 
+                Description = createDto.Description,
+                ReportingOfficerId = createDto.ReportingOfficerId,
             };
         }
 

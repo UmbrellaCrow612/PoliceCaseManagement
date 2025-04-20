@@ -23,6 +23,7 @@ namespace Cases.Infrastructure.Migrations
                     ReportedDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReportingOfficerId = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },

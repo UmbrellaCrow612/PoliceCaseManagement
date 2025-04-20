@@ -27,10 +27,10 @@ namespace Identity.API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if(userId is null) return BadRequest("User id missing");
+            if (userId is null) return BadRequest("User id missing");
 
             var user = await _authService.GetUserByIdAsync(userId);
-            if(user is null) return NotFound();
+            if (user is null) return NotFound();
 
             var roles = await _authService.GetUserRolesAsync(userId);
 
@@ -160,9 +160,12 @@ namespace Identity.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("search")]
+        /// <summary>
+        /// Searching a user - admin - more privilege can see more details about users.
+        /// </summary>
+        [HttpGet("admin/search")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<List<UserDto>>> SearchUsersAsync([FromQuery] SearchUserQuery query)
+        public async Task<ActionResult<List<UserDto>>> AdminSearchUsersAsync([FromQuery] SearchUserQuery query)
         {
             var users = await _authService.SearchUsersByQuery(query);
 
@@ -170,6 +173,25 @@ namespace Identity.API.Controllers
             foreach (var user in users)
             {
                 dto.Add(_userMapping.ToDto(user));
+            }
+
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Search users - see less details about them for less privileged users.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("search")]
+        [Authorize]
+        public async Task<IActionResult> SearchUsersAsync([FromQuery] SearchUserQuery query)
+        {
+            var users = await _authService.SearchUsersByQuery(query);
+
+            List<RestrictedUserDto> dto = [];
+            foreach (var user in users)
+            {
+                dto.Add(_userMapping.ToRestrictedUserDto(user));
             }
 
             return Ok(dto);

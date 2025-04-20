@@ -43,6 +43,10 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<DateTime>("ReportedDateTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReportingOfficerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 

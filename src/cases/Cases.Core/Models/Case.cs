@@ -54,6 +54,12 @@ namespace Cases.Core.Models
 
         public ICollection<CaseIncidentType> CaseIncidentType { get; set; } = [];
 
+        /// <summary>
+        /// The ID of the application user who is the reporting officer of the case.
+        /// No linked through ef core nav properties as there in diff projects
+        /// </summary>
+        public required string ReportingOfficerId { get; set; }
+
 
         // --- Audit Info ---
 

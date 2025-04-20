@@ -23,6 +23,11 @@ namespace Identity.API.Mappings
             };
         }
 
+        public RestrictedUserDto ToRestrictedUserDto(ApplicationUser user)
+        {
+            return new RestrictedUserDto { Id = user.Id, UserName = user.UserName! };
+        }
+
         public void Update(ApplicationUser @base, UpdateUserDto updateDto)
         {
             @base.UserName = updateDto.UserName;

@@ -42,6 +42,12 @@ export class HeaderProfileComponent {
       iconName: 'dashboard',
     },
     {
+      name: 'Cases',
+      href: '/cases',
+      authorizedRoles: [],
+      iconName: 'cases',
+    },
+    {
       name: 'System',
       href: '/system',
       authorizedRoles: [UserRoles.Admin],

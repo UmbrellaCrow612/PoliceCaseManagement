@@ -56,5 +56,6 @@ export const appPaths = {
   A_USER_MANAGEMENT: 'user-management',
   CHANGE_PASSWORD: 'change-password',
 
-  SYSTEM: "system"
+  SYSTEM: 'system',
+  CASES: 'cases',
 } as const;
