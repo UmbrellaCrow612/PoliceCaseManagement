@@ -13,5 +13,6 @@ namespace Cases.API.DTOs
         public required CaseStatus Status { get; set; }
         public required CasePriority Priority { get; set; }
         public required DateTime LastModifiedDate { get; set; }
+        public required string ReportingOfficerId { get; set; }
     }
 }

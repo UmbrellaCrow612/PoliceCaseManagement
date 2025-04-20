@@ -120,7 +120,7 @@ export class UserService {
     email: string | null;
     phoneNumber: string | null;
   }) {
-    let url = new URL(`${this.BASE_URL}/admin/users/search`);
+    let url = new URL(`${this.BASE_URL}/users/admin/search`);
 
     if (body.userName) {
       url.searchParams.append('username', body.userName);

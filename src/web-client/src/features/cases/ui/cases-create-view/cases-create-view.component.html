@@ -1,4 +1,4 @@
-<form class="form" [formGroup]="createCaseForm">
+<form class="form" [formGroup]="createCaseForm" (ngSubmit)="onSubmit()">
   <h2>Create a case</h2>
   <div class="inputs">
     <mat-form-field appearance="fill">
@@ -72,7 +72,11 @@
     </mat-form-field>
   </div>
   <div class="btns">
-    <button mat-raised-button [disabled]="createCaseForm.invalid" type="submit">
+    <button
+      mat-raised-button
+      [disabled]="createCaseForm.invalid || creatingCase"
+      type="submit"
+    >
       Create
     </button>
     <button mat-raised-button type="button" (click)="createCaseForm.reset()">

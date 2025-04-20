@@ -11,11 +11,13 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { RestrictedUser, User } from '../../../../core/user/type';
+import { RestrictedUser } from '../../../../core/user/type';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UserService } from '../../../../core/user/services/user.service';
 import { debounceTime, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { CaseService } from '../../../../core/cases/services/case.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cases-create-view',
@@ -34,7 +36,11 @@ import { CommonModule } from '@angular/common';
   providers: [provideNativeDateAdapter()],
 })
 export class CasesCreateViewComponent implements OnInit {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private caseService: CaseService,
+    private snackBar: MatSnackBar
+  ) {}
 
   @ViewChild('input') input: ElementRef<HTMLInputElement> | null = null;
 
@@ -59,6 +65,11 @@ export class CasesCreateViewComponent implements OnInit {
       }
     });
   }
+
+  /**
+   * Display any error
+   */
+  errorMessage: string | null = null;
 
   createCaseForm = new FormGroup({
     caseNumber: new FormControl<string | null>(null),
@@ -91,5 +102,50 @@ export class CasesCreateViewComponent implements OnInit {
     this.filterSubject.next();
   }
 
-  // TODO - when sending - find the id from filtered users using the username and send that not the username
+  /**
+   * Flag to indicate a case is being created
+   */
+  creatingCase = false;
+
+  onSubmit() {
+    if (this.createCaseForm.valid) {
+      let reportingOfficerId = this.filteredUsers.find(
+        (x) =>
+          x.userName ===
+          this.createCaseForm.controls.reportingOfficerUserName.value
+      )?.id;
+
+      if (!reportingOfficerId) {
+        return; // do some err check
+      }
+
+      this.creatingCase = true;
+      this.errorMessage = null;
+
+      let _caseNumber = this.createCaseForm.controls.caseNumber.value;
+      if (_caseNumber?.trim() == '') {
+        _caseNumber = null; // stop sending empty case number backend
+      }
+
+      this.caseService
+        .create({
+          caseNumber: _caseNumber,
+          description: this.createCaseForm.controls.description.value,
+          incidentDateTime:
+            this.createCaseForm.controls.incidentDateTime.value!,
+          reportingOfficerId: reportingOfficerId,
+          summary: this.createCaseForm.controls.summary.value,
+        })
+        .subscribe({
+          next: () => {
+            this.creatingCase = false;
+            this.snackBar.open('Created case', 'Close', { duration: 10000 });
+          },
+          error: () => {
+            this.creatingCase = false;
+            this.errorMessage = 'Failed';
+          },
+        });
+    }
+  }
 }

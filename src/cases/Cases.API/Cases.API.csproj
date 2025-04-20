@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\CORS\CORS.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
+    <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
     <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
     <ProjectReference Include="..\Cases.Application\Cases.Application.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />

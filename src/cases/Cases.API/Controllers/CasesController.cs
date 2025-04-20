@@ -1,5 +1,6 @@
 ﻿using Authorization;
 using Cases.API.DTOs;
+using Cases.API.DTOs.Validators;
 using Cases.API.Mappings;
 using Cases.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,17 +10,24 @@ namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
         private readonly CasesMapping _caseMapping = new();
+        private readonly CaseValidator _caseValidator = caseValidator;
 
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<CaseDto>> CreateCase([FromBody] CreateCaseDto dto)
         {
             var caseToCreate = _caseMapping.Create(dto);
+            var valResult = _caseValidator.Execute(caseToCreate);
+            if (!valResult.IsSuccessful)
+            {
+                return BadRequest(valResult.Errors);
+            }
+
             var result = await _caseService.CreateAsync(caseToCreate);
             if (!result.Succeeded)
             {

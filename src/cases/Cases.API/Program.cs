@@ -15,6 +15,8 @@ builder.Services.AddBaseAuthorization(config);
 builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
 
+builder.Services.AddValidators();
+
 var app = builder.Build();
 
 app.UseApplicationCors(config);

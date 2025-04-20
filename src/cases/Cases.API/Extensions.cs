@@ -1,4 +1,5 @@
 ﻿using Authorization;
+using Cases.API.DTOs.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -46,6 +47,13 @@ namespace Cases.API
 
             services.AddAuthorization();
 
+            return services;
+        }
+
+
+        public static IServiceCollection AddValidators(this IServiceCollection services)
+        {
+            services.AddScoped<CaseValidator>();
             return services;
         }
     }

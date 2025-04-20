@@ -5,7 +5,6 @@ import {
   PristineChangeEvent,
   ReactiveFormsModule,
   Validators,
-  ValueChangeEvent,
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,17 +14,7 @@ import {
   Validator_password,
 } from '../../../../../core/app/validators/controls';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  debounceTime,
-  filter,
-  map,
-  merge,
-  Observable,
-  Subscription,
-  throttle,
-  throttleTime,
-  timer,
-} from 'rxjs';
+import { debounceTime, filter, Observable, Subscription, timer } from 'rxjs';
 import { CanComponentDeactivate } from '../../../../../core/app/guards/canDeactivateGuard';
 import { UserService } from '../../../../../core/user/services/user.service';
 import { isEmail } from '../../../../../core/app/validators/isEmail';

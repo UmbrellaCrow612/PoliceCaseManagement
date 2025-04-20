@@ -30,7 +30,8 @@ namespace Cases.API.Mappings
                 Priority = @base.Priority,
                 ReportedDateTime = @base.ReportedDateTime,
                 Status = @base.Status,
-                Summary = @base.Summary
+                Summary = @base.Summary,
+                ReportingOfficerId = @base.ReportingOfficerId,
             };
         }
 
