@@ -16,7 +16,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { appPaths } from '../../../../core/app/constants/appPaths';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
+import { ErrorService } from '../../../../core/app/errors/services/error.service';
 
 @Component({
   selector: 'app-login-view',
@@ -36,7 +37,7 @@ export class LoginViewComponent {
     private authService: AuthenticationService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private errorService: ErrorService
   ) {}
 
   isLoggingIn = false;
@@ -68,7 +69,7 @@ export class LoginViewComponent {
           error: (err: HttpErrorResponse) => {
             this.isLoggingIn = false;
 
-            let code = err.error.errors[0]?.code;
+            let code = getBusinessErrorCode(err)
 
             switch (code) {
               case CODES.IncorrectCreds || CODES.UserDoseNotExist:
@@ -106,7 +107,7 @@ export class LoginViewComponent {
                 break;
 
               default:
-                this.snackBar.open(`Failed error: ${code}`);
+                this.errorService.HandleDisplay(err)
                 break;
             }
           },

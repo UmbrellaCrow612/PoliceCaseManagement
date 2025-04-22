@@ -9,7 +9,7 @@
         private readonly List<Rule<T>> _rules = [];
 
         /// <summary>
-        /// Add a rule as part of rules to run against the <see cref="T"/>, write the case that would return true for the case you dot want.
+        /// Add a rule as part of rules to run against the <see cref="T"/>, write the case that would return true for the case you don't want.
         /// For example:
         /// AddRule(x => string.IsNullOrWhiteSpace(x.Name), "Name should not be empty or null")
         /// </summary>
