@@ -15,6 +15,7 @@ import CODES from '../../../../core/server-responses/codes';
 import { ActivatedRoute, Router } from '@angular/router';
 import { appPaths } from '../../../../core/app/constants/appPaths';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-confirm-email-view',
@@ -62,7 +63,7 @@ export class ConfirmEmailViewComponent {
             this.isSendingRequest = false;
             this.sentEmailConfirmationSuccessfully = false;
 
-            let code = error.error[0]?.code;
+            let code = getBusinessErrorCode(error)
 
             switch (code) {
               case CODES.USER_DOES_NOT_EXIST:

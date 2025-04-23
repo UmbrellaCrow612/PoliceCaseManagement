@@ -9,6 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import CODES from '../../../../core/server-responses/codes';
 import { appPaths } from '../../../../core/app/constants/appPaths';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-phone-confirmation-view',
@@ -54,7 +55,7 @@ export class PhoneConfirmationViewComponent {
           error: (err: HttpErrorResponse) => {
             this.isSendPhoneConfirmationRequest = false;
 
-            let code = err.error[0]?.code;
+            let code = getBusinessErrorCode(err)
 
             switch (code) {
               case CODES.PHONE_NUMBER_ALREADY_CONFIRMED:
@@ -101,7 +102,7 @@ export class PhoneConfirmationViewComponent {
             });
           },
           error: (err: HttpErrorResponse) => {
-            let code = err.error[0].code;
+            let code = getBusinessErrorCode(err)
 
             switch (code) {
               case CODES.PHONE_NUMBER_ALREADY_CONFIRMED:
