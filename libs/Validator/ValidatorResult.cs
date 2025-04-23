@@ -14,6 +14,6 @@
         /// <summary>
         /// A List of error messages for <see cref="Validator{T}"/> for class <see cref="T"/>
         /// </summary>
-        public List<string> Errors { get; set; } = [];
+        public List<string> ValidationErrors { get; set; } = [];
     }
 }

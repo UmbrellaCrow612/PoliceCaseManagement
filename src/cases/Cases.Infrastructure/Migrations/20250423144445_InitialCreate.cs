@@ -16,7 +16,7 @@ namespace Cases.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    CaseNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    CaseNumber = table.Column<string>(type: "TEXT", nullable: false),
                     Summary = table.Column<string>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
                     IncidentDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),

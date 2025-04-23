@@ -55,6 +55,13 @@ namespace Cases.Core.Services
         /// Update a incident type.
         /// </summary>
         Task<CaseResult> UpdateIncidentType(IncidentType incidentType);
+
+        /// <summary>
+        /// Checks if a <see cref="Case.CaseNumber"/> is taken by another case
+        /// </summary>
+        /// <param name="caseNumber">The case number</param>
+        /// <returns>Flag to indicate if a case number is taken</returns>
+        Task<bool> IsCaseNumberTaken(string caseNumber);
     }
 
     /// <summary>

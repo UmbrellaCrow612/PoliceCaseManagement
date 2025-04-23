@@ -23,6 +23,7 @@ namespace Cases.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CaseNumber")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedDate")

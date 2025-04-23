@@ -95,15 +95,6 @@ namespace Identity.Application.Implamentations
                 return result;
             }
 
-            if (user.PasswordCreatedAt.AddDays(_passwordConfigSettings.RoationPeriodInDays) < DateTime.UtcNow)
-            {
-                loginAttempt.FailureReason = "Expired password being used.";
-                await _unitOfWork.SaveChangesAsync();
-                _logger.LogWarning("Login failed: Expired password being used. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
-                result.AddError(BusinessRuleCodes.ExpiredPasswordBeingUsed);
-                return result;
-            }
-
             if (!user.EmailConfirmed)
             {
                 loginAttempt.FailureReason = "Email not confirmed.";
@@ -140,6 +131,15 @@ namespace Identity.Application.Implamentations
                 _logger.LogWarning("Login failed: Requres password change. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
                 result.AddError(BusinessRuleCodes.RequiresPasswordChange);
 
+                return result;
+            }
+
+            if (user.PasswordCreatedAt.AddDays(_passwordConfigSettings.RoationPeriodInDays) < DateTime.UtcNow)
+            {
+                loginAttempt.FailureReason = "Expired password being used.";
+                await _unitOfWork.SaveChangesAsync();
+                _logger.LogWarning("Login failed: Expired password being used. UserId: {UserId}, IP: {IpAddress}", user.Id, deviceInfo.IpAddress);
+                result.AddError(BusinessRuleCodes.ExpiredPasswordBeingUsed);
                 return result;
             }
 

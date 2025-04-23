@@ -10,12 +10,9 @@ namespace Cases.API.Validators
     {
         public CaseValidator() 
         {
-            AddRule(
-            x => x.CaseNumber is not null && x.CaseNumber.Trim() == string.Empty,
-            "Case number must not be empty or whitespace if provided"
-            );
-
             AddRule(x => string.IsNullOrWhiteSpace(x.ReportingOfficerId), "ReportingOfficerId must not be empty or whitespace if provided");
+
+            AddRule(x => x.CaseNumber.Length < 5, "Case number must be grater than 5 characters long");
         }
     }
 }

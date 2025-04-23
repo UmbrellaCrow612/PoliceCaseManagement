@@ -23,6 +23,13 @@ export const CASES_ROUTES: Routes = [
             (c) => c.CasesCreateViewComponent
           ),
       },
+      {
+        path: ':caseId',
+        loadComponent: () =>
+          import('./ui/cases-id-view/cases-id-view.component').then(
+            (c) => c.CasesIdViewComponent
+          ),
+      },
     ],
   },
 ];

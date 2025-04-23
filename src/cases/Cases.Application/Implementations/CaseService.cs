@@ -40,10 +40,10 @@ namespace Cases.Application.Implementations
 
             if (!string.IsNullOrWhiteSpace(caseToCreate.CaseNumber))
             {
-                var isCaseNumberTaken = await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseToCreate.CaseNumber);
+                var isCaseNumberTaken = await IsCaseNumberTaken(caseToCreate.CaseNumber);
                 if (isCaseNumberTaken)
                 {
-                    result.AddError(BusinessRuleCodes.CaseNumberTaken, $"Case number: ${caseToCreate.CaseNumber} is taken.");
+                    result.AddError(BusinessRuleCodes.CaseNumberTaken, $"Case number: {caseToCreate.CaseNumber} is taken.");
                     return result;
                 }
             }
@@ -105,6 +105,16 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<bool> IsCaseNumberTaken(string caseNumber)
+        {
+            if (string.IsNullOrWhiteSpace(caseNumber))
+            {
+                return true;
+            }
+
+            return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
         }
 
         public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
