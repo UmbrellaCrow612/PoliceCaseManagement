@@ -11,10 +11,10 @@ namespace Cases.API.Mappings
             return new Case 
             { 
                 IncidentDateTime = createDto.IncidentDateTime, 
-                CaseNumber = createDto.CaseNumber, 
+                CaseNumber = createDto.CaseNumber.Trim(),
                 Summary = createDto.Summary, 
                 Description = createDto.Description,
-                ReportingOfficerId = createDto.ReportingOfficerId,
+                ReportingOfficerId = createDto.ReportingOfficerId.Trim(),
             };
         }
 

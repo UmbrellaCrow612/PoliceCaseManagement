@@ -5,6 +5,20 @@
       <mat-label>Case number</mat-label>
       <input matInput formControlName="caseNumber" />
       <mat-hint>Optional field: Make it human readable</mat-hint>
+
+      @if (createCaseForm.controls.caseNumber.hasError("caseNumberTaken")) {
+      <mat-error>
+        Case number taken
+      </mat-error>
+      } @else if (createCaseForm.controls.caseNumber.hasError("required")) {
+      <mat-error>
+        Required
+      </mat-error>
+      } @else if (createCaseForm.controls.caseNumber.hasError("minlength")) {
+      <mat-error>
+        Must be greater than 5 characters
+      </mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field>
@@ -21,32 +35,19 @@
 
     <mat-form-field>
       <mat-label>Incident data time</mat-label>
-      <input
-        matInput
-        [matDatepicker]="picker"
-        formControlName="incidentDateTime"
-      />
+      <input matInput [matDatepicker]="picker" formControlName="incidentDateTime" />
       @if (createCaseForm.controls.incidentDateTime.hasError("required")) {
       <mat-error> Required </mat-error>
       }
       <mat-hint>MM/DD/YYYY</mat-hint>
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="picker"
-      ></mat-datepicker-toggle>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field class="example-full-width">
       <mat-label>Reporting officer</mat-label>
-      <input
-        #input
-        type="text"
-        matInput
-        formControlName="reportingOfficerUserName"
-        [matAutocomplete]="auto"
-        (input)="filter()"
-      />
+      <input #input type="text" matInput formControlName="reportingOfficerUserName" [matAutocomplete]="auto"
+        (input)="filter()" />
       <mat-hint> Search users by there username </mat-hint>
       @if
       (createCaseForm.controls.reportingOfficerUserName.hasError("required")) {
@@ -72,11 +73,7 @@
     </mat-form-field>
   </div>
   <div class="btns">
-    <button
-      mat-raised-button
-      [disabled]="createCaseForm.invalid || creatingCase"
-      type="submit"
-    >
+    <button mat-raised-button [disabled]="createCaseForm.invalid || creatingCase" type="submit">
       Create
     </button>
     <button mat-raised-button type="button" (click)="createCaseForm.reset()">

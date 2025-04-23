@@ -32,11 +32,11 @@
                 var passed = rule.Func(item);
                 if (passed)
                 {
-                    result.Errors.Add(rule.Message ?? "No message provided");
+                    result.ValidationErrors.Add(rule.Message ?? "No message provided");
                 }
             }
 
-            if (result.Errors.Count != 0) return result;
+            if (result.ValidationErrors.Count != 0) return result;
             result.IsSuccessful = true;
             return result;
         }

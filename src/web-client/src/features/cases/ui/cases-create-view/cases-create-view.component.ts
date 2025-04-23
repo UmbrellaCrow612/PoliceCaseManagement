@@ -18,6 +18,12 @@ import { debounceTime, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ErrorService } from '../../../../core/app/errors/services/error.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
+import CODES from '../../../../core/server-responses/codes';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CreateCase } from '../../../../core/cases/type';
 
 @Component({
   selector: 'app-cases-create-view',
@@ -39,8 +45,11 @@ export class CasesCreateViewComponent implements OnInit {
   constructor(
     private userService: UserService,
     private caseService: CaseService,
-    private snackBar: MatSnackBar
-  ) {}
+    private snackBar: MatSnackBar,
+    private errorService: ErrorService,
+    private active: ActivatedRoute,
+    private router: Router
+  ) { }
 
   @ViewChild('input') input: ElementRef<HTMLInputElement> | null = null;
 
@@ -56,7 +65,6 @@ export class CasesCreateViewComponent implements OnInit {
           error: () => {
             this.fetchingUsers = false;
             this.filteredUsers = [];
-            // some rr state
           },
         });
       } else {
@@ -64,15 +72,27 @@ export class CasesCreateViewComponent implements OnInit {
         this.filteredUsers = [];
       }
     });
+
+    this.createCaseForm.controls.caseNumber.valueChanges.pipe(debounceTime(1200)).subscribe({
+      next: () => {
+        let value = this.createCaseForm.controls.caseNumber.value
+        if (value?.trim() !== "" && !this.createCaseForm.controls.caseNumber.hasError("required") && !this.createCaseForm.controls.caseNumber.hasError("minlength")) {
+          this.caseService.isCaseNumberTaken(value!).subscribe({
+            error: () => {
+              this.createCaseForm.controls.caseNumber.setErrors({
+                caseNumberTaken: true
+              })
+            }
+          })
+        }
+      }
+    })
   }
 
-  /**
-   * Display any error
-   */
-  errorMessage: string | null = null;
+
 
   createCaseForm = new FormGroup({
-    caseNumber: new FormControl<string | null>(null),
+    caseNumber: new FormControl<string | null>("", [Validators.required, Validators.minLength(5)]),
     summary: new FormControl<string | null>(''),
     description: new FormControl<string | null>(null),
     incidentDateTime: new FormControl<Date>(new Date(), [Validators.required]),
@@ -120,30 +140,40 @@ export class CasesCreateViewComponent implements OnInit {
       }
 
       this.creatingCase = true;
-      this.errorMessage = null;
 
-      let _caseNumber = this.createCaseForm.controls.caseNumber.value;
-      if (_caseNumber?.trim() == '') {
-        _caseNumber = null; // stop sending empty case number backend
+      let caseToCreate: CreateCase = {
+        caseNumber: this.createCaseForm.controls.caseNumber.value!.trim(),
+        description: this.createCaseForm.controls.description.value,
+        incidentDateTime: this.createCaseForm.controls.incidentDateTime.value!,
+        reportingOfficerId: reportingOfficerId,
+        summary: this.createCaseForm.controls.summary.value
       }
 
       this.caseService
-        .create({
-          caseNumber: _caseNumber,
-          description: this.createCaseForm.controls.description.value,
-          incidentDateTime:
-            this.createCaseForm.controls.incidentDateTime.value!,
-          reportingOfficerId: reportingOfficerId,
-          summary: this.createCaseForm.controls.summary.value,
-        })
+        .create(caseToCreate)
         .subscribe({
-          next: () => {
+          next: (resposne) => {
             this.creatingCase = false;
             this.snackBar.open('Created case', 'Close', { duration: 10000 });
+
+            this.router.navigate(["../", resposne.id], { relativeTo: this.active })
           },
-          error: () => {
+          error: (error: HttpErrorResponse) => {
             this.creatingCase = false;
-            this.errorMessage = 'Failed';
+
+            let code = getBusinessErrorCode(error)
+
+            switch (code) {
+              case CODES.CASE_NUMBER_TAKEN:
+                this.createCaseForm.controls.caseNumber.setErrors({
+                  caseNumberTaken: true
+                })
+                break;
+
+              default:
+                this.errorService.HandleDisplay(error)
+                break;
+            }
           },
         });
     }

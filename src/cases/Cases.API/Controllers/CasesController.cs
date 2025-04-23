@@ -17,6 +17,36 @@ namespace Cases.API.Controllers
         private readonly CasesMapping _caseMapping = new();
         private readonly CaseValidator _caseValidator = caseValidator;
 
+
+        [Authorize]
+        [HttpGet("case-numbers/{caseNumber}/is-taken")]
+        public async Task<IActionResult> IsCaseNumberTaken(string caseNumber)
+        {
+            var isTaken = await _caseService.IsCaseNumberTaken(caseNumber);
+            if (isTaken)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+
+        [Authorize]
+        [HttpGet("{caseId}")]
+        public async Task<ActionResult<CaseDto>> GetCaseById(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var dto = _caseMapping.ToDto(_case);
+
+            return Ok(dto);
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<CaseDto>> CreateCase([FromBody] CreateCaseDto dto)
@@ -25,7 +55,7 @@ namespace Cases.API.Controllers
             var valResult = _caseValidator.Execute(caseToCreate);
             if (!valResult.IsSuccessful)
             {
-                return BadRequest(valResult.Errors);
+                return BadRequest(valResult);
             }
 
             var result = await _caseService.CreateAsync(caseToCreate);

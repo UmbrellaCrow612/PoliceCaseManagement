@@ -14,9 +14,8 @@ namespace Cases.Core.Models
 
         /// <summary>
         // Human-readable case number assigned by the system or department(e.g., "2023-001234").
-        /// Might be assigned later than creation.
         /// </summary>
-        public string? CaseNumber { get; set; } = null;
+        public required string CaseNumber { get; set; }
 
         /// <summary>
         /// A brief summary or title for the case.
@@ -82,16 +81,16 @@ namespace Cases.Core.Models
     /// </summary>
     public enum CaseStatus
     {
-        Reported,       // Initial report taken
-        PendingReview,  // Waiting for assignment or initial assessment
-        Active,         // Under active investigation
-        Suspended,      // Investigation paused (e.g., lack of leads)
-        WarrantIssued,
-        Referred,       // Sent to another agency/department
-        ClosedCleared,  // Solved/Arrest made/Resolved
-        ClosedUnfounded,// Determined incident didn't occur as reported
-        ClosedUnsolved, // Investigation concluded without resolution
-        Archived
+        Reported = 0,       // Initial report taken
+        PendingReview = 1,  // Waiting for assignment or initial assessment
+        Active = 2,         // Under active investigation
+        Suspended = 3,      // Investigation paused (e.g., lack of leads)
+        WarrantIssued = 4,
+        Referred = 5,       // Sent to another agency/department
+        ClosedCleared = 6,  // Solved/Arrest made/Resolved
+        ClosedUnfounded = 7,// Determined incident didn't occur as reported
+        ClosedUnsolved = 8, // Investigation concluded without resolution
+        Archived = 9
     }
 
     /// <summary>
@@ -99,10 +98,10 @@ namespace Cases.Core.Models
     /// </summary>
     public enum CasePriority
     {
-        Low,
-        Normal,
-        High,
-        Urgent,
-        Critical
+        Low = 0,
+        Normal = 1,
+        High = 2,
+        Urgent = 3,
+        Critical = 4
     }
 }

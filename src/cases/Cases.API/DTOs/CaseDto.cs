@@ -5,7 +5,7 @@ namespace Cases.API.DTOs
     public class CaseDto
     {
         public required string Id { get; set; }
-        public required string? CaseNumber { get; set; } = null;
+        public required string CaseNumber { get; set; }
         public required string? Summary { get; set; } = null;
         public required string? Description { get; set; } = null;
         public required DateTime IncidentDateTime { get; set; }
