@@ -1,7 +1,8 @@
-<h2 mat-dialog-title>Hi</h2>
+<h2 mat-dialog-title>Error occured</h2>
 <mat-dialog-content>
-  <p>{{ data | json }}</p>
-  <p>Mess {{mess}}</p>
+  <p>{{mess}}</p>
+
+  <p>{{data | json}}</p>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button cdkFocusInitial matDialogClose>Ok</button>

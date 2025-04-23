@@ -161,16 +161,6 @@ namespace Identity.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResult>> Login([FromBody] LoginRequestDto dto)
         {
-
-            // test delete 
-
-            var result = new LoginResult { };
-            result.AddError("CODE", "Mess");
-            return BadRequest(result);
-
-            //
-
-
             var res = await _authService.LoginAsync(dto.Email, dto.Password, this.ComposeDeviceInfo());
             if (!res.Succeeded) return BadRequest(res);
 
