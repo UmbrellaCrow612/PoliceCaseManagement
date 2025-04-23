@@ -9,6 +9,7 @@ import { formatBackendError } from '../../formatError';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpErrorResponse } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-error-snack-bar',
   imports: [MatSnackBarModule, CommonModule, MatButtonModule],
@@ -17,7 +18,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class ErrorSnackBarComponent {
   snackBarRef = inject(MatSnackBarRef);
+
   data: HttpErrorResponse = inject(MAT_SNACK_BAR_DATA);
+
 
   mess = formatBackendError(this.data);
 }

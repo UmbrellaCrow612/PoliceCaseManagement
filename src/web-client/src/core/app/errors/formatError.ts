@@ -15,6 +15,7 @@ export function formatBackendError(error: HttpErrorResponse) {
     if (object.errors && object.errors[0]?.code) {
       message += `code: ${object.errors[0].code} message: ${object.errors[0]?.message ? object.errors[0]?.message : 'No Message'
         }`;
+
       return message;
     }
   }
@@ -44,6 +45,7 @@ export function formatBackendError(error: HttpErrorResponse) {
       return message;
     }
   }
+
 
   return message;
 }
