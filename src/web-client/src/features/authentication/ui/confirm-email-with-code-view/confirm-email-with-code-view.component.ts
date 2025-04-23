@@ -4,6 +4,7 @@ import { AuthenticationService } from '../../../../core/authentication/services/
 import { HttpErrorResponse } from '@angular/common/http';
 import { appPaths } from '../../../../core/app/constants/appPaths';
 import CODES from '../../../../core/server-responses/codes';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 /**
  * This acts as a boiler page - we use it as a page when a user clicks the link from the email with domain/confirm-email-code?code=123
  * they will get directed here then we simply take the code from the URL and make a request to confirm endpoint
@@ -57,7 +58,7 @@ export class ConfirmEmailWithCodeViewComponent implements OnInit {
             });
           },
           error: (err: HttpErrorResponse) => {
-            let code = err.error[0]?.code;
+            let code = getBusinessErrorCode(err)
 
             if (code == CODES.EMAIL_ALREADY_CONFIRMED) {
               this.router.navigate([`../${appPaths.LOGIN}`], {

@@ -1,5 +1,5 @@
 ﻿using Authorization;
-using Cases.API.DTOs.Validators;
+using Cases.API.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;

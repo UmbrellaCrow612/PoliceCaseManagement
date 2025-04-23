@@ -1,7 +1,7 @@
 ﻿using Cases.Core.Models;
 using Validator;
 
-namespace Cases.API.DTOs.Validators
+namespace Cases.API.Validators
 {
     /// <summary>
     /// Validation to run against a <see cref="Case"/> before we create it - typically from dto to a model state

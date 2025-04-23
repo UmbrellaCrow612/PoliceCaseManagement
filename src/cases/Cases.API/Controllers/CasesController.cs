@@ -1,7 +1,7 @@
 ﻿using Authorization;
 using Cases.API.DTOs;
-using Cases.API.DTOs.Validators;
 using Cases.API.Mappings;
+using Cases.API.Validators;
 using Cases.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

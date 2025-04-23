@@ -18,6 +18,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { interval, Subscription, timer } from 'rxjs';
 import { UserService } from '../../../../core/user/services/user.service';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-two-factor-sms-view',
@@ -88,7 +89,7 @@ export class TwoFactorSmsViewComponent implements OnInit {
           });
         },
         error: (err: HttpErrorResponse) => {
-          let code = err.error[0]?.code;
+          let code = getBusinessErrorCode(err)
 
           switch (code) {
             case CODES.LOGIN_ATTEMPT_NOT_VALID:

@@ -17,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { appPaths } from '../../../../core/app/constants/appPaths';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-device-challenge-view',
@@ -71,7 +72,7 @@ export class DeviceChallengeViewComponent {
           error: (err: HttpErrorResponse) => {
             this.isSendingRequestInProgress = false;
 
-            let code = err.error[0]?.code;
+            let code = getBusinessErrorCode(err)
 
             switch (code) {
               case CODES.DEVICE_ALREADY_TRUSTED:

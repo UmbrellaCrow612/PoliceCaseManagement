@@ -12,6 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { isEmail } from '../../../../core/app/validators/isEmail';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-confirm-device-challenge-view',
@@ -65,7 +66,7 @@ export class ConfirmDeviceChallengeViewComponent implements OnInit {
             });
           },
           error: (err: HttpErrorResponse) => {
-            let code = err.error[0]?.code;
+            let code = getBusinessErrorCode(err);
 
             switch (code) {
               case CODES.DEVICE_CONFIRMATION_DOES_NOT_EXIST:
@@ -110,7 +111,7 @@ export class ConfirmDeviceChallengeViewComponent implements OnInit {
           });
         },
         error: (err: HttpErrorResponse) => {
-          let code = err.error[0]?.code;
+          let code = getBusinessErrorCode(err)
 
           switch (code) {
             case CODES.DEVICE_ALREADY_TRUSTED:

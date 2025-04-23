@@ -22,6 +22,7 @@ import { isNumeric } from '../../../../../core/app/validators/isNumeric';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ErrorService } from '../../../../../core/app/errors/services/error.service';
 
 @Component({
   selector: 'app-user-management-create-view',
@@ -36,14 +37,14 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './user-management-create-view.component.css',
 })
 export class UserManagementCreateViewComponent
-  implements OnInit, OnDestroy, CanComponentDeactivate
-{
+  implements OnInit, OnDestroy, CanComponentDeactivate {
   constructor(
     private userService: UserService,
     private snackBar: MatSnackBar,
     private active: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private errorService: ErrorService
+  ) { }
   hasUnsavedChanges = false;
   showPassword = false;
   passwordInputType = 'password';
@@ -195,11 +196,8 @@ export class UserManagementCreateViewComponent
             });
           },
           error: (err: HttpErrorResponse) => {
-            let code = err.error[0]?.code;
-            this.snackBar.open(`Failed to create user code: ${code}`, 'Close', {
-              duration: 10000,
-            });
             this.isSendingCreatingUserRequest = false;
+            this.errorService.HandleDisplay(err)
           },
         });
     }

@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../../core/server-responses/codes';
+import { getBusinessErrorCode } from '../../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({
   selector: 'app-system-incident-type-create-view',
@@ -59,7 +60,7 @@ export class SystemIncidentTypeCreateViewComponent {
           error: (err: HttpErrorResponse) => {
             this.isSendingRequest = false;
 
-            let code = err.error.errors[0]?.code;
+            let code = getBusinessErrorCode(err)
 
             switch (code) {
               case CODES.INCIDENT_TYPE_ALREADY_EXISTS:
