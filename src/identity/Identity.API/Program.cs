@@ -6,7 +6,6 @@ using Identity.Application;
 using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
-using Email;
 using Identity.API.Extensions;
 using CORS;
 
@@ -25,7 +24,6 @@ builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
-builder.Services.AddEmailService(config);
 
 var app = builder.Build();
 

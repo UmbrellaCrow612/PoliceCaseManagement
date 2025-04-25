@@ -6,6 +6,12 @@
     <UserSecretsId>4c72902e-1a1b-45a6-8461-f9dca6fce89c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Settings\**" />
+    <Content Remove="Settings\**" />
+    <EmbeddedResource Remove="Settings\**" />
+    <None Remove="Settings\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
@@ -22,13 +28,9 @@
     <ProjectReference Include="..\..\..\libs\CORS\CORS.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
-    <ProjectReference Include="..\..\shared\Email\Email.csproj" />
     <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Settings\" />
   </ItemGroup>
 </Project>

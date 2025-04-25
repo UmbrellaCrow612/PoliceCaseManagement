@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine # Use alpine for smaller image size
+    container_name: rabbitmq_service
+    hostname: rabbitmq_node # Internal hostname
+    ports:
+      - "5672:5672"   # AMQP port for clients
+      - "15672:15672" # Management UI
+    volumes:
+      # Persist RabbitMQ data
+      - rabbitmq_data:/var/lib/rabbitmq/
+      # Optional: Mount custom configuration file (see step 3)
+      # - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      # Optional: Mount custom definitions file (advanced)
+      # - ./definitions.json:/etc/rabbitmq/definitions.json
+    environment:
+      # Set default user/pass (CHANGE THESE!)
+      # If not set, defaults to guest/guest (only accessible from localhost)
+      RABBITMQ_DEFAULT_USER: user # Replace 'user' with your desired username
+      RABBITMQ_DEFAULT_PASS: StrongPassword! # Replace with a SECURE password
+      RABBITMQ_DEFAULT_VHOST: / # Default virtual host
+      # Optional: Set node name (useful for clustering later)
+      # RABBITMQ_NODENAME: rabbit@rabbitmq_node
+    restart: unless-stopped # Or 'always' for more resilience
+
+volumes:
+  rabbitmq_data: # Define the named volume for persistence
+    driver: local
