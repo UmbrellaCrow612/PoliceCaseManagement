@@ -41,7 +41,7 @@ namespace Cases.Core.Models
         /// <summary>
         /// The current status of the case.
         /// </summary>
-        public CaseStatus Status { get; set; } = CaseStatus.Reported;
+        public CaseStatus Status { get; set; } = CaseStatus.Invalid;
 
         /// <summary>
         /// The priority level assigned to the case.
@@ -90,7 +90,8 @@ namespace Cases.Core.Models
         ClosedCleared = 6,  // Solved/Arrest made/Resolved
         ClosedUnfounded = 7,// Determined incident didn't occur as reported
         ClosedUnsolved = 8, // Investigation concluded without resolution
-        Archived = 9
+        Archived = 9,
+        Invalid = 10, // when a case is in a invalid state - typically when the reporting officer dosent exist
     }
 
     /// <summary>

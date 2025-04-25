@@ -3,8 +3,7 @@ using Identity.Application.Constants;
 using Identity.Application.Helpers;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using SendGrid;
+
 
 namespace Identity.API.Extensions
 {

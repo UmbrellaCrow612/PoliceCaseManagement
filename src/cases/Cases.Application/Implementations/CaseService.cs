@@ -3,13 +3,18 @@ using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Infrastructure.Data;
+using Events;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
+        private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
+        private readonly ILogger<CaseService> _logger = logger;
 
         public async Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType)
         {
@@ -50,6 +55,9 @@ namespace Cases.Application.Implementations
 
             await _dbcontext.Cases.AddAsync(caseToCreate);
             await _dbcontext.SaveChangesAsync();
+
+            await _publishEndpoint.Publish(new CaseCreatedEvent { CaseId = caseToCreate.Id, ReportingOffcierId = caseToCreate.ReportingOfficerId });
+            _logger.LogInformation("CaseCreatedEvent published");
 
             result.Succeeded = true;
             return result;

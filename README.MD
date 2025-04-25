@@ -18,3 +18,12 @@
 ## Features so far
 
 - Endpoint to compare two faces
+
+
+
+
+# Running
+
+- Run the broker
+- Backend API's through visual studio over https
+- Front end with `npm start` after gen creds for https

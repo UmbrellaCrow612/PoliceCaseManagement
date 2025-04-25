@@ -37,7 +37,8 @@ export const CaseStatusNames: { name: string, number: number }[] = [
   { name: 'ClosedCleared', number: 6 },
   { name: 'ClosedUnfounded', number: 7 },
   { name: 'ClosedUnsolved', number: 8 },
-  { name: 'Archived', number: 9 }
+  { name: 'Archived', number: 9 },
+  { name: 'Invalid', number: 10 }
 ];
 
 

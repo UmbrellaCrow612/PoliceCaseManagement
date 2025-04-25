@@ -14,7 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { RestrictedUser } from '../../../../core/user/type';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UserService } from '../../../../core/user/services/user.service';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, timer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -156,7 +156,9 @@ export class CasesCreateViewComponent implements OnInit {
             this.creatingCase = false;
             this.snackBar.open('Created case', 'Close', { duration: 10000 });
 
-            this.router.navigate(["../", resposne.id], { relativeTo: this.active })
+            timer(1200).subscribe(() => {
+              this.router.navigate(["../", resposne.id], { relativeTo: this.active })
+            })
           },
           error: (error: HttpErrorResponse) => {
             this.creatingCase = false;
