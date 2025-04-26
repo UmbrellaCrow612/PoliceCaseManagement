@@ -153,7 +153,6 @@ export class CasesCreateViewComponent implements OnInit {
         .create(caseToCreate)
         .subscribe({
           next: (resposne) => {
-            this.creatingCase = false;
             this.snackBar.open('Created case', 'Close', { duration: 10000 });
 
             timer(1200).subscribe(() => {

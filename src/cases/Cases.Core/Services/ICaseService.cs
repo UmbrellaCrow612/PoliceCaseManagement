@@ -1,5 +1,6 @@
 ﻿
 using Cases.Core.Models;
+using Cases.Core.ValueObjects;
 
 namespace Cases.Core.Services
 {
@@ -62,6 +63,13 @@ namespace Cases.Core.Services
         /// <param name="caseNumber">The case number</param>
         /// <returns>Flag to indicate if a case number is taken</returns>
         Task<bool> IsCaseNumberTaken(string caseNumber);
+
+        /// <summary>
+        /// Search for cases in the system with a query object
+        /// </summary>
+        /// <param name="query">The query object</param>
+        /// <returns>Pagination result of cases</returns>
+        Task<PagedResult<Case>> SearchCases(SearchCasesQuery query);
     }
 
     /// <summary>

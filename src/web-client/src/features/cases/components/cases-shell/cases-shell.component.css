@@ -6,9 +6,10 @@
 }
 
 .page_shell {
-  flex: 5;
+  flex: 6;
 }
 
 .page_header {
   flex: 1;
+  min-height: 120px;
 }

@@ -24,6 +24,13 @@ export const CASES_ROUTES: Routes = [
           ),
       },
       {
+        path: 'search',
+        loadComponent: () =>
+          import('./ui/search-cases-view/search-cases-view.component').then(
+            (c) => c.SearchCasesViewComponent
+          ),
+      },
+      {
         path: ':caseId',
         loadComponent: () =>
           import('./ui/cases-id-view/cases-id-view.component').then(

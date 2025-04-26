@@ -1,0 +1,66 @@
+<div class="container">
+    <form [formGroup]="searchCasesFrom" (ngSubmit)="onSubmit()" class="form">
+        <h2>Search for cases in the system</h2>
+        <div class="inputs">
+            <mat-form-field appearance="outline">
+                <mat-label>Case number</mat-label>
+                <input matInput formControlName="caseNumber">
+                <mat-hint>Can be partial case number</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Incident date time</mat-label>
+                <input matInput [matDatepicker]="incidentDateTimePicker" formControlName="incidentDateTime">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="incidentDateTimePicker"></mat-datepicker-toggle>
+                <mat-datepicker #incidentDateTimePicker></mat-datepicker>
+
+                @if (searchCasesFrom.controls.incidentDateTime.hasError("matDatepickerParse")) {
+                <mat-error>
+                    Date time must be a valid date
+                </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Reported date time</mat-label>
+                <input matInput [matDatepicker]="reportedDateTimePicker" formControlName="reportedDateTime">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="reportedDateTimePicker"></mat-datepicker-toggle>
+                <mat-datepicker #reportedDateTimePicker></mat-datepicker>
+
+                @if (searchCasesFrom.controls.reportedDateTime.hasError("matDatepickerParse")) {
+                <mat-error>
+                    Date time must be a valid date
+                </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Case status</mat-label>
+                <mat-select formControlName="status">
+                    @for (status of caseStatus; track status) {
+                    <mat-option [value]="status.number">{{status.name}}</mat-option>
+                    }
+                </mat-select>
+
+                <mat-hint>Optional</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Case priority</mat-label>
+                <mat-select formControlName="priority">
+                    @for (priority of casePrioritys; track priority) {
+                    <mat-option [value]="priority.number">{{priority.name}}</mat-option>
+                    }
+                </mat-select>
+
+                <mat-hint>Optional</mat-hint>
+            </mat-form-field>
+        </div>
+
+
+        {{searchCasesFrom.value | json}}
+
+        <div class="btns">
+            <button mat-raised-button type="submit">Search</button>
+            <button mat-raised-button type="reset">Clear</button>
+        </div>
+    </form>
+</div>

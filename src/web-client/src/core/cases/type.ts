@@ -29,14 +29,14 @@ export interface Case {
  */
 export const CaseStatusNames: { name: string, number: number }[] = [
   { name: 'Reported', number: 0 },
-  { name: 'PendingReview', number: 1 },
+  { name: 'Pending Review', number: 1 },
   { name: 'Active', number: 2 },
   { name: 'Suspended', number: 3 },
-  { name: 'WarrantIssued', number: 4 },
+  { name: 'Warrant Issued', number: 4 },
   { name: 'Referred', number: 5 },
-  { name: 'ClosedCleared', number: 6 },
-  { name: 'ClosedUnfounded', number: 7 },
-  { name: 'ClosedUnsolved', number: 8 },
+  { name: 'Closed Cleared', number: 6 },
+  { name: 'Closed Unfounded', number: 7 },
+  { name: 'Closed Unsolved', number: 8 },
   { name: 'Archived', number: 9 },
   { name: 'Invalid', number: 10 }
 ];

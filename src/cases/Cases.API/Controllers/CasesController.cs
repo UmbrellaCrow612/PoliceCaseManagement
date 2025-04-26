@@ -3,6 +3,7 @@ using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
 using Cases.Core.Services;
+using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +11,13 @@ namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
         private readonly CasesMapping _caseMapping = new();
         private readonly CaseValidator _caseValidator = caseValidator;
+        private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
 
 
         [Authorize]
@@ -214,6 +216,22 @@ namespace Cases.API.Controllers
             }
 
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchCases([FromQuery] SearchCasesQuery query)
+        {
+            var valResult = _searchCasesQueryValidator.Execute(query);
+            if (!valResult.IsSuccessful)
+            {
+                return BadRequest(valResult);
+            }
+
+            var result = await _caseService.SearchCases(query);
+            var dtoResult = new PagedResult<CaseDto>(result.Items.Select(x => _caseMapping.ToDto(x)).ToList(), result.TotalCount, result.PageNumber, result.PageSize);
+
+            return Ok(dtoResult);
         }
     }
 }

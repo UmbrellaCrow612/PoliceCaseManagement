@@ -53,7 +53,9 @@ namespace Cases.API
 
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
-            services.AddScoped<CaseValidator>();
+            services.AddSingleton<CaseValidator>();
+            services.AddSingleton<SearchCasesQueryValidator>();
+
             return services;
         }
     }

@@ -2,11 +2,13 @@
 using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.Services;
+using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
 using Events;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Cases.Infrastructure;
 
 namespace Cases.Application.Implementations
 {
@@ -123,6 +125,58 @@ namespace Cases.Application.Implementations
             }
 
             return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
+        }
+
+        public async Task<PagedResult<Case>> SearchCases(SearchCasesQuery query)
+        {
+            IQueryable<Case> queryBuilder = _dbcontext.Cases.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.CaseNumber))
+            {
+                queryBuilder = queryBuilder.Where(x => x.CaseNumber.Contains(query.CaseNumber));
+            }
+
+            if (query.IncidentDateTime.HasValue)
+            {
+                DateTime startDate = query.IncidentDateTime.Value.Date;
+                DateTime endDate = startDate.AddDays(1);
+
+                queryBuilder = queryBuilder.Where(x => x.IncidentDateTime >= startDate && x.IncidentDateTime < endDate);
+            }
+
+            if (query.ReportedDateTime.HasValue)
+            {
+                DateTime startDate = query.ReportedDateTime.Value.Date;
+                DateTime endDate = startDate.AddDays(1);
+                queryBuilder = queryBuilder.Where(x => x.ReportedDateTime >= startDate && x.ReportedDateTime < endDate);
+            }
+
+            if (query.Status.HasValue)
+            {
+                queryBuilder = queryBuilder.Where(x => x.Status == query.Status);
+            }
+
+            if (query.Priority.HasValue)
+            {
+                queryBuilder = queryBuilder.Where(x => x.Priority == query.Priority);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ReportingOfficerId))
+            {
+                queryBuilder = queryBuilder.Where(x => x.ReportingOfficerId == query.ReportingOfficerId);
+            }
+
+            var count = await queryBuilder.CountAsync();
+
+            queryBuilder = queryBuilder.OrderBy(x => x.Id);
+
+            var items = await queryBuilder
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var result =  new PagedResult<Case>(items, count, query.PageNumber, query.PageSize);
+            return result;
         }
 
         public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
