@@ -8,7 +8,7 @@ namespace Cases.API.Mappings
     {
         public IncidentType Create(CreateIncidentTypeDto createDto)
         {
-            return new IncidentType { Name = createDto.Name, Description = createDto.Description };
+            return new IncidentType { Name = createDto.Name.Trim(), Description = createDto.Description };
         }
 
         public IncidentTypeDto ToDto(IncidentType @base)

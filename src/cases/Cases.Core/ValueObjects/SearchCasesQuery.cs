@@ -22,5 +22,7 @@ namespace Cases.Core.ValueObjects
         public CasePriority? Priority { get; set; } = null;
 
         public string? ReportingOfficerId { get; set; } = null;
+
+        public string? IncidentTypeId { get; set; } = null;
     }
 }

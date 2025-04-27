@@ -53,10 +53,57 @@
 
                 <mat-hint>Optional</mat-hint>
             </mat-form-field>
+
+
+            <mat-form-field appearance="outline">
+                <mat-label>Reporting officer</mat-label>
+                <input #reportingOfficerInput type="text" matInput [matAutocomplete]="reportingOfficerAuto"
+                    (input)="filterUsers()" formControlName="reportingOfficerUserName">
+
+                <mat-hint>
+                    Optional
+                </mat-hint>
+                <mat-autocomplete requireSelection #reportingOfficerAuto="matAutocomplete">
+
+                    @if (isFetchingUsers) {
+                    <mat-option disabled>Fetching users...</mat-option>
+                    }
+                    <!---->
+                    @if (!isFetchingUsers) {
+                    @for (user of users; track user.id) {
+                    <mat-option [value]="user.userName">{{user.userName}}</mat-option>
+                    } @empty { <mat-option>No officers found with search
+                        term</mat-option>}
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+
+
+            <mat-form-field appearance="outline">
+                <mat-label>Incident type</mat-label>
+                <input #incidentTypeInput type="text" matInput formControlName="incidentType"
+                    [matAutocomplete]="incidentTypeAuto" (focus)="fetchIncidentTypes()" (input)="filterIncidentTypes()">
+
+                <mat-hint>
+                    Optional
+                </mat-hint>
+                <mat-autocomplete requireSelection #incidentTypeAuto="matAutocomplete">
+                    @if (isFetchingIncidentTypes) {
+                    <mat-option [value]="null" disabled>Fetching incident types</mat-option>
+                    }
+
+                    <!---->
+
+                    @if (!isFetchingIncidentTypes) {
+                    @for (incidentType of filteredIncidentTypes; track incidentType.id) {
+                    <mat-option [value]="incidentType.name">{{incidentType.name}}</mat-option>
+                    } @empty {
+                    <mat-option [value]="null">No incident types match search term</mat-option>
+                    }
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
         </div>
-
-
-        {{searchCasesFrom.value | json}}
 
         <div class="btns">
             <button mat-raised-button type="submit">Search</button>

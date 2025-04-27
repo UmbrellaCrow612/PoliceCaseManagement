@@ -131,6 +131,11 @@ namespace Cases.Application.Implementations
         {
             IQueryable<Case> queryBuilder = _dbcontext.Cases.AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(query.IncidentTypeId))
+            {
+                queryBuilder = queryBuilder.Where(c => c.CaseIncidentType.Any(cit => cit.IncidentTypeId == query.IncidentTypeId));
+            }
+
             if (!string.IsNullOrWhiteSpace(query.CaseNumber))
             {
                 queryBuilder = queryBuilder.Where(x => x.CaseNumber.Contains(query.CaseNumber));
