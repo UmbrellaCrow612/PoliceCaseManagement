@@ -26,3 +26,11 @@
   align-items: center;
   gap: 20px;
 }
+
+
+.cases_container{
+  min-height: 600px;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+}

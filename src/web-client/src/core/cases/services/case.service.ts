@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import env from '../../../environments/environment';
-import { Case, CreateCase } from '../type';
+import { Case, CasePagedResult, CreateCase } from '../type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CaseService {
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {}
 
   private readonly BASE_URL = env.BaseUrls.casesBaseUrl;
 
@@ -22,24 +22,85 @@ export class CaseService {
     });
   }
 
-
   /**
    * Check if a case number is taken already
    * @param caseNumber The case number
    * @returns 200 if it isnt other if it is
    */
-  isCaseNumberTaken(caseNumber:string) {
-    return this.httpClient.get(`${this.BASE_URL}/cases/case-numbers/${caseNumber}/is-taken`)
+  isCaseNumberTaken(caseNumber: string) {
+    return this.httpClient.get(
+      `${this.BASE_URL}/cases/case-numbers/${caseNumber}/is-taken`
+    );
   }
-
-
 
   /**
    * Get a case by it's ID
    * @param caseId case ID
    * @returns The case details or error if ot found.
    */
-  getCaseById(caseId:string){
-    return this.httpClient.get<Case>(`${this.BASE_URL}/cases/${caseId}`)
+  getCaseById(caseId: string) {
+    return this.httpClient.get<Case>(`${this.BASE_URL}/cases/${caseId}`);
+  }
+
+  /**
+   * Search for cases in the system
+   * @param options Search params to append to the URL and filter cases based on them
+   * @returns Observale and a paged result
+   */
+  searchCasesWithPagination(
+    options: Partial<{
+      caseNumber: string | null;
+      incidentDateTime: Date | null;
+      reportedDateTime: Date | null;
+      status: number;
+      priority: number;
+      reportingOfficerId: string | null;
+      incidentTypeId: string | null;
+    }>
+  ) {
+    let urlBuilder = new URL(`${this.BASE_URL}/cases/search`);
+
+    if (options.caseNumber) {
+      urlBuilder.searchParams.append('caseNumber', options.caseNumber);
+    }
+
+    if (options.incidentDateTime) {
+      const incidentDate = new Date(options.incidentDateTime);
+      urlBuilder.searchParams.append(
+        'incidentDateTime',
+        incidentDate.toUTCString()
+      );
+    }
+
+    if (options.reportedDateTime) {
+      const reportedDate = new Date(options.reportedDateTime);
+      urlBuilder.searchParams.append(
+        'reportedDateTime',
+        reportedDate.toUTCString()
+      );
+    }
+
+    if (options.status) {
+      urlBuilder.searchParams.append('status', options.status.toString());
+    }
+
+    if (options.priority) {
+      urlBuilder.searchParams.append('priority', options.priority.toString());
+    }
+
+    if (options.reportingOfficerId) {
+      urlBuilder.searchParams.append(
+        'reportingOfficerId',
+        options.reportingOfficerId
+      );
+    }
+
+    if (options.incidentTypeId) {
+      urlBuilder.searchParams.append('incidentTypeId', options.incidentTypeId);
+    }
+
+    let url = urlBuilder.toString();
+
+    return this.httpClient.get<CasePagedResult>(url);
   }
 }

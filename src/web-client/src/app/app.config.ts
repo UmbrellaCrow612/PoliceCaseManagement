@@ -13,6 +13,7 @@ import { authRedirectsInterceptor } from '../core/authentication/interceptors/re
 import { UserService } from '../core/user/services/user.service';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import { withCredentialsInterceptor } from '../core/http/interceptors/withCredentails.interceptor';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,7 +21,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(
-      withInterceptors([DeviceFingerPrintInterceptor, authRedirectsInterceptor, withCredentialsInterceptor])
+      withInterceptors([
+        DeviceFingerPrintInterceptor,
+        authRedirectsInterceptor,
+        withCredentialsInterceptor,
+      ])
     ),
     provideAppInitializer(() => {
       const userService = inject(UserService);
@@ -32,5 +37,6 @@ export const appConfig: ApplicationConfig = {
         )
       );
     }),
+    provideMomentDateAdapter(undefined, { useUtc: true }),
   ],
 };

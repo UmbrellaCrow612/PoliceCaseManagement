@@ -11,6 +11,8 @@ namespace Cases.Infrastructure.Data.Configs
             builder.HasIndex(x => x.Id).IsUnique();
 
             builder.HasIndex(x => x.CaseNumber).IsUnique();
+
+            builder.HasIndex(x => x.ReportingOfficerId);
         }
     }
 }

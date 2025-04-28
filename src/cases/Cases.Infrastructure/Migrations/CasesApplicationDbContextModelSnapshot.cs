@@ -62,6 +62,8 @@ namespace Cases.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
+                    b.HasIndex("ReportingOfficerId");
+
                     b.ToTable("Cases");
                 });
 

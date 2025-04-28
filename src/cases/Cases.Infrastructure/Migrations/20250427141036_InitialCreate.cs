@@ -91,6 +91,11 @@ namespace Cases.Infrastructure.Migrations
                 table: "Cases",
                 column: "Id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cases_ReportingOfficerId",
+                table: "Cases",
+                column: "ReportingOfficerId");
         }
 
         /// <inheritdoc />

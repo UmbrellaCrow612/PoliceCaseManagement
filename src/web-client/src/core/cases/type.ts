@@ -1,3 +1,4 @@
+import { PagedResult } from '../app/type';
 
 export interface CreateCase {
   caseNumber: string;
@@ -11,23 +12,21 @@ export interface CreateCase {
   reportingOfficerId: string;
 }
 
-
 export interface Case {
-  id: string
-  caseNumber: string
-  summary: string | null
-  description: string | null
-  incidentDateTime: Date
-  reportedDateTime: Date
-  status: number
-  priority: number
+  id: string;
+  caseNumber: string;
+  summary: string | null;
+  description: string | null;
+  incidentDateTime: Date;
+  reportedDateTime: Date;
+  status: number;
+  priority: number;
 }
-
 
 /**
  * Array containing the backend enum mapped here
  */
-export const CaseStatusNames: { name: string, number: number }[] = [
+export const CaseStatusNames: { name: string; number: number }[] = [
   { name: 'Reported', number: 0 },
   { name: 'Pending Review', number: 1 },
   { name: 'Active', number: 2 },
@@ -38,18 +37,18 @@ export const CaseStatusNames: { name: string, number: number }[] = [
   { name: 'Closed Unfounded', number: 7 },
   { name: 'Closed Unsolved', number: 8 },
   { name: 'Archived', number: 9 },
-  { name: 'Invalid', number: 10 }
+  { name: 'Invalid', number: 10 },
 ];
-
 
 /**
  * Array contaning the backend enum mapped here
  */
-export const CasePriorityNames: { name: string, number: number }[] = [
+export const CasePriorityNames: { name: string; number: number }[] = [
   { name: 'Low', number: 0 },
   { name: 'Normal', number: 1 },
   { name: 'High', number: 2 },
   { name: 'Urgent', number: 3 },
-  { name: 'Critical', number: 4 }
+  { name: 'Critical', number: 4 },
 ];
 
+export interface CasePagedResult extends PagedResult<Case> {}

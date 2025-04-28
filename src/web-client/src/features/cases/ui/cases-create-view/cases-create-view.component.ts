@@ -7,7 +7,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -39,7 +38,6 @@ import { CreateCase } from '../../../../core/cases/type';
   ],
   templateUrl: './cases-create-view.component.html',
   styleUrl: './cases-create-view.component.css',
-  providers: [provideNativeDateAdapter()],
 })
 export class CasesCreateViewComponent implements OnInit {
   constructor(

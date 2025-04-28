@@ -19,3 +19,16 @@ export interface AppLink {
    */
   href: string;
 }
+
+/**
+ * Generic pagination result sent from backend
+ */
+export interface PagedResult<T> {
+  items: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}

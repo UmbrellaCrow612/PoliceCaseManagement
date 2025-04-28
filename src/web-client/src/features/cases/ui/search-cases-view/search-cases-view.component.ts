@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {
+  CasePagedResult,
   CasePriorityNames,
   CaseStatusNames,
 } from '../../../../core/cases/type';
@@ -17,6 +17,14 @@ import { UserService } from '../../../../core/user/services/user.service';
 import { debounceTime, Subject } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { IncidentTypeService } from '../../../../core/incident-type/services/incident-type-service.service';
+import { CaseService } from '../../../../core/cases/services/case.service';
+import { tryConvertStringToNumber } from '../../../../core/app/utils/convert-string-to-number';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorService } from '../../../../core/app/errors/services/error.service';
+import { MatListModule } from '@angular/material/list';
+import { RouterLink } from '@angular/router';
+import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
+import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
 
 @Component({
   selector: 'app-search-cases-view',
@@ -29,15 +37,20 @@ import { IncidentTypeService } from '../../../../core/incident-type/services/inc
     CommonModule,
     MatSelectModule,
     MatAutocompleteModule,
+    MatListModule,
+    RouterLink,
+    CaseStatusPipe,
+    CasePriorityPipe
   ],
-  providers: [provideNativeDateAdapter()],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
 })
 export class SearchCasesViewComponent implements OnInit {
   constructor(
     private userService: UserService,
-    private incidentTypeService: IncidentTypeService
+    private incidentTypeService: IncidentTypeService,
+    private caseService: CaseService,
+    private errorService: ErrorService
   ) {}
   ngOnInit(): void {
     this.searchSubject.pipe(debounceTime(1000)).subscribe(() => {
@@ -64,6 +77,9 @@ export class SearchCasesViewComponent implements OnInit {
 
   @ViewChild('incidentTypeInput')
   incidentTypeInput: ElementRef<HTMLInputElement> | null = null;
+
+  @ViewChild('casesContainer')
+  casesContainer: ElementRef<HTMLDivElement> | null = null;
 
   searchCasesFrom = new FormGroup({
     caseNumber: new FormControl<string | null>(null),
@@ -122,5 +138,59 @@ export class SearchCasesViewComponent implements OnInit {
     }
   }
 
-  onSubmit() {}
+  isFetchingCases = false;
+  casesPagedResult: CasePagedResult | null = null;
+  onSubmit() {
+    this.casesContainer?.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+
+    let incidentTypeId = this.incidentTypes?.find(
+      (x) => x.name === this.searchCasesFrom.controls.incidentType.getRawValue()
+    )?.id;
+
+    let priority = tryConvertStringToNumber(
+      this.searchCasesFrom.controls.priority.getRawValue() as any
+    ) as number;
+
+    let reportingOfficerId = this.users.find(
+      (x) =>
+        x.userName ===
+        this.searchCasesFrom.controls.reportingOfficerUserName.getRawValue()
+    )?.id;
+
+    let status = tryConvertStringToNumber(
+      this.searchCasesFrom.controls.status.getRawValue() as any
+    ) as number;
+
+    this.isFetchingCases = true;
+    this.caseService
+      .searchCasesWithPagination({
+        caseNumber: this.searchCasesFrom.controls.caseNumber.getRawValue(),
+        incidentDateTime:
+          this.searchCasesFrom.controls.incidentDateTime.getRawValue(),
+        incidentTypeId: incidentTypeId,
+        priority: priority,
+        reportedDateTime:
+          this.searchCasesFrom.controls.reportedDateTime.getRawValue(),
+        reportingOfficerId: reportingOfficerId,
+        status,
+      })
+      .subscribe({
+        next: (result) => {
+          this.casesPagedResult = result;
+          this.isFetchingCases = false;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isFetchingCases = false;
+          this.errorService.HandleDisplay(err);
+        },
+      });
+  }
+
+  clearClicked() {
+    this.searchCasesFrom.reset();
+    this.casesPagedResult = null;
+  }
 }

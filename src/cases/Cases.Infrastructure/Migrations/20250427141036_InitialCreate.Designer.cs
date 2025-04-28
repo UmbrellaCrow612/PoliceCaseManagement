@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250425154756_InitialCreate")]
+    [Migration("20250427141036_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -64,6 +64,8 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("ReportingOfficerId");
 
                     b.ToTable("Cases");
                 });

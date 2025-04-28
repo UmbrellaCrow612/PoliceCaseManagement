@@ -17,6 +17,7 @@
     "@angular/core": "^19.0.0",
     "@angular/forms": "^19.0.0",
     "@angular/material": "^19.0.4",
+    "@angular/material-moment-adapter": "^19.0.4",
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",

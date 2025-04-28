@@ -26,3 +26,4 @@ if (this.form.valid) {
 ```
 
 - Handle error codes that are send from the backend correctly and do specific actions based on them
+- `NOTE`: Use UTC time when sendid time data to backend so we use both utc on backend and frontend `toUTCString`
