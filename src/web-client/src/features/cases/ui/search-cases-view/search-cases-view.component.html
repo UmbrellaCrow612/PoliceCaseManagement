@@ -112,7 +112,7 @@
     </form>
 
 
-    <div class="cases_container" #casesContainer>
+    <div class="cases_container" >
         @if (isFetchingCases) {
         <div>
             Loading
@@ -127,7 +127,8 @@
             <a [routerLink]="['../', case.id]">
                 <mat-list-item role="listitem">
                     <strong>Case Number:</strong> {{case.caseNumber}} <strong>Incident date time:
-                    </strong>{{case.incidentDateTime | date}} <strong>Case status: </strong>
+                    </strong>{{case.incidentDateTime | date}} <strong>Repoted date time: </strong>
+                    {{case.reportedDateTime | date}} <strong>Case status: </strong>
                     {{case.status | caseStatusPipe}} <strong>Priority: </strong> {{case.priority | casePriorityPipe}}
                 </mat-list-item>
             </a>
@@ -138,13 +139,21 @@
             </mat-list-item>
             }
         </mat-selection-list>
-
-        @if (casesPagedResult.items.length > 0) {
-        <div class="cases_pagination_buttons">
-            <button mat-raised-button>Next</button>
-            <button mat-raised-button>Previous</button>
-        </div>
-        }
         }
     </div>
+
+    @if (casesPagedResult && casesPagedResult.items.length > 0) {
+    <div class="pagination_buttons" #paginationButtons>
+        <span>
+            Page: {{casesPagedResult.pageNumber}} Total pages: {{casesPagedResult.totalPages}}
+        </span>
+        @if (casesPagedResult.hasNextPage) {
+        <button mat-raised-button (click)="nextPageClicked()" type="button">Next</button>
+        }
+        <!---->
+        @if (casesPagedResult.hasPreviousPage) {
+        <button mat-raised-button (click)="previousPageClicked()" type="button">Previous</button>
+        }
+    </div>
+    }
 </div>

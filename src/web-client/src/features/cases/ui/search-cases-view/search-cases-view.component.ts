@@ -14,7 +14,7 @@ import {
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { RestrictedUser } from '../../../../core/user/type';
 import { UserService } from '../../../../core/user/services/user.service';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, timer } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { IncidentTypeService } from '../../../../core/incident-type/services/incident-type-service.service';
 import { CaseService } from '../../../../core/cases/services/case.service';
@@ -40,7 +40,7 @@ import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe'
     MatListModule,
     RouterLink,
     CaseStatusPipe,
-    CasePriorityPipe
+    CasePriorityPipe,
   ],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
@@ -78,8 +78,8 @@ export class SearchCasesViewComponent implements OnInit {
   @ViewChild('incidentTypeInput')
   incidentTypeInput: ElementRef<HTMLInputElement> | null = null;
 
-  @ViewChild('casesContainer')
-  casesContainer: ElementRef<HTMLDivElement> | null = null;
+  @ViewChild('paginationButtons')
+  paginationButtonsContainer: ElementRef<HTMLDivElement> | null = null;
 
   searchCasesFrom = new FormGroup({
     caseNumber: new FormControl<string | null>(null),
@@ -141,11 +141,10 @@ export class SearchCasesViewComponent implements OnInit {
   isFetchingCases = false;
   casesPagedResult: CasePagedResult | null = null;
   onSubmit() {
-    this.casesContainer?.nativeElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    this.fetchCases({});
+  }
 
+  fetchCases(options: Partial<{ pageNumber: number | null }>) {
     let incidentTypeId = this.incidentTypes?.find(
       (x) => x.name === this.searchCasesFrom.controls.incidentType.getRawValue()
     )?.id;
@@ -176,17 +175,44 @@ export class SearchCasesViewComponent implements OnInit {
           this.searchCasesFrom.controls.reportedDateTime.getRawValue(),
         reportingOfficerId: reportingOfficerId,
         status,
+        pageNumber: options.pageNumber,
       })
       .subscribe({
         next: (result) => {
           this.casesPagedResult = result;
           this.isFetchingCases = false;
+          this.scrollToButtons();
         },
         error: (err: HttpErrorResponse) => {
           this.isFetchingCases = false;
           this.errorService.HandleDisplay(err);
         },
       });
+  }
+
+  nextPageClicked() {
+    this.fetchCases({
+      pageNumber: this.casesPagedResult?.hasNextPage
+        ? this.casesPagedResult.pageNumber + 1
+        : null,
+    });
+  }
+
+  previousPageClicked() {
+    this.fetchCases({
+      pageNumber: this.casesPagedResult?.hasPreviousPage
+        ? this.casesPagedResult.pageNumber - 1
+        : null,
+    });
+  }
+
+  scrollToButtons() {
+    timer(100).subscribe(() => {
+      this.paginationButtonsContainer?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
   }
 
   clearClicked() {

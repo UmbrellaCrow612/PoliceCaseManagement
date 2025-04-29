@@ -56,6 +56,7 @@ export class CaseService {
       priority: number;
       reportingOfficerId: string | null;
       incidentTypeId: string | null;
+      pageNumber: number | null;
     }>
   ) {
     let urlBuilder = new URL(`${this.BASE_URL}/cases/search`);
@@ -97,6 +98,13 @@ export class CaseService {
 
     if (options.incidentTypeId) {
       urlBuilder.searchParams.append('incidentTypeId', options.incidentTypeId);
+    }
+
+    if (options.pageNumber) {
+      urlBuilder.searchParams.append(
+        'pageNumber',
+        options.pageNumber.toString()
+      );
     }
 
     let url = urlBuilder.toString();

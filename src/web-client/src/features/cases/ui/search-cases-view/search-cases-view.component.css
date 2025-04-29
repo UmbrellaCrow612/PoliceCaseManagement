@@ -29,8 +29,14 @@
 
 
 .cases_container{
-  min-height: 600px;
+  max-height: 450px;
   padding: 20px;
   overflow-y: auto;
-  position: relative;
+}
+
+.pagination_buttons{
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 5px;
 }
