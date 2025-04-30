@@ -233,5 +233,22 @@ namespace Cases.API.Controllers
 
             return Ok(dtoResult);
         }
+
+
+        [Authorize]
+        [HttpGet("{caseId}/incident-types")]
+        public async Task<ActionResult<List<IncidentTypeDto>>> GetCaseIncidentTypes(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var linkedIncidentTypes = await _caseService.GetIncidentTypes(_case);
+
+            List<IncidentTypeDto> dto = [.. linkedIncidentTypes.Select(x => _incidentTypeMapping.ToDto(x))];
+            return Ok(dto);
+        }
     }
 }

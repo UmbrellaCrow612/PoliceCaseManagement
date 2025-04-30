@@ -1,6 +1,16 @@
 .container {
-    display: flex;
-    padding: 20px;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btns {
+  display: flex;
+  gap: 10px;
+}
+
+.incident_types {
+  display: flex;
+  gap: 5px;
 }

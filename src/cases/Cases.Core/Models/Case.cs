@@ -59,6 +59,11 @@ namespace Cases.Core.Models
         /// </summary>
         public required string ReportingOfficerId { get; set; }
 
+        /// <summary>
+        /// List of actions taken on this case
+        /// </summary>
+        public ICollection<CaseAction> CaseActions { get; set; } = [];
+
 
         // --- Audit Info ---
 

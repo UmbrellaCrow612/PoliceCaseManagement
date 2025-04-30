@@ -48,6 +48,7 @@ namespace Identity.Application
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<CaseCreatedConsumer>();
+                x.AddConsumer<CaseActionCreatedEventConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -59,6 +60,7 @@ namespace Identity.Application
                     cfg.ReceiveEndpoint("identity-queue-name", e => // Define a specific queue for this API's consumers
                     {
                         e.ConfigureConsumer<CaseCreatedConsumer>(context);
+                        e.ConfigureConsumer<CaseActionCreatedEventConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

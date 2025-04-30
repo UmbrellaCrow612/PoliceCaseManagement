@@ -23,6 +23,13 @@ namespace Cases.Core.Services
         Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType);
 
         /// <summary>
+        /// Adds a <see cref="CaseAction"/> to a <see cref="Case"/> case actions have a one to many relation to cases only one action belongs to one case
+        /// </summary>
+        /// <param name="case">The case you want to add a case action to</param>
+        /// <param name="caseAction">The action you want to record</param>
+        Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction);
+
+        /// <summary>
         /// Find a case by it's <see cref="Case.Id"/>
         /// </summary>
         /// <param name="caseId"></param>
@@ -70,6 +77,13 @@ namespace Cases.Core.Services
         /// <param name="query">The query object</param>
         /// <returns>Pagination result of cases</returns>
         Task<PagedResult<Case>> SearchCases(SearchCasesQuery query);
+
+        /// <summary>
+        /// Get <see cref="IncidentType"/> linked to the <see cref="Case"/> passed in through the join table <see cref="Models.Joins.CaseIncidentType"/>
+        /// </summary>
+        /// <param name="case">The case you want to the get the linked incident types to it</param>
+        /// <returns>List of incident types</returns>
+        Task<List<IncidentType>> GetIncidentTypes(Case @case);
     }
 
     /// <summary>

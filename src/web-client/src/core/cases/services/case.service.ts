@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import env from '../../../environments/environment';
 import { Case, CasePagedResult, CreateCase } from '../type';
+import { IncidentType } from '../../incident-type/types';
 
 @Injectable({
   providedIn: 'root',
@@ -110,5 +111,15 @@ export class CaseService {
     let url = urlBuilder.toString();
 
     return this.httpClient.get<CasePagedResult>(url);
+  }
+
+
+  /**
+   * Get all the incident types linked to a given case.
+   * @param caseId The case id
+   * @returns Observable list of incident types
+   */
+  getIncidentTypes(caseId:string){
+    return this.httpClient.get<IncidentType[]>(`${this.BASE_URL}/cases/${caseId}/incident-types`)
   }
 }

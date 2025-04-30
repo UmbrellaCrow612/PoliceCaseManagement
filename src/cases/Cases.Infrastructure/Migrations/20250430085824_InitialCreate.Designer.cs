@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250427141036_InitialCreate")]
+    [Migration("20250430085824_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -70,6 +70,42 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("Cases");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CaseAction", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CaseStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ValidationStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CaseActions");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>
                 {
                     b.Property<string>("Id")
@@ -109,6 +145,17 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseIncidentTypes");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CaseAction", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CaseActions")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -130,6 +177,8 @@ namespace Cases.Infrastructure.Migrations
 
             modelBuilder.Entity("Cases.Core.Models.Case", b =>
                 {
+                    b.Navigation("CaseActions");
+
                     b.Navigation("CaseIncidentType");
                 });
 

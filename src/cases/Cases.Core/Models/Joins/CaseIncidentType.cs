@@ -13,7 +13,7 @@
         public required string CaseId { get; set; }
 
 
-        public IncidentType? IncidentType { get; set; } = null;
+        public IncidentType IncidentType { get; set; } = null!;
         public required string IncidentTypeId { get; set; }
     }
 }

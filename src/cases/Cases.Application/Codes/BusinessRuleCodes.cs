@@ -21,5 +21,10 @@
         /// </summary>
         public const string IncidentTypeAlreadyLinkedToCase = "INCIDENT_TYPE_ALREADY_LINKED_TO_CASE";
 
+        /// <summary>
+        /// Indicates that a validation error occurred, could be more general than a known business rule error - typically used when a field is missing or 
+        /// miss configured in a model
+        /// </summary>
+        public const string ValidationError = "VALIDATION_ERROR";
     }
 }

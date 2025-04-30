@@ -23,6 +23,7 @@ namespace Cases.Application
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<CaseReportingOfficerValidationConsumer>();
+                x.AddConsumer<CaseActionCreatedByValidationEventConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -34,6 +35,7 @@ namespace Cases.Application
                     cfg.ReceiveEndpoint("cases-queue-name", e => 
                     {
                         e.ConfigureConsumer<CaseReportingOfficerValidationConsumer>(context);
+                        e.ConfigureConsumer<CaseActionCreatedByValidationEventConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

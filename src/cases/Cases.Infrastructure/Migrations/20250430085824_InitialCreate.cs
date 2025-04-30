@@ -46,6 +46,30 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseActions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
+                    CaseStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    ValidationStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedById = table.Column<string>(type: "TEXT", nullable: false),
+                    CaseId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseActions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CaseActions_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseIncidentTypes",
                 columns: table => new
                 {
@@ -69,6 +93,11 @@ namespace Cases.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseActions_CaseId",
+                table: "CaseActions",
+                column: "CaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseIncidentTypes_CaseId",
@@ -101,6 +130,9 @@ namespace Cases.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CaseActions");
+
             migrationBuilder.DropTable(
                 name: "CaseIncidentTypes");
 

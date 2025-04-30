@@ -23,8 +23,23 @@
         <p>Description: {{caseDetails?.description}}</p>
         <p>Summary: {{caseDetails?.summary}}</p>
         <p>Incident date: {{caseDetails?.incidentDateTime | date}}</p>
+        <p>Repoted date: {{caseDetails?.reportedDateTime | date}}</p>
         <p>Case priority: {{caseDetails?.priority | casePriorityPipe}}</p>
         <p>Case status: {{caseDetails?.status | caseStatusPipe}}</p>
+        <p class="incident_types">Incident types: @for (incidentType of incidentTypes; track $index)
+            {<span>{{incidentType.name}}</span>}
+            @empty {<span>No linked incident types</span>}</p>
     </div>
+
+    <div class="btns">
+        <button mat-raised-button>Edit</button>
+        @if (hasRequiredRole([userRoles.Admin], currentUserRoles)) {
+        <button mat-raised-button>
+            Delete
+        </button>
+        }
+    </div>
+
+
 </div>
 }

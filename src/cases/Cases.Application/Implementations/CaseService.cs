@@ -18,6 +18,31 @@ namespace Cases.Application.Implementations
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
 
+        public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
+        {
+            _logger.LogInformation("Started trying to add a case action: {caseActionId} to a case: {caseId}", caseAction.Id, @case.Id);
+
+            var result = new CaseResult();
+
+            if (caseAction.CaseId != @case.Id)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Case action not properly linked to the provided case");
+                return result;
+            }
+
+            await _dbcontext.CaseActions.AddAsync(caseAction);
+            await _dbcontext.SaveChangesAsync();
+
+            _logger.LogInformation("Saved and added case action: {caseActionId} to case: {caseId}.", caseAction.Id, @case.Id);
+
+            _logger.LogInformation("Trying to publish a case action created event for case action: {caseActionId}", caseAction.Id);
+            await _publishEndpoint.Publish(new CaseActionCreatedEvent { CaseActionId = caseAction.Id, CreatedById = caseAction.CreatedById });
+            _logger.LogInformation("Publish a case action created event for case action: {caseActionId}", caseAction.Id);
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType)
         {
             var result = new CaseResult();
@@ -115,6 +140,11 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<List<IncidentType>> GetIncidentTypes(Case @case)
+        {
+            return await _dbcontext.CaseIncidentTypes.Where(x => x.CaseId == @case.Id).Select(x => x.IncidentType).ToListAsync();
         }
 
         public async Task<bool> IsCaseNumberTaken(string caseNumber)
