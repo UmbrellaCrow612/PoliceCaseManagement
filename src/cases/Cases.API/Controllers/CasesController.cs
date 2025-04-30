@@ -1,8 +1,8 @@
 ﻿using Authorization;
+using Caching;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
-using Cases.Cache;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;

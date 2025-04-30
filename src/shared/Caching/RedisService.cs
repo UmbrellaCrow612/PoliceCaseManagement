@@ -1,6 +1,6 @@
 ﻿using StackExchange.Redis;
 
-namespace Cases.Cache
+namespace Caching
 {
     public class RedisService : IRedisService
     {

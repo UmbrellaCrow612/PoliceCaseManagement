@@ -1,4 +1,4 @@
-﻿namespace Cases.Cache
+﻿namespace Caching
 {
     public interface IRedisService
     {

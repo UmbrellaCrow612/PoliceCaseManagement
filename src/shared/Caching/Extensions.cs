@@ -2,17 +2,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace Cases.Cache
+namespace Caching
 {
     public static class Extensions
     {
         /// <summary>
-        /// Adds Redis cache to the application - adds <see cref="RedisSettings"/> to the Di and uses those settings to add it.
+        /// Adds Redis cache to the application - adds <see cref="RedisSettings"/> to the DI and uses those settings to add it.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCaching(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions<RedisSettings>()
                .Bind(configuration.GetSection("RedisSettings"))

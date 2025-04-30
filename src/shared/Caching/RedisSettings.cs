@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Cases.Cache
+namespace Caching
 {
     /// <summary>
     /// Settings object from the app settings for the Redis settings - can be accessed through IOptions through the DI
