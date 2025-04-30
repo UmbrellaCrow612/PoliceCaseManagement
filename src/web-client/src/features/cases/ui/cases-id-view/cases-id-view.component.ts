@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { Case } from '../../../../core/cases/type';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
@@ -15,7 +15,7 @@ import { IncidentType } from '../../../../core/incident-type/types';
 
 @Component({
   selector: 'app-cases-id-view',
-  imports: [CommonModule, CasePriorityPipe, CaseStatusPipe, MatButtonModule],
+  imports: [CommonModule, CasePriorityPipe, CaseStatusPipe, MatButtonModule, RouterLink],
   templateUrl: './cases-id-view.component.html',
   styleUrl: './cases-id-view.component.css',
 })

@@ -26,9 +26,6 @@
         <p>Repoted date: {{caseDetails?.reportedDateTime | date}}</p>
         <p>Case priority: {{caseDetails?.priority | casePriorityPipe}}</p>
         <p>Case status: {{caseDetails?.status | caseStatusPipe}}</p>
-        <p class="incident_types">Incident types: @for (incidentType of incidentTypes; track $index)
-            {<span>{{incidentType.name}}</span>}
-            @empty {<span>No linked incident types</span>}</p>
     </div>
 
     <div class="btns">
@@ -40,6 +37,13 @@
         }
     </div>
 
+    <p class="incident_types">Incident types: @for (incidentType of incidentTypes; track $index)
+        {<span>{{incidentType.name}}</span>}
+        @empty {<span>No linked incident types</span>}</p>
+
+    <div>
+        <a mat-raised-button routerLink="incident-types/edit">Edit</a>
+    </div>
 
 </div>
 }

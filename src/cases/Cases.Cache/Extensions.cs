@@ -1,0 +1,37 @@
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
+
+namespace Cases.Cache
+{
+    public static class Extensions
+    {
+        /// <summary>
+        /// Adds Redis cache to the application - adds <see cref="RedisSettings"/> to the Di and uses those settings to add it.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions<RedisSettings>()
+               .Bind(configuration.GetSection("RedisSettings"))
+               .ValidateDataAnnotations()
+               .ValidateOnStart();
+
+            var settings = configuration.GetSection("RedisSettings").Get<RedisSettings>() ?? throw new ApplicationException("Redis settings not in config");
+
+            var configurationOptions = new ConfigurationOptions
+            {
+                EndPoints = { settings.Connection },
+                Password = settings.Password 
+            };
+
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configurationOptions));
+            services.AddScoped<IRedisService, RedisService>();
+
+
+            return services;
+        }
+    }
+}

@@ -8,7 +8,6 @@ using Events;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Cases.Infrastructure;
 
 namespace Cases.Application.Implementations
 {

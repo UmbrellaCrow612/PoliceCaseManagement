@@ -2,6 +2,7 @@
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
+using Cases.Cache;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
@@ -11,13 +12,14 @@ namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
         private readonly CasesMapping _caseMapping = new();
         private readonly CaseValidator _caseValidator = caseValidator;
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
+        private readonly IRedisService _redisService = redisService;
 
 
         [Authorize]

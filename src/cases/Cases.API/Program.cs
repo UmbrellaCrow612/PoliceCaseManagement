@@ -1,5 +1,6 @@
 using Cases.API;
 using Cases.Application;
+using Cases.Cache;
 using Cases.Infrastructure;
 using CORS;
 using Logging;
@@ -20,6 +21,7 @@ builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
+builder.Services.AddRedis(config);
 
 builder.Services.AddValidators();
 
