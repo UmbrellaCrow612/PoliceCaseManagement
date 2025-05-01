@@ -22,6 +22,9 @@ namespace Cases.API.Controllers
         private readonly IRedisService _redisService = redisService;
 
 
+        private static readonly string _incidentTypesKey = "incident_types_key";
+
+
         [Authorize]
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
         public async Task<IActionResult> IsCaseNumberTaken(string caseNumber)
@@ -115,6 +118,7 @@ namespace Cases.API.Controllers
                 return BadRequest(result);
             }
             var returnDto = _incidentTypeMapping.ToDto(incidentType);
+            await _redisService.RemoveKeyAsync(_incidentTypesKey);
 
             return Ok(returnDto);
         }
@@ -127,12 +131,20 @@ namespace Cases.API.Controllers
         [HttpGet("incident-types")]
         public async Task<IActionResult> GetAllCaseIncidentTypes()
         {
+            var value = await _redisService.GetStringAsync<List<IncidentTypeDto>>(_incidentTypesKey);
+            if (value is not null)
+            {
+                return Ok(value);
+            }
+
             var incidentTypes = await _caseService.GetAllIncidentTypes();
             List<IncidentTypeDto> dto = [];
             foreach (var incidentType in incidentTypes)
             {
                 dto.Add(_incidentTypeMapping.ToDto(incidentType));
             }
+            await _redisService.SetStringAsync<List<IncidentTypeDto>>(_incidentTypesKey, dto);
+
             return Ok(dto);
         }
 
@@ -216,6 +228,7 @@ namespace Cases.API.Controllers
             {
                 return BadRequest(result);
             }
+            await _redisService.RemoveKeyAsync(_incidentTypesKey);
 
             return NoContent();
         }
