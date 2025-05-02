@@ -58,4 +58,5 @@ export const appPaths = {
 
   SYSTEM: 'system',
   CASES: 'cases',
+  PROFILE: "profile"
 } as const;

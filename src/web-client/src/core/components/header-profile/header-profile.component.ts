@@ -30,6 +30,12 @@ export class HeaderProfileComponent {
 
   links: Array<ProfileLink> = [
     {
+      name: 'Profile',
+      href: '/profile',
+      authorizedRoles: [],
+      iconName: 'person',
+    },
+    {
       name: 'Administration',
       href: '/administration',
       authorizedRoles: [UserRoles.Admin],

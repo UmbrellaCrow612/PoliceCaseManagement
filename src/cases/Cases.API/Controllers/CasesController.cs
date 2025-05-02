@@ -149,7 +149,7 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
-        /// Get details about a incident type bby there ID
+        /// Get details about a incident type by there ID
         /// </summary>
         [Authorize]
         [HttpGet("incident-types/{incidentTypeId}")]
