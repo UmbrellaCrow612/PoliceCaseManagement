@@ -1,0 +1,18 @@
+.nav_bar {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  padding: 20px 10px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+
+.profile{
+    font-weight: bold;
+    font-size: 20px;
+}

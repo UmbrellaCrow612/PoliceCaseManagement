@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\..\libs\CORS\CORS.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
+    <ProjectReference Include="..\..\shared\Caching\Caching.csproj" />
     <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />

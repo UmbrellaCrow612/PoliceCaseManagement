@@ -8,6 +8,7 @@ using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Identity.API.Extensions;
 using CORS;
+using Caching;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -24,6 +25,7 @@ builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
+builder.Services.AddCaching(config);
 
 var app = builder.Build();
 

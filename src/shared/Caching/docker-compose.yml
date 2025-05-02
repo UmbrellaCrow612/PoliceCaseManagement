@@ -1,8 +1,16 @@
 version: '3.8'
 
 services:
-  redis:
+  cases_cache:
     image: redis:7.2
+    container_name: cases_cache
     command: ["redis-server", "--requirepass", "mysecretpassword"]
     ports:
-      - "6379:6379"
+      - "6380:6379"
+
+  identity_cache:
+    image: redis:7.2
+    container_name: identity_cache
+    command: ["redis-server", "--requirepass", "mysecretpassword"]
+    ports:
+      - "6381:6379"
