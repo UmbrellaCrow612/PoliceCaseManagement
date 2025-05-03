@@ -1,14 +1,16 @@
 [
   {
-    "Name": "New Profile",
+    "Name": "MULTI",
     "Projects": [
       {
         "Path": "src\\identity\\Identity.API\\Identity.API.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "src\\cases\\Cases.API\\Cases.API.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       }
     ]
   }

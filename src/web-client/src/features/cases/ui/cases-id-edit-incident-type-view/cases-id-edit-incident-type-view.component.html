@@ -1,1 +1,51 @@
-<p>cases-id-edit-incident-type-view works!</p>
+@if (isLoading) {
+<div>
+    Loading data
+</div>
+}
+
+<!---->
+
+
+@if (!isLoading && error) {
+<div>
+    {{error}}
+</div>
+}
+
+<!---->
+
+
+@if (!isLoading && !error) {
+<div class="container">
+    <app-back-navigation-button></app-back-navigation-button>
+
+    <h1>
+        Select incident types you want to link to the case
+    </h1>
+    <mat-form-field appearance="outline">
+        <mat-label>Filter incident types </mat-label>
+        <input matInput [formControl]="filterInput">
+    </mat-form-field>
+    <div class="list_container">
+        <mat-selection-list #incidentTypes (selectionChange)="selectionChanged($event)">
+            @for (incidentType of filteredAllIncidentTypes; track incidentType.id) {
+            <mat-list-option [value]="incidentType" [selected]="isSelected(incidentType)">
+                {{incidentType.name}}
+            </mat-list-option>
+            }
+        </mat-selection-list>
+    </div>
+
+    <div class="btns">
+        <button mat-raised-button>Save changes</button>
+        <button mat-raised-button>
+            Cancel
+        </button>
+    </div>
+
+    @for (item of selectedIncidentTypes; track $index) {
+        {{item.name}}
+    }
+</div>
+}

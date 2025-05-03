@@ -27,3 +27,5 @@
 - Run the broker
 - Backend API's through visual studio over https
 - Front end with `npm start` after gen creds for https
+
+`docker-compose up -d`

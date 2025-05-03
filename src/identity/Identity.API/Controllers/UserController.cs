@@ -32,8 +32,7 @@ namespace Identity.API.Controllers
 
             if (userId is null) return BadRequest("User id missing");
 
-            string meKey = $@"me_{userId}";
-            var value = await _redisService.GetStringAsync<MeDto>(meKey);
+            var value = await _redisService.GetStringAsync<MeDto>(userId);
             if (value is not null)
             {
                 return Ok(value);
@@ -51,7 +50,7 @@ namespace Identity.API.Controllers
                 User = userDto
             };
 
-            await _redisService.SetStringAsync<MeDto>(meKey, returnDto);
+            await _redisService.SetStringAsync<MeDto>(userId, returnDto);
             return Ok(returnDto);
         }
 
@@ -138,6 +137,7 @@ namespace Identity.API.Controllers
                 return BadRequest(result.Errors);
             }
 
+            await _redisService.RemoveKeyAsync(userId);
             return NoContent();
         }
 
@@ -168,6 +168,7 @@ namespace Identity.API.Controllers
                 return BadRequest(result.Errors);
             }
 
+            await _redisService.RemoveKeyAsync(userId);
             return NoContent();
         }
 
