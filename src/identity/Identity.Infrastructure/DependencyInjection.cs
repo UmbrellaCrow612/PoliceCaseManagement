@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace Identity.Infrastructure
 {
     public static class DependencyInjection
@@ -16,7 +17,7 @@ namespace Identity.Infrastructure
             var connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentException("DefaultConnection is empty");
 
             services.AddDbContext<IdentityApplicationDbContext>(
-                options => options.UseSqlite(connectionString));
+                options => options.UseNpgsql(connectionString));
 
             services.AddIdentityCore<ApplicationUser>()
                 .AddRoles<ApplicationRole>()

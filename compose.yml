@@ -3,8 +3,8 @@ services:
     image: rabbitmq:3-management
     container_name: message_broker
     ports:
-      - "5672:5672" # AMQP protocol
-      - "15672:15672" # Web management UI
+      - "5672:5672" 
+      - "15672:15672" 
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: StrongPassword!
@@ -22,3 +22,19 @@ services:
     command: ["redis-server", "--requirepass", "mysecretpassword"]
     ports:
       - "6381:6379"
+
+  identity_db:
+    image: postgres:15
+    container_name: identity_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: your_strong_password_here
+      POSTGRES_DB: identitydb
+    ports:
+      - "5433:5432"
+    volumes:
+      - identity_db_data:/var/lib/postgresql/data
+
+volumes:
+  identity_db_data: {} 
