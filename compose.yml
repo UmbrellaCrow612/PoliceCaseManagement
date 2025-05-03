@@ -3,8 +3,8 @@ services:
     image: rabbitmq:3-management
     container_name: message_broker
     ports:
-      - "5672:5672" 
-      - "15672:15672" 
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: StrongPassword!
@@ -15,6 +15,19 @@ services:
     command: ["redis-server", "--requirepass", "mysecretpassword"]
     ports:
       - "6380:6379"
+
+  cases_db:
+    image: postgres:15
+    container_name: cases_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: your_strong_password_here
+      POSTGRES_DB: casesdb
+    ports:
+      - "5432:5432" #
+    volumes:
+      - cases_db_data:/var/lib/postgresql/data
 
   identity_cache:
     image: redis:7.2
@@ -37,4 +50,5 @@ services:
       - identity_db_data:/var/lib/postgresql/data
 
 volumes:
-  identity_db_data: {} 
+  identity_db_data: {}
+  cases_db_data: {}

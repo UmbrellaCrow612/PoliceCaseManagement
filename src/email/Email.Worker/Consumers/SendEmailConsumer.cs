@@ -41,7 +41,7 @@ namespace Email.Worker.Consumers
             await client.ConnectAsync(_emailSettings.SmtpHost, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
             await client.AuthenticateAsync(
                 userName: _emailSettings.Username,
-                password: _emailSettings.Password /
+                password: _emailSettings.Password 
             );
             await client.SendAsync(message);
             await client.DisconnectAsync(true);

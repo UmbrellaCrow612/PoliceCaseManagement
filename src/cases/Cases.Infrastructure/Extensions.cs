@@ -17,7 +17,7 @@ namespace Cases.Infrastructure
 
             services.AddDbContext<CasesApplicationDbContext>(option =>
             {
-                option.UseSqlite(connectionString);
+                option.UseNpgsql(connectionString);
             });
 
             return services;
