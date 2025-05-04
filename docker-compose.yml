@@ -1,4 +1,12 @@
 services:
+  identity.api:
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: src/identity/Identity.API/Dockerfile
+    ports:
+      - "5001:8080"
+
   broker:
     image: rabbitmq:3-management
     container_name: message_broker

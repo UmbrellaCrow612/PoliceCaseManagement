@@ -24,8 +24,9 @@
 
 # Running
 
-- Run the broker
-- Backend API's through visual studio over https
-- Front end with `npm start` after gen creds for https
+- Just run the docker compose 
 
-`docker-compose up -d`
+
+NOTES:
+
+if brand new might need to run migrations on the db - refer toi identity api readme for debug steps there

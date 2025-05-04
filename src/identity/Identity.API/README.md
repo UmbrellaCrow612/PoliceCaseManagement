@@ -30,3 +30,7 @@ Project/Identity.API> dotnet ef migrations add InitialCreate --project ../Identi
 ```
 dotnet ed database update
 ```
+
+If using docker disable redis `AddCahing` then run the migration stuff then re add the code back in
+Stuff to know
+- if this project adds another project reference re generate this docker file

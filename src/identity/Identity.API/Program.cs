@@ -9,6 +9,8 @@ using Logging;
 using Identity.API.Extensions;
 using CORS;
 using Caching;
+using Identity.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -48,6 +50,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityApplicationDbContext>();
+    dbContext.Database.Migrate(); 
+}
 
 using (var scope = app.Services.CreateScope())
 {
