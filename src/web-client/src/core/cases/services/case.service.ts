@@ -113,13 +113,29 @@ export class CaseService {
     return this.httpClient.get<CasePagedResult>(url);
   }
 
-
   /**
    * Get all the incident types linked to a given case.
    * @param caseId The case id
    * @returns Observable list of incident types
    */
-  getIncidentTypes(caseId:string){
-    return this.httpClient.get<IncidentType[]>(`${this.BASE_URL}/cases/${caseId}/incident-types`)
+  getIncidentTypes(caseId: string) {
+    return this.httpClient.get<IncidentType[]>(
+      `${this.BASE_URL}/cases/${caseId}/incident-types`
+    );
+  }
+
+  /**
+   * Update the incident types a given case is related to
+   * @param caseId The ID of the case you want to update the inciden types for
+   * @param incidentTypeIds A array of incident types you want to link to it - contain new and old incident types
+   * @returns Observable
+   */
+  updateIncidentTypes(caseId: string, incidentTypeIds: string[]) {
+    return this.httpClient.patch(
+      `${this.BASE_URL}/cases/${caseId}/incident-types`,
+      {
+        incidentTypeIds: incidentTypeIds,
+      }
+    );
   }
 }

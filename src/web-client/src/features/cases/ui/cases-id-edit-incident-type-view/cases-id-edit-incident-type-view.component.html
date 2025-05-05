@@ -18,7 +18,7 @@
 
 @if (!isLoading && !error) {
 <div class="container">
-    <app-back-navigation-button></app-back-navigation-button>
+    <app-back-navigation-button navigationUrl="../../"></app-back-navigation-button>
 
     <h1>
         Select incident types you want to link to the case
@@ -33,19 +33,19 @@
             <mat-list-option [value]="incidentType" [selected]="isSelected(incidentType)">
                 {{incidentType.name}}
             </mat-list-option>
+            } @empty {
+            <mat-list-option disabled>
+                No incident types in system
+            </mat-list-option>
             }
         </mat-selection-list>
     </div>
 
     <div class="btns">
-        <button mat-raised-button>Save changes</button>
-        <button mat-raised-button>
+        <button mat-raised-button (click)="saveChangesClicked()" [disabled]="!hasUnsavedChanges">Save changes</button>
+        <button mat-raised-button (click)="fetchData()">
             Cancel
         </button>
     </div>
-
-    @for (item of selectedIncidentTypes; track $index) {
-        {{item.name}}
-    }
 </div>
 }

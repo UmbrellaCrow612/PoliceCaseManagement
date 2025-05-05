@@ -3,6 +3,7 @@ using Caching;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
+using Cases.Core.Models;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
@@ -229,6 +230,40 @@ namespace Cases.API.Controllers
                 return BadRequest(result);
             }
             await _redisService.RemoveKeyAsync(_incidentTypesKey);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Update a cases linked incident types - unlinks currently linked ones and links the new ones passed
+        /// </summary>
+        [Authorize]
+        [HttpPatch("{caseId}/incident-types")]
+        public async Task<IActionResult> UpdateCasesLinkedIncidentTypes(string caseId, [FromBody] UpdateCasesLinkedIncidentTypesDto dto)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if(_case is null)
+            {
+                return NotFound("Case not found");
+            }
+
+            List<IncidentType> incidentTypes = [];
+
+            foreach (var incidentTypeId in dto.IncidentTypeIds)
+            {
+                var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+                if (incidentType is null)
+                {
+                    return NotFound("Incident type not found");
+                }
+                incidentTypes.Add(incidentType);
+            }
+
+            var result = await _caseService.UpdateCaseLinkedIncidentTypes(_case, incidentTypes);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
 
             return NoContent();
         }

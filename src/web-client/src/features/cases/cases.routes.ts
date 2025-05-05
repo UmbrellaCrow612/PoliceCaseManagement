@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { canDeactivateGuard } from '../../core/app/guards/canDeactivateGuard';
 
 export const CASES_ROUTES: Routes = [
   {
@@ -43,6 +44,7 @@ export const CASES_ROUTES: Routes = [
           import(
             './ui/cases-id-edit-incident-type-view/cases-id-edit-incident-type-view.component'
           ).then((c) => c.CasesIdEditIncidentTypeViewComponent),
+        canDeactivate: [canDeactivateGuard],
       },
     ],
   },

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { IncidentTypeService } from '../../../../core/incident-type/services/incident-type-service.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { IncidentType } from '../../../../core/incident-type/types';
@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { CanComponentDeactivate } from '../../../../core/app/guards/canDeactivateGuard';
 
 @Component({
   selector: 'app-cases-id-edit-incident-type-view',
@@ -27,7 +28,9 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './cases-id-edit-incident-type-view.component.html',
   styleUrl: './cases-id-edit-incident-type-view.component.css',
 })
-export class CasesIdEditIncidentTypeViewComponent implements OnInit {
+export class CasesIdEditIncidentTypeViewComponent
+  implements OnInit, CanComponentDeactivate
+{
   constructor(
     private caseService: CaseService,
     private incidentTypeService: IncidentTypeService,
@@ -35,6 +38,17 @@ export class CasesIdEditIncidentTypeViewComponent implements OnInit {
     private router: Router,
     private errorService: ErrorService
   ) {}
+
+  canDeactivate(): boolean | Observable<boolean> {
+    if (this.hasUnsavedChanges) {
+      return confirm(
+        'You have unsaved changes are you sure you want to exit ?'
+      );
+    }
+
+    return true;
+  }
+
   ngOnInit(): void {
     this.caseId = this.active.snapshot.paramMap.get('caseId');
     if (!this.caseId) {
@@ -88,7 +102,9 @@ export class CasesIdEditIncidentTypeViewComponent implements OnInit {
         (this.currentIncidentTypes = response.current),
           (this.allIncidentTypes = response.all);
         this.filteredAllIncidentTypes = response.all;
-        this.selectedIncidentTypes = new Set<IncidentType>(this.currentIncidentTypes);
+        this.selectedIncidentTypes = new Set<IncidentType>(
+          this.currentIncidentTypes
+        );
         this.isLoading = false;
       },
       error: (error) => {
@@ -105,9 +121,39 @@ export class CasesIdEditIncidentTypeViewComponent implements OnInit {
   }
 
   selectionChanged(event: MatSelectionListChange) {
+    this.hasUnsavedChanges = true;
+
     const listSelectedIncidentTypes = event.source.selectedOptions.selected.map(
       (option) => option.value
     ) as IncidentType[];
-    this.selectedIncidentTypes = new Set<IncidentType>(listSelectedIncidentTypes)
+    this.selectedIncidentTypes = new Set<IncidentType>(
+      listSelectedIncidentTypes
+    );
+  }
+
+  saveChangesClicked() {
+    this.isLoading = true;
+    this.error = null;
+
+    if (!this.caseId) {
+      this.error = 'Case ID missing';
+      return;
+    }
+
+    this.caseService
+      .updateIncidentTypes(
+        this.caseId,
+        Array.from(this.selectedIncidentTypes).map((x) => x.id)
+      )
+      .subscribe({
+        next: () => {
+          this.hasUnsavedChanges = false
+          this.router.navigate(['../../'], { relativeTo: this.active });
+        },
+        error: (err) => {
+          this.errorService.HandleDisplay(err);
+          this.error = "Failed update"
+        },
+      });
   }
 }

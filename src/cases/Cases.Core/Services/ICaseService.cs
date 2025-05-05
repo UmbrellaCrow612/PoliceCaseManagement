@@ -84,6 +84,14 @@ namespace Cases.Core.Services
         /// <param name="case">The case you want to the get the linked incident types to it</param>
         /// <returns>List of incident types</returns>
         Task<List<IncidentType>> GetIncidentTypes(Case @case);
+
+        /// <summary>
+        /// Update a cases linked incident types through the join table case incident types
+        /// it removes all currently linked incident types and then links the passed incident types to it
+        /// </summary>
+        /// <param name="case">The case you want to update</param>
+        /// <param name="incidentTypes">List of new incident types you want to link to it</param>
+        Task<CaseResult> UpdateCaseLinkedIncidentTypes(Case @case, List<IncidentType> incidentTypes);
     }
 
     /// <summary>

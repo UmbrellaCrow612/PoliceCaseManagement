@@ -213,6 +213,25 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<CaseResult> UpdateCaseLinkedIncidentTypes(Case @case, List<IncidentType> incidentTypes)
+        {
+            var result = new CaseResult();
+
+            var currentlyLinkedIncidentTypes = await _dbcontext.CaseIncidentTypes.Where(x => x.CaseId == @case.Id).ToListAsync();
+            _dbcontext.CaseIncidentTypes.RemoveRange(currentlyLinkedIncidentTypes);
+
+            List<CaseIncidentType> newlyLinkedIncidentTypes = [];
+            foreach (var incidentType in incidentTypes)
+            {
+                newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id});
+            }
+            await _dbcontext.CaseIncidentTypes.AddRangeAsync(newlyLinkedIncidentTypes);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
         {
             var result = new CaseResult();
