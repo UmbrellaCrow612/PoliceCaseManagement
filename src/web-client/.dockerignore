@@ -1,0 +1,33 @@
+# Ignore Node.js modules directory
+node_modules
+
+# Ignore build output directory (it's generated inside the container)
+dist
+tmp
+
+# Ignore Angular cache
+.angular
+
+# Ignore development specific files
+*.log
+.env
+.env.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore IDE/editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore Git directory
+.git

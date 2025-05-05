@@ -6,6 +6,10 @@ then `ng serve --ssl --ssl-key localhost+2-key.pem --ssl-cert localhost+2.pem` o
 
 when opening browser you should not get warning
 
+there is a docker image but for local dev use above steps and not docker image
+
+so generate the certs and run `npm start`
+
 # Style guide
 
 ## Code
