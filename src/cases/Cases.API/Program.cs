@@ -2,8 +2,10 @@ using Caching;
 using Cases.API;
 using Cases.Application;
 using Cases.Infrastructure;
+using Cases.Infrastructure.Data;
 using CORS;
 using Logging;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -35,7 +37,11 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -45,5 +51,11 @@ app.UseSerilogRequestLogging(options =>
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CasesApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

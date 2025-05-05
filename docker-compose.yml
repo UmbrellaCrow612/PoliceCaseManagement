@@ -1,12 +1,4 @@
 services:
-  identity.api:
-    image: ${DOCKER_REGISTRY-}identityapi
-    build:
-      context: .
-      dockerfile: src/identity/Identity.API/Dockerfile
-    ports:
-      - "5001:8080"
-
   broker:
     image: rabbitmq:3-management
     container_name: message_broker
@@ -16,6 +8,18 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: StrongPassword!
+
+  cases.api:
+    image: ${DOCKER_REGISTRY-}casesapi
+    build:
+      context: .
+      dockerfile: src/cases/Cases.API/Dockerfile
+    depends_on:
+      - cases_cache
+      - cases_db
+      - broker
+    ports: 
+      - "8080:8080"
 
   cases_cache:
     image: redis:7.2
@@ -33,9 +37,21 @@ services:
       POSTGRES_PASSWORD: your_strong_password_here
       POSTGRES_DB: casesdb
     ports:
-      - "5432:5432" #
+      - "5432:5432"
     volumes:
       - cases_db_data:/var/lib/postgresql/data
+
+  identity.api:
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: src/identity/Identity.API/Dockerfile
+    depends_on:
+      - identity_db
+      - identity_cache
+      - broker
+    ports: 
+      - "8082:8080" 
 
   identity_cache:
     image: redis:7.2
