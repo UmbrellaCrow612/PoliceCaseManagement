@@ -1,4 +1,17 @@
 services:
+
+  web_ui:
+    container_name: web_ui
+    build:
+      context: ./src/web-client
+      dockerfile: Dockerfile
+    ports: 
+      - "80:80"
+    depends_on:
+      - identity.api
+      - cases.api
+      - broker
+
   broker:
     image: rabbitmq:3-management
     container_name: message_broker
