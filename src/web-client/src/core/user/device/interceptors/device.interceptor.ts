@@ -4,7 +4,7 @@ import CustomHeaderNames from '../../../http/headers/constants/names';
 import { inject } from '@angular/core';
 import { DeviceService } from '../services/device.service';
 
-export function DeviceFingerPrintInterceptor(
+export function deviceFingerPrintInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {

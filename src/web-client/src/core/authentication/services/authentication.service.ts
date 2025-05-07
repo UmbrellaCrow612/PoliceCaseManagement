@@ -3,14 +3,41 @@ import { Injectable } from '@angular/core';
 import env from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { appPaths } from '../../app/constants/appPaths';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService {
   private readonly BASE_URL = env.BaseUrls.authenticationBaseUrl;
+  public readonly REFRESH_TOKEN_URL = `/authentication/refresh-token`
+  private JWT_TOKEN: string = '';
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  /**
+   * Used to refresh the token and set the jwt in memeory of the app
+   * called on page load first thing
+   */
+  refreshToken() {
+    return this.http
+      .get<{ jwtBearerToken: string }>(
+        `${this.BASE_URL}${this.REFRESH_TOKEN_URL}`
+      )
+      .pipe(
+        tap((response) => {
+          this.setJwtBearerToken(response.jwtBearerToken);
+        })
+      );
+  }
+
+  getJwtBearerToken() {
+    return this.JWT_TOKEN;
+  }
+
+  setJwtBearerToken(value: string) {
+    this.JWT_TOKEN = value;
+  }
 
   Login(email: string, password: string) {
     return this.http.post<{ loginAttemptId: string }>(
@@ -27,10 +54,16 @@ export class AuthenticationService {
   }
 
   ValidateTwoFactorSmsCode(loginAttemptId: string, code: string) {
-    return this.http.post(
-      `${this.BASE_URL}/authentication/validate-two-factor-sms`,
-      { loginAttemptId: loginAttemptId, code: code }
-    );
+    return this.http
+      .post<{ jwtBearerToken: string }>(
+        `${this.BASE_URL}/authentication/validate-two-factor-sms`,
+        { loginAttemptId: loginAttemptId, code: code }
+      )
+      .pipe(
+        tap((response) => {
+          this.setJwtBearerToken(response.jwtBearerToken);
+        })
+      );
   }
 
   SendConfirmationEmail(email: string) {

@@ -34,13 +34,12 @@ namespace Identity.Application.Implamentations
         {
             var roles = await _userManager.GetRolesAsync(user);
 
-            (string jwtBearerAcessToken, string jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
+            string jwtBearer = _jwtBearerHelper.GenerateBearerToken(user, roles);
             var refreshToken = _jwtBearerHelper.GenerateRefreshToken();
 
             var token = new Token
             {
-                Id = jwtBearerAcessTokenId,
-                RefreshToken = refreshToken,
+                Id = refreshToken,
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
                 UserDeviceId = device.Id,
                 UserId = user.Id
@@ -48,7 +47,7 @@ namespace Identity.Application.Implamentations
 
             await _unitOfWork.Repository<Token>().AddAsync(token);
 
-            return new Tokens { JwtBearerToken = jwtBearerAcessToken, RefreshToken = refreshToken };
+            return new Tokens { JwtBearerToken = jwtBearer, RefreshToken = refreshToken };
         }
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
@@ -364,24 +363,9 @@ namespace Identity.Application.Implamentations
             loginAttempt.MarkUsed();
             _unitOfWork.Repository<LoginAttempt>().Update(loginAttempt);
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var tokens = await GenerateAndStoreTokens(user, userDevice);
 
-            (string jwtBearerAcessToken, string jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
-            var refreshToken = _jwtBearerHelper.GenerateRefreshToken();
-
-            result.Tokens.JwtBearerToken = jwtBearerAcessToken;
-            result.Tokens.RefreshToken = refreshToken;
-
-            var token = new Token
-            {
-                Id = jwtBearerAcessTokenId,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
-                UserDeviceId = userDevice.Id,
-                UserId = user.Id
-            };
-
-            await _unitOfWork.Repository<Token>().AddAsync(token);
+            result.Tokens = tokens;
 
             user.LastLoginDeviceId = userDevice.Id;
 
@@ -404,14 +388,21 @@ namespace Identity.Application.Implamentations
             return (true, device);
         }
 
-        public async Task<RefreshTokenResult> RefreshTokensAsync(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo)
+        public async Task<RefreshTokenResult> RefreshTokensAsync(string refreshToken, DeviceInfo deviceInfo)
         {
             var result = new RefreshTokenResult();
 
-            var user = await GetUserByIdAsync(userId);
+            var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(refreshToken);
+            if (storedToken is null)
+            {
+                result.AddError(BusinessRuleCodes.RefreshToken);
+                return result;
+            }
+
+            var user = await _userManager.FindByIdAsync(storedToken.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.UserDoesNotExist);
+                result.AddError(BusinessRuleCodes.UserDoesNotExist, "User dose not exist");
                 return result;
             }
 
@@ -422,28 +413,26 @@ namespace Identity.Application.Implamentations
                 return result;
             }
 
-            var storedToken = await _unitOfWork.Repository<Token>().FindByIdAsync(tokenId);
-            if (storedToken is null || !storedToken.IsValid(refreshToken, userDevice.Id))
+            if (!storedToken.IsValid(userDevice.Id))
             {
+                var validTokens = await _unitOfWork.Repository<Token>().Query.Where(x => x.IsRevoked == false && x.UserId == user.Id).ToArrayAsync();
+                foreach (var item in validTokens)
+                {
+                    item.Revoke("Trying to refresh from either a invalid token or another device not linked with the token");
+                }
+                _unitOfWork.Repository<Token>().UpdateRange(validTokens);
+                await _unitOfWork.SaveChangesAsync();
+
                 result.AddError(BusinessRuleCodes.RefreshToken);
                 return result;
             }
+            storedToken.Revoke("Previous token used to issue a new jwt token");
+            _unitOfWork.Repository<Token>().Update(storedToken);
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var tokens = await GenerateAndStoreTokens(user, userDevice);
 
-            var (jwtBearerToken, jwtBearerAcessTokenId) = _jwtBearerHelper.GenerateBearerToken(user, roles);
+            result.Tokens = tokens;
 
-            var newToken = new Token
-            {
-                Id = jwtBearerAcessTokenId,
-                RefreshToken = storedToken.RefreshToken,
-                RefreshTokenExpiresAt = storedToken.RefreshTokenExpiresAt, // bind to previous refresh token and time
-                UserDeviceId = userDevice.Id,
-                UserId = user.Id,
-            };
-            result.Tokens.JwtBearerToken = jwtBearerToken;
-
-            await _unitOfWork.Repository<Token>().AddAsync(newToken);
             await _unitOfWork.SaveChangesAsync();
 
             result.Succeeded = true;
@@ -468,7 +457,7 @@ namespace Identity.Application.Implamentations
 
             foreach (var token in validTokens)
             {
-                token.Revoke();
+                token.Revoke("Logout called");
             }
 
             _unitOfWork.Repository<Token>().UpdateRange(validTokens);

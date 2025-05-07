@@ -39,7 +39,7 @@ namespace Identity.API.Controllers
             }
 
             var user = await _authService.GetUserByIdAsync(userId);
-            if (user is null) return NotFound();
+            if (user is null) return Unauthorized();
 
             var roles = await _authService.GetUserRolesAsync(userId);
 

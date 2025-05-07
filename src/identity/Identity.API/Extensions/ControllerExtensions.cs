@@ -10,20 +10,10 @@ namespace Identity.API.Extensions
     public static class ControllerExtensions
     {
         /// <summary>
-        /// Custom method that sets the JWT bearer and refresh tokens in the response cookies
+        /// Custom method that sets the refresh http only cookie
         /// </summary>
         public static void SetAuthCookies(this ControllerBase controller, Tokens tokens, JwtBearerOptions options)
         {
-            // TODO make it secure for HTTPS future
-            controller.Response.Cookies.Append(AuthCookieNamesConstant.JWT, tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true, 
-                SameSite =  SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(options.ExpiresInMinutes),
-                IsEssential = true
-            });
-
             controller.Response.Cookies.Append(AuthCookieNamesConstant.REFRESH_TOKEN, tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
@@ -32,8 +22,6 @@ namespace Identity.API.Extensions
                 Expires = DateTime.UtcNow.AddMinutes(options.RefreshTokenExpiriesInMinutes),
                 IsEssential = true
             });
-
-
         }
 
         /// <summary>
@@ -41,22 +29,7 @@ namespace Identity.API.Extensions
         /// </summary>
         public static void RemoveAuthCookies(this ControllerBase controller)
         {
-            controller.Request.Cookies.TryGetValue(AuthCookieNamesConstant.JWT, out string? jwtCookie);
             controller.Request.Cookies.TryGetValue(AuthCookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
-
-            if (!string.IsNullOrWhiteSpace(jwtCookie))
-            {
-               
-                var expiredCookie = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(-1),
-                    IsEssential = true
-                };
-                controller.Response.Cookies.Append(AuthCookieNamesConstant.JWT, "", expiredCookie);
-            }
 
             if (!string.IsNullOrWhiteSpace(refreshToken))
             {

@@ -75,7 +75,7 @@ namespace Identity.API.Controllers
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);
 
-            return Ok(new { res.Tokens });
+            return Ok(new { res.Tokens.JwtBearerToken });
         }
 
         [RequireDeviceInformation]
@@ -177,7 +177,7 @@ namespace Identity.API.Controllers
 
             this.SetAuthCookies(result.Tokens, _JWTOptions);
 
-            return Ok(new { result.Tokens.JwtBearerToken, result.Tokens.RefreshToken });
+            return Ok(new { result.Tokens.JwtBearerToken });
         }
 
         [RequireDeviceInformation]
@@ -228,41 +228,25 @@ namespace Identity.API.Controllers
             return Ok(returnDto);
         }
 
-        [Authorize]
         [RequireDeviceInformation]
         [HttpGet("refresh-token")]
         public async Task<ActionResult> RefreshToken()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
             Request.Cookies.TryGetValue(AuthCookieNamesConstant.REFRESH_TOKEN, out string? refreshToken);
 
-            if (string.IsNullOrWhiteSpace(refreshToken))
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                return Unauthorized("Refresh cookie missing"); // we send 401 here as if it cannoit refresh it means they should be logged out 
+                return Unauthorized("Refresh token missing");
             }
 
-            if (string.IsNullOrEmpty(userId))
+            var result = await _authService.RefreshTokensAsync(refreshToken, this.ComposeDeviceInfo());
+            if (!result.Succeeded)
             {
-                return Unauthorized("User ID not found in token.");
+                this.RemoveAuthCookies();
+                return Unauthorized(result.Errors);
             }
 
-            if (string.IsNullOrEmpty(tokenId))
-            {
-                return Unauthorized("Jti ID not found in token.");
-            }
-
-            var result = await _authService.RefreshTokensAsync(userId, tokenId, refreshToken, this.ComposeDeviceInfo());
-            if (!result.Succeeded) return Unauthorized(result.Errors);
-
-            /// we are not using <see cref="ControllerExtensions.SetAuthCookies(ControllerBase, Tokens, JwtBearerOptions)"/> becuase we only send back a new jwt
-            Response.Cookies.Append(AuthCookieNamesConstant.JWT, result.Tokens.JwtBearerToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_JWTOptions.ExpiresInMinutes)
-            });
+            this.SetAuthCookies(result.Tokens, _JWTOptions);
 
             return Ok(new { result.Tokens.JwtBearerToken });
         }

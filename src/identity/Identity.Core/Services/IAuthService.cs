@@ -19,7 +19,7 @@ namespace Identity.Core.Services
 
         Task<(bool isTrusted, UserDevice? userDevice)> ValidateDeviceAsync(string userId, DeviceInfo info);
 
-        Task<RefreshTokenResult> RefreshTokensAsync(string userId, string tokenId, string refreshToken, DeviceInfo deviceInfo);
+        Task<RefreshTokenResult> RefreshTokensAsync(string refreshToken, DeviceInfo deviceInfo);
 
         Task<LogoutResult> LogoutAsync(string userId);
 

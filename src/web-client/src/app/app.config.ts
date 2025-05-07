@@ -8,12 +8,15 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { DeviceFingerPrintInterceptor } from '../core/user/device/interceptors/device.interceptor';
-import { authRedirectsInterceptor } from '../core/authentication/interceptors/redirect.interceptor';
+import { deviceFingerPrintInterceptor } from '../core/user/device/interceptors/device.interceptor';
+import { jwtRefreshInterceptor } from '../core/authentication/interceptors/jwt-refresh.interceptor';
 import { UserService } from '../core/user/services/user.service';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { withCredentialsInterceptor } from '../core/http/interceptors/withCredentails.interceptor';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { AuthenticationService } from '../core/authentication/services/authentication.service';
+import { jwtBearerInterceptor } from '../core/authentication/interceptors/jwt-bearer.interceptor';
+import { Location } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,19 +25,49 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
       withInterceptors([
-        DeviceFingerPrintInterceptor,
-        authRedirectsInterceptor,
+        deviceFingerPrintInterceptor,
         withCredentialsInterceptor,
+        jwtRefreshInterceptor,
+        jwtBearerInterceptor,
       ])
     ),
     provideAppInitializer(() => {
       const userService = inject(UserService);
-      return firstValueFrom(
-        userService.getCurrentUser().pipe(
-          catchError(() => {
-            return of(null);
-          })
-        )
+      const authService = inject(AuthenticationService);
+      const location = inject(Location);
+
+      const currentPath = location.path();
+      const isAuthRoute = currentPath.includes('/authentication');
+
+      if (isAuthRoute) {
+        console.log(
+          'Skipping app init logic on authentication route:',
+          currentPath
+        );
+        return of(null);
+      }
+
+      return authService.refreshToken().pipe(
+        catchError((error) => {
+          console.error(
+            'Failed to refresh token during app initialization:',
+            error
+          );
+          // Ensure catchError returns an Observable for the stream to continue
+          return of(null);
+        }),
+        switchMap(() => {
+          // This will be executed regardless of refreshToken success or failure (due to catchError)
+          return userService.getCurrentUser().pipe(
+            catchError(() => {
+              console.error(
+                'Failed to get current user during app initialization.'
+              );
+              // Ensure catchError returns an Observable
+              return of(null);
+            })
+          );
+        })
       );
     }),
     provideMomentDateAdapter(undefined, { useUtc: true }),

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250504152634_InitialCreate")]
+    [Migration("20250507124802_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -519,10 +519,6 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<bool>("IsRevoked")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("RefreshTokenExpiresAt")
                         .HasColumnType("timestamp with time zone");

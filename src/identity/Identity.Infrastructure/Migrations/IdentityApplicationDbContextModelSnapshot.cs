@@ -517,10 +517,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("IsRevoked")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("RefreshTokenExpiresAt")
                         .HasColumnType("timestamp with time zone");
 

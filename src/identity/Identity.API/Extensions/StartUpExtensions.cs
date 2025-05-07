@@ -1,5 +1,4 @@
-﻿using Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -25,19 +24,6 @@ namespace Identity.API.Extensions
                                 Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new ApplicationException("Jwt Key not provided"))),
 
                             ClockSkew = TimeSpan.Zero
-                        };
-
-
-                        options.Events = new JwtBearerEvents
-                        {
-                            OnMessageReceived = context =>
-                            {
-                                if (context.Request.Cookies.TryGetValue(AuthCookieNamesConstant.JWT, out var token))
-                                {
-                                    context.Token = token;
-                                }
-                                return Task.CompletedTask;
-                            }
                         };
                     });
 
