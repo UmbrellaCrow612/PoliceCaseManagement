@@ -1,0 +1,16 @@
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: start;
+}
+
+.list_container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: 500px;
+  overflow-y: scroll;
+  width: 100%;
+}

@@ -7,10 +7,10 @@ using Scalar.AspNetCore;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Identity.API.Extensions;
-using CORS;
 using Caching;
 using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -23,15 +23,30 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddApplicationCors(config);
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
 builder.Services.AddCaching(config);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // If your reverse proxy is on the same machine or a trusted network,
+    // you might not need to specify KnownProxies or KnownNetworks.
+    // However, for security, it's good practice if possible.
+    // Since Nginx is running as another Docker container on the same Docker network,
+    // it's generally considered trusted.
+    // If you knew the specific IP of the reverse_proxy container (which can change),
+    // you could add it to KnownProxies.
+    // For now, clearing them means it will trust any proxy.
+    options.KnownProxies.Clear();
+    options.KnownNetworks.Clear();
+});
+
 var app = builder.Build();
 
-app.UseApplicationCors(config);
+app.UseForwardedHeaders(); // IMPORTANT: Call this early in the pipeline
 
 if (app.Environment.IsDevelopment())
 {

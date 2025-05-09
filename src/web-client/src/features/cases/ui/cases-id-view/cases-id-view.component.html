@@ -14,11 +14,19 @@
 
 @if (!isLoading && !errorMessage) {
 <div class="container">
+
+    <div class="links">
+       @for (item of links; track $index) {
+        <a mat-flat-button [routerLink]="item.href">{{item.name}}</a>
+       }
+    </div>
+
+
     <h2>
         Case Overview:
     </h2>
 
-    <div>
+    <div class="overview_container">
         <p>Case Number: {{caseDetails?.caseNumber}}</p>
         <p>Description: {{caseDetails?.description}}</p>
         <p>Summary: {{caseDetails?.summary}}</p>

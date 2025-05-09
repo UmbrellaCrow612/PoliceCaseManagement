@@ -98,7 +98,7 @@ export class UserService {
    * Update a user details like there username and email etc - Note only admins can do this.
    */
   updateUserDetails(body: User) {
-    return this.httpClient.patch(`${this.BASE_URL}/users/${body.id}`, body);
+    return this.httpClient.put(`${this.BASE_URL}/users/${body.id}`, body);
   }
 
   /**
@@ -107,7 +107,7 @@ export class UserService {
    * @param newRoles List of new selected roles for them
    */
   updateUserRoles(user: User, newRoles: string[]) {
-    return this.httpClient.patch(`${this.BASE_URL}/users/${user.id}/roles`, {
+    return this.httpClient.put(`${this.BASE_URL}/users/${user.id}/roles`, {
       roles: newRoles,
     });
   }

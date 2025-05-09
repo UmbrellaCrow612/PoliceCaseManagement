@@ -141,10 +141,10 @@ export class SearchCasesViewComponent implements OnInit {
   isFetchingCases = false;
   casesPagedResult: CasePagedResult | null = null;
   onSubmit() {
-    this.fetchCases({});
+    this.fetchCases();
   }
 
-  fetchCases(options: Partial<{ pageNumber: number | null }>) {
+  fetchCases(options: Partial<{ pageNumber: number | null }> = {}) {
     let incidentTypeId = this.incidentTypes?.find(
       (x) => x.name === this.searchCasesFrom.controls.incidentType.getRawValue()
     )?.id;

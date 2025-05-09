@@ -44,6 +44,12 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}")]
         public async Task<ActionResult<CaseDto>> GetCaseById(string caseId)
         {
+            var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
+            if (cache is not null)
+            {
+                return Ok(cache);
+            }
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null)
             {
@@ -51,6 +57,7 @@ namespace Cases.API.Controllers
             }
 
             var dto = _caseMapping.ToDto(_case);
+            await _redisService.SetStringAsync<CaseDto>(_case.Id, dto);
 
             return Ok(dto);
         }
@@ -213,7 +220,7 @@ namespace Cases.API.Controllers
         /// Update a incident type - only admins can do this.
         /// </summary>
         [Authorize(Roles = Roles.Admin)]
-        [HttpPatch("incident-types/{incidentTypeId}")]
+        [HttpPut("incident-types/{incidentTypeId}")]
         public async Task<IActionResult> UpdateIncidentType(string incidentTypeId, [FromBody] UpdateIncidentTypeDto dto)
         {
             var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
@@ -238,7 +245,7 @@ namespace Cases.API.Controllers
         /// Update a cases linked incident types - unlinks currently linked ones and links the new ones passed
         /// </summary>
         [Authorize]
-        [HttpPatch("{caseId}/incident-types")]
+        [HttpPut("{caseId}/incident-types")]
         public async Task<IActionResult> UpdateCasesLinkedIncidentTypes(string caseId, [FromBody] UpdateCasesLinkedIncidentTypesDto dto)
         {
             var _case = await _caseService.FindById(caseId);

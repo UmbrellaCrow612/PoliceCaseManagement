@@ -131,7 +131,7 @@ export class CaseService {
    * @returns Observable
    */
   updateIncidentTypes(caseId: string, incidentTypeIds: string[]) {
-    return this.httpClient.patch(
+    return this.httpClient.put(
       `${this.BASE_URL}/cases/${caseId}/incident-types`,
       {
         incidentTypeIds: incidentTypeIds,

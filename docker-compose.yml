@@ -1,16 +1,15 @@
 services:
-
-  web_ui:
-    container_name: web_ui
-    build:
-      context: ./src/web-client
-      dockerfile: Dockerfile
-    ports: 
-      - "80:80"
-    depends_on:
-      - identity.api
-      - cases.api
-      - broker
+  # web_ui:
+  #   container_name: web_ui
+  #   build:
+  #     context: ./src/web-client
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - identity.api
+  #     - cases.api
+  #     - broker
 
   broker:
     image: rabbitmq:3-management
@@ -22,6 +21,17 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: StrongPassword!
 
+  reverse_proxy:
+    container_name: reverse_proxy
+    ports:
+      - "8088:80"
+    build:
+      context: ./src/reverse-proxy
+      dockerfile: Dockerfile
+    depends_on:
+      - identity.api
+      - cases.api
+
   cases.api:
     image: ${DOCKER_REGISTRY-}casesapi
     build:
@@ -31,7 +41,7 @@ services:
       - cases_cache
       - cases_db
       - broker
-    ports: 
+    ports:
       - "8080:8080"
 
   cases_cache:
@@ -63,8 +73,8 @@ services:
       - identity_db
       - identity_cache
       - broker
-    ports: 
-      - "8082:8080" 
+    ports:
+      - "8082:8080"
 
   identity_cache:
     image: redis:7.2

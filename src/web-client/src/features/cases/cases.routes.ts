@@ -46,6 +46,13 @@ export const CASES_ROUTES: Routes = [
           ).then((c) => c.CasesIdEditIncidentTypeViewComponent),
         canDeactivate: [canDeactivateGuard],
       },
+      {
+        path: ':caseId/actions',
+        loadComponent: () =>
+          import(
+            './ui/cases-id-actions-view/cases-id-actions-view.component'
+          ).then((c) => c.CasesIdActionsViewComponent),
+      },
     ],
   },
 ];

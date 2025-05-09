@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { Case } from '../../../../core/cases/type';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
@@ -12,10 +12,17 @@ import { hasRequiredRole } from '../../../../core/authentication/utils';
 import { UserRoles } from '../../../../core/authentication/roles';
 import { forkJoin } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
+import { AppLink } from '../../../../core/app/type';
 
 @Component({
   selector: 'app-cases-id-view',
-  imports: [CommonModule, CasePriorityPipe, CaseStatusPipe, MatButtonModule, RouterLink],
+  imports: [
+    CommonModule,
+    CasePriorityPipe,
+    CaseStatusPipe,
+    MatButtonModule,
+    RouterLink,
+  ],
   templateUrl: './cases-id-view.component.html',
   styleUrl: './cases-id-view.component.css',
 })
@@ -75,4 +82,12 @@ export class CasesIdViewComponent implements OnInit {
       },
     });
   }
+
+  links: AppLink[] = [
+    {
+      authorizedRoles: [],
+      href: './actions',
+      name: 'Actions',
+    },
+  ];
 }

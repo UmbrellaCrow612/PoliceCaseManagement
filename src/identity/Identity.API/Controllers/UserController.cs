@@ -120,7 +120,7 @@ namespace Identity.API.Controllers
             return Ok(dto);
         }
 
-        [HttpPatch("{userId}")]
+        [HttpPut("{userId}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserByIdAsync(string userId, [FromBody] UpdateUserDto dto)
         {
@@ -152,7 +152,7 @@ namespace Identity.API.Controllers
             return Ok(dto);
         }
 
-        [HttpPatch("{userId}/roles")]
+        [HttpPut("{userId}/roles")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserRolesByIdAsync(string userId, UpdateUserRolesDto dto)
         {

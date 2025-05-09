@@ -77,7 +77,7 @@ export class IncidentTypeService {
       description: string | null;
     }>
   ) {
-    return this.httpClient.patch(
+    return this.httpClient.put(
       `${this.BASE_URL}/cases/incident-types/${updatedIncidentType.id}`,
       updatedIncidentType
     );
