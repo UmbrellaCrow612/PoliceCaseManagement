@@ -1,0 +1,24 @@
+{
+  "listen_port": 80,
+  "server_name": "localhost",
+  "cors_origin": "https://localhost:4200",
+  "cors_methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "cors_headers": "Authorization, Content-Type, X-Requested-With, Accept, x-device-fingerprint",
+  "services": [
+    {
+      "name": "cases",
+      "path_prefix": "/cases/",
+      "upstream_name": "cases_api_upstream",
+      "upstream_server": "cases.api:8080"
+    },
+    {
+      "name": "identity",
+      "path_prefix": "/identity/",
+      "upstream_name": "identity_api_upstream",
+      "upstream_server": "identity.api:8080"
+    }
+  ],
+  "default_log_level": "warn",
+  "worker_connections": 1024,
+  "enable_websocket_support": true
+}
