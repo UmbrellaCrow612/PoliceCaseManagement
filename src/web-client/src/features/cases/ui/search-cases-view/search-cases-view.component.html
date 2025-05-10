@@ -37,7 +37,7 @@
                 <mat-label>Case status</mat-label>
                 <mat-select formControlName="status">
                     @for (status of caseStatus; track status) {
-                    <mat-option [value]="status.number">{{status.name}}</mat-option>
+                    <mat-option [value]="status.number.toString()">{{status.name}}</mat-option>
                     }
                 </mat-select>
 
@@ -47,7 +47,7 @@
                 <mat-label>Case priority</mat-label>
                 <mat-select formControlName="priority">
                     @for (priority of casePrioritys; track priority) {
-                    <mat-option [value]="priority.number">{{priority.name}}</mat-option>
+                    <mat-option [value]="priority.number.toString()">{{priority.name}}</mat-option>
                     }
                 </mat-select>
 

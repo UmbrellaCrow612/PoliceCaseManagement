@@ -53,8 +53,8 @@ export class CaseService {
       caseNumber: string | null;
       incidentDateTime: Date | null;
       reportedDateTime: Date | null;
-      status: number;
-      priority: number;
+      status: string | null;
+      priority: string | null;
       reportingOfficerId: string | null;
       incidentTypeId: string | null;
       pageNumber: number | null;

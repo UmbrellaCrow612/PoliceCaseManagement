@@ -85,8 +85,8 @@ export class SearchCasesViewComponent implements OnInit {
     caseNumber: new FormControl<string | null>(null),
     incidentDateTime: new FormControl<Date | null>(null),
     reportedDateTime: new FormControl<Date | null>(null),
-    status: new FormControl<number | null>(null),
-    priority: new FormControl<number | null>(null),
+    status: new FormControl<string | null>(null),
+    priority: new FormControl<string | null>(null),
     reportingOfficerUserName: new FormControl<string | null>(null),
     incidentType: new FormControl<string | null>(null),
   });
@@ -149,19 +149,12 @@ export class SearchCasesViewComponent implements OnInit {
       (x) => x.name === this.searchCasesFrom.controls.incidentType.getRawValue()
     )?.id;
 
-    let priority = tryConvertStringToNumber(
-      this.searchCasesFrom.controls.priority.getRawValue() as any
-    ) as number;
-
     let reportingOfficerId = this.users.find(
       (x) =>
         x.userName ===
         this.searchCasesFrom.controls.reportingOfficerUserName.getRawValue()
     )?.id;
 
-    let status = tryConvertStringToNumber(
-      this.searchCasesFrom.controls.status.getRawValue() as any
-    ) as number;
 
     this.isFetchingCases = true;
     this.caseService
@@ -170,11 +163,11 @@ export class SearchCasesViewComponent implements OnInit {
         incidentDateTime:
           this.searchCasesFrom.controls.incidentDateTime.getRawValue(),
         incidentTypeId: incidentTypeId,
-        priority: priority,
+        priority: this.searchCasesFrom.controls.priority.getRawValue(),
         reportedDateTime:
           this.searchCasesFrom.controls.reportedDateTime.getRawValue(),
         reportingOfficerId: reportingOfficerId,
-        status,
+        status: this.searchCasesFrom.controls.status.getRawValue() ,
         pageNumber: options.pageNumber,
       })
       .subscribe({
