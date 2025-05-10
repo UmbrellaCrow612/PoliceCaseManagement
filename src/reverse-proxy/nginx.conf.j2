@@ -19,6 +19,9 @@ http {
     keepalive_timeout 65;
     types_hash_max_size 2048;
 
+    # Rate Limiting Setup
+    limit_req_zone $binary_remote_addr zone=req_limit_per_ip:10m rate=1r/s;
+
     # Internal Docker resolver
     resolver 127.0.0.11 valid=30s;
 
@@ -32,6 +35,7 @@ http {
         listen {{ listen_port }};
         server_name {{ server_name }};
 
+        # Health check endpoint
         location /health {
             return 200 'Healthy';
             add_header Content-Type text/plain;
@@ -39,6 +43,7 @@ http {
 
         {% for service in services %}
         location {{ service.path_prefix }} {
+            # CORS headers for OPTIONS method
             if ($request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '{{ cors_origin }}' always;
                 add_header 'Access-Control-Allow-Methods' '{{ cors_methods }}' always;
@@ -50,22 +55,34 @@ http {
                 return 204;
             }
 
+            # Standard CORS headers
             add_header 'Access-Control-Allow-Origin' '{{ cors_origin }}' always;
             add_header 'Access-Control-Allow-Methods' '{{ cors_methods }}' always;
             add_header 'Access-Control-Allow-Headers' '{{ cors_headers }}' always;
             add_header 'Access-Control-Allow-Credentials' 'true' always;
 
-            rewrite ^{{ service.path_prefix }}(.*)$ /$1 break; 
+            # Security Headers
+            add_header X-Content-Type-Options 'nosniff' always;
+            add_header X-Frame-Options 'SAMEORIGIN' always;
+            add_header X-XSS-Protection '1; mode=block' always;
+
+            # Apply rate limiting
+            limit_req zone=req_limit_per_ip burst=10 nodelay;
+
+            # Rewrite and proxy pass
+            rewrite ^{{ service.path_prefix }}(.*)$ /$1 break;
             proxy_pass http://{{ service.upstream_name }};
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
             {% if enable_websocket_support %}
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
             {% endif %}
+
             proxy_read_timeout 90s;
             proxy_redirect off;
         }
