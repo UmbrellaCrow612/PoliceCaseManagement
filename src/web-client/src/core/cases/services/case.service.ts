@@ -1,7 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import env from '../../../environments/environment';
-import { Case, CasePagedResult, CreateCase } from '../type';
+import {
+  Case,
+  CaseAction,
+  CasePagedResult,
+  CreateCase,
+  CreateCaseAction,
+} from '../type';
 import { IncidentType } from '../../incident-type/types';
 
 @Injectable({
@@ -125,6 +131,17 @@ export class CaseService {
   }
 
   /**
+   * Get all case actions for a given case
+   * @param caseId The case ID
+   * @returns Observable
+   */
+  getCaseActions(caseId: string) {
+    return this.httpClient.get<CaseAction[]>(
+      `${this.BASE_URL}/cases/${caseId}/case-actions`
+    );
+  }
+
+  /**
    * Update the incident types a given case is related to
    * @param caseId The ID of the case you want to update the inciden types for
    * @param incidentTypeIds A array of incident types you want to link to it - contain new and old incident types
@@ -136,6 +153,19 @@ export class CaseService {
       {
         incidentTypeIds: incidentTypeIds,
       }
+    );
+  }
+
+  /**
+   * Add a case action to a given case by it's ID
+   * @param caseId The case id of the case to add this case action to
+   * @param caseActionToCreate Contains the information of the action to create
+   * @returns Observable
+   */
+  addCaseAction(caseId: string, caseActionToCreate: CreateCaseAction) {
+    return this.httpClient.post<CaseAction>(
+      `${this.BASE_URL}/cases/${caseId}/case-actions`,
+      { ...caseActionToCreate }
     );
   }
 }

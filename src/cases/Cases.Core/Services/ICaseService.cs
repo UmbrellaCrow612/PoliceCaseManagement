@@ -92,6 +92,12 @@ namespace Cases.Core.Services
         /// <param name="case">The case you want to update</param>
         /// <param name="incidentTypes">List of new incident types you want to link to it</param>
         Task<CaseResult> UpdateCaseLinkedIncidentTypes(Case @case, List<IncidentType> incidentTypes);
+
+        /// <summary>
+        /// Get all case actions for a given case
+        /// </summary>
+        /// <param name="case">The case you want to get all case actions for</param>
+        Task<List<CaseAction>> GetCaseActions(Case @case);
     }
 
     /// <summary>

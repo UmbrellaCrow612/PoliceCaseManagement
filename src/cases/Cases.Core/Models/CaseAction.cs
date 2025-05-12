@@ -7,12 +7,7 @@
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Description { get; set; }
-        public string? Notes { get; set; } = null;
-
-        /// <summary>
-        /// The <see cref="Case.Status"/> at the time of this action being recorded
-        /// </summary>
-        public required CaseStatus CaseStatus { get; set; }
+        public required string? Notes { get; set; } = null;
 
         /// <summary>
         /// Indicates if the case action is in a valid state by default it is pending as the created by ID needs to be validated
@@ -25,14 +20,18 @@
         /// <summary>
         /// User id of the person who created it
         /// </summary>
-        public required string CreatedById { get; set; }
+        public string CreatedById { get; set; } = null!;
 
 
         /// <summary>
         /// Ef core navigation properties
         /// </summary>
-        public required Case Case { get; set; } = null!;
-        public required string CaseId { get; set; }
+        public Case Case { get; set; } = null!;
+
+        /// <summary>
+        /// Must be set
+        /// </summary>
+        public string CaseId { get; set; } = null!;
     }
 
     /// <summary>

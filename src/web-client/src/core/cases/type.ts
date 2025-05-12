@@ -23,6 +23,20 @@ export interface Case {
   priority: number;
 }
 
+export interface CreateCaseAction {
+  description: string;
+  notes: string | null;
+}
+
+export interface CaseAction {
+  id: string;
+  description: string | null;
+  notes: string | null;
+  validationStatus: number;
+  createdAt: Date;
+  createdById: string;
+}
+
 /**
  * Array containing the backend enum mapped here
  */

@@ -52,7 +52,6 @@ namespace Cases.Infrastructure.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: true),
-                    CaseStatus = table.Column<int>(type: "integer", nullable: false),
                     ValidationStatus = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedById = table.Column<string>(type: "text", nullable: false),
@@ -98,6 +97,12 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_CaseActions_CaseId",
                 table: "CaseActions",
                 column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseActions_Id",
+                table: "CaseActions",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseIncidentTypes_CaseId",

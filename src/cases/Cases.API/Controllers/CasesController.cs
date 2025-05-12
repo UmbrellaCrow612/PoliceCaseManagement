@@ -1,4 +1,6 @@
-﻿using Authorization;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Authorization;
 using Caching;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
@@ -21,6 +23,7 @@ namespace Cases.API.Controllers
         private readonly CaseValidator _caseValidator = caseValidator;
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
         private readonly IRedisService _redisService = redisService;
+        private readonly CaseActionMapping _caseActionMapping = new();
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -306,6 +309,59 @@ namespace Cases.API.Controllers
 
             List<IncidentTypeDto> dto = [.. linkedIncidentTypes.Select(x => _incidentTypeMapping.ToDto(x))];
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Get all case actions for a given case by it's ID
+        /// </summary>
+        [Authorize]
+        [HttpGet("{caseId}/case-actions")]
+        public async Task<IActionResult> GetCaseActionsForCaseByIdAsync(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var actions = await _caseService.GetCaseActions(_case);
+            List<CaseActionDto> dto = [.. actions.Select(x => _caseActionMapping.ToDto(x))];
+
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Add a case action to a given case by there id
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("{caseId}/case-actions")]
+        public async Task<IActionResult> AddCaseActionToCase(string caseId, [FromBody] CreateCaseActionDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized();
+            }
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+            var action = _caseActionMapping.Create(dto);
+            action.CaseId = caseId;
+            action.CreatedById = userId;
+
+            var result = await _caseService.AddCaseAction(_case, action);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            var returnDto = _caseActionMapping.ToDto(action);
+
+            return Ok(returnDto);
         }
     }
 }

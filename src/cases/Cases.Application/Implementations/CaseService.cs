@@ -23,9 +23,21 @@ namespace Cases.Application.Implementations
 
             var result = new CaseResult();
 
+            if (caseAction.CaseId is null)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Case Id for case action is null");
+                return result;
+            }
+
             if (caseAction.CaseId != @case.Id)
             {
-                result.AddError(BusinessRuleCodes.ValidationError, "Case action not properly linked to the provided case");
+                result.AddError(BusinessRuleCodes.ValidationError, "Case action not properly linked to the provided case id");
+                return result;
+            }
+
+            if (caseAction.CreatedById is null)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Case action created by ID is null");
                 return result;
             }
 
@@ -134,6 +146,11 @@ namespace Cases.Application.Implementations
         public async Task<List<IncidentType>> GetAllIncidentTypes()
         {
             return await _dbcontext.IncidentTypes.ToListAsync();
+        }
+
+        public async Task<List<CaseAction>> GetCaseActions(Case @case)
+        {
+            return await _dbcontext.CaseActions.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)

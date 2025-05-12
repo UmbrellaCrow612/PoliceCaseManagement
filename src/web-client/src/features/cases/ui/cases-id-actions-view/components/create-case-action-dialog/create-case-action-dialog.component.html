@@ -1,1 +1,37 @@
-<p>create-case-action-dialog works!</p>
+<form [formGroup]="createCaseActionForm" (ngSubmit)="onSubmit()">
+    <h2 mat-dialog-title>Add an action taken on this case</h2>
+    <mat-dialog-content>
+        <div class="space">
+            <h3>
+                Enter the details of the action
+            </h3>
+            <mat-form-field>
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" cdkFocusInitial></textarea>
+                @if (createCaseActionForm.controls.description.hasError("required")) {
+                <mat-error>
+                    Required
+                </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Extra notes</mat-label>
+                <textarea matInput formControlName="notes"></textarea>
+                <mat-hint>
+                    Optional
+                </mat-hint>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button [disabled]="createCaseActionForm.invalid || isLoading">
+            @if (isLoading) {
+            <span>Creating...</span>
+            } @else {
+            <span>Add</span>
+            }
+
+        </button>
+    </mat-dialog-actions>
+</form>

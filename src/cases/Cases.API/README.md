@@ -15,3 +15,5 @@ Running
 
 - run docker for rabbit mq 
 - run docker for redis
+
+for migrations comment out `AddCahing` when making migrations as it will cause it to fail then uncomment when done

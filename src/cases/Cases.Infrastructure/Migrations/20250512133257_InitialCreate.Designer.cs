@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250503155147_InitialCreate")]
+    [Migration("20250512133257_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -84,9 +84,6 @@ namespace Cases.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("CaseStatus")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -107,6 +104,9 @@ namespace Cases.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CaseId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("CaseActions");
                 });
