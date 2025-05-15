@@ -1,0 +1,27 @@
+/*
+
+Contains all common user related grpc user service methods and responses
+
+*/
+
+
+syntax = "proto3";
+
+package user.V1;
+
+// The user service definition
+service UserService {
+  // Checks if a user exists
+  rpc DoesUserExist(DoesUserExistRequest) returns (DoesUserExistResponse);
+}
+
+// The request message containing the userId
+message DoesUserExistRequest {
+  string userId = 1;
+}
+
+// The response message containing the existence result
+message DoesUserExistResponse {
+  bool exists = 1;
+}
+

@@ -1,7 +1,7 @@
 const env = {
   BaseUrls: {
-    authenticationBaseUrl: 'http://localhost:8088/identity',
-    casesBaseUrl: 'http://localhost:8088/cases', 
+    authenticationBaseUrl: 'https://localhost:7101/identity-api',
+    casesBaseUrl: 'https://localhost:7101/cases-api', 
   },
   JwtTokenValidationPeriodInMinutesInMilliSeconds: 5 * 60 * 1000,
   JWTTokenValidationInitialWaitTimeInMilliSeconds: 25000,

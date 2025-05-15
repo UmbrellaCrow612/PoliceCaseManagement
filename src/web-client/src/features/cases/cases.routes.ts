@@ -53,6 +53,20 @@ export const CASES_ROUTES: Routes = [
             './ui/cases-id-actions-view/cases-id-actions-view.component'
           ).then((c) => c.CasesIdActionsViewComponent),
       },
+      {
+        path: ':caseId/assigned-users',
+        loadComponent: () =>
+          import(
+            './ui/cases-id-assigned-users/cases-id-assigned-users.component'
+          ).then((c) => c.CasesIdAssignedUsersComponent),
+      },
+      {
+        path: ':caseId/assign-users',
+        loadComponent: () =>
+          import(
+            './ui/cases-id-assign-users/cases-id-assign-users.component'
+          ).then((c) => c.CasesIdAssignUsersComponent),
+      },
     ],
   },
 ];

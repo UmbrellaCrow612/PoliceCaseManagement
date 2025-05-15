@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Email.Worker", "src\email\E
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proxy", "src\proxy\proxy.csproj", "{F484646F-4539-372D-B353-0A22F6110E5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +121,10 @@ Global
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F484646F-4539-372D-B353-0A22F6110E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F484646F-4539-372D-B353-0A22F6110E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F484646F-4539-372D-B353-0A22F6110E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F484646F-4539-372D-B353-0A22F6110E5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +149,7 @@ Global
 		{95FAEFC2-9E9E-176E-B333-4DF39791B36D} = {7BA1F4EC-DC87-4E3F-B21D-5F7108292FAF}
 		{0CC97824-8162-4A75-ACDB-52B24F62DC64} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{2DAA40A3-65DF-4127-B0E2-98B902B5C6F1} = {0CC97824-8162-4A75-ACDB-52B24F62DC64}
+		{F484646F-4539-372D-B353-0A22F6110E5C} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}

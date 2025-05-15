@@ -21,28 +21,17 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: StrongPassword!
 
-  reverse_proxy:
-    container_name: reverse_proxy
-    ports:
-      - "8088:80"
-    build:
-      context: ./src/reverse-proxy
-      dockerfile: Dockerfile
-    depends_on:
-      - identity.api
-      - cases.api
-
-  cases.api:
-    image: ${DOCKER_REGISTRY-}casesapi
-    build:
-      context: .
-      dockerfile: src/cases/Cases.API/Dockerfile
-    depends_on:
-      - cases_cache
-      - cases_db
-      - broker
-    ports:
-      - "8080:8080"
+  # cases.api:
+  #   image: ${DOCKER_REGISTRY-}casesapi
+  #   build:
+  #     context: .
+  #     dockerfile: src/cases/Cases.API/Dockerfile
+  #   depends_on:
+  #     - cases_cache
+  #     - cases_db
+  #     - broker
+  #   ports:
+  #     - "8080:8080"
 
   cases_cache:
     image: redis:7.2
@@ -64,17 +53,17 @@ services:
     volumes:
       - cases_db_data:/var/lib/postgresql/data
 
-  identity.api:
-    image: ${DOCKER_REGISTRY-}identityapi
-    build:
-      context: .
-      dockerfile: src/identity/Identity.API/Dockerfile
-    depends_on:
-      - identity_db
-      - identity_cache
-      - broker
-    ports:
-      - "8082:8080"
+  # identity.api:
+  #   image: ${DOCKER_REGISTRY-}identityapi
+  #   build:
+  #     context: .
+  #     dockerfile: src/identity/Identity.API/Dockerfile
+  #   depends_on:
+  #     - identity_db
+  #     - identity_cache
+  #     - broker
+  #   ports:
+  #     - "8082:8080"
 
   identity_cache:
     image: redis:7.2
@@ -96,6 +85,15 @@ services:
     volumes:
       - identity_db_data:/var/lib/postgresql/data
 
+  # proxy:
+  #   image: ${DOCKER_REGISTRY-}proxy
+  #   build:
+  #     context: .
+  #     dockerfile: src/proxy/Dockerfile
+  #   ports:
+  #   - "8000:80"
+
 volumes:
   identity_db_data: {}
   cases_db_data: {}
+

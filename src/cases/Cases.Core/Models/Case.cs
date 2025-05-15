@@ -64,6 +64,11 @@ namespace Cases.Core.Models
         /// </summary>
         public ICollection<CaseAction> CaseActions { get; set; } = [];
 
+        /// <summary>
+        /// Many to many link between a user and a case
+        /// </summary>
+        public ICollection<CaseUser> CaseUsers { get; set; } = [];
+
 
         // --- Audit Info ---
 

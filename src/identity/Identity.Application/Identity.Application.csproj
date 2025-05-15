@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Consumers\" />
+  </ItemGroup>
+
 </Project>

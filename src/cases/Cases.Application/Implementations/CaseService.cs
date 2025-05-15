@@ -11,11 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
+        private readonly UserValidationService _userValidationService = userValidationService;
 
         public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
         {
@@ -45,10 +46,6 @@ namespace Cases.Application.Implementations
             await _dbcontext.SaveChangesAsync();
 
             _logger.LogInformation("Saved and added case action: {caseActionId} to case: {caseId}.", caseAction.Id, @case.Id);
-
-            _logger.LogInformation("Trying to publish a case action created event for case action: {caseActionId}", caseAction.Id);
-            await _publishEndpoint.Publish(new CaseActionCreatedEvent { CaseActionId = caseAction.Id, CreatedById = caseAction.CreatedById });
-            _logger.LogInformation("Publish a case action created event for case action: {caseActionId}", caseAction.Id);
 
             result.Succeeded = true;
             return result;
@@ -81,21 +78,23 @@ namespace Cases.Application.Implementations
         {
             var result = new CaseResult();
 
-            if (!string.IsNullOrWhiteSpace(caseToCreate.CaseNumber))
+            var isCaseNumberTaken = await IsCaseNumberTaken(caseToCreate.CaseNumber);
+            if (isCaseNumberTaken)
             {
-                var isCaseNumberTaken = await IsCaseNumberTaken(caseToCreate.CaseNumber);
-                if (isCaseNumberTaken)
-                {
-                    result.AddError(BusinessRuleCodes.CaseNumberTaken, $"Case number: {caseToCreate.CaseNumber} is taken.");
-                    return result;
-                }
+                result.AddError(BusinessRuleCodes.CaseNumberTaken, $"Case number: {caseToCreate.CaseNumber} is taken.");
+                return result;
+            }
+
+            var userExists = await _userValidationService.DoesUserExistAsync(caseToCreate.ReportingOfficerId);
+            if (!userExists)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "User dose not exist");
+                return result;
             }
 
             await _dbcontext.Cases.AddAsync(caseToCreate);
             await _dbcontext.SaveChangesAsync();
 
-            await _publishEndpoint.Publish(new CaseCreatedEvent { CaseId = caseToCreate.Id, ReportingOffcierId = caseToCreate.ReportingOfficerId });
-            _logger.LogInformation("CaseCreatedEvent published");
 
             result.Succeeded = true;
             return result;
@@ -156,6 +155,11 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<List<string>> GetCaseUsers(Case @case)
+        {
+            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).Select(x => x.UserId).ToListAsync();
         }
 
         public async Task<List<IncidentType>> GetIncidentTypes(Case @case)

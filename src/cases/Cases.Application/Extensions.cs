@@ -1,11 +1,11 @@
-﻿using Cases.Application.Consumers;
-using Cases.Application.Implementations;
+﻿using Cases.Application.Implementations;
 using Cases.Core.Services;
 using Events.Settings;
 using Events;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using User.V1;
 
 namespace Cases.Application
 {
@@ -22,9 +22,6 @@ namespace Cases.Application
 
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<CaseReportingOfficerValidationConsumer>();
-                x.AddConsumer<CaseActionCreatedByValidationEventConsumer>();
-
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(rabbitMqSettings.Host, "/", h => { 
@@ -34,13 +31,18 @@ namespace Cases.Application
 
                     cfg.ReceiveEndpoint("cases-queue-name", e => 
                     {
-                        e.ConfigureConsumer<CaseReportingOfficerValidationConsumer>(context);
-                        e.ConfigureConsumer<CaseActionCreatedByValidationEventConsumer>(context);
+                      
                     });
 
                     cfg.ConfigureEndpoints(context);
                 });
             });
+
+            services.AddGrpcClient<UserService.UserServiceClient>(o =>
+            {
+                o.Address = new Uri("https://localhost:7058");
+            });
+            services.AddScoped<UserValidationService>();
 
             return services;
         }

@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "Multi",
+    "Projects": [
+      {
+        "Path": "src\\identity\\Identity.API\\Identity.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "src\\cases\\Cases.API\\Cases.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "src\\proxy\\proxy.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]

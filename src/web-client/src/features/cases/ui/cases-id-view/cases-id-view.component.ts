@@ -89,5 +89,10 @@ export class CasesIdViewComponent implements OnInit {
       href: './actions',
       name: 'Actions',
     },
+    {
+      authorizedRoles: [],
+      href: './assigned-users',
+      name: 'Assigned Officers',
+    },
   ];
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250512133257_InitialCreate")]
+    [Migration("20250514132920_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -150,6 +150,26 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseIncidentTypes");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.Joins.CaseUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CaseUsers");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.CaseAction", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -180,11 +200,24 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("IncidentType");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.Joins.CaseUser", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CaseUsers")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Case", b =>
                 {
                     b.Navigation("CaseActions");
 
                     b.Navigation("CaseIncidentType");
+
+                    b.Navigation("CaseUsers");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>

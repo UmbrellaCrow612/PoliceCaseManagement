@@ -10,7 +10,7 @@ using Identity.API.Extensions;
 using Caching;
 using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpOverrides;
+using Identity.API.Grpc;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -20,33 +20,14 @@ var config = builder.Configuration;
 builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
-
+builder.Services.AddGrpc();
 builder.Services.AddOpenApi();
-
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
 builder.Services.AddCaching(config);
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders =
-        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    // If your reverse proxy is on the same machine or a trusted network,
-    // you might not need to specify KnownProxies or KnownNetworks.
-    // However, for security, it's good practice if possible.
-    // Since Nginx is running as another Docker container on the same Docker network,
-    // it's generally considered trusted.
-    // If you knew the specific IP of the reverse_proxy container (which can change),
-    // you could add it to KnownProxies.
-    // For now, clearing them means it will trust any proxy.
-    options.KnownProxies.Clear();
-    options.KnownNetworks.Clear();
-});
-
 var app = builder.Build();
-
-app.UseForwardedHeaders(); // IMPORTANT: Call this early in the pipeline
 
 if (app.Environment.IsDevelopment())
 {
@@ -54,21 +35,19 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
 });
 
-
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHttpsRedirection();
+
 app.MapControllers();
+
+app.MapGrpcService<UserServiceImpl>();
 
 using (var scope = app.Services.CreateScope())
 {

@@ -80,6 +80,12 @@ namespace Identity.Core.Services
         Task<AuthResult> UpdateUserRolesAsync(ApplicationUser user, string[] newRoles);
 
         Task<List<ApplicationUser>> SearchUsersByQuery(SearchUserQuery query);
+
+        /// <summary>
+        /// Checks if a user exists in the DB
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        Task<bool> UserExists(string userId);
     }
 
     public class AuthError : IServiceError

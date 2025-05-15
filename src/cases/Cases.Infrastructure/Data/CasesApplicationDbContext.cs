@@ -11,6 +11,7 @@ namespace Cases.Infrastructure.Data
         public DbSet<IncidentType> IncidentTypes { get; set; }
         public DbSet<CaseIncidentType> CaseIncidentTypes { get; set; }
         public DbSet<CaseAction> CaseActions { get; set; }
+        public DbSet<CaseUser> CaseUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

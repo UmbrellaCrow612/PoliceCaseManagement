@@ -69,6 +69,25 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    CaseId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CaseUsers_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseIncidentTypes",
                 columns: table => new
                 {
@@ -130,6 +149,11 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_Cases_ReportingOfficerId",
                 table: "Cases",
                 column: "ReportingOfficerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseUsers_CaseId",
+                table: "CaseUsers",
+                column: "CaseId");
         }
 
         /// <inheritdoc />
@@ -142,10 +166,13 @@ namespace Cases.Infrastructure.Migrations
                 name: "CaseIncidentTypes");
 
             migrationBuilder.DropTable(
-                name: "Cases");
+                name: "CaseUsers");
 
             migrationBuilder.DropTable(
                 name: "IncidentTypes");
+
+            migrationBuilder.DropTable(
+                name: "Cases");
         }
     }
 }

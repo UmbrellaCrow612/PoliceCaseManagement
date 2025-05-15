@@ -1,6 +1,5 @@
 ﻿using Events;
 using Events.Settings;
-using Identity.Application.Consumers;
 using Identity.Application.Helpers;
 using Identity.Application.Implamentations;
 using Identity.Application.Settings;
@@ -14,7 +13,7 @@ namespace Identity.Application
     public static class Extensions
     {
         /// <summary>
-        /// Adds the application service implamenations from the service interfaces
+        /// Adds the application service implementations from the service interfaces
         /// </summary>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -47,8 +46,7 @@ namespace Identity.Application
 
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<CaseCreatedConsumer>();
-                x.AddConsumer<CaseActionCreatedEventConsumer>();
+            
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -59,8 +57,7 @@ namespace Identity.Application
 
                     cfg.ReceiveEndpoint("identity-queue-name", e => // Define a specific queue for this API's consumers
                     {
-                        e.ConfigureConsumer<CaseCreatedConsumer>(context);
-                        e.ConfigureConsumer<CaseActionCreatedEventConsumer>(context);
+                     
                     });
 
                     cfg.ConfigureEndpoints(context);

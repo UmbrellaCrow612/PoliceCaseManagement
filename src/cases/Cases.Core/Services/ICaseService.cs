@@ -98,6 +98,12 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="case">The case you want to get all case actions for</param>
         Task<List<CaseAction>> GetCaseActions(Case @case);
+
+        /// <summary>
+        /// Get all user id's linked to a given case
+        /// </summary>
+        /// <param name="case">Case you want to get info for</param>
+        Task<List<string>> GetCaseUsers(Case @case);
     }
 
     /// <summary>

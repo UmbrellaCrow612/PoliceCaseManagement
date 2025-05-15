@@ -9,7 +9,8 @@
 - Device Fingerptining
 - Refresh tokens
 - Magic link auth
-- More on the way
+- Rabbit mq and mass tranit events 
+- GRPC communication between api's using proto files
 
 ## Mobile app
 - Scan QR codes and show OTP or register TOTP codes like google authenticator
@@ -24,9 +25,6 @@
 
 # Running
 
-- Just run the docker compose 
-
-
-NOTES:
-
-if brand new might need to run migrations on the db - refer toi identity api readme for debug steps there
+- Run the frontend - inctructions in `web-client` project
+- Run `docker-compose.yml` file in root here with `docker-compose up -d` to run redis and db
+- Open the `sln` file and select start up project to be the `multi` launch

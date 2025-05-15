@@ -363,5 +363,20 @@ namespace Cases.API.Controllers
 
             return Ok(returnDto);
         }
+
+        /// <summary>
+        /// Get all users ID's stored who are linked to a given case
+        /// </summary>
+        [Authorize]
+        [HttpGet("{caseId}/users")]
+        public async Task<IActionResult> GetUsersLinkedToCaseById(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var usersIds = await _caseService.GetCaseUsers(_case);
+
+            return Ok(usersIds);
+        }
     }
 }

@@ -1399,5 +1399,10 @@ namespace Identity.Application.Implamentations
             var users = await queryBuilder.AsNoTracking().ToListAsync();
             return users;
         }
+
+        public async Task<bool> UserExists(string userId)
+        {
+            return await _unitOfWork.Repository<ApplicationUser>().Query.AnyAsync(x => x.Id == userId);
+        }
     }
 }
