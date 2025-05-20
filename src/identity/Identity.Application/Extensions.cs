@@ -46,8 +46,6 @@ namespace Identity.Application
 
             services.AddMassTransit(x =>
             {
-            
-
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(rabbitMqSettings.Host, "/", h => { 

@@ -9,7 +9,6 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { deviceFingerPrintInterceptor } from '../core/user/device/interceptors/device.interceptor';
-import { jwtRefreshInterceptor } from '../core/authentication/interceptors/jwt-refresh.interceptor';
 import { UserService } from '../core/user/services/user.service';
 import { catchError, of, switchMap } from 'rxjs';
 import { withCredentialsInterceptor } from '../core/http/interceptors/withCredentails.interceptor';
@@ -27,7 +26,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([
         deviceFingerPrintInterceptor,
         withCredentialsInterceptor,
-        jwtRefreshInterceptor,
         jwtBearerInterceptor,
       ])
     ),
