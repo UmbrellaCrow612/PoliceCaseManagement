@@ -1,7 +1,7 @@
 ﻿using Events;
 using Events.Settings;
 using Identity.Application.Helpers;
-using Identity.Application.Implamentations;
+using Identity.Application.Implementations;
 using Identity.Application.Settings;
 using Identity.Core.Services;
 using MassTransit;
@@ -38,6 +38,7 @@ namespace Identity.Application
                 .ValidateOnStart();
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserService, UserService>();
 
 
             services.AddRabbitMqSettings(configuration);

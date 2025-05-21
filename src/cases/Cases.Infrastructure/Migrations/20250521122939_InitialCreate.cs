@@ -52,9 +52,10 @@ namespace Cases.Infrastructure.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: true),
-                    ValidationStatus = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedById = table.Column<string>(type: "text", nullable: false),
+                    CreatedByName = table.Column<string>(type: "text", nullable: false),
+                    CreatedByEmail = table.Column<string>(type: "text", nullable: false),
                     CaseId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

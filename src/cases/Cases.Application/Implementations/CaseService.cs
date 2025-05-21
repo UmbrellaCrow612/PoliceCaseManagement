@@ -4,7 +4,6 @@ using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
-using Events;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -41,6 +40,17 @@ namespace Cases.Application.Implementations
                 result.AddError(BusinessRuleCodes.ValidationError, "Case action created by ID is null");
                 return result;
             }
+
+            var userExists = await _userValidationService.DoesUserExistAsync(caseAction.CreatedById);
+            if (!userExists)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Created by ID user dose not exist");
+                return result;
+            }
+
+            var deNormUserDetails = await _userValidationService.GetUserById(caseAction.CreatedById);
+            caseAction.CreatedByName = deNormUserDetails.Username;
+            caseAction.CreatedByEmail = deNormUserDetails.Email;
 
             await _dbcontext.CaseActions.AddAsync(caseAction);
             await _dbcontext.SaveChangesAsync();

@@ -68,7 +68,6 @@ export class CreateCaseActionDialogComponent {
 
       this.caseService.addCaseAction(this.data.caseId, action).subscribe({
         next: () => {
-          this.isLoading = false;
           this.snackBar.open('Created case action', 'Close', {
             duration: 5000,
           });

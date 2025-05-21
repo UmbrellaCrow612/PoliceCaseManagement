@@ -13,7 +13,7 @@ using System.Data;
 using System.Security.Cryptography;
 using Identity.Core.ValueObjects;
 
-namespace Identity.Application.Implamentations
+namespace Identity.Application.Implementations
 {
     internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, 
         IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IOptions<PasswordConfigSettings> passwordConfigSettings

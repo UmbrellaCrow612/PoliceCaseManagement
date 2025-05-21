@@ -24,7 +24,8 @@ namespace Cases.API.Mappings
                 Description = @base.Description,
                 Id = @base.Id,
                 Notes = @base.Notes,
-                ValidationStatus = @base.ValidationStatus,
+                CreatedByEmail = @base.CreatedByEmail,
+                CreatedByName = @base.CreatedByName,
             };
         }
 

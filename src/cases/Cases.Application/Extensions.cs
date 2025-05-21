@@ -14,6 +14,7 @@ namespace Cases.Application
         public static IServiceCollection AddCasesApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ICaseService, CaseService>();
+            services.AddScoped<ICaseActionService, CaseActionService>();
 
 
             services.AddRabbitMqSettings(configuration);

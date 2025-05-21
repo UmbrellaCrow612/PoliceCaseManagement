@@ -1,5 +1,4 @@
-﻿
-using Cases.Core.Models;
+﻿using Cases.Core.Models;
 using Cases.Core.ValueObjects;
 
 namespace Cases.Core.Services

@@ -15,5 +15,17 @@ namespace Identity.API.Grpc
 
             return new DoesUserExistResponse { Exists = exists };
         }
+
+
+        public override async Task<GetUserByIdResponse> GetUserById(GetUserByIdRequest request, ServerCallContext context)
+        {
+            var user = await _authService.GetUserByIdAsync(request.UserId) ?? throw new RpcException(new Status(StatusCode.NotFound, $"User with ID {request.UserId} not found"));
+            return new GetUserByIdResponse
+            {
+                Email = user.Email,
+                UserId = user.Id,
+                Username = user.UserName,
+            };
+        }
     }
 }

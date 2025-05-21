@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Action details </h2>
+<mat-dialog-content>
+    @if (isLoading) {
+    <div>
+        Loading information
+    </div>
+    }
+
+
+    <!---->
+
+
+    @if (!isLoading && error) {
+    <div>
+        Error occured{{error}}
+    </div>
+    }
+
+    <!---->
+
+
+    @if (!isLoading && !error) {
+    {{caseActionDetails | json}}
+    }
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button cdkFocusInitial mat-raised-button mat-dialog-close>Close</button>
+    <button mat-button mat-raised-button [disabled]="isDeleteButtonDiabled || isLoading">Delete</button>
+</mat-dialog-actions>

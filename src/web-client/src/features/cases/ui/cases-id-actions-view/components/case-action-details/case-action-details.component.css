@@ -7,3 +7,9 @@
   flex-direction: column;
   gap: 5px;
 }
+
+.action_details_container:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

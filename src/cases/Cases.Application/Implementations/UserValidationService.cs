@@ -11,5 +11,11 @@ namespace Cases.Application.Implementations
             var response = await _client.DoesUserExistAsync(new DoesUserExistRequest { UserId = userId });
             return response.Exists;
         }
+
+
+        public async Task<GetUserByIdResponse> GetUserById(string userId)
+        {
+            return await _client.GetUserByIdAsync(new GetUserByIdRequest { UserId = userId });
+        }
     }
 }

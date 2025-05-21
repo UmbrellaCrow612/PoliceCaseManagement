@@ -1,9 +1,6 @@
 /*
-
-Contains all common user related grpc user service methods and responses
-
+Contains all common user-related gRPC user service methods and responses.
 */
-
 
 syntax = "proto3";
 
@@ -13,6 +10,9 @@ package user.V1;
 service UserService {
   // Checks if a user exists
   rpc DoesUserExist(DoesUserExistRequest) returns (DoesUserExistResponse);
+
+  // Retrieves user information by ID
+  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
 }
 
 // The request message containing the userId
@@ -25,3 +25,14 @@ message DoesUserExistResponse {
   bool exists = 1;
 }
 
+// The request message to get a user by ID
+message GetUserByIdRequest {
+  string userId = 1;
+}
+
+// The response message containing basic user details
+message GetUserByIdResponse {
+  string userId = 1;
+  string username = 2;
+  string email = 3;
+}
