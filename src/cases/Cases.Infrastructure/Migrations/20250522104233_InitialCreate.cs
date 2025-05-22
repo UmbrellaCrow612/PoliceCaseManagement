@@ -24,6 +24,8 @@ namespace Cases.Infrastructure.Migrations
                     Status = table.Column<int>(type: "integer", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false),
                     ReportingOfficerId = table.Column<string>(type: "text", nullable: false),
+                    ReportingOfficerUserName = table.Column<string>(type: "text", nullable: false),
+                    ReportingOfficerEmail = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -75,6 +77,8 @@ namespace Cases.Infrastructure.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
+                    UserEmail = table.Column<string>(type: "text", nullable: false),
                     CaseId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -119,6 +123,12 @@ namespace Cases.Infrastructure.Migrations
                 column: "CaseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseActions_CreatedById",
+                table: "CaseActions",
+                column: "CreatedById",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseActions_Id",
                 table: "CaseActions",
                 column: "Id",
@@ -155,6 +165,18 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_CaseUsers_CaseId",
                 table: "CaseUsers",
                 column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseUsers_Id",
+                table: "CaseUsers",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseUsers_UserId",
+                table: "CaseUsers",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />

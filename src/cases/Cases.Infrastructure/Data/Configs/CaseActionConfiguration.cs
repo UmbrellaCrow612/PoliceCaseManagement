@@ -11,6 +11,8 @@ namespace Cases.Infrastructure.Data.Configs
             builder.HasIndex(x => x.Id).IsUnique();
 
             builder.Property(x => x.CaseId).IsRequired();
+
+            builder.HasIndex(x => x.CreatedById).IsUnique();
         }
     }
 }

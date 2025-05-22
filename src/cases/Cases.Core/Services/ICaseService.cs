@@ -1,4 +1,5 @@
 ﻿using Cases.Core.Models;
+using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
 
 namespace Cases.Core.Services
@@ -99,10 +100,10 @@ namespace Cases.Core.Services
         Task<List<CaseAction>> GetCaseActions(Case @case);
 
         /// <summary>
-        /// Get all user id's linked to a given case
+        /// Get all users linked to a case
         /// </summary>
         /// <param name="case">Case you want to get info for</param>
-        Task<List<string>> GetCaseUsers(Case @case);
+        Task<List<CaseUser>> GetCaseUsers(Case @case);
     }
 
     /// <summary>

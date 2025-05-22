@@ -102,6 +102,10 @@ namespace Cases.Application.Implementations
                 return result;
             }
 
+            var userDetails = await _userValidationService.GetUserById(caseToCreate.ReportingOfficerId);
+            caseToCreate.ReportingOfficerEmail = userDetails.Email;
+            caseToCreate.ReportingOfficerUserName = userDetails.Username;
+
             await _dbcontext.Cases.AddAsync(caseToCreate);
             await _dbcontext.SaveChangesAsync();
 
@@ -167,9 +171,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
         }
 
-        public async Task<List<string>> GetCaseUsers(Case @case)
+        public async Task<List<CaseUser>> GetCaseUsers(Case @case)
         {
-            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).Select(x => x.UserId).ToListAsync();
+            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<List<IncidentType>> GetIncidentTypes(Case @case)

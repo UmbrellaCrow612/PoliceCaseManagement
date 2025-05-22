@@ -209,28 +209,5 @@ namespace Identity.API.Controllers
 
             return Ok(dto);
         }
-
-        /// <summary>
-        /// Bulk get a list of user details with a list of user id's
-        /// </summary>
-        [Authorize]
-        [HttpGet("bulk")]
-        public async Task<IActionResult> BulkGetUsersByIdAsync([FromBody] List<string> userIds)
-        {
-            if (userIds.Count < 1)
-            {
-                return BadRequest();
-            }
-
-            var result = await _userService.BulkFetchUsers(userIds);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            List<RestrictedUserDto> users = [..result.Users.Select(x => _userMapping.ToRestrictedUserDto(x))];
-
-            return Ok(users);
-        }
     }
 }

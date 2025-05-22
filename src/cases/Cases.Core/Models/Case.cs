@@ -54,10 +54,11 @@ namespace Cases.Core.Models
         public ICollection<CaseIncidentType> CaseIncidentType { get; set; } = [];
 
         /// <summary>
-        /// The ID of the application user who is the reporting officer of the case.
-        /// No linked through ef core nav properties as there in diff projects
+        /// The ID of the reporting user de norm data
         /// </summary>
         public required string ReportingOfficerId { get; set; }
+        public string ReportingOfficerUserName { get; set; } = null!;
+        public string ReportingOfficerEmail { get; set; } = null!;
 
         /// <summary>
         /// List of actions taken on this case
@@ -65,7 +66,7 @@ namespace Cases.Core.Models
         public ICollection<CaseAction> CaseActions { get; set; } = [];
 
         /// <summary>
-        /// Many to many link between a user and a case
+        /// All users linked to this case
         /// </summary>
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
 

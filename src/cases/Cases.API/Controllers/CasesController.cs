@@ -23,6 +23,7 @@ namespace Cases.API.Controllers
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
         private readonly IRedisService _redisService = redisService;
         private readonly CaseActionMapping _caseActionMapping = new();
+        private readonly CaseUserMapping _caseUserMapping = new();
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -373,9 +374,10 @@ namespace Cases.API.Controllers
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var usersIds = await _caseService.GetCaseUsers(_case);
+            var users = await _caseService.GetCaseUsers(_case);
+            List<CaseUserDto> dto = [.. users.Select(x => _caseUserMapping.ToDto(x))];
 
-            return Ok(usersIds);
+            return Ok(dto);
         }
     }
 }

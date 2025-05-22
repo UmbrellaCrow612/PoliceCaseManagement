@@ -16,7 +16,6 @@ namespace Cases.Application
             services.AddScoped<ICaseService, CaseService>();
             services.AddScoped<ICaseActionService, CaseActionService>();
 
-
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()
                     ?? throw new ApplicationException("RabbitMqSettings config missing");

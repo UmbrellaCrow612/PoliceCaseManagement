@@ -49,7 +49,15 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<DateTime>("ReportedDateTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ReportingOfficerEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ReportingOfficerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReportingOfficerUserName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -107,6 +115,9 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasIndex("CaseId");
 
+                    b.HasIndex("CreatedById")
+                        .IsUnique();
+
                     b.HasIndex("Id")
                         .IsUnique();
 
@@ -161,13 +172,27 @@ namespace Cases.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CaseId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("CaseUsers");
                 });

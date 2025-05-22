@@ -17,8 +17,6 @@
         public string CreatedById { get; set; } = null!;
         public string CreatedByName { get; set; } = null!;
         public string CreatedByEmail { get; set; } = null!;
-        // Recommended Enterprise Approach: DE normalize Only What You Need and listen to events to update this locally
-
 
         /// <summary>
         /// Ef core navigation properties

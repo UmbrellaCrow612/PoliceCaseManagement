@@ -14,5 +14,7 @@ namespace Cases.API.DTOs
         public required CasePriority Priority { get; set; }
         public required DateTime LastModifiedDate { get; set; }
         public required string ReportingOfficerId { get; set; }
+        public required string ReportingOfficerUserName { get; set; } 
+        public required string ReportingOfficerEmail { get; set; } 
     }
 }

@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Assign Officers</h2>
+<mat-dialog-content>
+  <form
+    [formGroup]="searchUsersForm"
+    class="search_form"
+    (submit)="searchUsersFormSubmit()"
+  >
+    <mat-form-field class="full">
+      <mat-label>Search for users</mat-label>
+      <input matInput formControlName="search" />
+
+      @if (searchUsersForm.controls.search.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <button
+      type="submit"
+      [disabled]="searchUsersForm.invalid || isFetchingUsers"
+      mat-button
+    >
+      @if (isFetchingUsers) {
+      <span>Fetchinbg..</span>
+      } @else { Search }
+    </button>
+  </form>
+
+  @if (fetchingUsersError) {
+  <span>
+    {{ fetchingUsersError }}
+  </span>
+  }
+
+  <mat-selection-list
+    class="searched_users_display_list_container"
+    (selectionChange)="selectedUsersChangedListener($event)"
+  >
+    @for (user of searchedUsers; track user) {
+    <mat-list-option [value]="user" [selected]="selectedUsersMap.has(user.id)">{{ user.userName }}</mat-list-option>
+    } @empty {
+    <mat-list-option disabled>No users found</mat-list-option>
+    }
+  </mat-selection-list>
+
+  <div class="selected_users_details_container">
+    <span>Selected Officers: </span>
+
+    @for (user of fromMap(); track $index) {
+    <div class="selected_user_details_with_btn">
+      <span>{{ user.userName }}</span>
+      <button mat-icon-button (click)="removedSelectedUser(user)"><mat-icon class="icon_colour">close</mat-icon></button>
+    </div>
+    } @empty {
+    <span> No officers selected </span>
+    }
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button>Save</button>
+</mat-dialog-actions>
