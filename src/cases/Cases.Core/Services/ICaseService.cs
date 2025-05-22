@@ -104,6 +104,13 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="case">Case you want to get info for</param>
         Task<List<CaseUser>> GetCaseUsers(Case @case);
+
+        /// <summary>
+        /// Assign a set of users to a case
+        /// </summary>
+        /// <param name="case">The case to link to</param>
+        /// <param name="userIds">A set of user id's to link to it</param>
+        Task<CaseResult> AddUsers(Case @case, List<string> userIds);
     }
 
     /// <summary>

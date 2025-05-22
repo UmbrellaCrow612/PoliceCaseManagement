@@ -36,7 +36,11 @@
     (selectionChange)="selectedUsersChangedListener($event)"
   >
     @for (user of searchedUsers; track user) {
-    <mat-list-option [value]="user" [selected]="selectedUsersMap.has(user.id)">{{ user.userName }}</mat-list-option>
+    <mat-list-option
+      [value]="user"
+      [selected]="selectedUsersMap.has(user.id)"
+      >{{ user.userName }}</mat-list-option
+    >
     } @empty {
     <mat-list-option disabled>No users found</mat-list-option>
     }
@@ -48,7 +52,9 @@
     @for (user of fromMap(); track $index) {
     <div class="selected_user_details_with_btn">
       <span>{{ user.userName }}</span>
-      <button mat-icon-button (click)="removedSelectedUser(user)"><mat-icon class="icon_colour">close</mat-icon></button>
+      <button mat-icon-button (click)="removedSelectedUser(user)">
+        <mat-icon class="icon_colour">close</mat-icon>
+      </button>
     </div>
     } @empty {
     <span> No officers selected </span>
@@ -57,5 +63,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button>Save</button>
+  <button mat-button (click)="saveClicked()" [disabled]="isSavingUsers">
+    @if (isSavingUsers) { Saving... } @else { Save }
+  </button>
 </mat-dialog-actions>

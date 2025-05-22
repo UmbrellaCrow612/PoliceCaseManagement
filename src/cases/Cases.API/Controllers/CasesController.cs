@@ -365,7 +365,7 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
-        /// Get all users ID's stored who are linked to a given case
+        /// Get all users stored who are linked to a given case
         /// </summary>
         [Authorize]
         [HttpGet("{caseId}/users")]
@@ -378,6 +378,25 @@ namespace Cases.API.Controllers
             List<CaseUserDto> dto = [.. users.Select(x => _caseUserMapping.ToDto(x))];
 
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Assign a set of users to a case
+        /// </summary>
+        [Authorize]
+        [HttpPost("{caseId}/users")]
+        public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUsersToCaseDto dto)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var result = await _caseService.AddUsers(_case, dto.UserIds);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
     }
 }

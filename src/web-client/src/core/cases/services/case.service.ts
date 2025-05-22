@@ -9,6 +9,7 @@ import {
   CreateCaseAction,
 } from '../type';
 import { IncidentType } from '../../incident-type/types';
+import { RestrictedUser } from '../../user/type';
 
 @Injectable({
   providedIn: 'root',
@@ -167,5 +168,16 @@ export class CaseService {
       `${this.BASE_URL}/cases/${caseId}/case-actions`,
       { ...caseActionToCreate }
     );
+  }
+
+  /**
+   * Assign a set of users to a case
+   * @param usersToAssign List of users to assign to this case - make sure there unquie and do not contain already assigned users to the given case, will be validated on server anyways
+   * @param caseId The case to link to
+   */
+  assignUsersToCase(caseId:string, usersToAssign: RestrictedUser[]) {
+    return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/users`, {
+      userIds: usersToAssign.map((x) => x.id),
+    });
   }
 }

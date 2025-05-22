@@ -7,13 +7,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../../../../../core/user/services/user.service';
 import { RestrictedUser, User } from '../../../../../../core/user/type';
 import { MatListModule, MatSelectionListChange } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { CaseService } from '../../../../../../core/cases/services/case.service';
 
 @Component({
   selector: 'app-assign-user-dialog',
@@ -31,14 +36,23 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './assign-user-dialog.component.css',
 })
 export class AssignUserDialogComponent {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly caseService: CaseService
+  ) {}
 
   /**
    * Caller will pass you a list of currently assigned user id's for the case so you can hide them in the UI
    */
-  readonly currentAssignedUserIds = inject<{
+  readonly data = inject<{
     currentAssignedUserIds: string[];
-  }>(MAT_DIALOG_DATA).currentAssignedUserIds;
+    caseId: string;
+  }>(MAT_DIALOG_DATA);
+
+  /**
+   * Ref to the current dialog
+   */
+  readonly dialogRef = inject(MatDialogRef<AssignUserDialogComponent>);
 
   /**
    * List of selected user to be assigned to this case
@@ -50,6 +64,8 @@ export class AssignUserDialogComponent {
   isFetchingUsers = false;
   fetchingUsersError: string | null = null;
   searchedUsers: RestrictedUser[] = [];
+  isSavingUsers = false;
+  isSavingError: string | null = null;
 
   /**
    * Ran when the user submits the search form
@@ -64,7 +80,7 @@ export class AssignUserDialogComponent {
         .subscribe({
           next: (users) => {
             this.searchedUsers = users.filter(
-              (user) => !this.currentAssignedUserIds.includes(user.id) // we remove those already on this case from parent
+              (user) => !this.data.currentAssignedUserIds.includes(user.id) // we remove those already on this case from parent
             );
             this.isFetchingUsers = false;
           },
@@ -76,6 +92,10 @@ export class AssignUserDialogComponent {
     }
   }
 
+  /**
+   *
+   * @returns retuns a list of selcted users
+   */
   fromMap() {
     return Array.from(this.selectedUsersMap.values());
   }
@@ -87,15 +107,15 @@ export class AssignUserDialogComponent {
   selectedUsersChangedListener(event: MatSelectionListChange) {
     const selectedMatListUsers: RestrictedUser[] =
       event.source.selectedOptions.selected.map((option) => option.value);
-  
+
     const selectedIds = new Set(selectedMatListUsers.map((u) => u.id));
-  
+
     selectedMatListUsers.forEach((user) => {
       if (!this.selectedUsersMap.has(user.id)) {
         this.selectedUsersMap.set(user.id, user);
       }
     });
-  
+
     Array.from(this.selectedUsersMap.values()).forEach((user) => {
       if (
         this.searchedUsers.find((u) => u.id === user.id) &&
@@ -105,7 +125,32 @@ export class AssignUserDialogComponent {
       }
     });
   }
-  
+
+  /**
+   * fired off when you want to save assignerd users to a case
+   */
+  saveClicked() {
+    if (!this.data.caseId) {
+      console.error('Case ID not passed');
+      return;
+    }
+
+    if (this.selectedUsersMap.size > 0) {
+      this.isSavingUsers = true;
+      this.isSavingError = null;
+
+      this.caseService
+        .assignUsersToCase(this.data.caseId, this.fromMap())
+        .subscribe({
+          next: () => {
+            this.dialogRef.close();
+          },
+          error: (error) => {
+            (this.isSavingError = error), (this.isSavingUsers = false);
+          },
+        });
+    }
+  }
 
   /**
    * Fired off when a user is selected then clicked to be removed off the selection list
