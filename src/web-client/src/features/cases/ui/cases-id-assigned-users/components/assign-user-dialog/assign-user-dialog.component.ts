@@ -87,13 +87,25 @@ export class AssignUserDialogComponent {
   selectedUsersChangedListener(event: MatSelectionListChange) {
     const selectedMatListUsers: RestrictedUser[] =
       event.source.selectedOptions.selected.map((option) => option.value);
-
+  
+    const selectedIds = new Set(selectedMatListUsers.map((u) => u.id));
+  
     selectedMatListUsers.forEach((user) => {
       if (!this.selectedUsersMap.has(user.id)) {
         this.selectedUsersMap.set(user.id, user);
       }
     });
+  
+    Array.from(this.selectedUsersMap.values()).forEach((user) => {
+      if (
+        this.searchedUsers.find((u) => u.id === user.id) &&
+        !selectedIds.has(user.id)
+      ) {
+        this.selectedUsersMap.delete(user.id);
+      }
+    });
   }
+  
 
   /**
    * Fired off when a user is selected then clicked to be removed off the selection list
