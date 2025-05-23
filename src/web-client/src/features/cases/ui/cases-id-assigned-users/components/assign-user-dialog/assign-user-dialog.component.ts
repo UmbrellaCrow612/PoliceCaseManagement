@@ -19,6 +19,7 @@ import { RestrictedUser, User } from '../../../../../../core/user/type';
 import { MatListModule, MatSelectionListChange } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { CaseService } from '../../../../../../core/cases/services/case.service';
+import { formatBackendError } from '../../../../../../core/app/errors/formatError';
 
 @Component({
   selector: 'app-assign-user-dialog',
@@ -79,8 +80,9 @@ export class AssignUserDialogComponent {
         .searchUsersByUsername(this.searchUsersForm.controls.search.value!)
         .subscribe({
           next: (users) => {
+            const assignedUserIds = new Set(this.data.currentAssignedUserIds);
             this.searchedUsers = users.filter(
-              (user) => !this.data.currentAssignedUserIds.includes(user.id) // we remove those already on this case from parent
+              (user) => !assignedUserIds.has(user.id)
             );
             this.isFetchingUsers = false;
           },
@@ -146,7 +148,8 @@ export class AssignUserDialogComponent {
             this.dialogRef.close();
           },
           error: (error) => {
-            (this.isSavingError = error), (this.isSavingUsers = false);
+            (this.isSavingError = formatBackendError(error)),
+              (this.isSavingUsers = false);
           },
         });
     }

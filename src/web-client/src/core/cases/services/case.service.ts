@@ -9,7 +9,7 @@ import {
   CreateCaseAction,
 } from '../type';
 import { IncidentType } from '../../incident-type/types';
-import { RestrictedUser } from '../../user/type';
+import { CaseUser, RestrictedUser } from '../../user/type';
 
 @Injectable({
   providedIn: 'root',
@@ -179,5 +179,15 @@ export class CaseService {
     return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/users`, {
       userIds: usersToAssign.map((x) => x.id),
     });
+  }
+
+
+  /**
+   * Get all users assigned to a given case.
+   * @param caseId The ID of the case
+   * @returns List of users assigned to the given case
+   */
+  getAssignedUsers(caseId:string){
+    return this.httpClient.get<CaseUser[]>(`${this.BASE_URL}/cases/${caseId}/users`)
   }
 }

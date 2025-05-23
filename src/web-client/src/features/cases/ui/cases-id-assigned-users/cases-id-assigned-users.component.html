@@ -1,9 +1,25 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (error && !isLoading) {
+<div>Error occcured: {{ error }}</div>
+}
+
+<!---->
+
+@if (!isLoading && !error) {
 <div>
-    {{caseId}}
 
     <div>
-        <button mat-raised-button (click)="assignUserClicked()">
-            assign officer
-        </button>
+        {{assignedUsers | json}}
     </div>
+  <div>
+    <button mat-raised-button (click)="assignUserClicked()">
+      assign officer
+    </button>
+  </div>
 </div>
+}

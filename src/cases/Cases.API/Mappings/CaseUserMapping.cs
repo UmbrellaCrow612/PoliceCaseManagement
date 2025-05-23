@@ -12,7 +12,14 @@ namespace Cases.API.Mappings
 
         public CaseUserDto ToDto(CaseUser @base)
         {
-            throw new NotImplementedException();
+            return new CaseUserDto
+            {
+                Id = @base.Id,
+                CaseId = @base.CaseId,
+                UserEmail = @base.UserEmail,
+                UserId = @base.UserId,
+                UserName = @base.UserName,
+            };
         }
 
         public void Update(CaseUser @base, EmptyDto updateDto)

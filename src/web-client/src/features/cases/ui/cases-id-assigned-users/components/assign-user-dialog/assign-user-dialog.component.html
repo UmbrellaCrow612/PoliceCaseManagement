@@ -29,6 +29,10 @@
   <span>
     {{ fetchingUsersError }}
   </span>
+  } @if (isSavingError) {
+  <span>
+    {{ isSavingError }}
+  </span>
   }
 
   <mat-selection-list
