@@ -23,6 +23,7 @@ namespace Cases.API.Controllers
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
         private readonly IRedisService _redisService = redisService;
         private readonly CaseActionMapping _caseActionMapping = new();
+        private readonly CaseUserMapping _caseUserMapping = new();
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -364,7 +365,7 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
-        /// Get all users ID's stored who are linked to a given case
+        /// Get all users stored who are linked to a given case
         /// </summary>
         [Authorize]
         [HttpGet("{caseId}/users")]
@@ -373,9 +374,29 @@ namespace Cases.API.Controllers
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var usersIds = await _caseService.GetCaseUsers(_case);
+            var users = await _caseService.GetCaseUsers(_case);
+            List<CaseUserDto> dto = [.. users.Select(x => _caseUserMapping.ToDto(x))];
 
-            return Ok(usersIds);
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Assign a set of users to a case
+        /// </summary>
+        [Authorize]
+        [HttpPost("{caseId}/users")]
+        public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUsersToCaseDto dto)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var result = await _caseService.AddUsers(_case, dto.UserIds);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
     }
 }

@@ -21,6 +21,9 @@ export interface Case {
   reportedDateTime: Date;
   status: number;
   priority: number;
+  reportingOfficerUserName: string;
+  reportingOfficerId: string;
+  reportingOfficerEmail: string;
 }
 
 export interface CreateCaseAction {
@@ -32,9 +35,10 @@ export interface CaseAction {
   id: string;
   description: string | null;
   notes: string | null;
-  validationStatus: number;
   createdAt: Date;
   createdById: string;
+  createdByEmail: string;
+  createdByName: string;
 }
 
 /**

@@ -20,11 +20,29 @@
 
 
     @if (!isLoading && !error) {
-    {{caseActionDetails | json}}
+   <div class="content">
+    <span>
+        Description: {{caseActionDetails?.description}}
+    </span>
+
+
+    <span>
+        Notes: {{caseActionDetails?.notes}}
+    </span>
+
+    <span>
+        Created At: {{caseActionDetails?.createdAt | date}}
+    </span>
+
+    <span>
+        Created by: {{caseActionDetails?.createdByName}}
+    </span>
+   </div>
     }
 
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-button cdkFocusInitial mat-raised-button mat-dialog-close>Close</button>
+    <button mat-button mat-raised-button>Edit</button>
     <button mat-button mat-raised-button [disabled]="isDeleteButtonDiabled || isLoading">Delete</button>
 </mat-dialog-actions>

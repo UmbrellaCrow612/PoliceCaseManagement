@@ -32,6 +32,8 @@ namespace Cases.API.Mappings
                 Status = @base.Status,
                 Summary = @base.Summary,
                 ReportingOfficerId = @base.ReportingOfficerId,
+                ReportingOfficerEmail = @base.ReportingOfficerEmail,
+                ReportingOfficerUserName = @base.ReportingOfficerUserName,
             };
         }
 

@@ -7,6 +7,7 @@ using Cases.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using User.V1;
 
 namespace Cases.Application.Implementations
 {
@@ -84,6 +85,50 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<CaseResult> AddUsers(Case @case, List<string> userIds)
+        {
+            var result = new CaseResult();
+
+            if (userIds.Count < 1)
+            {
+                result.Succeeded = true;
+                return result;
+            }
+
+            var currentAssignedUsers = await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
+
+            bool anyMatch = currentAssignedUsers.Any(cu => userIds.Contains(cu.UserId)); // we do not want to assign users currently assigned
+            if (anyMatch)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Cannot assign a user to this case who is already assigned to it");
+                return result;
+            }
+
+            foreach (var userId in userIds)
+            {
+                var exists = await _userValidationService.DoesUserExistAsync(userId);
+                if (!exists)
+                {
+                    result.AddError(BusinessRuleCodes.ValidationError, "User to assign dose not exist");
+                    return result;
+                }
+            }
+
+            List<GetUserByIdResponse> userDetails = [];
+            foreach (var userId in userIds)
+            {
+                userDetails.Add(await _userValidationService.GetUserById(userId));
+            }
+
+            List<CaseUser> dbEntry = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
+
+            await _dbcontext.CaseUsers.AddRangeAsync(dbEntry);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<CaseResult> CreateAsync(Case caseToCreate)
         {
             var result = new CaseResult();
@@ -101,6 +146,10 @@ namespace Cases.Application.Implementations
                 result.AddError(BusinessRuleCodes.ValidationError, "User dose not exist");
                 return result;
             }
+
+            var userDetails = await _userValidationService.GetUserById(caseToCreate.ReportingOfficerId);
+            caseToCreate.ReportingOfficerEmail = userDetails.Email;
+            caseToCreate.ReportingOfficerUserName = userDetails.Username;
 
             await _dbcontext.Cases.AddAsync(caseToCreate);
             await _dbcontext.SaveChangesAsync();
@@ -167,9 +216,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
         }
 
-        public async Task<List<string>> GetCaseUsers(Case @case)
+        public async Task<List<CaseUser>> GetCaseUsers(Case @case)
         {
-            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).Select(x => x.UserId).ToListAsync();
+            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<List<IncidentType>> GetIncidentTypes(Case @case)

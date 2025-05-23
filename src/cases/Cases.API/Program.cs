@@ -4,7 +4,6 @@ using Cases.Application;
 using Cases.Infrastructure;
 using Cases.Infrastructure.Data;
 using Logging;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;

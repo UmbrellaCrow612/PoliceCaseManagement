@@ -1,1 +1,28 @@
-<p>cases-id-assigned-users works!</p>
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (error && !isLoading) {
+<div>Error occcured: {{ error }}</div>
+}
+
+<!---->
+
+@if (!isLoading && !error) {
+<div class="container">
+
+  <h1>
+    Assigned Officers
+  </h1>
+    <div class="assigned_users_list_container">
+        {{assignedUsers | json}}
+    </div>
+  <div>
+    <button mat-raised-button (click)="assignUserClicked()">
+      assign officer
+    </button>
+  </div>
+</div>
+}
