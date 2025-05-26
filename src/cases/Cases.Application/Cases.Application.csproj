@@ -26,10 +26,6 @@
     <ProjectReference Include="..\Cases.Infrastructure\Cases.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Consumers\" />
-  </ItemGroup>
-
    <ItemGroup>
 	   <Protobuf Include="..\..\proto\common\user.proto" GrpcServices="Client" />
    </ItemGroup>

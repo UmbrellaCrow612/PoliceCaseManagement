@@ -1,9 +1,11 @@
-﻿namespace Cases.Core.Models
+﻿using Events;
+
+namespace Cases.Core.Models
 {
     /// <summary>
     /// Represents a action taken on a <see cref="Case"/>
     /// </summary>
-    public class CaseAction
+    public class CaseAction : IDenormalizedEntity
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Description { get; set; }
@@ -11,11 +13,14 @@
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        /// <summary>
-        /// User id of the person who created it
-        /// </summary>
+
+        [DenormalizedField("Application user", "Id", "Identity Service")]
         public string CreatedById { get; set; } = null!;
+
+        [DenormalizedField("Application user", "UserName", "Identity Service")]
         public string CreatedByName { get; set; } = null!;
+
+        [DenormalizedField("Application user", "Email", "Identity Service")]
         public string CreatedByEmail { get; set; } = null!;
 
         /// <summary>

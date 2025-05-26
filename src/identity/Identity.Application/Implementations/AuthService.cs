@@ -12,12 +12,14 @@ using OtpNet;
 using System.Data;
 using System.Security.Cryptography;
 using Identity.Core.ValueObjects;
+using Events.User;
+using MassTransit;
 
 namespace Identity.Application.Implementations
 {
     internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, 
         IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IOptions<PasswordConfigSettings> passwordConfigSettings
-        , IPasswordHasher<ApplicationUser> passwordHasher, RoleManager<ApplicationRole> roleManager) : IAuthService
+        , IPasswordHasher<ApplicationUser> passwordHasher, RoleManager<ApplicationRole> roleManager, IPublishEndpoint publishEndpoint) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly DeviceManager _deviceManager = deviceManager;
@@ -29,6 +31,7 @@ namespace Identity.Application.Implementations
         private readonly PasswordConfigSettings _passwordConfigSettings = passwordConfigSettings.Value;
         private readonly IPasswordHasher<ApplicationUser> _passwordHasher = passwordHasher;
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
 
         private async Task<Tokens> GenerateAndStoreTokens(ApplicationUser user, UserDevice device)
         {
@@ -1338,6 +1341,18 @@ namespace Identity.Application.Implementations
                 }
                 return result;
             }
+
+            _logger.LogInformation("Firing off event {event}", nameof(UserUpdatedEvent));
+
+            var message = new UserUpdatedEvent
+            {
+                Email = user.Email!,
+                UserId = user.Id,
+                UserName = user.UserName!
+            };
+
+            await _publishEndpoint.Publish(message);
+
             result.Succeeded = true;
             return result;
         }

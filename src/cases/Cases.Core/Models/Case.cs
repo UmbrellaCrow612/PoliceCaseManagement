@@ -1,11 +1,12 @@
 ﻿using Cases.Core.Models.Joins;
+using Events;
 
 namespace Cases.Core.Models
 {
     /// <summary>
     /// Represents the core information about a police case.
     /// </summary>
-    public class Case
+    public class Case : IDenormalizedEntity
     {
         /// <summary>
         /// Unique identifier for the case (e.g., a GUID).
@@ -53,12 +54,20 @@ namespace Cases.Core.Models
 
         public ICollection<CaseIncidentType> CaseIncidentType { get; set; } = [];
 
-        /// <summary>
-        /// The ID of the reporting user de norm data
-        /// </summary>
+
+        // Local copy of user data 
+
+        [DenormalizedField("Application user", "Id", "Identity Service")]
         public required string ReportingOfficerId { get; set; }
+
+        [DenormalizedField("Application user", "UserName", "Identity Service")]
         public string ReportingOfficerUserName { get; set; } = null!;
+
+        [DenormalizedField("Application user", "Email", "Identity Service")]
         public string ReportingOfficerEmail { get; set; } = null!;
+
+        // Local copy of user data 
+
 
         /// <summary>
         /// List of actions taken on this case

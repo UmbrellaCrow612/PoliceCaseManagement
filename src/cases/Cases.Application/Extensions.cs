@@ -6,6 +6,7 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using User.V1;
+using Cases.Application.Consumers;
 
 namespace Cases.Application
 {
@@ -22,6 +23,8 @@ namespace Cases.Application
 
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<UserUpdatedEventConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(rabbitMqSettings.Host, "/", h => { 
@@ -31,7 +34,7 @@ namespace Cases.Application
 
                     cfg.ReceiveEndpoint("cases-queue-name", e => 
                     {
-                      
+                        e.ConfigureConsumer<UserUpdatedEventConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);
