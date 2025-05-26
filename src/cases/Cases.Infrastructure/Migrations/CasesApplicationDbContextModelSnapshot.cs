@@ -115,8 +115,7 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasIndex("CaseId");
 
-                    b.HasIndex("CreatedById")
-                        .IsUnique();
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("Id")
                         .IsUnique();

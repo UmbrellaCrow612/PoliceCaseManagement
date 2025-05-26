@@ -125,8 +125,7 @@ namespace Cases.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_CaseActions_CreatedById",
                 table: "CaseActions",
-                column: "CreatedById",
-                unique: true);
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseActions_Id",

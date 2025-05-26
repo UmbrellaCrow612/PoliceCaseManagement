@@ -12,7 +12,7 @@ namespace Cases.Infrastructure.Data.Configs
 
             builder.Property(x => x.CaseId).IsRequired();
 
-            builder.HasIndex(x => x.CreatedById).IsUnique();
+            builder.HasIndex(x => x.CreatedById);
         }
     }
 }
