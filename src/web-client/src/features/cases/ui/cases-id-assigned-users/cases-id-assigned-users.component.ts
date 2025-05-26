@@ -7,10 +7,12 @@ import { CaseService } from '../../../../core/cases/services/case.service';
 import { CaseUser, RestrictedUser } from '../../../../core/user/type';
 import { CommonModule } from '@angular/common';
 import { formatBackendError } from '../../../../core/app/errors/formatError';
+import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
+import { RemoveAssignedUserDialogComponent } from './components/remove-assigned-user-dialog/remove-assigned-user-dialog.component';
 
 @Component({
   selector: 'app-cases-id-assigned-users',
-  imports: [MatButtonModule, CommonModule],
+  imports: [MatButtonModule, CommonModule, BackNavigationButtonComponent],
   templateUrl: './cases-id-assigned-users.component.html',
   styleUrl: './cases-id-assigned-users.component.css',
 })
@@ -62,6 +64,26 @@ export class CasesIdAssignedUsersComponent implements OnInit {
 
         data: {
           currentAssignedUserIds: this.assignedUsers.map((x) => x.userId),
+          caseId: this.caseId,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.fetchData();
+      });
+  }
+
+  /**
+   * Runs when the remove button is clicked
+   * @param userId The ID of thye user to remove
+   */
+  removeUserClicked(userId: string) {
+    this.dialog
+      .open(RemoveAssignedUserDialogComponent, {
+        width: '100%',
+        maxWidth: '500px',
+        data: {
+          userId: userId,
           caseId: this.caseId,
         },
       })

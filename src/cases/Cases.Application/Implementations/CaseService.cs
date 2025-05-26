@@ -236,6 +236,24 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
         }
 
+        public async Task<CaseResult> RemoveUser(Case @case, string userId)
+        {
+            var result = new CaseResult();
+
+            var join = await _dbcontext.CaseUsers.Where(x => x.UserId == userId && x.CaseId == @case.Id).FirstOrDefaultAsync();
+            if (join is null)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "User is not linked to the given case already");
+                return result;
+            }
+
+            _dbcontext.CaseUsers.Remove(join);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<PagedResult<Case>> SearchCases(SearchCasesQuery query)
         {
             IQueryable<Case> queryBuilder = _dbcontext.Cases.AsQueryable();

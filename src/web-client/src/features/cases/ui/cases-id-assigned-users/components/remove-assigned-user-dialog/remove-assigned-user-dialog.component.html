@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>Remove assigned user ?</h2>
+<mat-dialog-content>
+  Are you sure you want to unlink them from this case ? <br />
+  @if (error) {
+  {{ error }}
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial>No</button>
+  <button
+    mat-button
+    (click)="removeUserClicked()"
+    [disabled]="isRemovingUser"
+  >
+    @if (isRemovingUser) {
+    <span> Loading </span>
+    } @else {
+    <span> Yes </span>
+    }
+  </button>
+</mat-dialog-actions>

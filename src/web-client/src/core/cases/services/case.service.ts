@@ -190,4 +190,14 @@ export class CaseService {
   getAssignedUsers(caseId:string){
     return this.httpClient.get<CaseUser[]>(`${this.BASE_URL}/cases/${caseId}/users`)
   }
+
+
+  /**
+   * Remove a assigned user from a case 
+   * @param caseId The ID of the case
+   * @param userId The ID of he user
+   */
+  removeUser(caseId:string, userId:string){
+    return this.httpClient.delete(`${this.BASE_URL}/cases/${caseId}/users/${userId}`)
+  }
 }

@@ -8,4 +8,14 @@
   height: 450px;
   overflow-y: scroll;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user_details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
 }

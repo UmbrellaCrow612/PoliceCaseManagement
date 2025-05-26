@@ -111,6 +111,13 @@ namespace Cases.Core.Services
         /// <param name="case">The case to link to</param>
         /// <param name="userIds">A set of user id's to link to it</param>
         Task<CaseResult> AddUsers(Case @case, List<string> userIds);
+
+        /// <summary>
+        /// Remove assigned user from a case
+        /// </summary>
+        /// <param name="userId">The ID of he user to remove</param>
+        /// <param name="case">The case you want to remove them from</param>
+        Task<CaseResult> RemoveUser(Case @case, string userId);
     }
 
     /// <summary>

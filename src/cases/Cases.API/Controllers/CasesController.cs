@@ -9,6 +9,7 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 
 namespace Cases.API.Controllers
 {
@@ -391,6 +392,31 @@ namespace Cases.API.Controllers
             if (_case is null) return NotFound();
 
             var result = await _caseService.AddUsers(_case, dto.UserIds);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+
+        /// <summary>
+        /// Remove a assigned user from a given case, they will no longer be assigned to the given case after.
+        /// </summary>
+        /// <param name="caseId">The ID of the case</param>
+        /// <param name="userId">TThe ID of the user</param>
+        [Authorize]
+        [HttpDelete("{caseId}/users/{userId}")]
+        public async Task<IActionResult> RemoveUserFromCaseAsync(string caseId, string userId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.RemoveUser(_case, userId);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
