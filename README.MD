@@ -20,8 +20,12 @@
 
 - Endpoint to compare two faces
 
+# Cases
 
-
+- Create cases
+- Assign users to them
+- Add actions to them
+- Upload attachments to them
 
 # Running
 
