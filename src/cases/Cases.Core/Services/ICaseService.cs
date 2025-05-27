@@ -1,6 +1,7 @@
 ﻿using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
+using Microsoft.AspNetCore.Http;
 
 namespace Cases.Core.Services
 {
@@ -118,6 +119,13 @@ namespace Cases.Core.Services
         /// <param name="userId">The ID of he user to remove</param>
         /// <param name="case">The case you want to remove them from</param>
         Task<CaseResult> RemoveUser(Case @case, string userId);
+
+        /// <summary>
+        /// Add a file to a case as a Attachment
+        /// </summary>
+        /// <param name="case">The case to add it to</param>
+        /// <param name="file">The file to add</param>
+        Task<CaseResult> AddAttachment(Case @case, IFormFile file);
     }
 
     /// <summary>

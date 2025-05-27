@@ -1,7 +1,14 @@
-﻿using Cases.Infrastructure.Data;
+﻿using Amazon.S3;
+using Amazon;
+using System.Net;
+using Cases.Core.Services;
+using Cases.Infrastructure.Data;
+using Cases.Infrastructure.Implementations;
+using Cases.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Amazon.Runtime;
 
 namespace Cases.Infrastructure
 {
@@ -19,6 +26,22 @@ namespace Cases.Infrastructure
             {
                 option.UseNpgsql(connectionString);
             });
+
+            services.AddOptions<AWSSettings>()
+                .Bind(configuration.GetSection("aws"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            var awsSettings = configuration.GetSection("aws").Get<AWSSettings>() ?? throw new ApplicationException("AWS Settings missing");
+
+            var credentials = new BasicAWSCredentials(awsSettings.AccessKey, awsSettings.SecretKey);
+            var regionEndpoint = RegionEndpoint.GetBySystemName(awsSettings.Region);
+
+            services.AddSingleton<IAmazonS3>(sp =>
+                new AmazonS3Client(credentials, regionEndpoint)
+            );
+
+            services.AddScoped<IFileUploadService, AWSs3FileUploadService>();
 
             return services;
         }

@@ -89,6 +89,25 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
+        /// Upload a file attachment to a case
+        /// </summary>
+        [Authorize] 
+        [HttpPost("{caseId}/attachments/upload")]
+        public async Task<IActionResult> UploadAttachmentForCase(string caseId, IFormFile file)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var result = await _caseService.AddAttachment(_case, file);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Link a case to a incident type by there ID's
         /// </summary>
         /// <param name="caseId"></param>

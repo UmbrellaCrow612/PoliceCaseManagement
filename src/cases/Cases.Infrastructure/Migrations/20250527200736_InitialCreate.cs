@@ -72,6 +72,30 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseAttachmentFiles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    S3Key = table.Column<string>(type: "text", nullable: false),
+                    BucketName = table.Column<string>(type: "text", nullable: false),
+                    ContentType = table.Column<string>(type: "text", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CaseId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseAttachmentFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CaseAttachmentFiles_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseUsers",
                 columns: table => new
                 {
@@ -134,6 +158,11 @@ namespace Cases.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseAttachmentFiles_CaseId",
+                table: "CaseAttachmentFiles",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseIncidentTypes_CaseId",
                 table: "CaseIncidentTypes",
                 column: "CaseId");
@@ -183,6 +212,9 @@ namespace Cases.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CaseActions");
+
+            migrationBuilder.DropTable(
+                name: "CaseAttachmentFiles");
 
             migrationBuilder.DropTable(
                 name: "CaseIncidentTypes");

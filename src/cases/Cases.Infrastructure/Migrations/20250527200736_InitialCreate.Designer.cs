@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250526111501_InitialCreate")]
+    [Migration("20250527200736_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -126,6 +126,44 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseActions");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CaseAttachmentFile", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BucketName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("S3Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CaseAttachmentFiles");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>
                 {
                     b.Property<string>("Id")
@@ -210,6 +248,17 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("Case");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CaseAttachmentFile", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CaseAttachmentFiles")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -243,6 +292,8 @@ namespace Cases.Infrastructure.Migrations
             modelBuilder.Entity("Cases.Core.Models.Case", b =>
                 {
                     b.Navigation("CaseActions");
+
+                    b.Navigation("CaseAttachmentFiles");
 
                     b.Navigation("CaseIncidentType");
 

@@ -79,6 +79,11 @@ namespace Cases.Core.Models
         /// </summary>
         public ICollection<CaseUser> CaseUsers { get; set; } = [];
 
+        /// <summary>
+        /// List of file meta data for attachments for the given case
+        /// </summary>
+        public ICollection<CaseAttachmentFile> CaseAttachmentFiles { get; set; } = [];
+
 
         // --- Audit Info ---
 
