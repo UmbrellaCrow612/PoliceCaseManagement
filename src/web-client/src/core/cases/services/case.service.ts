@@ -4,6 +4,7 @@ import env from '../../../environments/environment';
 import {
   Case,
   CaseAction,
+  CaseAttachment,
   CasePagedResult,
   CreateCase,
   CreateCaseAction,
@@ -175,29 +176,57 @@ export class CaseService {
    * @param usersToAssign List of users to assign to this case - make sure there unquie and do not contain already assigned users to the given case, will be validated on server anyways
    * @param caseId The case to link to
    */
-  assignUsersToCase(caseId:string, usersToAssign: RestrictedUser[]) {
+  assignUsersToCase(caseId: string, usersToAssign: RestrictedUser[]) {
     return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/users`, {
       userIds: usersToAssign.map((x) => x.id),
     });
   }
-
 
   /**
    * Get all users assigned to a given case.
    * @param caseId The ID of the case
    * @returns List of users assigned to the given case
    */
-  getAssignedUsers(caseId:string){
-    return this.httpClient.get<CaseUser[]>(`${this.BASE_URL}/cases/${caseId}/users`)
+  getAssignedUsers(caseId: string) {
+    return this.httpClient.get<CaseUser[]>(
+      `${this.BASE_URL}/cases/${caseId}/users`
+    );
   }
 
-
   /**
-   * Remove a assigned user from a case 
+   * Remove a assigned user from a case
    * @param caseId The ID of the case
    * @param userId The ID of he user
    */
-  removeUser(caseId:string, userId:string){
-    return this.httpClient.delete(`${this.BASE_URL}/cases/${caseId}/users/${userId}`)
+  removeUser(caseId: string, userId: string) {
+    return this.httpClient.delete(
+      `${this.BASE_URL}/cases/${caseId}/users/${userId}`
+    );
+  }
+
+  /**
+   * Get all case attachments for a given case
+   * @param caseId The ID of the case to get the files for
+   * @returns List of attachments
+   */
+  getAttachments(caseId: string) {
+    return this.httpClient.get<CaseAttachment[]>(
+      `${this.BASE_URL}/cases/${caseId}/attachments`
+    );
+  }
+
+  /**
+   * Upload a case file attachament to a given case
+   * @param caseId The case to add it to
+   * @param file The file
+   */
+  uploadAttachment(caseId: string, file: File) {
+    const formData = new FormData();
+    formData.append('file', file); // Must match parameter name in controller
+
+    return this.httpClient.post(
+      `${this.BASE_URL}/cases/${caseId}/attachments/upload`,
+      formData
+    );
   }
 }

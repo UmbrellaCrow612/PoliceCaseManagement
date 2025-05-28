@@ -219,9 +219,19 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
+        {
+            return await _fileUploadService.DownloadFileAsync(caseAttachmentFile.S3Key);
+        }
+
         public async Task<Case?> FindById(string caseId)
         {
             return await _dbcontext.Cases.FindAsync(caseId);
+        }
+
+        public async Task<CaseAttachmentFile?> FindCaseAttachmentById(string caseAttachmentId)
+        {
+            return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
         }
 
         public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
@@ -237,6 +247,11 @@ namespace Cases.Application.Implementations
         public async Task<List<CaseAction>> GetCaseActions(Case @case)
         {
             return await _dbcontext.CaseActions.Where(x => x.CaseId == @case.Id).ToListAsync();
+        }
+
+        public async Task<List<CaseAttachmentFile>> GetCaseAttachments(Case @case)
+        {
+            return await _dbcontext.CaseAttachmentFiles.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)

@@ -41,6 +41,14 @@ export interface CaseAction {
   createdByName: string;
 }
 
+export interface CaseAttachment {
+  id: string;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  uploadedAt: Date;
+}
+
 /**
  * Array containing the backend enum mapped here
  */

@@ -25,6 +25,7 @@ namespace Cases.API.Controllers
         private readonly IRedisService _redisService = redisService;
         private readonly CaseActionMapping _caseActionMapping = new();
         private readonly CaseUserMapping _caseUserMapping = new();
+        private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -105,6 +106,41 @@ namespace Cases.API.Controllers
             }
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Get all case attachments stored in local db
+        /// </summary>
+        [Authorize]
+        [HttpGet("{caseId}/attachments")]
+        public async Task<IActionResult> GetCaseAttachments(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var files = await _caseService.GetCaseAttachments(_case);
+            var dto = files.Select(x => _caseAttachmentFileMapping.ToDto(x));
+
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Download a specific attachment 
+        /// </summary>
+        /// <param name="attachmentId">The attachment to download</param>
+        [Authorize] 
+        [HttpGet("attachments/download/{attachmentId}")]
+        public async Task<IActionResult> DownloadCaseAttachmentFile(string attachmentId)
+        {
+            var file = await _caseService.FindCaseAttachmentById(attachmentId);
+            if (file is null)
+            {
+                return NotFound();
+            }
+
+            var stream = await _caseService.DownloadCaseAttachment(file);
+
+            return File(stream, "application/octet-stream", Path.GetFileName(file.FileName));
         }
 
         /// <summary>

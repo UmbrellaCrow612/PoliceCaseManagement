@@ -48,6 +48,34 @@ namespace Cases.Infrastructure.Implementations
             return fileKey;
         }
 
+        public async Task<Stream> DownloadFileAsync(string fileId)
+        {
+            if (string.IsNullOrEmpty(fileId)) throw new ArgumentNullException(nameof(fileId));
+
+            var request = new GetObjectRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = fileId
+            };
+
+            var response = await _s3Client.GetObjectAsync(request);
+            return response.ResponseStream;
+        }
+
+        public string GetPreSignedUrl(string fileId, int expiryMinutes = 10)
+        {
+            if (string.IsNullOrEmpty(fileId)) throw new ArgumentNullException(nameof(fileId));
+
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = fileId,
+                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes)
+            };
+
+            return _s3Client.GetPreSignedURL(request);
+        }
+
 
         private static string GetContentType(string fileName)
         {

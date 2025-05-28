@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Add a case file attachment</h2>
+
+<mat-dialog-content>
+  <p>Select the file you want to add:</p>
+  <input
+    type="file"
+    (change)="onFileSelected($event)"
+    [accept]="acceptedFileTypes"
+  />
+
+  @if (selectedFile) {
+  <div>
+    <p><strong>File:</strong> {{ selectedFile.name }}</p>
+    <p>
+      <strong>Size:</strong>
+      {{ selectedFile.size / 1024 | number : "1.0-2" }} KB
+    </p>
+  </div>
+
+  }
+  <!---->
+  @if (errorMessage) {
+  <p style="color: red">{{ errorMessage }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
+  <button
+    mat-button
+    [disabled]="!selectedFile || errorMessage || isUploading"
+    (click)="submit()"
+  >
+    @if (isUploading) { Loading } @else { Add }
+  </button>
+</mat-dialog-actions>

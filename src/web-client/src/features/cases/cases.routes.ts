@@ -60,6 +60,13 @@ export const CASES_ROUTES: Routes = [
             './ui/cases-id-assigned-users/cases-id-assigned-users.component'
           ).then((c) => c.CasesIdAssignedUsersComponent),
       },
+      {
+        path: ':caseId/attachments',
+        loadComponent: () =>
+          import(
+            './ui//cases-id-attachments-view/cases-id-attachments-view.component'
+          ).then((c) => c.CasesIdAttachmentsViewComponent),
+      },
     ],
   },
 ];

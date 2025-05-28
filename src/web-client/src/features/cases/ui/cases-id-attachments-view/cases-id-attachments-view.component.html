@@ -1,0 +1,40 @@
+@if (isLoading) {
+
+<div>Loading</div>
+}
+
+<!---->
+
+@if (!isLoading && error) {
+<div>Error occured: {{ error }}</div>
+}
+
+<!---->
+
+@if (!isLoading && !error) {
+
+<div class="container">
+  <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
+
+  <h1>Case file attachments</h1>
+  <p>Upload none evidence items here</p>
+
+  <div class="attachment_container">
+    @for (attachment of attachments; track $index) {
+    <div class="attachment_item">
+      <div class="flex">
+        <span>File name: {{ attachment.fileName }} </span>
+        <span> File size: {{ attachment.fileSize }} </span>
+        <span> Uploaded At: {{ attachment.uploadedAt | date }} </span>
+      </div>
+      <div>
+        <button mat-button>Download</button>
+        <button mat-button>Delete</button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <button (click)="addCaseFileAttachmentClicked()" mat-button>Add File</button>
+</div>
+}

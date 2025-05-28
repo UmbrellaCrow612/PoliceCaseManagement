@@ -126,6 +126,25 @@ namespace Cases.Core.Services
         /// <param name="case">The case to add it to</param>
         /// <param name="file">The file to add</param>
         Task<CaseResult> AddAttachment(Case @case, IFormFile file);
+
+        /// <summary>
+        /// Get all <see cref="CaseAttachmentFile"/> linked to the given case
+        /// </summary>
+        /// <param name="case">The case to get the files for</param>
+        /// <returns>List of files</returns>
+        Task<List<CaseAttachmentFile>> GetCaseAttachments(Case @case);
+
+        /// <summary>
+        /// Find a specific <see cref="CaseAttachmentFile"/> by it's ID
+        /// </summary>
+        /// <param name="caseAttachmentId">The ID of <see cref="CaseAttachmentFile.Id"/></param>
+        Task<CaseAttachmentFile?> FindCaseAttachmentById(string caseAttachmentId);
+
+        /// <summary>
+        /// Download a <see cref="CaseAttachmentFile"/> as a stream
+        /// </summary>
+        /// <param name="caseAttachmentFile">The file to download</param>
+        Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
     }
 
     /// <summary>
