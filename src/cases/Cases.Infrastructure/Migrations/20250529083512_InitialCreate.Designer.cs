@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250527200736_InitialCreate")]
+    [Migration("20250529083512_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -143,12 +143,18 @@ namespace Cases.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("S3Key")
                         .IsRequired()
@@ -160,6 +166,9 @@ namespace Cases.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CaseId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("CaseAttachmentFiles");
                 });

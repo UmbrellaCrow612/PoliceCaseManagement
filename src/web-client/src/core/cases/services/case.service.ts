@@ -229,4 +229,19 @@ export class CaseService {
       formData
     );
   }
+
+  /**
+   * Download a specific case attachment
+   * @param attachamentId The attachment id to download
+   * @returns Stream blob
+   */
+  downloadAttachment(attachamentId: string) {
+    return this.httpClient.get(
+      `${this.BASE_URL}/cases/attachments/download/${attachamentId}`,
+      {
+        responseType: 'blob',
+        observe: 'response',
+      }
+    );
+  }
 }

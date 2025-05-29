@@ -3,7 +3,7 @@
     /// <summary>
     /// Stores the meta data of a cases file attachment 
     /// </summary>
-    public class CaseAttachmentFile
+    public class CaseAttachmentFile : ISoftDelete
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -22,5 +22,9 @@
 
         public required string CaseId { get; set; }
         public Case Case { get; set; } = null!;
+
+
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; } = null;
     }
 }

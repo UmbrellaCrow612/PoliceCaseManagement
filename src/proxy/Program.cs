@@ -6,8 +6,9 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("https://localhost:4200") // Your Angular frontend origin
-                  .WithMethods("POST", "GET", "OPTIONS", "PUT", "DELETE") // Added GET and other common methods
-                  .WithHeaders("Content-Type", "X-Device-Fingerprint", "Authorization") // *** ADDED "Authorization" HERE ***
+                  .WithMethods("POST", "GET", "OPTIONS", "PUT", "DELETE")
+                  .WithHeaders("Content-Type", "X-Device-Fingerprint", "Authorization") // Allowed request headers
+                  .WithExposedHeaders("Content-Disposition") 
                   .AllowCredentials();
         });
 });
@@ -18,8 +19,7 @@ builder.Services.AddReverseProxy()
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-
-app.UseRouting();
+app.UseRouting(); 
 
 app.UseCors("AllowSpecificOrigin"); 
 

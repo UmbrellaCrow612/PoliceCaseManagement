@@ -2,7 +2,8 @@
 {
     /// <summary>
     /// Used to add soft deletion to a model meaning it dose not get fully removed from a database 
-    /// but a flag is added to remove it from query's
+    /// but a flag is added to remove it from query's, there should be a global query filter on such model meaning deleted items 
+    /// are filtered out on every query with a global query
     /// </summary>
     public interface ISoftDelete
     {

@@ -82,7 +82,9 @@ namespace Cases.Infrastructure.Migrations
                     ContentType = table.Column<string>(type: "text", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
                     UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CaseId = table.Column<string>(type: "text", nullable: false)
+                    CaseId = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -161,6 +163,12 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_CaseAttachmentFiles_CaseId",
                 table: "CaseAttachmentFiles",
                 column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseAttachmentFiles_Id",
+                table: "CaseAttachmentFiles",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseIncidentTypes_CaseId",

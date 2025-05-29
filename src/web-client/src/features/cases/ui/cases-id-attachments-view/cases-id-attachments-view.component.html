@@ -28,7 +28,13 @@
         <span> Uploaded At: {{ attachment.uploadedAt | date }} </span>
       </div>
       <div>
-        <button mat-button>Download</button>
+        <button
+          mat-button
+          (click)="downloadAttachamentClicked(attachment)"
+          [disabled]="isDownloadingAttachment"
+        >
+          Download
+        </button>
         <button mat-button>Delete</button>
       </div>
     </div>

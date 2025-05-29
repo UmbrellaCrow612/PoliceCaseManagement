@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddCaseFileAttachmentDialogComponent } from './components/add-case-file-attachment-dialog/add-case-file-attachment-dialog.component';
 import { MatButtonModule } from '@angular/material/button';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cases-id-attachments-view',
@@ -19,7 +20,8 @@ export class CasesIdAttachmentsViewComponent implements OnInit {
   constructor(
     private readonly caseService: CaseService,
     private readonly active: ActivatedRoute,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly snackBar: MatSnackBar
   ) {}
   ngOnInit(): void {
     this.caseId = this.active.snapshot.paramMap.get('caseId');
@@ -72,5 +74,50 @@ export class CasesIdAttachmentsViewComponent implements OnInit {
       .subscribe(() => {
         this.fetchData();
       });
+  }
+
+  downloadError = '';
+  isDownloadingAttachment = false;
+  downloadAttachamentClicked(item: CaseAttachment) {
+    this.isDownloadingAttachment = true;
+
+    this.caseService.downloadAttachment(item.id).subscribe({
+      next: (response) => {
+        const blob = response.body as Blob;
+
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'downloaded-file';
+
+        if (contentDisposition) {
+          const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+          const matches = filenameRegex.exec(contentDisposition);
+          if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, ''); // Remove quotes
+            // Handle URI-encoded filename e.g. filename*=UTF-8''my%20file.pdf
+            if (filename.startsWith("UTF-8''")) {
+              filename = decodeURIComponent(filename.substring(7));
+            }
+          }
+        }
+
+        // Create a download link and simulate a click
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        this.isDownloadingAttachment = false;
+      },
+      error: (err) => {
+        this.downloadError = formatBackendError(err);
+        this.isDownloadingAttachment = false;
+
+        this.snackBar.open(this.downloadError, 'Close');
+      },
+    });
   }
 }
