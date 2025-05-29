@@ -26,5 +26,15 @@
 
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; } = null;
+
+
+        /// <summary>
+        /// Marks the model as deleted
+        /// </summary>
+        public void Delete()
+        {
+            IsDeleted = true;
+            DeletedAt = DateTime.UtcNow;
+        }
     }
 }

@@ -35,7 +35,11 @@
         >
           Download
         </button>
-        <button mat-button>Delete</button>
+        @if (hasRoles([systemRoles.Admin], currentUserRoles)) {
+          <button mat-button (click)="deleteAttachmentClicked(attachment)" [disabled]="isDeletingAttachment">
+            Delete
+          </button>
+        }
       </div>
     </div>
     }

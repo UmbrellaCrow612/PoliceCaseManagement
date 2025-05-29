@@ -145,6 +145,12 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="caseAttachmentFile">The file to download</param>
         Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
+
+        /// <summary>
+        /// Soft delete's a specific <see cref="CaseAttachmentFile"/>
+        /// </summary>
+        /// <param name="file">The specific attachment to delete</param>
+        Task<CaseResult> DeleteAttachment(CaseAttachmentFile file);
     }
 
     /// <summary>

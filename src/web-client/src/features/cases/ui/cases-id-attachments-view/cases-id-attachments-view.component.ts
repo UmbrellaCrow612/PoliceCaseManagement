@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { ActivatedRoute } from '@angular/router';
 import { CaseAttachment } from '../../../../core/cases/type';
@@ -9,6 +9,9 @@ import { AddCaseFileAttachmentDialogComponent } from './components/add-case-file
 import { MatButtonModule } from '@angular/material/button';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { hasRequiredRole } from '../../../../core/authentication/utils';
+import { UserRoles } from '../../../../core/authentication/roles';
+import { UserService } from '../../../../core/user/services/user.service';
 
 @Component({
   selector: 'app-cases-id-attachments-view',
@@ -32,6 +35,10 @@ export class CasesIdAttachmentsViewComponent implements OnInit {
 
     this.fetchData();
   }
+
+  hasRoles = hasRequiredRole;
+  systemRoles = UserRoles;
+  currentUserRoles = inject(UserService).ROLES!;
 
   attachments: CaseAttachment[] = [];
 
@@ -117,6 +124,20 @@ export class CasesIdAttachmentsViewComponent implements OnInit {
         this.isDownloadingAttachment = false;
 
         this.snackBar.open(this.downloadError, 'Close');
+      },
+    });
+  }
+
+  isDeletingAttachment = false;
+  deleteAttachmentClicked(item: CaseAttachment) {
+    this.isDeletingAttachment = true;
+    this.caseService.deleteAttachment(item.id).subscribe({
+      next: () => {
+        this.isDeletingAttachment = false;
+        this.fetchData();
+      },
+      error: (err) => {
+        this.snackBar.open(formatBackendError(err), 'Close');
       },
     });
   }

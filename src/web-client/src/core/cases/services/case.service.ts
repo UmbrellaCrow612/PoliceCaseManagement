@@ -244,4 +244,14 @@ export class CaseService {
       }
     );
   }
+
+  /**
+   * Delete a specific case attachament by it's ID
+   * @param attachamentId The file to delete
+   */
+  deleteAttachment(attachamentId: string) {
+    return this.httpClient.delete(
+      `${this.BASE_URL}/cases/attachments/${attachamentId}`
+    );
+  }
 }

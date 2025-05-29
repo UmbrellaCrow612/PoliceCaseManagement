@@ -205,6 +205,24 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<CaseResult> DeleteAttachment(CaseAttachmentFile file)
+        {
+            var result = new CaseResult();
+
+            if (file.IsDeleted)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "File already deleted");
+                return result;
+            }
+
+            file.Delete();
+            _dbcontext.CaseAttachmentFiles.Update(file);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<CaseResult> DeleteIncidentType(IncidentType incidentType)
         {
             var result = new CaseResult();

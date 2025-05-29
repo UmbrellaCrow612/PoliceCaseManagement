@@ -144,6 +144,25 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
+        /// Delete a specific <see cref="CaseAttachmentFile"/> by it's ID, only admins can do this
+        /// </summary>
+        [Authorize(Roles = Roles.Admin)]
+        [HttpDelete("attachments/{attachmentId}")]
+        public async Task<IActionResult> DeleteCaseFileAttachments(string attachmentId)
+        {
+            var file = await _caseService.FindCaseAttachmentById(attachmentId);
+            if (file is null) return NotFound();
+
+            var result = await _caseService.DeleteAttachment(file);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Link a case to a incident type by there ID's
         /// </summary>
         /// <param name="caseId"></param>
