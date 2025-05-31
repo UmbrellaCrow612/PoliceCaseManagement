@@ -84,6 +84,11 @@ namespace Cases.Core.Models
         /// </summary>
         public ICollection<CaseAttachmentFile> CaseAttachmentFiles { get; set; } = [];
 
+        /// <summary>
+        /// List of ABAC for the case applied to user actions
+        /// </summary>
+        public ICollection<CasePermission> CasePermissions { get; set; } = [];
+
 
         // --- Audit Info ---
 

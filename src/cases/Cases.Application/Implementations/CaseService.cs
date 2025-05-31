@@ -142,19 +142,32 @@ namespace Cases.Application.Implementations
                 }
             }
 
+            List<CasePermission> defaultCasePermissions = [];
             List<GetUserByIdResponse> userDetails = [];
             foreach (var userId in userIds)
             {
                 userDetails.Add(await _userValidationService.GetUserById(userId));
             }
 
-            List<CaseUser> dbEntry = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
+            foreach(var user in userDetails)
+            {
+                defaultCasePermissions.Add(new CasePermission { CanAssign = false, CanEdit = false, CaseId = @case.Id, UserId = user.UserId, UserName = user.Username });
+            }
 
-            await _dbcontext.CaseUsers.AddRangeAsync(dbEntry);
+            List<CaseUser> linksToThisCase = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
+            await _dbcontext.CaseUsers.AddRangeAsync(linksToThisCase);
+
+            await _dbcontext.CasePermissions.AddRangeAsync(defaultCasePermissions);
+
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
             return result;
+        }
+
+        public async Task<bool> CanUserViewCaseDetails(string caseId, string userId)
+        {
+            return await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
         }
 
         public async Task<CaseResult> CreateAsync(Case caseToCreate)
@@ -252,6 +265,11 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
         }
 
+        public async Task<CasePermission?> FindCasePermissionById(string permissionId)
+        {
+            return await _dbcontext.CasePermissions.FindAsync(permissionId);
+        }
+
         public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
         {
             return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
@@ -275,6 +293,11 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<List<CasePermission>> GetCasePermissions(Case @case)
+        {
+            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<List<CaseUser>> GetCaseUsers(Case @case)
@@ -385,6 +408,17 @@ namespace Cases.Application.Implementations
                 newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id});
             }
             await _dbcontext.CaseIncidentTypes.AddRangeAsync(newlyLinkedIncidentTypes);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> UpdateCasePermission(CasePermission permission)
+        {
+            var result = new CaseResult();
+
+            _dbcontext.CasePermissions.Update(permission);
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;

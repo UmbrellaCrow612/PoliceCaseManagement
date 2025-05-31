@@ -61,5 +61,4 @@ namespace Identity.API.Extensions
             };
         }
     }
-
 }

@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Cases.Core.Services
 {
+    /// <summary>
+    /// Represents the business contract to interact with cases and there dependences
+    /// </summary>
     public interface ICaseService
     {
         /// <summary>
@@ -107,7 +110,7 @@ namespace Cases.Core.Services
         Task<List<CaseUser>> GetCaseUsers(Case @case);
 
         /// <summary>
-        /// Assign a set of users to a case
+        /// Assign a set of users to a case, gives them default permissions for the case
         /// </summary>
         /// <param name="case">The case to link to</param>
         /// <param name="userIds">A set of user id's to link to it</param>
@@ -151,6 +154,34 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="file">The specific attachment to delete</param>
         Task<CaseResult> DeleteAttachment(CaseAttachmentFile file);
+
+        /// <summary>
+        /// Quick look up to check if a user has been assigned to to the given case <see cref="Case.CaseUsers"/> meaning that they can see it's details, this dose not check
+        /// there roles but only that they are linked
+        /// </summary>
+        /// <param name="caseId">The ID of the case</param>
+        /// <param name="userId">The ID of rhe user</param>
+        /// <returns><c>bool</c> to indicate if they can or not, <c>true</c> if they can <c>false</c> if they cannot</returns>
+         Task<bool> CanUserViewCaseDetails(string caseId, string userId);
+
+        /// <summary>
+        /// Get a list of <see cref="CasePermission"/> set on the given case
+        /// </summary>
+        /// <param name="case">The case to get the permissions for</param>
+        Task<List<CasePermission>> GetCasePermissions(Case @case);
+
+        /// <summary>
+        /// Find a <see cref="CasePermission"/> by it's ID
+        /// </summary>
+        /// <param name="permissionId">The case permission to find</param>
+        Task<CasePermission?> FindCasePermissionById(string permissionId);
+
+        /// <summary>
+        /// Update a <see cref="CasePermission"/>
+        /// </summary>
+        /// <param name="permission">The permission to update</param>
+        Task<CaseResult> UpdateCasePermission(CasePermission permission);
+   
     }
 
     /// <summary>

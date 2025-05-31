@@ -26,6 +26,7 @@ namespace Cases.API.Controllers
         private readonly CaseActionMapping _caseActionMapping = new();
         private readonly CaseUserMapping _caseUserMapping = new();
         private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
+        private readonly CasePermissionMapping _casePermissionMapping = new();
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -49,6 +50,17 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}")]
         public async Task<ActionResult<CaseDto>> GetCaseById(string caseId)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var canByPassCaseViewCheck = User.IsInRole(Roles.Admin);
+
+            if (!canByPassCaseViewCheck)
+            {
+                var canViewCaseDetails = await _caseService.CanUserViewCaseDetails(caseId, userId);
+                if (!canViewCaseDetails) return BadRequest();
+            }
+
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
             if (cache is not null)
             {
@@ -65,6 +77,49 @@ namespace Cases.API.Controllers
             await _redisService.SetStringAsync<CaseDto>(_case.Id, dto);
 
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Return the permissions set on the case
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("{caseId}/permissions")]
+        public async Task<IActionResult> GetCasePermissions(string caseId)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var permissions = await _caseService.GetCasePermissions(_case);
+
+            IEnumerable<CasePermissionDto> dto = permissions.Select(x => new CasePermissionDto { });
+
+            return Ok(dto);
+        }
+
+        /// <summary>
+        /// Update a case permission
+        /// </summary>
+        /// <param name="permissionId">The permission to update</param>
+        /// <param name="dto">Request body</param>
+        [Authorize(Roles = Roles.Admin)] // future change to manager or high rank than base officer - or same rank
+        [HttpPut("permissions/{permissionId}")]
+        public async Task<IActionResult> UpdateCasePermission(string permissionId, [FromBody] UpdateCasePermissionDto dto)
+        {
+            var permission = await _caseService.FindCasePermissionById(permissionId);
+            if (permission is null)
+            {
+                return NotFound();
+            }
+            _casePermissionMapping.Update(permission, dto);
+
+            var result = await _caseService.UpdateCasePermission(permission);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
 
         [Authorize]
