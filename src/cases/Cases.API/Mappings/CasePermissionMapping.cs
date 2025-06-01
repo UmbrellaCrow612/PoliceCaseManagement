@@ -13,12 +13,13 @@ namespace Cases.API.Mappings
 
         public CasePermissionDto ToDto(CasePermission @base)
         {
-            throw new NotImplementedException();
+            return new CasePermissionDto { CanAssign = @base.CanAssign, CanEdit = @base.CanEdit, CaseId = @base.CaseId, Id = @base.Id, UserId = @base.UserId, UserName = @base.UserName };
         }
 
         public void Update(CasePermission @base, UpdateCasePermissionDto updateDto)
         {
-            @base.
+            @base.CanAssign = updateDto.CanAssign;
+            @base.CanEdit = updateDto.CanEdit;
         }
     }
 }

@@ -165,9 +165,18 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<bool> CanUserViewCaseDetails(string caseId, string userId)
+        public async Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId)
         {
-            return await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
+            var result = new CaseResult();
+            var linkExists = await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
+            if (!linkExists)
+            {
+                result.AddError(BusinessRuleCodes.UserCannotViewCaseAsTheyLackPermissions);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
         }
 
         public async Task<CaseResult> CreateAsync(Case caseToCreate)
@@ -329,6 +338,12 @@ namespace Cases.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "User is not linked to the given case already");
                 return result;
+            }
+
+            var permissionForThisCase = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
+            if (permissionForThisCase is not null)
+            {
+                _dbcontext.CasePermissions.Remove(permissionForThisCase);
             }
 
             _dbcontext.CaseUsers.Remove(join);

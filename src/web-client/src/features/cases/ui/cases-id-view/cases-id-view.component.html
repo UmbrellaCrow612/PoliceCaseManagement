@@ -1,58 +1,53 @@
 @if (isLoading) {
-<div>
-    Loading
-</div>
+<div>Loading</div>
 }
 
 <!---->
 @if (!isLoading && errorMessage) {
 <div>
-    {{errorMessage}}
+  {{ errorMessage }}
 </div>
 }
 <!---->
 
 @if (!isLoading && !errorMessage) {
 <div class="container">
+  <div class="links">
+    @for (item of links; track $index) { @if
+    (hasRequiredRole(item.authorizedRoles, currentUserRoles)) {
+    <a mat-flat-button [routerLink]="item.href">{{ item.name }}</a>
+    } }
+  </div>
 
-    <div class="links">
-       @for (item of links; track $index) {
-        <a mat-flat-button [routerLink]="item.href">{{item.name}}</a>
-       }
-    </div>
+  <h2>Case Overview:</h2>
 
+  <div class="overview_container">
+    <p>Case Number: {{ caseDetails?.caseNumber }}</p>
+    <p>Description: {{ caseDetails?.description }}</p>
+    <p>Summary: {{ caseDetails?.summary }}</p>
+    <p>Incident date: {{ caseDetails?.incidentDateTime | date }}</p>
+    <p>Repoted date: {{ caseDetails?.reportedDateTime | date }}</p>
+    <p>Case priority: {{ caseDetails?.priority | casePriorityPipe }}</p>
+    <p>Case status: {{ caseDetails?.status | caseStatusPipe }}</p>
+    <p>Created By: {{ caseDetails?.reportingOfficerUserName }}</p>
+  </div>
 
-    <h2>
-        Case Overview:
-    </h2>
+  <div class="btns">
+    <button mat-raised-button>Edit</button>
+    @if (hasRequiredRole([userRoles.Admin], currentUserRoles)) {
+    <button mat-raised-button>Delete</button>
+    }
+  </div>
 
-    <div class="overview_container">
-        <p>Case Number: {{caseDetails?.caseNumber}}</p>
-        <p>Description: {{caseDetails?.description}}</p>
-        <p>Summary: {{caseDetails?.summary}}</p>
-        <p>Incident date: {{caseDetails?.incidentDateTime | date}}</p>
-        <p>Repoted date: {{caseDetails?.reportedDateTime | date}}</p>
-        <p>Case priority: {{caseDetails?.priority | casePriorityPipe}}</p>
-        <p>Case status: {{caseDetails?.status | caseStatusPipe}}</p>
-        <p>Created By: {{caseDetails?.reportingOfficerUserName}}</p>
-    </div>
+  <p class="incident_types">
+    Incident types: @for (incidentType of incidentTypes; track $index) {<span>{{
+      incidentType.name
+    }}</span
+    >} @empty {<span>No linked incident types</span>}
+  </p>
 
-    <div class="btns">
-        <button mat-raised-button>Edit</button>
-        @if (hasRequiredRole([userRoles.Admin], currentUserRoles)) {
-        <button mat-raised-button>
-            Delete
-        </button>
-        }
-    </div>
-
-    <p class="incident_types">Incident types: @for (incidentType of incidentTypes; track $index)
-        {<span>{{incidentType.name}}</span>}
-        @empty {<span>No linked incident types</span>}</p>
-
-    <div>
-        <a mat-raised-button routerLink="incident-types/edit">Edit</a>
-    </div>
-
+  <div>
+    <a mat-raised-button routerLink="incident-types/edit">Edit</a>
+  </div>
 </div>
 }

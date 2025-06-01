@@ -57,8 +57,8 @@ namespace Cases.API.Controllers
 
             if (!canByPassCaseViewCheck)
             {
-                var canViewCaseDetails = await _caseService.CanUserViewCaseDetails(caseId, userId);
-                if (!canViewCaseDetails) return BadRequest();
+                var result = await _caseService.CanUserViewCaseDetails(caseId, userId);
+                if (!result.Succeeded) return BadRequest(result);
             }
 
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
@@ -92,7 +92,7 @@ namespace Cases.API.Controllers
 
             var permissions = await _caseService.GetCasePermissions(_case);
 
-            IEnumerable<CasePermissionDto> dto = permissions.Select(x => new CasePermissionDto { });
+            IEnumerable<CasePermissionDto> dto = permissions.Select(x => _casePermissionMapping.ToDto(x));
 
             return Ok(dto);
         }

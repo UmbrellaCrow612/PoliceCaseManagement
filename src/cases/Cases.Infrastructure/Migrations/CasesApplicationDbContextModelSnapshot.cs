@@ -170,6 +170,41 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseAttachmentFiles");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CasePermission", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("CanAssign")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEdit")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CasePermissions");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>
                 {
                     b.Property<string>("Id")
@@ -265,6 +300,17 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("Case");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CasePermission", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CasePermissions")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -302,6 +348,8 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("CaseAttachmentFiles");
 
                     b.Navigation("CaseIncidentType");
+
+                    b.Navigation("CasePermissions");
 
                     b.Navigation("CaseUsers");
                 });

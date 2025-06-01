@@ -26,5 +26,10 @@
         /// miss configured in a model
         /// </summary>
         public const string ValidationError = "VALIDATION_ERROR";
+
+        /// <summary>
+        /// Indicates that the user trying to access the case cannot, as they are not assigned to it, meaning they should not be able to see it's details
+        /// </summary>
+        public const string UserCannotViewCaseAsTheyLackPermissions = "CASE_PERMISSION";
     }
 }

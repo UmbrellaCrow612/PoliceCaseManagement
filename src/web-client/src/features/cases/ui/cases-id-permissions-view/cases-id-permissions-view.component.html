@@ -1,0 +1,33 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (!isLoading && error) {
+<div>Error: {{ error }}</div>
+}
+
+<!---->
+
+@if (!isLoading && !error) {
+<div class="container">
+  <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
+  <h1>Change permission for this case for assigned offciers</h1>
+  <div class="permissions_container">
+    @for (perm of permissions; track $index) {
+    <app-case-permission-item
+      [permissionData]="perm"
+    ></app-case-permission-item>
+    }
+  </div>
+</div>
+}
+
+<!--
+
+TODO:
+
+if same user disable there checks so they cannot change there own perms also on endpoints
+
+-->

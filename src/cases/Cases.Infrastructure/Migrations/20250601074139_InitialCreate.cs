@@ -98,6 +98,28 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CasePermissions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    CanEdit = table.Column<bool>(type: "boolean", nullable: false),
+                    CanAssign = table.Column<bool>(type: "boolean", nullable: false),
+                    CaseId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CasePermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CasePermissions_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseUsers",
                 columns: table => new
                 {
@@ -181,6 +203,22 @@ namespace Cases.Infrastructure.Migrations
                 column: "IncidentTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CasePermissions_CaseId",
+                table: "CasePermissions",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CasePermissions_Id",
+                table: "CasePermissions",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CasePermissions_UserId",
+                table: "CasePermissions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cases_CaseNumber",
                 table: "Cases",
                 column: "CaseNumber",
@@ -226,6 +264,9 @@ namespace Cases.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "CaseIncidentTypes");
+
+            migrationBuilder.DropTable(
+                name: "CasePermissions");
 
             migrationBuilder.DropTable(
                 name: "CaseUsers");

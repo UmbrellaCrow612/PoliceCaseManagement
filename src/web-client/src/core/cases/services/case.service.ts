@@ -6,6 +6,7 @@ import {
   CaseAction,
   CaseAttachment,
   CasePagedResult,
+  CasePermission,
   CreateCase,
   CreateCaseAction,
 } from '../type';
@@ -252,6 +253,30 @@ export class CaseService {
   deleteAttachment(attachamentId: string) {
     return this.httpClient.delete(
       `${this.BASE_URL}/cases/attachments/${attachamentId}`
+    );
+  }
+
+  /**
+   * Get all the case level permissions set on a given case by it's ID - NOTE: Only admins can CRUD these
+   * @param caseId The ID of the case to fetch it for
+   * @returns List of permissions
+   */
+  getPermissions(caseId: string) {
+    return this.httpClient.get<CasePermission[]>(
+      `${this.BASE_URL}/cases/${caseId}/permissions`
+    );
+  }
+
+  /**
+   * Update a case permission
+   * @param permission The updated object
+   */
+  updatePermission(permission: CasePermission) {
+    return this.httpClient.put(
+      `${this.BASE_URL}/cases/permissions/${permission.id}`,
+      {
+        ...permission,
+      }
     );
   }
 }

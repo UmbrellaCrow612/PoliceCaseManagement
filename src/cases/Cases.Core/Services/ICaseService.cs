@@ -155,14 +155,15 @@ namespace Cases.Core.Services
         /// <param name="file">The specific attachment to delete</param>
         Task<CaseResult> DeleteAttachment(CaseAttachmentFile file);
 
+
         /// <summary>
         /// Quick look up to check if a user has been assigned to to the given case <see cref="Case.CaseUsers"/> meaning that they can see it's details, this dose not check
         /// there roles but only that they are linked
         /// </summary>
-        /// <param name="caseId">The ID of the case</param>
-        /// <param name="userId">The ID of rhe user</param>
-        /// <returns><c>bool</c> to indicate if they can or not, <c>true</c> if they can <c>false</c> if they cannot</returns>
-         Task<bool> CanUserViewCaseDetails(string caseId, string userId);
+        /// <param name="caseId">The case ID to check</param>
+        /// <param name="userId">The user ID to check</param>
+        /// <returns>Result object, if it is <see cref="CaseResult.Succeeded"/> as true it means they can view it else they cannot</returns>
+        Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId);
 
         /// <summary>
         /// Get a list of <see cref="CasePermission"/> set on the given case

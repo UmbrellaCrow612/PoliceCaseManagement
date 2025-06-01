@@ -1,0 +1,19 @@
+<div class="singular_permission_item">
+  <span> User: {{ permissionData().userName }} </span>
+  <mat-slide-toggle
+    class="example-margin"
+    [checked]="permissionData().canEdit"
+    [disabled]="disbaleItem"
+    (change)="canEditPermissionSlideToggleValueChangedEventListner($event)"
+  >
+    Can Edit
+  </mat-slide-toggle>
+  <mat-slide-toggle
+    class="example-margin"
+    [checked]="permissionData().canAssign"
+    [disabled]="disbaleItem"
+    (change)="canAssignPermissionSlideToggleValueChangedEventListner($event)"
+  >
+    Can Assign
+  </mat-slide-toggle>
+</div>

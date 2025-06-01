@@ -49,6 +49,18 @@ export interface CaseAttachment {
   uploadedAt: Date;
 }
 
+export interface CasePermission {
+  /**
+   * NOTE this is not the user's ID but the specific permission itself refer to userId field for that
+   */
+  id: string;
+  canEdit: boolean;
+  canAssign: boolean;
+  caseId: string;
+  userId: string;
+  userName: string;
+}
+
 /**
  * Array containing the backend enum mapped here
  */

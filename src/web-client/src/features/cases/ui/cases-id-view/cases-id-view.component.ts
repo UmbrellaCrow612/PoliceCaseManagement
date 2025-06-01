@@ -13,6 +13,9 @@ import { UserRoles } from '../../../../core/authentication/roles';
 import { forkJoin } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { AppLink } from '../../../../core/app/type';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
+import CODES from '../../../../core/server-responses/codes';
+import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 
 @Component({
   selector: 'app-cases-id-view',
@@ -30,8 +33,8 @@ export class CasesIdViewComponent implements OnInit {
   constructor(
     private active: ActivatedRoute,
     private caseService: CaseService,
-    private errorService: ErrorService,
-    private userService: UserService
+    private userService: UserService,
+    private readonly authService: AuthenticationService
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +80,18 @@ export class CasesIdViewComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        this.errorService.HandleDisplay(err);
+        let code = getBusinessErrorCode(err);
+
+        switch (code) {
+          case CODES.CASE_PERMISSION:
+            this.authService.UnAuthorized();
+            break;
+
+          default:
+            this.errorMessage = 'Could nto find case';
+            break;
+        }
+
         this.isLoading = false;
       },
     });
@@ -98,6 +112,11 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './attachments',
       name: 'File attachments',
+    },
+    {
+      authorizedRoles: [this.userRoles.Admin],
+      href: './permissions',
+      name: 'Permissions',
     },
   ];
 }
