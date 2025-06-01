@@ -142,16 +142,38 @@ namespace Cases.Application.Implementations
                 }
             }
 
+            List<CasePermission> defaultCasePermissions = [];
             List<GetUserByIdResponse> userDetails = [];
             foreach (var userId in userIds)
             {
                 userDetails.Add(await _userValidationService.GetUserById(userId));
             }
 
-            List<CaseUser> dbEntry = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
+            foreach(var user in userDetails)
+            {
+                defaultCasePermissions.Add(new CasePermission { CanAssign = false, CanEdit = false, CaseId = @case.Id, UserId = user.UserId, UserName = user.Username });
+            }
 
-            await _dbcontext.CaseUsers.AddRangeAsync(dbEntry);
+            List<CaseUser> linksToThisCase = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
+            await _dbcontext.CaseUsers.AddRangeAsync(linksToThisCase);
+
+            await _dbcontext.CasePermissions.AddRangeAsync(defaultCasePermissions);
+
             await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId)
+        {
+            var result = new CaseResult();
+            var linkExists = await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
+            if (!linkExists)
+            {
+                result.AddError(BusinessRuleCodes.UserCannotViewCaseAsTheyLackPermissions);
+                return result;
+            }
 
             result.Succeeded = true;
             return result;
@@ -179,7 +201,10 @@ namespace Cases.Application.Implementations
             caseToCreate.ReportingOfficerEmail = userDetails.Email;
             caseToCreate.ReportingOfficerUserName = userDetails.Username;
 
+            var defaultPermissionForCreator = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = userDetails.UserId, UserName = userDetails.Username };
+
             await _dbcontext.Cases.AddAsync(caseToCreate);
+            await _dbcontext.CasePermissions.AddAsync(defaultPermissionForCreator);
             await _dbcontext.SaveChangesAsync();
 
 
@@ -204,6 +229,7 @@ namespace Cases.Application.Implementations
             result.Succeeded = true;
             return result;
         }
+
 
         public async Task<CaseResult> DeleteAttachment(CaseAttachmentFile file)
         {
@@ -252,6 +278,11 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
         }
 
+        public async Task<CasePermission?> FindCasePermissionById(string permissionId)
+        {
+            return await _dbcontext.CasePermissions.FindAsync(permissionId);
+        }
+
         public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
         {
             return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
@@ -275,6 +306,37 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId)
+        {
+            var result = new MyCasePermissionResult();
+
+            var perm = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
+            if (perm is null)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Permissions not found");
+                return result;
+            }
+
+            List<string> perms = [];
+            if (perm.CanAssign)
+            {
+                perms.Add(nameof(perm.CanAssign));
+            }
+            if (perm.CanEdit)
+            {
+                perms.Add(nameof(perm.CanEdit));
+            }
+            result.Permissions = perms;
+            result.Succeeded = true;
+
+            return result;
+        }
+
+        public async Task<List<CasePermission>> GetCasePermissions(Case @case)
+        {
+            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<List<CaseUser>> GetCaseUsers(Case @case)
@@ -306,6 +368,12 @@ namespace Cases.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "User is not linked to the given case already");
                 return result;
+            }
+
+            var permissionForThisCase = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
+            if (permissionForThisCase is not null)
+            {
+                _dbcontext.CasePermissions.Remove(permissionForThisCase);
             }
 
             _dbcontext.CaseUsers.Remove(join);
@@ -385,6 +453,17 @@ namespace Cases.Application.Implementations
                 newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id});
             }
             await _dbcontext.CaseIncidentTypes.AddRangeAsync(newlyLinkedIncidentTypes);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> UpdateCasePermission(CasePermission permission)
+        {
+            var result = new CaseResult();
+
+            _dbcontext.CasePermissions.Update(permission);
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;

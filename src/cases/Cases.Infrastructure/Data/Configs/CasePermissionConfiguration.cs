@@ -1,12 +1,12 @@
-﻿using Cases.Core.Models.Joins;
+﻿using Cases.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Cases.Infrastructure.Data.Configs
 {
-    public class CaseUserConfiguration : IEntityTypeConfiguration<CaseUser>
+    public class CasePermissionConfiguration : IEntityTypeConfiguration<CasePermission>
     {
-        public void Configure(EntityTypeBuilder<CaseUser> builder)
+        public void Configure(EntityTypeBuilder<CasePermission> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
 

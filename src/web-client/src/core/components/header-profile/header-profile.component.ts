@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { hasRequiredRole } from '../../authentication/utils';
+import { hasRequiredRole } from '../../authentication/utils/hasRequiredRole';
 import { UserService } from '../../user/services/user.service';
 import { AppLink } from '../../app/type';
 import { UserRoles } from '../../authentication/roles';
@@ -34,30 +34,35 @@ export class HeaderProfileComponent {
       href: '/profile',
       authorizedRoles: [],
       iconName: 'person',
+      permissionsNeeded: []
     },
     {
       name: 'Administration',
       href: '/administration',
       authorizedRoles: [UserRoles.Admin],
       iconName: 'shield_person',
+      permissionsNeeded: []
     },
     {
       name: 'Dashboard',
       href: '/dashboard',
       authorizedRoles: [],
       iconName: 'dashboard',
+      permissionsNeeded: []
     },
     {
       name: 'Cases',
       href: '/cases',
       authorizedRoles: [],
       iconName: 'cases',
+      permissionsNeeded: []
     },
     {
       name: 'System',
       href: '/system',
       authorizedRoles: [UserRoles.Admin],
       iconName: 'hub',
+      permissionsNeeded: []
     },
   ];
 

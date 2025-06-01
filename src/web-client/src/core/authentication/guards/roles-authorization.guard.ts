@@ -2,7 +2,7 @@ import { AuthenticationService } from './../services/authentication.service';
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { UserService } from '../../user/services/user.service';
-import { hasRequiredRole } from '../utils';
+import { hasRequiredRole } from '../utils/hasRequiredRole';
 
 /**
  * This will make sure:

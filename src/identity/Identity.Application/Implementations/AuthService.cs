@@ -446,25 +446,21 @@ namespace Identity.Application.Implementations
         {
             var result = new LogoutResult();
 
-            var user = GetUserByIdAsync(userId);
+            var user = await GetUserByIdAsync(userId);
             if (user is null)
             {
                 result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
             }
 
-            var validTokens = await _unitOfWork.Repository<Token>()
+            var affectedRows = await _unitOfWork.Repository<Token>()
                 .Query
-                .Where(x => x.IsRevoked == false && x.UserId == userId && x.RefreshTokenExpiresAt > DateTime.UtcNow)
-                .ToArrayAsync();
-
-            foreach (var token in validTokens)
-            {
-                token.Revoke("Logout called");
-            }
-
-            _unitOfWork.Repository<Token>().UpdateRange(validTokens);
-            await _unitOfWork.SaveChangesAsync();
+                .Where(x => !x.IsRevoked && x.UserId == userId && x.RefreshTokenExpiresAt > DateTime.UtcNow)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(t => t.IsRevoked, true)
+                    .SetProperty(t => t.RevokedAt, DateTime.UtcNow)
+                    .SetProperty(t => t.RevokedReason, "Logout called")
+                );
 
             result.Succeeded = true;
             return result;

@@ -1,0 +1,6 @@
+.singular_permission_item {
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
