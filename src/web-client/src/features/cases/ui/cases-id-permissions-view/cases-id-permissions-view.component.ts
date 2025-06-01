@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { ActivatedRoute } from '@angular/router';
 import { CasePermission } from '../../../../core/cases/type';
@@ -6,6 +6,7 @@ import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { CommonModule } from '@angular/common';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { CasePermissionItemComponent } from './components/case-permission-item/case-permission-item.component';
+import { UserService } from '../../../../core/user/services/user.service';
 
 @Component({
   selector: 'app-cases-id-permissions-view',
@@ -28,6 +29,10 @@ export class CasesIdPermissionsViewComponent implements OnInit {
     this.fetchData();
   }
 
+  /**
+   * Used to filter out permission of trhe current user so they cannot change there own
+   */
+  currentUserId = inject(UserService).USER?.id;
   permissions: CasePermission[] = [];
 
   caseId: string | null = null;
@@ -46,7 +51,7 @@ export class CasesIdPermissionsViewComponent implements OnInit {
 
     this.caseService.getPermissions(this.caseId).subscribe({
       next: (perms) => {
-        this.permissions = perms;
+        this.permissions = perms.filter((x) => x.userId !== this.currentUserId); // remove current user perms from UI
         this.isLoading = false;
       },
       error: (err) => {
@@ -55,8 +60,4 @@ export class CasesIdPermissionsViewComponent implements OnInit {
       },
     });
   }
-
-  // we dont use save changes state stuff as it makes it more compolex for this secernio instead just fire off request as they change values
-  // just use toasts to convey information
-  // disable the row as one slide toggle - might need to extract it into own component for that
 }

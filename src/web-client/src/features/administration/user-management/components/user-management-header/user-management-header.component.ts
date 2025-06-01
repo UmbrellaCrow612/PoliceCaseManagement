@@ -20,11 +20,13 @@ export class UserManagementHeaderComponent {
       href: `/${appPaths.ADMINISTRATION}/${appPaths.A_USER_MANAGEMENT}`,
       authorizedRoles: [],
       name: 'Home',
+      permissionsNeeded: []
     },
     {
       href: 'create',
       authorizedRoles: [],
       name: 'Add new user',
+      permissionsNeeded: []
     },
   ];
 

@@ -14,7 +14,8 @@
 <div class="container">
   <div class="links">
     @for (item of links; track $index) { @if
-    (hasRequiredRole(item.authorizedRoles, currentUserRoles)) {
+    (hasRequiredRole(item.authorizedRoles, currentUserRoles) &&
+    hasRequiredPermissions(item.permissionsNeeded, currentPermissions)) {
     <a mat-flat-button [routerLink]="item.href">{{ item.name }}</a>
     } }
   </div>
@@ -33,8 +34,10 @@
   </div>
 
   <div class="btns">
+    @if (hasRequiredPermissions([casePermissionNames.canEdit],
+    currentPermissions)) {
     <button mat-raised-button>Edit</button>
-    @if (hasRequiredRole([userRoles.Admin], currentUserRoles)) {
+    } @if (hasRequiredRole([userRoles.Admin], currentUserRoles)) {
     <button mat-raised-button>Delete</button>
     }
   </div>

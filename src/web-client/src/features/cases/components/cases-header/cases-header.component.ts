@@ -34,6 +34,7 @@ export class CasesHeaderComponent {
       name: 'Home',
       children: [],
       icon: 'home',
+      permissionsNeeded: []
     },
     {
       authorizedRoles: [],
@@ -41,6 +42,7 @@ export class CasesHeaderComponent {
       name: 'Search',
       children: [],
       icon: 'search',
+      permissionsNeeded: []
     },
   ];
 }

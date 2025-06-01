@@ -9,7 +9,7 @@ import { AddCaseFileAttachmentDialogComponent } from './components/add-case-file
 import { MatButtonModule } from '@angular/material/button';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { hasRequiredRole } from '../../../../core/authentication/utils';
+import { hasRequiredRole } from '../../../../core/authentication/utils/hasRequiredRole';
 import { UserRoles } from '../../../../core/authentication/roles';
 import { UserService } from '../../../../core/user/services/user.service';
 

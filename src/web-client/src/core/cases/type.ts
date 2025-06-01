@@ -89,3 +89,18 @@ export const CasePriorityNames: { name: string; number: number }[] = [
 ];
 
 export interface CasePagedResult extends PagedResult<Case> {}
+
+/**
+ * Contains all the permissions for cases mapped from the model table names
+ */
+export const CasePermissionNames = {
+  canEdit: 'CanEdit',
+  canAssign: 'CanAssign',
+
+  /**
+   * Returns an array of all permission names
+   */
+  all(): string[] {
+    return [this.canEdit, this.canAssign];
+  },
+};

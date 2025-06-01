@@ -122,6 +122,25 @@ namespace Cases.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Get the current requesting users permissions on a given case - returns a list of permission they have strings
+        /// </summary>
+        [Authorize]
+        [HttpGet("{caseId}/permissions/me")]
+        public async Task<IActionResult> GetMyCasePermissionForCase(string caseId)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var _case = await _caseService.FindById(caseId);
+            if(_case is null) return NotFound();
+
+            var result = await _caseService.GetCasePermissionForUserOnCase(_case, userId);
+            if (!result.Succeeded) return BadRequest(result);
+
+            return Ok(result.Permissions);
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<CaseDto>> CreateCase([FromBody] CreateCaseDto dto)

@@ -4,7 +4,7 @@ import { appPaths } from '../../../../core/app/constants/appPaths';
 import { RouterLink } from '@angular/router';
 import { AppLink } from '../../../../core/app/type';
 import { UserService } from '../../../../core/user/services/user.service';
-import { hasRequiredRole } from '../../../../core/authentication/utils';
+import { hasRequiredRole } from '../../../../core/authentication/utils/hasRequiredRole';
 import { UserRoles } from '../../../../core/authentication/roles';
 import { fromEvent, Subscription } from 'rxjs';
 import { HeaderProfileComponent } from '../../../../core/components/header-profile/header-profile.component';
@@ -37,46 +37,55 @@ export class DashboardHeaderComponent implements OnInit, OnDestroy {
       name: 'Cases',
       authorizedRoles: [],
       href: `/${appPaths.DASHBOARD_CASES()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Officers',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_OFFICER()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Evidence',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_EVIDENCE()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Crime',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_CRIME()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Suspect & Witness',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_SUSPECT_AND_WITNESS()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Victim',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_VICTIM()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Task & Assignment',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_TASK_AND_ASSIGNMENT()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Legal & Court',
       authorizedRoles: [], // TODO: here in future we could restrict to managers above officers as personal details or a role that is above a officer
       href: `/${appPaths.DASHBOARD_LEGAL_AND_COURT()}`,
+      permissionsNeeded: []
     },
     {
       name: 'Administration & User',
       authorizedRoles: [UserRoles.Admin],
       href: `/${appPaths.DASHBOARD_ADMIN()}`,
+      permissionsNeeded: []
     },
   ];
 

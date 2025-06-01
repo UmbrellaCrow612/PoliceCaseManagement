@@ -201,7 +201,10 @@ namespace Cases.Application.Implementations
             caseToCreate.ReportingOfficerEmail = userDetails.Email;
             caseToCreate.ReportingOfficerUserName = userDetails.Username;
 
+            var defaultPermissionForCreator = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = userDetails.UserId, UserName = userDetails.Username };
+
             await _dbcontext.Cases.AddAsync(caseToCreate);
+            await _dbcontext.CasePermissions.AddAsync(defaultPermissionForCreator);
             await _dbcontext.SaveChangesAsync();
 
 
@@ -226,6 +229,7 @@ namespace Cases.Application.Implementations
             result.Succeeded = true;
             return result;
         }
+
 
         public async Task<CaseResult> DeleteAttachment(CaseAttachmentFile file)
         {
@@ -302,6 +306,32 @@ namespace Cases.Application.Implementations
         public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
         {
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
+        }
+
+        public async Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId)
+        {
+            var result = new MyCasePermissionResult();
+
+            var perm = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
+            if (perm is null)
+            {
+                result.AddError(BusinessRuleCodes.ValidationError, "Permissions not found");
+                return result;
+            }
+
+            List<string> perms = [];
+            if (perm.CanAssign)
+            {
+                perms.Add(nameof(perm.CanAssign));
+            }
+            if (perm.CanEdit)
+            {
+                perms.Add(nameof(perm.CanEdit));
+            }
+            result.Permissions = perms;
+            result.Succeeded = true;
+
+            return result;
         }
 
         public async Task<List<CasePermission>> GetCasePermissions(Case @case)

@@ -182,7 +182,14 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="permission">The permission to update</param>
         Task<CaseResult> UpdateCasePermission(CasePermission permission);
-   
+
+        /// <summary>
+        /// Get a users case permission on a given case
+        /// </summary>
+        /// <param name="case">The case to get there permission for</param>
+        /// <param name="userId">The user who's permission you want to get</param>
+        /// <returns>List of permissions they have if the operation succeeds</returns>
+        Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId);
     }
 
     /// <summary>
@@ -206,5 +213,10 @@ namespace Cases.Core.Services
     {
         public required string Code { get; set; }
         public string? Message { get; set; }
+    }
+
+    public class MyCasePermissionResult : CaseResult
+    {
+        public List<string> Permissions { get; set; } = [];
     }
 }

@@ -19,15 +19,9 @@
     <app-case-permission-item
       [permissionData]="perm"
     ></app-case-permission-item>
+    } @empty {
+    <div>No users assigned to case for you to change permissions for</div>
     }
   </div>
 </div>
 }
-
-<!--
-
-TODO:
-
-if same user disable there checks so they cannot change there own perms also on endpoints
-
--->

@@ -21,6 +21,7 @@ export class AdministrationSideNavComponent {
       href: `/${appPaths.ADMINISTRATION}`,
       authorizedRoles: [],
       name: 'Home',
+      permissionsNeeded: [],
       iconName: 'home',
     },
     {
@@ -28,6 +29,7 @@ export class AdministrationSideNavComponent {
       authorizedRoles: [],
       name: 'User management',
       iconName: 'group',
+      permissionsNeeded: []
     },
   ];
 }

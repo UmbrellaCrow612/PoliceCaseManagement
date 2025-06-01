@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250601074139_InitialCreate")]
+    [Migration("20250601143140_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -275,8 +275,7 @@ namespace Cases.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("CaseUsers");
                 });

@@ -249,8 +249,7 @@ namespace Cases.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_CaseUsers_UserId",
                 table: "CaseUsers",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
         }
 
         /// <inheritdoc />

@@ -11,12 +11,12 @@ namespace Cases.Core.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// If the given user can edit details for case details
+        /// If the given user can edit details for case details - The table name itself is the permission name
         /// </summary>
         public required bool CanEdit { get; set; }
 
         /// <summary>
-        /// If the given user can assign / edit users to the case
+        /// If the given user can assign / edit users to the case - The table name itself is the permission name
         /// </summary>
         public required bool CanAssign { get; set; }
 
