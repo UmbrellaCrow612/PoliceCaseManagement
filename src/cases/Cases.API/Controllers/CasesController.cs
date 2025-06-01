@@ -145,7 +145,12 @@ namespace Cases.API.Controllers
         [HttpPost]
         public async Task<ActionResult<CaseDto>> CreateCase([FromBody] CreateCaseDto dto)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
             var caseToCreate = _caseMapping.Create(dto);
+            caseToCreate.CreatedById = userId;
+
             var valResult = _caseValidator.Execute(caseToCreate);
             if (!valResult.IsSuccessful)
             {

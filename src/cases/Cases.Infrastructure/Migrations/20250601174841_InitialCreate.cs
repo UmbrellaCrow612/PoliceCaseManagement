@@ -26,6 +26,9 @@ namespace Cases.Infrastructure.Migrations
                     ReportingOfficerId = table.Column<string>(type: "text", nullable: false),
                     ReportingOfficerUserName = table.Column<string>(type: "text", nullable: false),
                     ReportingOfficerEmail = table.Column<string>(type: "text", nullable: false),
+                    CreatedById = table.Column<string>(type: "text", nullable: false),
+                    CreatedByUserName = table.Column<string>(type: "text", nullable: false),
+                    CreatedByEmail = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },

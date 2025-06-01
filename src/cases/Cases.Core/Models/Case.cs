@@ -50,6 +50,8 @@ namespace Cases.Core.Models
         public CasePriority Priority { get; set; } = CasePriority.Normal;
 
 
+
+
         // --- Relationships (using IDs for simplicity, could be full objects later) ---
 
         public ICollection<CaseIncidentType> CaseIncidentType { get; set; } = [];
@@ -65,6 +67,18 @@ namespace Cases.Core.Models
 
         [DenormalizedField("Application user", "Email", "Identity Service")]
         public string ReportingOfficerEmail { get; set; } = null!;
+
+
+        // user data copy of creator 
+
+        [DenormalizedField("Application user", "Id", "Identity Service")]
+        public string CreatedById { get; set; } = null!;
+
+        [DenormalizedField("Application user", "UserName", "Identity Service")]
+        public string CreatedByUserName { get; set; } = null!;
+
+        [DenormalizedField("Application user", "Email", "Identity Service")]
+        public string CreatedByEmail { get; set; } = null!;
 
         // Local copy of user data 
 

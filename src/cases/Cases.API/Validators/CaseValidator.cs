@@ -12,6 +12,8 @@ namespace Cases.API.Validators
         {
             AddRule(x => string.IsNullOrWhiteSpace(x.ReportingOfficerId), "ReportingOfficerId must not be empty or whitespace if provided");
 
+            AddRule(x => string.IsNullOrWhiteSpace(x.CreatedById), "Created by ID must not be empty or whitespace if provided");
+
             AddRule(x => x.CaseNumber.Length < 5, "Case number must be grater than 5 characters long");
         }
     }

@@ -190,23 +190,46 @@ namespace Cases.Application.Implementations
                 return result;
             }
 
-            var userExists = await _userValidationService.DoesUserExistAsync(caseToCreate.ReportingOfficerId);
-            if (!userExists)
+            var reportingOfficerExists = await _userValidationService.DoesUserExistAsync(caseToCreate.ReportingOfficerId);
+            var createdByUserExists = await _userValidationService.DoesUserExistAsync(caseToCreate.CreatedById);
+
+            if (!createdByUserExists || !reportingOfficerExists)
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "User dose not exist");
                 return result;
             }
 
-            var userDetails = await _userValidationService.GetUserById(caseToCreate.ReportingOfficerId);
-            caseToCreate.ReportingOfficerEmail = userDetails.Email;
-            caseToCreate.ReportingOfficerUserName = userDetails.Username;
+            var reportingOfficerDetails = await _userValidationService.GetUserById(caseToCreate.ReportingOfficerId);
+            var createdByDetails = await _userValidationService.GetUserById(caseToCreate.CreatedById);
 
-            var defaultPermissionForCreator = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = userDetails.UserId, UserName = userDetails.Username };
+            caseToCreate.ReportingOfficerEmail = reportingOfficerDetails.Email;
+            caseToCreate.ReportingOfficerUserName = reportingOfficerDetails.Username;
+
+            caseToCreate.CreatedByUserName = createdByDetails.Username;
+            caseToCreate.CreatedByEmail = createdByDetails.Email;
 
             await _dbcontext.Cases.AddAsync(caseToCreate);
-            await _dbcontext.CasePermissions.AddAsync(defaultPermissionForCreator);
-            await _dbcontext.SaveChangesAsync();
 
+            if (caseToCreate.ReportingOfficerId != caseToCreate.CreatedById)
+            {
+                var permissionsForCreator = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
+                var permissionsForReportingOfficer = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
+
+                var assignReportingOfficerToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = reportingOfficerDetails.Email, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
+                var assignCreatorToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
+
+                await _dbcontext.CasePermissions.AddRangeAsync([permissionsForCreator, permissionsForReportingOfficer]);
+                await _dbcontext.CaseUsers.AddRangeAsync([assignReportingOfficerToCaseLink, assignCreatorToCaseLink]);
+            } else
+            {
+                var permission = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
+                var assignUserToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
+
+                await _dbcontext.CasePermissions.AddAsync(permission);
+                await _dbcontext.CaseUsers.AddAsync(assignUserToCaseLink);
+            }
+
+            await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
             return result;
