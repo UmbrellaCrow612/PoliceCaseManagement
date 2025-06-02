@@ -1,16 +1,16 @@
-using Identity.Infrastructure;
-using Microsoft.AspNetCore.Identity;
-using Serilog;
-using Identity.Core.Models;
+using Caching;
+using Identity.API.Extensions;
+using Identity.API.Grpc;
 using Identity.Application;
-using Scalar.AspNetCore;
+using Identity.Core.Models;
+using Identity.Infrastructure;
+using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
-using Identity.API.Extensions;
-using Caching;
-using Identity.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Identity.API.Grpc;
+using Scalar.AspNetCore;
+using Serilog;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -52,7 +52,7 @@ app.MapGrpcService<UserServiceImpl>();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<IdentityApplicationDbContext>();
-    dbContext.Database.Migrate(); 
+    dbContext.Database.Migrate();
 }
 
 using (var scope = app.Services.CreateScope())

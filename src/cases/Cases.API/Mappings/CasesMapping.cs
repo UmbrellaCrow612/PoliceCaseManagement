@@ -8,11 +8,11 @@ namespace Cases.API.Mappings
     {
         public Case Create(CreateCaseDto createDto)
         {
-            return new Case 
-            { 
-                IncidentDateTime = createDto.IncidentDateTime, 
+            return new Case
+            {
+                IncidentDateTime = createDto.IncidentDateTime,
                 CaseNumber = createDto.CaseNumber.Trim(),
-                Summary = createDto.Summary, 
+                Summary = createDto.Summary,
                 Description = createDto.Description,
                 ReportingOfficerId = createDto.ReportingOfficerId.Trim(),
             };
@@ -20,13 +20,13 @@ namespace Cases.API.Mappings
 
         public CaseDto ToDto(Case @base)
         {
-            return new CaseDto 
-            { 
+            return new CaseDto
+            {
                 Id = @base.Id,
-                CaseNumber = @base.CaseNumber, 
-                Description = @base.Description, 
-                IncidentDateTime = @base.IncidentDateTime, 
-                LastModifiedDate = @base.LastModifiedDate, 
+                CaseNumber = @base.CaseNumber,
+                Description = @base.Description,
+                IncidentDateTime = @base.IncidentDateTime,
+                LastModifiedDate = @base.LastModifiedDate,
                 Priority = @base.Priority,
                 ReportedDateTime = @base.ReportedDateTime,
                 Status = @base.Status,

@@ -2,7 +2,6 @@
 using Amazon.S3.Model;
 using Cases.Core.Services;
 using Cases.Infrastructure.Options;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Cases.Infrastructure.Implementations

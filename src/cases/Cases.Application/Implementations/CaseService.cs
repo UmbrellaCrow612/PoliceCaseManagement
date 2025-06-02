@@ -43,7 +43,7 @@ namespace Cases.Application.Implementations
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
-            return result;   
+            return result;
         }
 
         public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
@@ -149,9 +149,26 @@ namespace Cases.Application.Implementations
                 userDetails.Add(await _userValidationService.GetUserById(userId));
             }
 
-            foreach(var user in userDetails)
+            foreach (var user in userDetails)
             {
-                defaultCasePermissions.Add(new CasePermission { CanAssign = false, CanEdit = false, CaseId = @case.Id, UserId = user.UserId, UserName = user.Username });
+                defaultCasePermissions.Add(new CasePermission
+                {
+                    CanAssign = false,
+                    CanEdit = false,
+                    CaseId = @case.Id,
+                    UserId = user.UserId,
+                    UserName = user.Username,
+                    CanAddActions = false,
+                    CanDeleteActions = false,
+                    CanDeleteFileAttachments = false,
+                    CanEditActions = false,
+                    CanEditPermissions = false,
+                    CanRemoveAssigned = false,
+                    CanViewActions = false,
+                    CanViewAssigned = false,
+                    CanViewFileAttachments = false,
+                    CanViewPermissions = false,
+                });
             }
 
             List<CaseUser> linksToThisCase = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
@@ -171,10 +188,23 @@ namespace Cases.Application.Implementations
             var linkExists = await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
             if (!linkExists)
             {
-                result.AddError(BusinessRuleCodes.UserCannotViewCaseAsTheyLackPermissions);
+                result.AddError(BusinessRuleCodes.CasePermissions);
                 return result;
             }
 
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> CanUserViewCasePermissions(string caseId, string userId)
+        {
+            var result = new CaseResult();
+            var hasPerms = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewPermissions == true).AnyAsync();
+            if (!hasPerms)
+            {
+                result.AddError(BusinessRuleCodes.CasePermissions);
+                return result;
+            }
             result.Succeeded = true;
             return result;
         }
@@ -212,17 +242,69 @@ namespace Cases.Application.Implementations
 
             if (caseToCreate.ReportingOfficerId != caseToCreate.CreatedById)
             {
-                var permissionsForCreator = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
-                var permissionsForReportingOfficer = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
+                var permissionsForCreator = new CasePermission
+                {
+                    CanAssign = true,
+                    CanEdit = true,
+                    CanAddActions = true,
+                    CanDeleteActions = true,
+                    CanDeleteFileAttachments = true,
+                    CaseId = caseToCreate.Id,
+                    UserId = createdByDetails.UserId,
+                    UserName = createdByDetails.Username,
+                    CanEditActions = true,
+                    CanEditPermissions = true,
+                    CanRemoveAssigned = true,
+                    CanViewActions = true,
+                    CanViewAssigned = true,
+                    CanViewFileAttachments = true,
+                    CanViewPermissions = true,
+                };
+                var permissionsForReportingOfficer = new CasePermission
+                {
+                    CanAssign = true,
+                    CanEdit = true,
+                    CaseId = caseToCreate.Id,
+                    UserId = reportingOfficerDetails.UserId,
+                    UserName = reportingOfficerDetails.Username,
+                    CanAddActions = true,
+                    CanDeleteActions = true,
+                    CanDeleteFileAttachments = true,
+                    CanEditActions = true,
+                    CanEditPermissions = true,
+                    CanRemoveAssigned = true,
+                    CanViewActions = true,
+                    CanViewAssigned = true,
+                    CanViewFileAttachments = true,
+                    CanViewPermissions = true,
+                };
 
                 var assignReportingOfficerToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = reportingOfficerDetails.Email, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
                 var assignCreatorToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
 
                 await _dbcontext.CasePermissions.AddRangeAsync([permissionsForCreator, permissionsForReportingOfficer]);
                 await _dbcontext.CaseUsers.AddRangeAsync([assignReportingOfficerToCaseLink, assignCreatorToCaseLink]);
-            } else
+            }
+            else
             {
-                var permission = new CasePermission { CanAssign = true, CanEdit = true, CaseId = caseToCreate.Id, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
+                var permission = new CasePermission
+                {
+                    CanAssign = true,
+                    CanEdit = true,
+                    CaseId = caseToCreate.Id,
+                    UserId = createdByDetails.UserId,
+                    UserName = createdByDetails.Username,
+                    CanAddActions = true,
+                    CanDeleteActions = true,
+                    CanDeleteFileAttachments = true,
+                    CanEditActions = true,
+                    CanEditPermissions = true,
+                    CanRemoveAssigned = true,
+                    CanViewActions = true,
+                    CanViewAssigned = true,
+                    CanViewFileAttachments = true,
+                    CanViewPermissions = true,
+                };
                 var assignUserToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
 
                 await _dbcontext.CasePermissions.AddAsync(permission);
@@ -301,9 +383,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
         }
 
-        public async Task<CasePermission?> FindCasePermissionById(string permissionId)
+        public async Task<CasePermission?> FindCasePermissionById(Case @case, string permissionId)
         {
-            return await _dbcontext.CasePermissions.FindAsync(permissionId);
+            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.Id == permissionId).FirstOrDefaultAsync();
         }
 
         public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
@@ -343,17 +425,58 @@ namespace Cases.Application.Implementations
             }
 
             List<string> perms = [];
-            if (perm.CanAssign)
-            {
-                perms.Add(nameof(perm.CanAssign));
-            }
+
             if (perm.CanEdit)
             {
                 perms.Add(nameof(perm.CanEdit));
             }
+            if (perm.CanViewPermissions)
+            {
+                perms.Add(nameof(perm.CanViewPermissions));
+            }
+            if (perm.CanEditPermissions)
+            {
+                perms.Add(nameof(perm.CanEditPermissions));
+            }
+            if (perm.CanViewFileAttachments)
+            {
+                perms.Add(nameof(perm.CanViewFileAttachments));
+            }
+            if (perm.CanDeleteFileAttachments)
+            {
+                perms.Add(nameof(perm.CanDeleteFileAttachments));
+            }
+            if (perm.CanViewAssigned)
+            {
+                perms.Add(nameof(perm.CanViewAssigned));
+            }
+            if (perm.CanAssign)
+            {
+                perms.Add(nameof(perm.CanAssign));
+            }
+            if (perm.CanRemoveAssigned)
+            {
+                perms.Add(nameof(perm.CanRemoveAssigned));
+            }
+            if (perm.CanViewActions)
+            {
+                perms.Add(nameof(perm.CanViewActions));
+            }
+            if (perm.CanAddActions)
+            {
+                perms.Add(nameof(perm.CanAddActions));
+            }
+            if (perm.CanEditActions)
+            {
+                perms.Add(nameof(perm.CanEditActions));
+            }
+            if (perm.CanDeleteActions)
+            {
+                perms.Add(nameof(perm.CanDeleteActions));
+            }
+
             result.Permissions = perms;
             result.Succeeded = true;
-
             return result;
         }
 
@@ -459,7 +582,7 @@ namespace Cases.Application.Implementations
                 .Take(query.PageSize)
                 .ToListAsync();
 
-            var result =  new PagedResult<Case>(items, count, query.PageNumber, query.PageSize);
+            var result = new PagedResult<Case>(items, count, query.PageNumber, query.PageSize);
             return result;
         }
 
@@ -473,7 +596,7 @@ namespace Cases.Application.Implementations
             List<CaseIncidentType> newlyLinkedIncidentTypes = [];
             foreach (var incidentType in incidentTypes)
             {
-                newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id});
+                newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id });
             }
             await _dbcontext.CaseIncidentTypes.AddRangeAsync(newlyLinkedIncidentTypes);
             await _dbcontext.SaveChangesAsync();
@@ -507,7 +630,7 @@ namespace Cases.Application.Implementations
             _dbcontext.IncidentTypes.Update(incidentType);
             await _dbcontext.SaveChangesAsync();
 
-            result.Succeeded= true;
+            result.Succeeded = true;
             return result;
         }
     }

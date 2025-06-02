@@ -9,7 +9,6 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 
 namespace Cases.API.Controllers
 {
@@ -51,15 +50,10 @@ namespace Cases.API.Controllers
         public async Task<ActionResult<CaseDto>> GetCaseById(string caseId)
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var canByPassCaseViewCheck = User.IsInRole(Roles.Admin);
-
-            if (!canByPassCaseViewCheck)
-            {
-                var result = await _caseService.CanUserViewCaseDetails(caseId, userId);
-                if (!result.Succeeded) return BadRequest(result);
-            }
+            var result = await _caseService.CanUserViewCaseDetails(caseId, userId);
+            if (!result.Succeeded) return BadRequest(result);
 
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
             if (cache is not null)
@@ -82,11 +76,16 @@ namespace Cases.API.Controllers
         /// <summary>
         /// Return the permissions set on the case
         /// </summary>
-        /// <returns></returns>
-        [Authorize(Roles = Roles.Admin)]
+        [Authorize]
         [HttpGet("{caseId}/permissions")]
         public async Task<IActionResult> GetCasePermissions(string caseId)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var result = await _caseService.CanUserViewCasePermissions(caseId, userId);
+            if(!result.Succeeded) return BadRequest(result);
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
@@ -101,23 +100,28 @@ namespace Cases.API.Controllers
         /// Update a case permission
         /// </summary>
         /// <param name="permissionId">The permission to update</param>
+        /// <param name="caseId">The parent case it is linked to</param>
         /// <param name="dto">Request body</param>
-        [Authorize(Roles = Roles.Admin)] // future change to manager or high rank than base officer - or same rank
-        [HttpPut("permissions/{permissionId}")]
-        public async Task<IActionResult> UpdateCasePermission(string permissionId, [FromBody] UpdateCasePermissionDto dto)
+        [Authorize] 
+        [HttpPut("{caseId}/permissions/{permissionId}")]
+        public async Task<IActionResult> UpdateCasePermission(string caseId, string permissionId, [FromBody] UpdateCasePermissionDto dto)
         {
-            var permission = await _caseService.FindCasePermissionById(permissionId);
-            if (permission is null)
-            {
-                return NotFound();
-            }
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var res = await _caseService.CanUserEditCasePermissions(caseId, userId);
+            if (!res.Succeeded) return BadRequest(res);
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            var permission = await _caseService.FindCasePermissionById(_case, permissionId);
+            if (permission is null) return NotFound();
+
             _casePermissionMapping.Update(permission, dto);
 
             var result = await _caseService.UpdateCasePermission(permission);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
+            if (!result.Succeeded) return BadRequest(result);
 
             return NoContent();
         }
@@ -133,7 +137,7 @@ namespace Cases.API.Controllers
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
             var _case = await _caseService.FindById(caseId);
-            if(_case is null) return NotFound();
+            if (_case is null) return NotFound();
 
             var result = await _caseService.GetCasePermissionForUserOnCase(_case, userId);
             if (!result.Succeeded) return BadRequest(result);
@@ -171,7 +175,7 @@ namespace Cases.API.Controllers
         /// <summary>
         /// Upload a file attachment to a case
         /// </summary>
-        [Authorize] 
+        [Authorize]
         [HttpPost("{caseId}/attachments/upload")]
         public async Task<IActionResult> UploadAttachmentForCase(string caseId, IFormFile file)
         {
@@ -207,7 +211,7 @@ namespace Cases.API.Controllers
         /// Download a specific attachment 
         /// </summary>
         /// <param name="attachmentId">The attachment to download</param>
-        [Authorize] 
+        [Authorize]
         [HttpGet("attachments/download/{attachmentId}")]
         public async Task<IActionResult> DownloadCaseAttachmentFile(string attachmentId)
         {
@@ -406,7 +410,7 @@ namespace Cases.API.Controllers
         public async Task<IActionResult> UpdateCasesLinkedIncidentTypes(string caseId, [FromBody] UpdateCasesLinkedIncidentTypesDto dto)
         {
             var _case = await _caseService.FindById(caseId);
-            if(_case is null)
+            if (_case is null)
             {
                 return NotFound("Case not found");
             }

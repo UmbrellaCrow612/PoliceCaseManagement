@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250601174841_InitialCreate")]
+    [Migration("20250602075511_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -190,10 +190,40 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<bool>("CanAddActions")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanAssign")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanDeleteActions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDeleteFileAttachments")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanEdit")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditActions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditPermissions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanRemoveAssigned")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewActions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewAssigned")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewFileAttachments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanViewPermissions")
                         .HasColumnType("boolean");
 
                     b.Property<string>("CaseId")

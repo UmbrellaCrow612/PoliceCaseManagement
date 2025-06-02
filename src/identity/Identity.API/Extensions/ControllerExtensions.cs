@@ -17,7 +17,7 @@ namespace Identity.API.Extensions
             controller.Response.Cookies.Append(AuthCookieNamesConstant.REFRESH_TOKEN, tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,  
+                Secure = true,
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(options.RefreshTokenExpiriesInMinutes),
                 IsEssential = true
@@ -53,7 +53,7 @@ namespace Identity.API.Extensions
             /// we assume that <see cref="Annotations.RequireDeviceInformationAttribute"/> has been run on the endpoint
             return new DeviceInfo
             {
-                DeviceFingerPrint = controller.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!, 
+                DeviceFingerPrint = controller.Request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault()!,
                 IpAddress = controller.Request.HttpContext.Connection.RemoteIpAddress?.ToString()
                                 ?? controller.Request.Headers["X-Forwarded-For"].FirstOrDefault()
                                 ?? "Unknown",

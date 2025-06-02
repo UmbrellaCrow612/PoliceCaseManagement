@@ -1,7 +1,7 @@
-﻿using Cases.API.Validators;
+﻿using System.Text;
+using Cases.API.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Cases.API
 {

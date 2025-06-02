@@ -8,7 +8,7 @@ namespace Cases.API.Validators
     /// </summary>
     public class CaseValidator : Validator<Case>
     {
-        public CaseValidator() 
+        public CaseValidator()
         {
             AddRule(x => string.IsNullOrWhiteSpace(x.ReportingOfficerId), "ReportingOfficerId must not be empty or whitespace if provided");
 

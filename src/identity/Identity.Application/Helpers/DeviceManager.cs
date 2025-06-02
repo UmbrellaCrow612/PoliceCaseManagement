@@ -53,7 +53,7 @@ namespace Identity.Application.Helpers
 
         private class Err : IServiceError
         {
-            public required string Code { get ; set ; }
+            public required string Code { get; set; }
             public string? Message { get; set; }
         }
 

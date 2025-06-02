@@ -1,7 +1,7 @@
-﻿using Identity.Core.Models;
+﻿using System.Reflection;
+using Identity.Core.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace Identity.Infrastructure.Data
 {

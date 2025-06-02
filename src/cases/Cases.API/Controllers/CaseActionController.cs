@@ -17,7 +17,7 @@ namespace Cases.API.Controllers
         public async Task<IActionResult> GetCaseActionByIdAsync(string caseActionId)
         {
             var action = await _caseActionService.GetCaseActionByIdAsync(caseActionId);
-            if (action  is null)
+            if (action is null)
             {
                 return NotFound();
             }

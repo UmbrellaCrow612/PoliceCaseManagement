@@ -1,6 +1,6 @@
-﻿using Identity.Core.Models;
+﻿using System.Text.Json;
+using Identity.Core.Models;
 using QRCoder;
-using System.Text.Json;
 
 namespace Identity.Application.Helpers
 {

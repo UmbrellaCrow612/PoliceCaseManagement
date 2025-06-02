@@ -1,5 +1,5 @@
-﻿using Identity.Core.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Identity.Core.Models;
 
 namespace Identity.API.DTOs
 {

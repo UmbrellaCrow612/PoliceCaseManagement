@@ -1,6 +1,4 @@
-﻿using Cases.Core.Models;
-
-namespace Cases.API.Mappings
+﻿namespace Cases.API.Mappings
 {
     public class CaseUserDto
     {

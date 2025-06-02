@@ -10,8 +10,8 @@
         public DateTime? SuccessfulAt { get; set; } = null;
         public required string LoginAttemptId { get; set; }
         public LoginAttempt? LoginAttempt { get; set; } = null;
-        public required DateTime ExpiresAt {  get; set; }
-   
+        public required DateTime ExpiresAt { get; set; }
+
         public bool IsValid()
         {
             if (IsSuccessful)

@@ -175,7 +175,8 @@ namespace Cases.Core.Services
         /// Find a <see cref="CasePermission"/> by it's ID
         /// </summary>
         /// <param name="permissionId">The case permission to find</param>
-        Task<CasePermission?> FindCasePermissionById(string permissionId);
+        /// <param name="case">The parent case it is linked to</param>
+        Task<CasePermission?> FindCasePermissionById(Case @case, string permissionId);
 
         /// <summary>
         /// Update a <see cref="CasePermission"/>
@@ -190,6 +191,22 @@ namespace Cases.Core.Services
         /// <param name="userId">The user who's permission you want to get</param>
         /// <returns>List of permissions they have if the operation succeeds</returns>
         Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId);
+
+        /// <summary>
+        /// Checks if a user has <see cref="CasePermission.CanViewPermissions"/> flag set to true for the given case
+        /// </summary>
+        /// <param name="caseId">The case to check it for</param>
+        /// <param name="userId">The ID of the user</param>
+        /// <returns>Result if it is <see cref="CaseResult.Succeeded"/> then they do have permissions to view them</returns>
+        Task<CaseResult> CanUserViewCasePermissions(string caseId, string userId);
+
+        /// <summary>
+        /// Checks if a user has <see cref="CasePermission.CanEditPermissions"/> flag set to true
+        /// </summary>
+        /// <param name="caseId">The case to check</param>
+        /// <param name="userId">The user to check for</param>
+        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
+        Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId);
     }
 
     /// <summary>

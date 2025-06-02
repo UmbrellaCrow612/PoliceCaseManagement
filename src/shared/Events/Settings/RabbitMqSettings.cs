@@ -8,7 +8,7 @@ namespace Events.Settings
     public class RabbitMqSettings
     {
         [Required]
-        public required string Host {  get; set; }
+        public required string Host { get; set; }
 
         [Required]
         public required string Username { get; set; }

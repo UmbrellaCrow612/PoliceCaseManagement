@@ -1,23 +1,23 @@
-﻿using Identity.Application.Helpers;
-using Identity.Application.Settings;
+﻿using System.Data;
+using System.Security.Cryptography;
+using Events.User;
 using Identity.Application.Codes;
+using Identity.Application.Helpers;
+using Identity.Application.Settings;
 using Identity.Core.Models;
 using Identity.Core.Repositorys;
 using Identity.Core.Services;
+using Identity.Core.ValueObjects;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OtpNet;
-using System.Data;
-using System.Security.Cryptography;
-using Identity.Core.ValueObjects;
-using Events.User;
-using MassTransit;
 
 namespace Identity.Application.Implementations
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper, 
+    internal class AuthService(UserManager<ApplicationUser> userManager, DeviceManager deviceManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper,
         IOptions<JwtBearerOptions> jwtBearerOptions, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IOptions<PasswordConfigSettings> passwordConfigSettings
         , IPasswordHasher<ApplicationUser> passwordHasher, RoleManager<ApplicationRole> roleManager, IPublishEndpoint publishEndpoint) : IAuthService
     {
@@ -808,7 +808,7 @@ namespace Identity.Application.Implementations
             {
                 foreach (var err in changePasswordResult.Errors)
                 {
-                    result.AddError(BusinessRuleCodes.ValidationError, $@"Code: ${err.Code} Description: ${err.Description}" );
+                    result.AddError(BusinessRuleCodes.ValidationError, $@"Code: ${err.Code} Description: ${err.Description}");
                 }
                 return result;
             }
@@ -826,7 +826,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.EmailAlreadyConfirmed);
                 return result;
-            };
+            }
+            ;
 
             var validRecentEmailConfirmationAttemptExists = await _unitOfWork.Repository<EmailVerificationAttempt>()
                 .Query
@@ -837,7 +838,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ValidEmailConfirmationAttemptExists);
                 return result;
-            };
+            }
+            ;
 
             var newAttempt = new EmailVerificationAttempt
             {
@@ -865,7 +867,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.EmailAlreadyConfirmed);
                 return result;
-            };
+            }
+            ;
 
             var attempt = await _unitOfWork.Repository<EmailVerificationAttempt>()
                 .Query
@@ -875,7 +878,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.EmailConfirmation);
                 return result;
-            };
+            }
+            ;
             user.EmailConfirmed = true;
 
             _unitOfWork.Repository<ApplicationUser>().Update(user);
@@ -897,7 +901,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.UserDoesNotExist);
                 return result;
-            };
+            }
+            ;
 
             var deviceId = _deviceManager.GenerateDeviceId(user.Id, info.DeviceFingerPrint, info.UserAgent);
             var deviceExists = await _unitOfWork.Repository<UserDevice>().Query.Where(x => x.Id == deviceId).AnyAsync();
@@ -917,7 +922,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(device is null ? BusinessRuleCodes.DeviceNotConfirmed : BusinessRuleCodes.DeviceAlreadyTrusted);
                 return result;
-            };
+            }
+            ;
 
             var validRecentAttemptExists = await _unitOfWork.Repository<UserDeviceChallengeAttempt>()
                 .Query
@@ -928,7 +934,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ValidDeviceConfirmationAttemptExists);
                 return result;
-            };
+            }
+            ;
 
             var attempt = new UserDeviceChallengeAttempt
             {
@@ -958,14 +965,16 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.DeviceConfirmationAttemptDoesNotExist);
                 return result;
-            };
+            }
+            ;
 
             var device = await _unitOfWork.Repository<UserDevice>().FindByIdAsync(attempt.UserDeviceId);
             if (device is null || device.IsTrusted)
             {
                 result.AddError(device is null ? BusinessRuleCodes.DeviceNotConfirmed : BusinessRuleCodes.DeviceAlreadyTrusted);
                 return result;
-            };
+            }
+            ;
 
             attempt.MarkUsed();
             _unitOfWork.Repository<UserDeviceChallengeAttempt>().Update(attempt);
@@ -997,7 +1006,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ValidConfirmationPhoneNumberAttemptExists);
                 return result;
-            };
+            }
+            ;
 
             var newAttempt = new PhoneConfirmationAttempt
             {
@@ -1023,7 +1033,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(user is null ? BusinessRuleCodes.UserDoesNotExist : BusinessRuleCodes.PhoneNumberAlreadyConfirmed);
                 return result;
-            };
+            }
+            ;
 
             var attempt = await _unitOfWork.Repository<PhoneConfirmationAttempt>()
                 .Query
@@ -1033,7 +1044,8 @@ namespace Identity.Application.Implementations
             {
                 result.AddError(BusinessRuleCodes.ConfirmPhoneNumberAttemptDoesNotExist);
                 return result;
-            };
+            }
+            ;
 
             user.PhoneNumberConfirmed = true;
             _unitOfWork.Repository<ApplicationUser>().Update(user);
@@ -1178,12 +1190,12 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<ChangePasswordResult> ChangePassword(DeviceInfo deviceInfo,string email, string password, string newPassword)
+        public async Task<ChangePasswordResult> ChangePassword(DeviceInfo deviceInfo, string email, string password, string newPassword)
         {
             var result = new ChangePasswordResult();
 
             var user = await _userManager.FindByEmailAsync(email);
-            if(user is null)
+            if (user is null)
             {
                 result.AddError(BusinessRuleCodes.IncorrectCredentials);
                 return result;
@@ -1331,7 +1343,7 @@ namespace Identity.Application.Implementations
             var updateUserResult = await _userManager.UpdateAsync(user);
             if (!updateUserResult.Succeeded)
             {
-                foreach(var err in updateUserResult.Errors)
+                foreach (var err in updateUserResult.Errors)
                 {
                     result.AddError(BusinessRuleCodes.ValidationError, $@"Identity Error message: ${err.Description} Code: ${err.Code}");
                 }

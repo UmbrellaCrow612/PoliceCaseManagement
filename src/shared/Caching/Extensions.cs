@@ -24,7 +24,7 @@ namespace Caching
             var configurationOptions = new ConfigurationOptions
             {
                 EndPoints = { settings.Connection },
-                Password = settings.Password 
+                Password = settings.Password
             };
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configurationOptions));

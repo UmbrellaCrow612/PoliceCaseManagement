@@ -1,4 +1,4 @@
-﻿ namespace Cases.Core.Models
+﻿namespace Cases.Core.Models
 {
     /// <summary>
     /// Stores the meta data of a cases file attachment 

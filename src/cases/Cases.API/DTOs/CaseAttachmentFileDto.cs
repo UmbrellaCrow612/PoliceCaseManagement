@@ -10,6 +10,6 @@
 
         public required long FileSize { get; set; }
 
-        public required DateTime UploadedAt { get; set; } 
+        public required DateTime UploadedAt { get; set; }
     }
 }

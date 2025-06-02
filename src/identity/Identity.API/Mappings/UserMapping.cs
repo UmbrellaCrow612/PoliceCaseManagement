@@ -16,10 +16,10 @@ namespace Identity.API.Mappings
             return new UserDto
             {
                 Id = user.Id,
-                Email= user.Email!,
+                Email = user.Email!,
                 UserName = user.UserName!,
                 PhoneNumber = user.PhoneNumber!
-                
+
             };
         }
 

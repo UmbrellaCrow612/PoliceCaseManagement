@@ -14,7 +14,7 @@ namespace Cases.Infrastructure.Options
         public required string SecretKey { get; set; }
 
         [Required]
-        public required string Region {  get; set; }
+        public required string Region { get; set; }
 
         [Required]
         public required string BucketName { get; set; }

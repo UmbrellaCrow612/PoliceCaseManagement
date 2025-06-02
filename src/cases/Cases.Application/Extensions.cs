@@ -1,12 +1,12 @@
-﻿using Cases.Application.Implementations;
+﻿using Cases.Application.Consumers;
+using Cases.Application.Implementations;
 using Cases.Core.Services;
-using Events.Settings;
 using Events;
+using Events.Settings;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using User.V1;
-using Cases.Application.Consumers;
 
 namespace Cases.Application
 {
@@ -27,12 +27,13 @@ namespace Cases.Application
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(rabbitMqSettings.Host, "/", h => { 
-                        h.Username(rabbitMqSettings.Username); 
+                    cfg.Host(rabbitMqSettings.Host, "/", h =>
+                    {
+                        h.Username(rabbitMqSettings.Username);
                         h.Password(rabbitMqSettings.Password);
                     });
 
-                    cfg.ReceiveEndpoint("cases-queue-name", e => 
+                    cfg.ReceiveEndpoint("cases-queue-name", e =>
                     {
                         e.ConfigureConsumer<UserUpdatedEventConsumer>(context);
                     });

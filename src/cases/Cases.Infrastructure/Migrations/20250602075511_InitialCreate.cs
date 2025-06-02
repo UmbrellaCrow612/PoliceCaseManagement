@@ -106,7 +106,17 @@ namespace Cases.Infrastructure.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     CanEdit = table.Column<bool>(type: "boolean", nullable: false),
+                    CanViewPermissions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditPermissions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanViewFileAttachments = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDeleteFileAttachments = table.Column<bool>(type: "boolean", nullable: false),
+                    CanViewAssigned = table.Column<bool>(type: "boolean", nullable: false),
                     CanAssign = table.Column<bool>(type: "boolean", nullable: false),
+                    CanRemoveAssigned = table.Column<bool>(type: "boolean", nullable: false),
+                    CanViewActions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanAddActions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditActions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDeleteActions = table.Column<bool>(type: "boolean", nullable: false),
                     CaseId = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
                     UserName = table.Column<string>(type: "text", nullable: false)

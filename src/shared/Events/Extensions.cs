@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Events
 {
-    public static  class Extensions
+    public static class Extensions
     {
         /// <summary>
         /// Adds the rabbit mq section from the config into the DI and runs some validation on it.
@@ -13,7 +13,7 @@ namespace Events
         {
             services.AddOptions<RabbitMqSettings>()
                 .Bind(configuration.GetSection("RabbitMqSettings"))
-                .ValidateDataAnnotations() 
+                .ValidateDataAnnotations()
                 .ValidateOnStart();
 
             return services;

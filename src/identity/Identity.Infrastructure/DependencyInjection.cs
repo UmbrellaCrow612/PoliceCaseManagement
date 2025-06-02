@@ -31,7 +31,7 @@ namespace Identity.Infrastructure
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-         
+
 
             return services;
         }

@@ -49,14 +49,15 @@ namespace Identity.Application
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(rabbitMqSettings.Host, "/", h => { 
-                        h.Username(rabbitMqSettings.Username); 
-                        h.Password(rabbitMqSettings.Password); 
+                    cfg.Host(rabbitMqSettings.Host, "/", h =>
+                    {
+                        h.Username(rabbitMqSettings.Username);
+                        h.Password(rabbitMqSettings.Password);
                     });
 
                     cfg.ReceiveEndpoint("identity-queue-name", e => // Define a specific queue for this API's consumers
                     {
-                     
+
                     });
 
                     cfg.ConfigureEndpoints(context);

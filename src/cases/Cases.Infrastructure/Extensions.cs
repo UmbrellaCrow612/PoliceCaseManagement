@@ -1,6 +1,6 @@
-﻿using Amazon.S3;
-using Amazon;
-using System.Net;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
 using Cases.Core.Services;
 using Cases.Infrastructure.Data;
 using Cases.Infrastructure.Implementations;
@@ -8,7 +8,6 @@ using Cases.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Amazon.Runtime;
 
 namespace Cases.Infrastructure
 {

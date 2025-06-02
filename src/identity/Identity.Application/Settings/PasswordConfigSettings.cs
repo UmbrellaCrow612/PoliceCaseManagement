@@ -12,7 +12,7 @@ namespace Identity.Application.Settings
         /// Numbered field amount of days
         /// </summary>
         [Required]
-        [Range(1,30, ErrorMessage = "Validation failed on RoationPeriodInDays needs to be between 1 and 30")]
+        [Range(1, 30, ErrorMessage = "Validation failed on RoationPeriodInDays needs to be between 1 and 30")]
         public required int RoationPeriodInDays { get; set; }
     }
 }

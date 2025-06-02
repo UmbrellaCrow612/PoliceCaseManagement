@@ -1,6 +1,4 @@
-﻿using Identity.Core.Models;
-
-namespace Identity.API.DTOs
+﻿namespace Identity.API.DTOs
 {
     public class MeDto
     {

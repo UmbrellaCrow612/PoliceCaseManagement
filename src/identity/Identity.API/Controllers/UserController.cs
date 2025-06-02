@@ -1,4 +1,5 @@
-﻿using Authorization;
+﻿using System.Security.Claims;
+using Authorization;
 using Caching;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
@@ -6,7 +7,6 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Identity.API.Controllers
 {

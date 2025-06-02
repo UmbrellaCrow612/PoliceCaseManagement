@@ -8,6 +8,6 @@
         public required DateTime CreatedAt { get; set; }
         public required string CreatedById { get; set; }
         public required string CreatedByName { get; set; }
-        public required string CreatedByEmail { get; set; } 
+        public required string CreatedByEmail { get; set; }
     }
 }

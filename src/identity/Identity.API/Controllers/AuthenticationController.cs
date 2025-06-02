@@ -1,15 +1,14 @@
-﻿using Identity.API.Annotations;
+﻿using System.Security.Claims;
+using Authorization;
+using Identity.API.Annotations;
 using Identity.API.DTOs;
+using Identity.API.Extensions;
 using Identity.API.Mappings;
+using Identity.Application.Helpers;
+using Identity.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Identity.API.Extensions;
-using Identity.Core.Services;
-using Authorization;
-using Identity.Application.Helpers;
 
 namespace Identity.API.Controllers
 {
@@ -70,7 +69,7 @@ namespace Identity.API.Controllers
         [HttpPost("validate-totp")]
         public async Task<ActionResult> ValidateTOTP([FromBody] ValidateTOTPDto dto)
         {
-            var res = await _authService.ValidateTOTP(dto.Code,dto.LoginAttemptId, this.ComposeDeviceInfo());
+            var res = await _authService.ValidateTOTP(dto.Code, dto.LoginAttemptId, this.ComposeDeviceInfo());
             if (!res.Succeeded) return BadRequest(res.Errors);
 
             this.SetAuthCookies(res.Tokens, _JWTOptions);

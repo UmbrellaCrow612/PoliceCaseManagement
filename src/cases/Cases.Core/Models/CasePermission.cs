@@ -3,8 +3,8 @@
 namespace Cases.Core.Models
 {
     /// <summary>
-    /// Used for Attribute-Based Access Control (ABAC) or Resource-Based Access Control for <see cref="Case"/>, typically created in the system 
-    /// then used in the app - system refers to the app side logic, admins do this, These are scoped to only <see cref="Case"/> 
+    /// Used for Attribute-Based Access Control (ABAC) or Resource-Based Access Control for <see cref="Case"/>, the table name themselves \
+    /// are the permission names issued out if they are flagged on and the checked on endpoints if needed
     /// </summary>
     public class CasePermission : IDenormalizedEntity
     {
@@ -15,10 +15,67 @@ namespace Cases.Core.Models
         /// </summary>
         public required bool CanEdit { get; set; }
 
+
+
         /// <summary>
-        /// If the given user can assign / edit users to the case - The table name itself is the permission name
+        /// If a user can see the permissions set on the case
+        /// </summary>
+        public required bool CanViewPermissions { get; set; }
+
+        /// <summary>
+        /// If a user can edit permissions on a case
+        /// </summary>
+        public required bool CanEditPermissions { get; set; }
+
+
+
+        /// <summary>
+        /// If a user can see what files are attached to a case
+        /// </summary>
+        public required bool CanViewFileAttachments { get; set; }
+
+        /// <summary>
+        /// If a user can remove file attachments
+        /// </summary>
+        public required bool CanDeleteFileAttachments { get; set; }
+
+
+        /// <summary>
+        /// If a user can see who is linked to a given case
+        /// </summary>
+        public required bool CanViewAssigned { get; set; }
+
+        /// <summary>
+        /// If the given user can assign users to the case - The table name itself is the permission name
         /// </summary>
         public required bool CanAssign { get; set; }
+
+        /// <summary>
+        /// If a user can remove assigned users
+        /// </summary>
+        public required bool CanRemoveAssigned { get; set; }
+
+
+
+        /// <summary>
+        /// If the user can see actions performed on the case - The table name itself is the permission name
+        /// </summary>
+        public required bool CanViewActions { get; set; }
+
+        /// <summary>
+        /// If a user can add a case case action to a case - The table name itself is the permission name
+        /// </summary>
+        public required bool CanAddActions { get; set; }
+
+        /// <summary>
+        /// If a user can edit actions taken on a case - The table name itself is the permission name
+        /// </summary>
+        public required bool CanEditActions { get; set; }
+
+        /// <summary>
+        /// If a user can delete actions taken on a case - The table name itself is the permission name
+        /// </summary>
+        public required bool CanDeleteActions { get; set; }
 
 
         /// <summary>

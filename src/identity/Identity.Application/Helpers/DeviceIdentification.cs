@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using UAParser;
 
 namespace Identity.Application.Helpers
