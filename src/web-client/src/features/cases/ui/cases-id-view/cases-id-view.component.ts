@@ -117,7 +117,7 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './assigned-users',
       name: 'Assigned Officers',
-      permissionsNeeded: [CasePermissionNames.canAssign],
+      permissionsNeeded: [CasePermissionNames.canViewAssigned],
     },
     {
       authorizedRoles: [],

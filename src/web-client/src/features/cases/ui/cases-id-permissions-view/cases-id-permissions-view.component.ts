@@ -40,6 +40,13 @@ export class CasesIdPermissionsViewComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
 
+  /**
+   * Fired off from the child when the perms have up[dated so we refresh stale data
+   */
+  permissionUpdatedListner() {
+    this.fetchData();
+  }
+
   fetchData() {
     if (!this.caseId) {
       this.error = 'Case ID not extracted from URL';

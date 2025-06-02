@@ -18,6 +18,7 @@
     @for (perm of permissions; track $index) {
     <app-case-permission-item
       [permissionData]="perm"
+      (permissionUpdatedEvent)="permissionUpdatedListner()"
     ></app-case-permission-item>
     } @empty {
     <div>No users assigned to case for you to change permissions for</div>

@@ -182,11 +182,40 @@ namespace Cases.Application.Implementations
             return result;
         }
 
+        public async Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId)
+        {
+            var result = new CaseResult();
+
+            var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanAddActions == true).AnyAsync();
+            if (!hasPerm)
+            {
+                result.AddError(BusinessRuleCodes.CasePermissions);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId)
         {
             var result = new CaseResult();
             var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditPermissions == true).AnyAsync();
             if (!hasPerm)
+            {
+                result.AddError(BusinessRuleCodes.CasePermissions);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> CanUserViewCaseActions(string caseId, string userId)
+        {
+            var result = new CaseResult();
+            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewActions == true).AnyAsync();
+            if (!hasPermission)
             {
                 result.AddError(BusinessRuleCodes.CasePermissions);
                 return result;

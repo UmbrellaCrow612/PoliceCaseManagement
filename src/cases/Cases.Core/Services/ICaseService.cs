@@ -207,6 +207,22 @@ namespace Cases.Core.Services
         /// <param name="userId">The user to check for</param>
         /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
         Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId);
+
+        /// <summary>
+        /// Checks to see if the given user has the permissions to view the actions taken on a case
+        /// </summary>
+        /// <param name="caseId">The ID of the case to check</param>
+        /// <param name="userId">The ID of the user to check</param>
+        /// <returns><see cref="CaseResult.Succeeded"/> if they can or not</returns>
+        Task<CaseResult> CanUserViewCaseActions(string caseId, string userId);
+
+        /// <summary>
+        /// Checks if a user can create actions on a given case
+        /// </summary>
+        /// <param name="caseId">The case to check</param>
+        /// <param name="userId">The user to check</param>
+        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
+        Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId);
     }
 
     /// <summary>

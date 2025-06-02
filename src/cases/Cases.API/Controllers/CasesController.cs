@@ -476,6 +476,12 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}/case-actions")]
         public async Task<IActionResult> GetCaseActionsForCaseByIdAsync(string caseId)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var result = await _caseService.CanUserViewCaseActions(caseId, userId);
+            if (!result.Succeeded) return BadRequest(result);
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null)
             {
@@ -497,11 +503,11 @@ namespace Cases.API.Controllers
         public async Task<IActionResult> AddCaseActionToCase(string caseId, [FromBody] CreateCaseActionDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return Unauthorized();
-            }
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
+            var permResult = await _caseService.CanUserCreateCaseActions(caseId, userId);
+            if(!permResult.Succeeded) return BadRequest(permResult);
+            
             var _case = await _caseService.FindById(caseId);
             if (_case is null)
             {

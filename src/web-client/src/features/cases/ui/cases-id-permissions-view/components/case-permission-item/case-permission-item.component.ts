@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import {
   MatSlideToggleChange,
   MatSlideToggleModule,
@@ -27,6 +27,11 @@ export class CasePermissionItemComponent {
   disbaleItem = false;
 
   /**
+   * Event fired off when the permission is updated
+   */
+  permissionUpdatedEvent = output<void>();
+
+  /**
    * Generic method to handle permission toggle changes
    * @param key The name of the permission field
    * @param event The toggle event
@@ -49,6 +54,7 @@ export class CasePermissionItemComponent {
           'Close',
           { duration: 5000 }
         );
+        this.permissionUpdatedEvent.emit();
       },
       error: (err) => {
         this.disbaleItem = false;

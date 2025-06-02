@@ -17,10 +17,18 @@ import { ActivatedRoute } from '@angular/router';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { CommonModule } from '@angular/common';
 import { CaseActionDetailsComponent } from './components/case-action-details/case-action-details.component';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
+import CODES from '../../../../core/server-responses/codes';
+import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
 
 @Component({
   selector: 'app-cases-id-actions-view',
-  imports: [MatButtonModule, BackNavigationButtonComponent, CommonModule, CaseActionDetailsComponent],
+  imports: [
+    MatButtonModule,
+    BackNavigationButtonComponent,
+    CommonModule,
+    CaseActionDetailsComponent,
+  ],
   templateUrl: './cases-id-actions-view.component.html',
   styleUrl: './cases-id-actions-view.component.css',
 })
@@ -28,7 +36,7 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
   constructor(
     private caseService: CaseService,
     private active: ActivatedRoute,
-    private errorService: ErrorService
+    private readonly authService: AuthenticationService
   ) {}
   ngOnInit(): void {
     this.caseId = this.active.snapshot.paramMap.get('caseId');
@@ -85,8 +93,17 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        this.error = 'Error occured';
-        this.errorService.HandleDisplay(err);
+        let code = getBusinessErrorCode(err);
+
+        switch (code) {
+          case CODES.CASE_PERMISSION:
+            this.authService.UnAuthorized();
+            break;
+
+          default:
+            this.error = 'Error occured';
+            break;
+        }
       },
     });
   }
