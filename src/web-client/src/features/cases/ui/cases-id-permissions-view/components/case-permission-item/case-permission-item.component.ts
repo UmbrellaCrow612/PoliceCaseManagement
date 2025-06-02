@@ -27,23 +27,25 @@ export class CasePermissionItemComponent {
   disbaleItem = false;
 
   /**
-   * Fires off whena specific permission is changed i.e when the slide toggle changes for can edit
-   * @param event The angular material slide toggle event contaning the info
-   * @param permission The permission it was fired for
+   * Generic method to handle permission toggle changes
+   * @param key The name of the permission field
+   * @param event The toggle event
    */
-  canEditPermissionSlideToggleValueChangedEventListner(
+  onPermissionToggleChange(
+    key: keyof CasePermission,
     event: MatSlideToggleChange
   ) {
     this.disbaleItem = true;
-    let copy = this.permissionData();
+    const updatedPermission = {
+      ...this.permissionData(),
+      [key]: event.checked,
+    };
 
-    copy.canEdit = event.checked;
-
-    this.caseService.updatePermission(copy).subscribe({
+    this.caseService.updatePermission(updatedPermission).subscribe({
       next: () => {
         this.disbaleItem = false;
         this.snackBar.open(
-          `Changed ${this.permissionData().userName} edit permissions`,
+          `Changed ${this.permissionData().userName}'s "${key}" permission`,
           'Close',
           { duration: 5000 }
         );
@@ -54,38 +56,4 @@ export class CasePermissionItemComponent {
       },
     });
   }
-
-  /**
-   * Fires off whena specific permission is changed i.e when the slide toggle changes for can assign
-   * @param event The angular material slide toggle event contaning the info
-   * @param permission The permission it was fired for
-   */
-  canAssignPermissionSlideToggleValueChangedEventListner(
-    event: MatSlideToggleChange
-  ) {
-    this.disbaleItem = true;
-    let copy = this.permissionData();
-
-    copy.canAssign = event.checked;
-
-    this.caseService.updatePermission(copy).subscribe({
-      next: () => {
-        this.disbaleItem = false;
-        this.snackBar.open(
-          `Changed ${this.permissionData().userName} assign permissions`,
-          'Close',
-          { duration: 5000 }
-        );
-      },
-      error: (err) => {
-        this.disbaleItem = false;
-        this.snackBar.open(formatBackendError(err), 'Close');
-      },
-    });
-  }
-
-  // fix comments
-
-  // whe sending disbale the whole item to stop spaming and use toasts
-  // also out event when changed so parent can refresh data
 }

@@ -273,7 +273,7 @@ export class CaseService {
    */
   updatePermission(permission: CasePermission) {
     return this.httpClient.put(
-      `${this.BASE_URL}/cases/permissions/${permission.id}`,
+      `${this.BASE_URL}/cases/${permission.caseId}/permissions/${permission.id}`,
       {
         ...permission,
       }

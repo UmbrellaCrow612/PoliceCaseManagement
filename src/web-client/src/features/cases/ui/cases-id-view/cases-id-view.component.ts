@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { Case, CasePermissionNames } from '../../../../core/cases/type';
-import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { CommonModule } from '@angular/common';
 import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
 import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
@@ -112,7 +111,7 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './actions',
       name: 'Actions',
-      permissionsNeeded: [],
+      permissionsNeeded: [CasePermissionNames.canViewActions],
     },
     {
       authorizedRoles: [],
@@ -124,13 +123,13 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './attachments',
       name: 'File attachments',
-      permissionsNeeded: [],
+      permissionsNeeded: [CasePermissionNames.canViewFileAttachments],
     },
     {
-      authorizedRoles: [this.userRoles.Admin],
+      authorizedRoles: [],
       href: './permissions',
       name: 'Permissions',
-      permissionsNeeded: [],
+      permissionsNeeded: [CasePermissionNames.canViewPermissions],
     },
   ];
 }

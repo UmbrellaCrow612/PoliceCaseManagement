@@ -51,11 +51,27 @@ export interface CaseAttachment {
 
 export interface CasePermission {
   /**
-   * NOTE this is not the user's ID but the specific permission itself refer to userId field for that
+   * This is the unique ID of the permission record (not the user's ID).
+   * Use the userId field to identify the user this permission belongs to.
    */
   id: string;
+
   canEdit: boolean;
+  canViewPermissions: boolean;
+  canEditPermissions: boolean;
+
+  canViewFileAttachments: boolean;
+  canDeleteFileAttachments: boolean;
+
+  canViewAssigned: boolean;
   canAssign: boolean;
+  canRemoveAssigned: boolean;
+
+  canViewActions: boolean;
+  canAddActions: boolean;
+  canEditActions: boolean;
+  canDeleteActions: boolean;
+
   caseId: string;
   userId: string;
   userName: string;
@@ -95,12 +111,38 @@ export interface CasePagedResult extends PagedResult<Case> {}
  */
 export const CasePermissionNames = {
   canEdit: 'CanEdit',
+  canViewPermissions: 'CanViewPermissions',
+  canEditPermissions: 'CanEditPermissions',
+
+  canViewFileAttachments: 'CanViewFileAttachments',
+  canDeleteFileAttachments: 'CanDeleteFileAttachments',
+
+  canViewAssigned: 'CanViewAssigned',
   canAssign: 'CanAssign',
+  canRemoveAssigned: 'CanRemoveAssigned',
+
+  canViewActions: 'CanViewActions',
+  canAddActions: 'CanAddActions',
+  canEditActions: 'CanEditActions',
+  canDeleteActions: 'CanDeleteActions',
 
   /**
    * Returns an array of all permission names
    */
   all(): string[] {
-    return [this.canEdit, this.canAssign];
+    return [
+      this.canEdit,
+      this.canViewPermissions,
+      this.canEditPermissions,
+      this.canViewFileAttachments,
+      this.canDeleteFileAttachments,
+      this.canViewAssigned,
+      this.canAssign,
+      this.canRemoveAssigned,
+      this.canViewActions,
+      this.canAddActions,
+      this.canEditActions,
+      this.canDeleteActions,
+    ];
   },
 };
