@@ -139,7 +139,7 @@ namespace Cases.API.Controllers
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var result = await _caseService.GetCasePermissionForUserOnCase(_case, userId);
+            var result = await _caseService.GetUserCasePermissions(_case, userId);
             if (!result.Succeeded) return BadRequest(result);
 
             return Ok(result.Permissions);

@@ -33,7 +33,7 @@ import { hasRequiredPermissions } from '../../../../core/authentication/utils/ha
   templateUrl: './cases-id-actions-view.component.html',
   styleUrl: './cases-id-actions-view.component.css',
 })
-export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
+export class CasesIdActionsViewComponent implements OnInit {
   constructor(
     private caseService: CaseService,
     private active: ActivatedRoute,
@@ -47,9 +47,6 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
     }
 
     this.fetchData();
-  }
-  ngAfterViewInit(): void {
-    this.scrollToAddButton();
   }
 
   @ViewChild('addButtonContainer') addButtonContainer!: ElementRef;
@@ -109,6 +106,7 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
         this.currentPermissions = perms;
 
         this.isLoading = false;
+        this.scrollToAddButton();
       },
       error: (err) => {
         let code = getBusinessErrorCode(err);

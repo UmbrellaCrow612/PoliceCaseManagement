@@ -21,11 +21,17 @@
         {{ caseUsers.userName }}
       </span>
 
-
-      <button mat-button (click)="removeUserClicked(caseUsers.userId)">
+      @if (caseUsers.userId !== currentUserId) {
+      <button
+        mat-button
+        (click)="removeUserClicked(caseUsers.userId)"
+      >
         Remove
       </button>
+      }
     </div>
+    } @empty {
+    <div>No Assigned users</div>
     }
   </div>
   <div>

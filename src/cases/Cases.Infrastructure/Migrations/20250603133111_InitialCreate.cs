@@ -117,6 +117,7 @@ namespace Cases.Infrastructure.Migrations
                     CanAddActions = table.Column<bool>(type: "boolean", nullable: false),
                     CanEditActions = table.Column<bool>(type: "boolean", nullable: false),
                     CanDeleteActions = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditIncidentType = table.Column<bool>(type: "boolean", nullable: false),
                     CaseId = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
                     UserName = table.Column<string>(type: "text", nullable: false)

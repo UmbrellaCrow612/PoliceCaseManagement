@@ -126,6 +126,8 @@ export const CasePermissionNames = {
   canEditActions: 'CanEditActions',
   canDeleteActions: 'CanDeleteActions',
 
+  canEditIncidentType: 'CanEditIncidentType',
+
   /**
    * Returns an array of all permission names
    */
@@ -143,6 +145,7 @@ export const CasePermissionNames = {
       this.canAddActions,
       this.canEditActions,
       this.canDeleteActions,
+      this.canEditIncidentType,
     ];
   },
 };

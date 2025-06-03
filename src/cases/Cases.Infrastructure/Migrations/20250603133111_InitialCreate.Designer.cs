@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250602075511_InitialCreate")]
+    [Migration("20250603133111_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -206,6 +206,9 @@ namespace Cases.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanEditActions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditIncidentType")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanEditPermissions")

@@ -40,6 +40,7 @@ namespace Cases.Core.Models
         public required bool CanDeleteFileAttachments { get; set; }
 
 
+
         /// <summary>
         /// If a user can see who is linked to a given case
         /// </summary>
@@ -76,6 +77,13 @@ namespace Cases.Core.Models
         /// If a user can delete actions taken on a case - The table name itself is the permission name
         /// </summary>
         public required bool CanDeleteActions { get; set; }
+
+
+        /// <summary>
+        /// By default they can view incident types on a case - but they need perms to edit or remove them from given case - this
+        /// if turned on makes it so they can edit and remove <see cref="IncidentType"/> linked to a given case
+        /// </summary>
+        public required bool CanEditIncidentType { get; set; }
 
 
         /// <summary>

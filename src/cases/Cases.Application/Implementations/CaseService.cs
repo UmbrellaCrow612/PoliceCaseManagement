@@ -1,4 +1,5 @@
-﻿using Cases.Application.Codes;
+﻿using System.Reflection;
+using Cases.Application.Codes;
 using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.Services;
@@ -168,6 +169,7 @@ namespace Cases.Application.Implementations
                     CanViewAssigned = false,
                     CanViewFileAttachments = false,
                     CanViewPermissions = false,
+                    CanEditIncidentType = false,
                 });
             }
 
@@ -302,6 +304,7 @@ namespace Cases.Application.Implementations
                     CanViewAssigned = true,
                     CanViewFileAttachments = true,
                     CanViewPermissions = true,
+                    CanEditIncidentType = true,
                 };
                 var permissionsForReportingOfficer = new CasePermission
                 {
@@ -320,6 +323,7 @@ namespace Cases.Application.Implementations
                     CanViewAssigned = true,
                     CanViewFileAttachments = true,
                     CanViewPermissions = true,
+                    CanEditIncidentType = true,
                 };
 
                 var assignReportingOfficerToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = reportingOfficerDetails.Email, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
@@ -347,6 +351,7 @@ namespace Cases.Application.Implementations
                     CanViewAssigned = true,
                     CanViewFileAttachments = true,
                     CanViewPermissions = true,
+                    CanEditIncidentType = true,
                 };
                 var assignUserToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
 
@@ -456,72 +461,32 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
         }
 
-        public async Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId)
+        public async Task<MyCasePermissionResult> GetUserCasePermissions(Case @case, string userId)
         {
             var result = new MyCasePermissionResult();
 
-            var perm = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
+            var perm = await _dbcontext.CasePermissions
+                .Where(x => x.CaseId == @case.Id && x.UserId == userId)
+                .FirstOrDefaultAsync();
+
             if (perm is null)
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Permissions not found");
                 return result;
             }
 
-            List<string> perms = [];
-
-            if (perm.CanEdit)
-            {
-                perms.Add(nameof(perm.CanEdit));
-            }
-            if (perm.CanViewPermissions)
-            {
-                perms.Add(nameof(perm.CanViewPermissions));
-            }
-            if (perm.CanEditPermissions)
-            {
-                perms.Add(nameof(perm.CanEditPermissions));
-            }
-            if (perm.CanViewFileAttachments)
-            {
-                perms.Add(nameof(perm.CanViewFileAttachments));
-            }
-            if (perm.CanDeleteFileAttachments)
-            {
-                perms.Add(nameof(perm.CanDeleteFileAttachments));
-            }
-            if (perm.CanViewAssigned)
-            {
-                perms.Add(nameof(perm.CanViewAssigned));
-            }
-            if (perm.CanAssign)
-            {
-                perms.Add(nameof(perm.CanAssign));
-            }
-            if (perm.CanRemoveAssigned)
-            {
-                perms.Add(nameof(perm.CanRemoveAssigned));
-            }
-            if (perm.CanViewActions)
-            {
-                perms.Add(nameof(perm.CanViewActions));
-            }
-            if (perm.CanAddActions)
-            {
-                perms.Add(nameof(perm.CanAddActions));
-            }
-            if (perm.CanEditActions)
-            {
-                perms.Add(nameof(perm.CanEditActions));
-            }
-            if (perm.CanDeleteActions)
-            {
-                perms.Add(nameof(perm.CanDeleteActions));
-            }
+            var perms = typeof(CasePermission)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.PropertyType == typeof(bool))
+                .Where(p => (bool)p.GetValue(perm)!)
+                .Select(p => p.Name)
+                .ToList();
 
             result.Permissions = perms;
             result.Succeeded = true;
             return result;
         }
+
 
         public async Task<List<CasePermission>> GetCasePermissions(Case @case)
         {

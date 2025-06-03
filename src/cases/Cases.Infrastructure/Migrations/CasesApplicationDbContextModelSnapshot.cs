@@ -205,6 +205,9 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<bool>("CanEditActions")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanEditIncidentType")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanEditPermissions")
                         .HasColumnType("boolean");
 

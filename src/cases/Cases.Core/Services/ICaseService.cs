@@ -190,7 +190,7 @@ namespace Cases.Core.Services
         /// <param name="case">The case to get there permission for</param>
         /// <param name="userId">The user who's permission you want to get</param>
         /// <returns>List of permissions they have if the operation succeeds</returns>
-        Task<MyCasePermissionResult> GetCasePermissionForUserOnCase(Case @case, string userId);
+        Task<MyCasePermissionResult> GetUserCasePermissions(Case @case, string userId);
 
         /// <summary>
         /// Checks if a user has <see cref="CasePermission.CanViewPermissions"/> flag set to true for the given case

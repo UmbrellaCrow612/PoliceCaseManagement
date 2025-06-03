@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { AssignUserDialogComponent } from './components/assign-user-dialog/assign-user-dialog.component';
@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { RemoveAssignedUserDialogComponent } from './components/remove-assigned-user-dialog/remove-assigned-user-dialog.component';
+import { UserService } from '../../../../core/user/services/user.service';
 
 @Component({
   selector: 'app-cases-id-assigned-users',
@@ -32,6 +33,11 @@ export class CasesIdAssignedUsersComponent implements OnInit {
   assignedUsers: CaseUser[] = [];
   isLoading = true;
   error: string | null = null;
+
+  /**
+   * Current context loged in user
+   */
+  currentUserId = inject(UserService).USER?.id
   /**
    * Fetches page data
    */
