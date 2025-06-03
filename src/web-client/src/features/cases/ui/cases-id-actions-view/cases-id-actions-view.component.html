@@ -1,44 +1,33 @@
 @if (error) {
 <div>
-    {{error}}
+  {{ error }}
 </div>
 }
 
 <!---->
 
-
 @if (!error && isLoading) {
-<div>
-    Loading
-</div>
+<div>Loading</div>
 }
 
 <!---->
 @if (!error && !isLoading) {
 <div class="container">
-    <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
-    <h1>
-        Case actions on this case
-    </h1>
+  <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
+  <h1>Case actions on this case</h1>
 
+  <div class="list_container">
+    @for (action of caseActions; track $index) {
+    <app-case-action-details [details]="action"></app-case-action-details>
+    } @empty {
+    <span> No actions taken on this case </span>
+    }
+  </div>
 
-
-    <div class="list_container">
-        @for (action of caseActions; track $index) {
-        <app-case-action-details [details]="action"></app-case-action-details>
-        } @empty {
-        <span>
-            No actions taken on this case
-        </span>
-        }
-    </div>
-
-
-
-    <div #addButtonContainer>
-        <button mat-raised-button (click)="addCaseActionClicked()">
-            Add
-        </button>
-    </div>
+  <div #addButtonContainer>
+    @if (hasRequiredPerms([allPermissions.canAddActions],currentPermissions)) {
+    <button mat-raised-button (click)="addCaseActionClicked()">Add</button>
+    }
+  </div>
 </div>
 }

@@ -10,9 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateCaseActionDialogComponent } from './components/create-case-action-dialog/create-case-action-dialog.component';
-import { timer } from 'rxjs';
+import { forkJoin, timer } from 'rxjs';
 import { CaseService } from '../../../../core/cases/services/case.service';
-import { CaseAction } from '../../../../core/cases/type';
+import { CaseAction, CasePermissionNames } from '../../../../core/cases/type';
 import { ActivatedRoute } from '@angular/router';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { CommonModule } from '@angular/common';
@@ -20,6 +20,7 @@ import { CaseActionDetailsComponent } from './components/case-action-details/cas
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
+import { hasRequiredPermissions } from '../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-cases-id-actions-view',
@@ -58,6 +59,18 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
   caseActions: CaseAction[] = [];
 
   /**
+   * Copy of all case permissions in the system
+   */
+  readonly allPermissions = CasePermissionNames;
+  /**
+   * Copyt of the helper method to render stuff in UI based on perms
+   */
+  readonly hasRequiredPerms = hasRequiredPermissions;
+  /**
+   * Current user permissions they have on the given case
+   */
+  currentPermissions: string[] = [];
+  /**
    * Current case id from the URL
    */
   caseId: string | null = null;
@@ -87,9 +100,14 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
       return;
     }
 
-    this.caseService.getCaseActions(this.caseId).subscribe({
-      next: (response) => {
-        this.caseActions = response;
+    forkJoin([
+      this.caseService.getCaseActions(this.caseId),
+      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+    ]).subscribe({
+      next: ([actions, perms]) => {
+        this.caseActions = actions;
+        this.currentPermissions = perms;
+
         this.isLoading = false;
       },
       error: (err) => {
@@ -102,6 +120,7 @@ export class CasesIdActionsViewComponent implements AfterViewInit, OnInit {
 
           default:
             this.error = 'Error occured';
+            this.isLoading = false;
             break;
         }
       },
