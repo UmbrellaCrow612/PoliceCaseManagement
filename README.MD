@@ -26,6 +26,7 @@
 - Assign users to them
 - Add actions to them
 - Upload attachments to them
+- Fine grained permission per user
 
 # Running
 
