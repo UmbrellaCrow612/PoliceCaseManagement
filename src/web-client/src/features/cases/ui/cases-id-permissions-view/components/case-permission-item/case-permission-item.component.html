@@ -108,4 +108,12 @@
   >
     Can Delete Actions
   </mat-slide-toggle>
+
+  <mat-slide-toggle
+    [checked]="permissionData().canEditIncidentType"
+    [disabled]="disbaleItem"
+    (change)="onPermissionToggleChange('canEditIncidentType', $event)"
+  >
+    Can Edit Incident type
+  </mat-slide-toggle>
 </div>

@@ -75,10 +75,6 @@ export const CASES_ROUTES: Routes = [
           import(
             './ui//cases-id-permissions-view/cases-id-permissions-view.component'
           ).then((c) => c.CasesIdPermissionsViewComponent),
-        canActivate: [rolesAuthorizationGuard],
-        data: {
-          requiredRoles: [UserRoles.Admin], // Means there authenticated and have admin role
-        },
       },
     ],
   },

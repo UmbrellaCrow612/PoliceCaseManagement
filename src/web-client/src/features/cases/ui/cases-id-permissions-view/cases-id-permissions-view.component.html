@@ -19,6 +19,7 @@
     <app-case-permission-item
       [permissionData]="perm"
       (permissionUpdatedEvent)="permissionUpdatedListner()"
+      [currentUserCasePermissions]="currentUserCasePermissions"
     ></app-case-permission-item>
     } @empty {
     <div>No users assigned to case for you to change permissions for</div>

@@ -30,7 +30,8 @@ namespace Cases.API.Mappings
                 CanViewActions = @base.CanViewActions,
                 CanViewAssigned = @base.CanViewAssigned,
                 CanViewFileAttachments = @base.CanViewFileAttachments,
-                CanViewPermissions = @base.CanViewPermissions
+                CanViewPermissions = @base.CanViewPermissions,
+                CanEditIncidentType = @base.CanEditIncidentType,
             };
         }
 
@@ -48,6 +49,7 @@ namespace Cases.API.Mappings
             @base.CanAddActions = updateDto.CanAddActions;
             @base.CanEditActions = updateDto.CanEditActions;
             @base.CanDeleteActions = updateDto.CanDeleteActions;
+            @base.CanEditIncidentType = updateDto.CanEditIncidentType;
         }
     }
 }

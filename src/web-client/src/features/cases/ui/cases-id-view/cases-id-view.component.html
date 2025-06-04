@@ -49,8 +49,11 @@
     >} @empty {<span>No linked incident types</span>}
   </p>
 
+  @if (hasRequiredPermissions([casePermissionNames.canEditIncidentType],
+  currentPermissions)) {
   <div>
     <a mat-raised-button routerLink="incident-types/edit">Edit</a>
   </div>
+  }
 </div>
 }

@@ -1,12 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { ActivatedRoute } from '@angular/router';
-import { CasePermission } from '../../../../core/cases/type';
+import {
+  CasePermission,
+  CasePermissionNames,
+} from '../../../../core/cases/type';
 import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { CommonModule } from '@angular/common';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { CasePermissionItemComponent } from './components/case-permission-item/case-permission-item.component';
 import { UserService } from '../../../../core/user/services/user.service';
+import { forkJoin } from 'rxjs';
+import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
+import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
+import CODES from '../../../../core/server-responses/codes';
 
 @Component({
   selector: 'app-cases-id-permissions-view',
@@ -21,7 +28,8 @@ import { UserService } from '../../../../core/user/services/user.service';
 export class CasesIdPermissionsViewComponent implements OnInit {
   constructor(
     private readonly caseService: CaseService,
-    private readonly active: ActivatedRoute
+    private readonly active: ActivatedRoute,
+    private readonly authService: AuthenticationService
   ) {}
   ngOnInit(): void {
     this.caseId = this.active.snapshot.paramMap.get('caseId');
@@ -34,6 +42,11 @@ export class CasesIdPermissionsViewComponent implements OnInit {
    */
   currentUserId = inject(UserService).USER?.id;
   permissions: CasePermission[] = [];
+
+  /**
+   * Get the current users permissions for the given case
+   */
+  currentUserCasePermissions: string[] = [];
 
   caseId: string | null = null;
 
@@ -56,14 +69,28 @@ export class CasesIdPermissionsViewComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.caseService.getPermissions(this.caseId).subscribe({
-      next: (perms) => {
+    forkJoin([
+      this.caseService.getPermissions(this.caseId),
+      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+    ]).subscribe({
+      next: ([perms, currentUserPerms]) => {
         this.permissions = perms.filter((x) => x.userId !== this.currentUserId); // remove current user perms from UI
+        this.currentUserCasePermissions = currentUserPerms;
         this.isLoading = false;
       },
       error: (err) => {
-        this.error = formatBackendError(err);
-        this.isLoading = false;
+        let code = getBusinessErrorCode(err);
+
+        switch (code) {
+          case CODES.CASE_PERMISSION:
+            this.authService.UnAuthorized();
+            break;
+
+          default:
+            this.error = formatBackendError(err);
+            this.isLoading = false;
+            break;
+        }
       },
     });
   }

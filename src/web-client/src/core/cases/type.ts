@@ -72,6 +72,8 @@ export interface CasePermission {
   canEditActions: boolean;
   canDeleteActions: boolean;
 
+  canEditIncidentType:boolean;
+
   caseId: string;
   userId: string;
   userName: string;

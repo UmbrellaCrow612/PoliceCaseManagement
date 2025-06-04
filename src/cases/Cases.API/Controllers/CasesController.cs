@@ -409,6 +409,12 @@ namespace Cases.API.Controllers
         [HttpPut("{caseId}/incident-types")]
         public async Task<IActionResult> UpdateCasesLinkedIncidentTypes(string caseId, [FromBody] UpdateCasesLinkedIncidentTypesDto dto)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var permResult = await _caseService.CanUserEditLinkedIncidentTypes(caseId, userId);
+            if (!permResult.Succeeded) return BadRequest(permResult);
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null)
             {

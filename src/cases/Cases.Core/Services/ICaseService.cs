@@ -223,6 +223,15 @@ namespace Cases.Core.Services
         /// <param name="userId">The user to check</param>
         /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
         Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId);
+
+        /// <summary>
+        /// Checks if a user can edit linked incident types to a given case NOTE it dose not mean they can edit the incident type itself but a 
+        /// specific cases linked incident types i.e ones it it linked to
+        /// </summary>
+        /// <param name="caseId">The case to check for</param>
+        /// <param name="userId">The user to check for</param>
+        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
+        Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId);
     }
 
     /// <summary>

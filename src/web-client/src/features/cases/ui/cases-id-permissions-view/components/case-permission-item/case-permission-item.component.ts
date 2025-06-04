@@ -1,12 +1,16 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, OnInit, output } from '@angular/core';
 import {
   MatSlideToggleChange,
   MatSlideToggleModule,
 } from '@angular/material/slide-toggle';
-import { CasePermission } from '../../../../../../core/cases/type';
+import {
+  CasePermission,
+  CasePermissionNames,
+} from '../../../../../../core/cases/type';
 import { CaseService } from '../../../../../../core/cases/services/case.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { formatBackendError } from '../../../../../../core/app/errors/formatError';
+import { hasRequiredPermissions } from '../../../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-case-permission-item',
@@ -14,12 +18,25 @@ import { formatBackendError } from '../../../../../../core/app/errors/formatErro
   templateUrl: './case-permission-item.component.html',
   styleUrl: './case-permission-item.component.css',
 })
-export class CasePermissionItemComponent {
+export class CasePermissionItemComponent implements OnInit {
   constructor(
     private readonly caseService: CaseService,
     private readonly snackBar: MatSnackBar
   ) {}
+  ngOnInit(): void {
+    if (
+      !hasRequiredPermissions(
+        [this.casePermissionNames.canEditPermissions],
+        this.currentUserCasePermissions()
+      )
+    ) {
+      this.disbaleItem = true;
+    }
+  }
   permissionData = input.required<CasePermission>();
+
+  currentUserCasePermissions = input.required<string[]>();
+  casePermissionNames = CasePermissionNames;
 
   /**
    * used to disbale item while one value changes in the mat slide

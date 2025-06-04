@@ -641,5 +641,19 @@ namespace Cases.Application.Implementations
             result.Succeeded = true;
             return result;
         }
+
+        public async Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId)
+        {
+            var result = new CaseResult();
+            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditIncidentType == true).AnyAsync();
+            if (!hasPermission)
+            {
+                result.AddError(BusinessRuleCodes.CasePermissions);
+                return result;
+            }
+
+            result.Succeeded = true;
+            return result;
+        }
     }
 }

@@ -27,5 +27,7 @@
         public required bool CanEditActions { get; set; }
 
         public required bool CanDeleteActions { get; set; }
+
+        public required bool CanEditIncidentType { get; set; }
     }
 }

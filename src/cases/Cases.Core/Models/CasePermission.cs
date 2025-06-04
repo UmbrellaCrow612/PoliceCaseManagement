@@ -81,7 +81,8 @@ namespace Cases.Core.Models
 
         /// <summary>
         /// By default they can view incident types on a case - but they need perms to edit or remove them from given case - this
-        /// if turned on makes it so they can edit and remove <see cref="IncidentType"/> linked to a given case
+        /// if turned on makes it so they can edit and remove <see cref="IncidentType"/> linked to a given case, NOTE: this should not be used to edit 
+        /// <see cref="IncidentType"/> model itself only to allow them to link or unlink them
         /// </summary>
         public required bool CanEditIncidentType { get; set; }
 

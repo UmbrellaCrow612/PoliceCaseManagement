@@ -38,6 +38,9 @@
         public required bool CanDeleteActions { get; set; }
 
 
+        public required bool CanEditIncidentType { get; set; }
+
+
 
         public required string CaseId { get; set; }
 
