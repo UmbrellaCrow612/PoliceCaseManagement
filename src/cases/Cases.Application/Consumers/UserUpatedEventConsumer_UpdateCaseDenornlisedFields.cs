@@ -1,4 +1,6 @@
-﻿using Cases.Infrastructure.Data;
+﻿using Cases.Core.Models;
+using Cases.Infrastructure.Data;
+using Events.Core;
 using Events.User;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ namespace Cases.Application.Consumers
     /// Listens to <see cref="Events.User.UserUpdatedEvent"/> and updates <see cref="Cases.Core.Models.Case"/> and updated <see cref="Events.IDenormalizedEntity"/> fields for 
     /// user fields
     /// </summary>
+    [DenormalisedEventConsumer(nameof(Case))]
     internal class UserUpdatedEventConsumer_UpdateCaseDenormalizedFields(CasesApplicationDbContext dbContext, ILogger<UserUpdatedEventConsumer_UpdateCaseDenormalizedFields> logger) : IConsumer<UserUpdatedEvent>
     {
         private readonly CasesApplicationDbContext _dbContext = dbContext;

@@ -1,5 +1,6 @@
 ﻿using Cases.Core.Models.Joins;
-using Events;
+using Events.Core;
+using Events.User;
 
 namespace Cases.Core.Models
 {
@@ -48,8 +49,6 @@ namespace Cases.Core.Models
         /// The priority level assigned to the case.
         /// </summary>
         public CasePriority Priority { get; set; } = CasePriority.Normal;
-
-
 
 
         // --- Relationships (using IDs for simplicity, could be full objects later) ---

@@ -51,6 +51,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proxy", "src\proxy\proxy.csproj", "{F484646F-4539-372D-B353-0A22F6110E5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Core", "src\shared\Events.Core\Events.Core.csproj", "{8121BE93-6BEB-4F9F-A882-A571FEE2415F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,10 @@ Global
 		{F484646F-4539-372D-B353-0A22F6110E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F484646F-4539-372D-B353-0A22F6110E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F484646F-4539-372D-B353-0A22F6110E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8121BE93-6BEB-4F9F-A882-A571FEE2415F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8121BE93-6BEB-4F9F-A882-A571FEE2415F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8121BE93-6BEB-4F9F-A882-A571FEE2415F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8121BE93-6BEB-4F9F-A882-A571FEE2415F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{0CC97824-8162-4A75-ACDB-52B24F62DC64} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
 		{2DAA40A3-65DF-4127-B0E2-98B902B5C6F1} = {0CC97824-8162-4A75-ACDB-52B24F62DC64}
 		{F484646F-4539-372D-B353-0A22F6110E5C} = {00F68AA3-381E-4E3B-99AD-F4570D96866B}
+		{8121BE93-6BEB-4F9F-A882-A571FEE2415F} = {7BA1F4EC-DC87-4E3F-B21D-5F7108292FAF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}

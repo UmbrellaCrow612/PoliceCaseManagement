@@ -1,4 +1,4 @@
-﻿namespace Events
+﻿namespace Events.Core
 {
     /// <summary>
     /// Indicates that a property is a denormalized copy of data from another source model.

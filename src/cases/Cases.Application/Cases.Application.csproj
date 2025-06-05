@@ -17,10 +17,11 @@
     <PackageReference Include="MassTransit" Version="8.4.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\..\shared\Events\Events.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />
     <ProjectReference Include="..\Cases.Infrastructure\Cases.Infrastructure.csproj" />

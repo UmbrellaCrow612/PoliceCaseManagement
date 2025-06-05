@@ -1,4 +1,4 @@
-﻿namespace Events
+﻿namespace Events.Core
 {
     /// <summary>
     /// Used to mark model or entity that it contains Denormalized data from a main entity and if said main entity is changed the local copy should

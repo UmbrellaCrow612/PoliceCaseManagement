@@ -1,4 +1,5 @@
 ﻿using Events;
+using Events.Core;
 
 namespace Cases.Core.Models
 {

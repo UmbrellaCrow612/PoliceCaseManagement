@@ -1,7 +1,9 @@
 ﻿using Cases.Application.Consumers;
 using Cases.Application.Implementations;
+using Cases.Core.Models;
 using Cases.Core.Services;
 using Events;
+using Events.Core;
 using Events.Settings;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +55,9 @@ namespace Cases.Application
                 o.Address = new Uri("https://localhost:7058");
             });
             services.AddScoped<UserValidationService>();
+
+
+            services.EnsureDenormalisedFieldsAreUpdated();
 
             return services;
         }

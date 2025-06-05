@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\..\shared\Events\Events.csproj" />
   </ItemGroup>
 
