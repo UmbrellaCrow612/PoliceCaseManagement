@@ -6,10 +6,10 @@ namespace Events.Core
     public static class Extensions 
     {
         /// <summary>
-        /// Compile time check to make sure <see cref="IDenormalizedEntity"/> actually update there <see cref="DenormalizedFieldAttribute"/> use only for development check 
-        /// Checks there is a consumer for it, checks that, that consumer dose modify those fields
+        /// Compile time basic check to make sure <see cref="IDenormalizedEntity"/> have at least defined a <see cref="DenormalisedEventConsumer"/> for the given entity - dose not check
+        /// if they actually update the <see cref="DenormalizedFieldAttribute"/> themselves the analyzer will do that
         /// </summary>
-        public static IServiceCollection EnsureDenormalisedFieldsAreUpdated(this IServiceCollection services)
+        public static IServiceCollection EnsureDenormalisedEntitiesHaveAConsumer(this IServiceCollection services)
         {
             var deNormClasses = GetDenormalisedClasses();
             var consumers = GetTypesWithDenormalisedEventConsumer();
@@ -21,23 +21,10 @@ namespace Events.Core
                     var modelName = x.GetCustomAttribute<DenormalisedEventConsumer>().ModelName;
                     return deNormClass.Name == modelName;
                 }) ?? throw new ApplicationException($"Model {deNormClass.Name} dose not have a {nameof(DenormalisedEventConsumer)} that updates it's {nameof(DenormalizedFieldAttribute)} fields");
-
-                var fields = deNormClass.GetProperties(BindingFlags.Public | BindingFlags.Instance) // fields that need to be updated
-                 .Where(p => p.GetCustomAttribute<DenormalizedFieldAttribute>() != null)
-                 .Select(p => p.Name)
-                 .ToList();
-
-                foreach (var field in fields)
-                {
-                }
-
-                var r = 0;
-
             }
 
             return services;
         }
-
 
         private static List<Type> GetDenormalisedClasses()
         {
@@ -47,7 +34,6 @@ namespace Events.Core
                             && t.IsClass
                             && !t.IsAbstract)];
         }
-
 
         private static List<Type> GetTypesWithDenormalisedEventConsumer()
         {

@@ -57,7 +57,7 @@ namespace Cases.Application
             services.AddScoped<UserValidationService>();
 
 
-            services.EnsureDenormalisedFieldsAreUpdated();
+            services.EnsureDenormalisedEntitiesHaveAConsumer();
 
             return services;
         }
