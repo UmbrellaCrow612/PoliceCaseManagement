@@ -34,6 +34,13 @@ export const CASES_ROUTES: Routes = [
           ),
       },
       {
+        path: 'me',
+        loadComponent: () =>
+          import('./ui/cases-me-view/cases-me-view.component').then(
+            (c) => c.CasesMeViewComponent
+          ),
+      },
+      {
         path: ':caseId',
         loadComponent: () =>
           import('./ui/cases-id-view/cases-id-view.component').then(

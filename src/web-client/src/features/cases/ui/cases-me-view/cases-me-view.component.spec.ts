@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SearchCasesViewComponent } from './search-cases-view.component';
+import { CasesMeViewComponent } from './cases-me-view.component';
 
-describe('SearchCasesViewComponent', () => {
-  let component: SearchCasesViewComponent;
-  let fixture: ComponentFixture<SearchCasesViewComponent>;
+describe('CasesMeViewComponent', () => {
+  let component: CasesMeViewComponent;
+  let fixture: ComponentFixture<CasesMeViewComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SearchCasesViewComponent]
+      imports: [CasesMeViewComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SearchCasesViewComponent);
+    fixture = TestBed.createComponent(CasesMeViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

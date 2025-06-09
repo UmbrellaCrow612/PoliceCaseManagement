@@ -286,6 +286,8 @@ export class CaseService {
    * @returns The permission
    */
   getCurrentUsersPermissionForCase(caseId: string) {
-    return this.httpClient.get<string[]>(`${this.BASE_URL}/cases/${caseId}/permissions/me`)
+    return this.httpClient.get<string[]>(
+      `${this.BASE_URL}/cases/${caseId}/permissions/me`
+    );
   }
 }

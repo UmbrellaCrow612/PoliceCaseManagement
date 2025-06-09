@@ -25,6 +25,8 @@ import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
 import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
+import { CaseStatusSelectComponent } from "../../../../core/cases/components/case-status-select/case-status-select.component";
+import { CasePrioritySelectComponent } from "../../../../core/cases/components/case-priority-select/case-priority-select.component";
 
 @Component({
   selector: 'app-search-cases-view',
@@ -41,7 +43,9 @@ import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe'
     RouterLink,
     CaseStatusPipe,
     CasePriorityPipe,
-  ],
+    CaseStatusSelectComponent,
+    CasePrioritySelectComponent
+],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
 })
