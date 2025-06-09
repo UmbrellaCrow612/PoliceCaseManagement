@@ -581,6 +581,16 @@ namespace Cases.Application.Implementations
                 queryBuilder = queryBuilder.Where(x => x.ReportingOfficerId == query.ReportingOfficerId);
             }
 
+            if (!string.IsNullOrWhiteSpace(query.CreatedById))
+            {
+                queryBuilder = queryBuilder.Where(x => x.CreatedById == query.CreatedById);
+            }
+
+            if (query.AssignedUserIds.Length != 0)
+            {
+                queryBuilder = queryBuilder.Where(c => c.CaseUsers.Any(cu => query.AssignedUserIds.Contains(cu.UserId)));
+            }
+
             var count = await queryBuilder.CountAsync();
 
             queryBuilder = queryBuilder.OrderBy(x => x.Id);

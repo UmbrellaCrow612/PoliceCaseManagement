@@ -67,6 +67,8 @@ export class CaseService {
       reportingOfficerId: string | null;
       incidentTypeId: string | null;
       pageNumber: number | null;
+      assignedUserIds: string[];
+      createdById: string | null;
     }>
   ) {
     let urlBuilder = new URL(`${this.BASE_URL}/cases/search`);
@@ -115,6 +117,16 @@ export class CaseService {
         'pageNumber',
         options.pageNumber.toString()
       );
+    }
+
+    if (options.assignedUserIds && options.assignedUserIds.length > 0) {
+      options.assignedUserIds.forEach((x) => {
+        urlBuilder.searchParams.append('assignedUserIds', x);
+      });
+    }
+
+    if (options.createdById) {
+      urlBuilder.searchParams.append('createdById', options.createdById);
     }
 
     let url = urlBuilder.toString();

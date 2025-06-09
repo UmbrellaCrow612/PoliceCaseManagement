@@ -24,5 +24,9 @@ namespace Cases.Core.ValueObjects
         public string? ReportingOfficerId { get; set; } = null;
 
         public string? IncidentTypeId { get; set; } = null;
+
+        public string? CreatedById { get; set; } = null;
+
+        public string[] AssignedUserIds { get; set; } = [];
     }
 }

@@ -1,0 +1,36 @@
+<mat-form-field>
+  <mat-label>Select user</mat-label>
+  <input
+    #input
+    type="text"
+    matInput
+    [matAutocomplete]="auto"
+    [formControl]="searchUsersInput"
+    (input)="search()"
+  />
+
+  @if (searchUsersInput.hasError("required")) {
+  <mat-error> Required </mat-error>
+  }
+  <mat-autocomplete
+    #auto="matAutocomplete"
+    requireSelection
+    (optionSelected)="optionSelected($event)"
+  >
+    @if (isLoading) {
+    <mat-option disabled>Loading...</mat-option>
+    }
+    <!---->
+
+    @if (!isLoading && error) {
+    <mat-option disabled>Failed to fetch users</mat-option>
+    }
+    <!---->
+
+    @if (!isLoading && !error) { @for (user of searchedUsers; track $index) {
+    <mat-option [value]="user.userName">{{ user.userName }}</mat-option>
+    } @empty {
+    <mat-option disabled>No User found for search term</mat-option>
+    } }
+  </mat-autocomplete>
+</mat-form-field>

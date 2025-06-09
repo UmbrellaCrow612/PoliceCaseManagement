@@ -1,22 +1,55 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { UserService } from '../../../../core/user/services/user.service';
 import { CaseService } from '../../../../core/cases/services/case.service';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
+import { CommonModule } from '@angular/common';
+import { RestrictedUser } from '../../../../core/user/type';
 
 @Component({
   selector: 'app-cases-me-view',
-  imports: [],
+  imports: [SearchUsersSelectComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './cases-me-view.component.html',
   styleUrl: './cases-me-view.component.css',
 })
-export class CasesMeViewComponent {
-  private user = inject(UserService).USER;
+export class CasesMeViewComponent implements OnInit {
+  ngOnInit(): void {}
+  private currentUser = inject(UserService).USER;
   private readonly caseService = inject(CaseService);
 
+  form = new FormGroup({
+    selectedUser: new FormControl<RestrictedUser | null>(null, [
+      Validators.required,
+    ]),
+    selectedUserTwo: new FormControl<RestrictedUser | null>(null, [Validators.required])
+  });
 
-  /**
-   * Used to filter cases for the current user still using the search endpoint but pre filling it with the current users details
-   */
-  private searchMyCasesQuery = {}
+  isLoading = true;
+  error: string | null = null;
 
-  // we dont add it to urls here it will be added internal;ly in the on init of the view
+  searchCasesForm = new FormGroup({
+    status: new FormControl<string | null>(null),
+    priority: new FormControl<string | null>(null),
+  });
+
+  filterClicked() {
+    this.fetchData();
+  }
+
+  fetchData() {
+    this.isLoading = true;
+    this.error = null;
+
+    this.caseService.searchCasesWithPagination({
+      status: this.searchCasesForm.controls.status.getRawValue(),
+      priority: this.searchCasesForm.controls.priority.getRawValue(),
+      createdById: this.currentUser?.id,
+      assignedUserIds: [this.currentUser?.id!],
+    });
+  }
 }

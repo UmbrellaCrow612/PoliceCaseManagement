@@ -1,15 +1,15 @@
 <div>
-    <h1>
-        My Cases
-    </h1>
-    <p>
-        View cases you'r assigned to
-    </p>
+  <h1>My Cases</h1>
+  <p>View cases you'r assigned to</p>
 
+  <div>Filters for status and pri <button>Filter</button></div>
 
-    <!--
-    todo 
-    - just use the search endpoint but pre fill URL search paarms with current user objects values
-    as it fits the use case
-    -->
+  <div>Paged result with next pre buttoins</div>
+
+  <form action="" [formGroup]="form">
+    <app-search-users-select formControlName="selectedUser" />
+    <app-search-users-select formControlName="selectedUserTwo" />
+  </form>
+
+  {{ form.value | json }}
 </div>
