@@ -3,6 +3,7 @@ import {
   ElementRef,
   forwardRef,
   inject,
+  input,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -17,7 +18,6 @@ import { UserService } from '../../services/user.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
-  MatAutocompleteActivatedEvent,
   MatAutocompleteModule,
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
@@ -49,6 +49,16 @@ import { debounceTime, Subject } from 'rxjs';
 export class SearchUsersSelectComponent
   implements ControlValueAccessor, OnInit
 {
+  /**
+   * Optionally pass this to make the user select required or not
+   */
+  requireSelection = input<boolean>(false);
+
+  /**
+   * Text to display as the label for the input
+   */
+  displayText = input.required<string>();
+
   @ViewChild('input') input: ElementRef<HTMLInputElement> | null = null;
 
   ngOnInit(): void {
@@ -63,10 +73,15 @@ export class SearchUsersSelectComponent
         this.onChange(null);
       }
     });
+
+    if (this.requireSelection()) {
+      this.searchUsersInput.addValidators(Validators.required);
+    }
   }
 
   writeValue(obj: RestrictedUser | null): void {
     this.selectedUser = obj;
+    this.searchUsersInput.setValue(null);
   }
 
   registerOnChange(fn: (value: RestrictedUser | null) => void): void {
@@ -109,7 +124,7 @@ export class SearchUsersSelectComponent
   /**
    * Input used to search for users to select
    */
-  searchUsersInput = new FormControl('', [Validators.required]);
+  searchUsersInput = new FormControl('');
 
   /**
    * All the users fetched for the search

@@ -49,33 +49,16 @@
       </mat-form-field>
       <app-case-status-select formControlName="status" />
       <app-case-priority-select formControlName="priority" />
-
-      <mat-form-field appearance="outline">
-        <mat-label>Reporting officer</mat-label>
-        <input
-          #reportingOfficerInput
-          type="text"
-          matInput
-          [matAutocomplete]="reportingOfficerAuto"
-          (input)="filterUsers()"
-          formControlName="reportingOfficerUserName"
-        />
-
-        <mat-hint> Optional </mat-hint>
-        <mat-autocomplete
-          requireSelection
-          #reportingOfficerAuto="matAutocomplete"
-        >
-          @if (isFetchingUsers) {
-          <mat-option disabled>Fetching users...</mat-option>
-          }
-          <!---->
-          @if (!isFetchingUsers) { @for (user of users; track user.id) {
-          <mat-option [value]="user.userName">{{ user.userName }}</mat-option>
-          } @empty {
-          <mat-option>No officers found with search term</mat-option>} }
-        </mat-autocomplete>
-      </mat-form-field>
+      <app-search-users-select
+        formControlName="reportingOfficer"
+        [requireSelection]="false"
+        displayText="Reporting Officer"
+      />
+      <app-search-users-select
+        formControlName="createdByUser"
+        [requireSelection]="false"
+        displayText="Created by Officer"
+      />
 
       <mat-form-field appearance="outline">
         <mat-label>Incident type</mat-label>

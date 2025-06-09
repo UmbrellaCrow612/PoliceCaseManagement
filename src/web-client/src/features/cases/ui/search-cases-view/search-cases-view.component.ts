@@ -18,15 +18,15 @@ import { debounceTime, Subject, timer } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { IncidentTypeService } from '../../../../core/incident-type/services/incident-type-service.service';
 import { CaseService } from '../../../../core/cases/services/case.service';
-import { tryConvertStringToNumber } from '../../../../core/app/utils/convert-string-to-number';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
 import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
-import { CaseStatusSelectComponent } from "../../../../core/cases/components/case-status-select/case-status-select.component";
-import { CasePrioritySelectComponent } from "../../../../core/cases/components/case-priority-select/case-priority-select.component";
+import { CaseStatusSelectComponent } from '../../../../core/cases/components/case-status-select/case-status-select.component';
+import { CasePrioritySelectComponent } from '../../../../core/cases/components/case-priority-select/case-priority-select.component';
+import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
 
 @Component({
   selector: 'app-search-cases-view',
@@ -44,40 +44,19 @@ import { CasePrioritySelectComponent } from "../../../../core/cases/components/c
     CaseStatusPipe,
     CasePriorityPipe,
     CaseStatusSelectComponent,
-    CasePrioritySelectComponent
-],
+    CasePrioritySelectComponent,
+    SearchUsersSelectComponent,
+  ],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
 })
 export class SearchCasesViewComponent implements OnInit {
   constructor(
-    private userService: UserService,
     private incidentTypeService: IncidentTypeService,
     private caseService: CaseService,
     private errorService: ErrorService
   ) {}
-  ngOnInit(): void {
-    this.searchSubject.pipe(debounceTime(1000)).subscribe(() => {
-      let searchTerm = this.input?.nativeElement.value;
-      if (searchTerm && searchTerm?.trim() !== '') {
-        this.userService.searchUsersByUsername(searchTerm).subscribe({
-          next: (users) => {
-            this.users = users;
-            this.isFetchingUsers = false;
-          },
-          error: () => {
-            this.isFetchingUsers = false;
-          },
-        });
-      } else {
-        this.isFetchingUsers = false;
-        this.users = [];
-      }
-    });
-  }
-
-  @ViewChild('reportingOfficerInput')
-  input: ElementRef<HTMLInputElement> | null = null;
+  ngOnInit(): void {}
 
   @ViewChild('incidentTypeInput')
   incidentTypeInput: ElementRef<HTMLInputElement> | null = null;
@@ -91,20 +70,13 @@ export class SearchCasesViewComponent implements OnInit {
     reportedDateTime: new FormControl<Date | null>(null),
     status: new FormControl<string | null>(null),
     priority: new FormControl<string | null>(null),
-    reportingOfficerUserName: new FormControl<string | null>(null),
+    reportingOfficer: new FormControl<RestrictedUser | null>(null),
+    createdByUser: new FormControl<RestrictedUser | null>(null),
     incidentType: new FormControl<string | null>(null),
   });
 
   caseStatus = CaseStatusNames;
   casePrioritys = CasePriorityNames;
-
-  isFetchingUsers = false;
-  users: RestrictedUser[] = [];
-  searchSubject = new Subject<void>();
-  filterUsers() {
-    this.isFetchingUsers = true;
-    this.searchSubject.next();
-  }
 
   isFetchingIncidentTypes = false;
   incidentTypes: IncidentType[] | null = null;
@@ -153,13 +125,6 @@ export class SearchCasesViewComponent implements OnInit {
       (x) => x.name === this.searchCasesFrom.controls.incidentType.getRawValue()
     )?.id;
 
-    let reportingOfficerId = this.users.find(
-      (x) =>
-        x.userName ===
-        this.searchCasesFrom.controls.reportingOfficerUserName.getRawValue()
-    )?.id;
-
-
     this.isFetchingCases = true;
     this.caseService
       .searchCasesWithPagination({
@@ -170,9 +135,12 @@ export class SearchCasesViewComponent implements OnInit {
         priority: this.searchCasesFrom.controls.priority.getRawValue(),
         reportedDateTime:
           this.searchCasesFrom.controls.reportedDateTime.getRawValue(),
-        reportingOfficerId: reportingOfficerId,
-        status: this.searchCasesFrom.controls.status.getRawValue() ,
+        reportingOfficerId:
+          this.searchCasesFrom.controls.reportingOfficer.getRawValue()?.id,
+        status: this.searchCasesFrom.controls.status.getRawValue(),
         pageNumber: options.pageNumber,
+        createdById:
+          this.searchCasesFrom.controls.createdByUser.getRawValue()?.id,
       })
       .subscribe({
         next: (result) => {

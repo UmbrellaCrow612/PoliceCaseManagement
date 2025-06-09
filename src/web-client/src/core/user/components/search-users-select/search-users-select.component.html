@@ -1,5 +1,7 @@
-<mat-form-field>
-  <mat-label>Select user</mat-label>
+<mat-form-field appearance="outline">
+  <mat-label>
+    {{ displayText() }}
+  </mat-label>
   <input
     #input
     type="text"
@@ -12,6 +14,7 @@
   @if (searchUsersInput.hasError("required")) {
   <mat-error> Required </mat-error>
   }
+
   <mat-autocomplete
     #auto="matAutocomplete"
     requireSelection
