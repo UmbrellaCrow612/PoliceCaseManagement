@@ -1,1 +1,54 @@
-<p>search-users-multi-select works!</p>
+<div class="flex">
+  <mat-form-field appearance="outline">
+    <mat-label>{{ displayText() }}</mat-label>
+    <input
+      #input
+      type="text"
+      matInput
+      [formControl]="SearchInputControl"
+      [matAutocomplete]="auto"
+      [disabled]="disabled"
+      (input)="search()"
+    />
+    <mat-autocomplete
+      requireSelection
+      #auto="matAutocomplete"
+      (optionSelected)="optionSelected($event)"
+    >
+      @if (isLoading) {
+      <mat-option disabled>Loading users</mat-option>
+      }
+
+      <!---->
+
+      @if (!isLoading && error) {
+      <mat-option [value]="null">Failed {{ error }}</mat-option>
+      }
+
+      <!---->
+
+      @if (!isLoading && !error) {
+      <!---->
+      @for (user of SearchedUsers; track user.id) {
+      <mat-option [value]="user.userName">{{ user.userName }}</mat-option>
+      } @empty {
+      <mat-option disabled>No users found</mat-option>
+      }
+      <!---->
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-chip-set aria-label="User selection">
+    @for (user of SelectedUsers.values(); track $index) {
+    <mat-chip matIconSuffix="cancel"
+      >{{ user.userName }}
+      <button matChipRemove [attr.aria-label]="'remove ' + user.userName" (click)="removeSelectedUser(user)">
+        <mat-icon>cancel</mat-icon>
+      </button></mat-chip
+    >
+
+    } @empty {
+    <mat-chip disabled>No users selected</mat-chip>
+    }
+  </mat-chip-set>
+</div>

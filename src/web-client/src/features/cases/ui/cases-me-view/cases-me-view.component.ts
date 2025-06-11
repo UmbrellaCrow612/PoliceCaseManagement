@@ -10,10 +10,16 @@ import {
 import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
 import { CommonModule } from '@angular/common';
 import { RestrictedUser } from '../../../../core/user/type';
+import { SearchUsersMultiSelectComponent } from '../../../../core/user/components/search-users-multi-select/search-users-multi-select.component';
 
 @Component({
   selector: 'app-cases-me-view',
-  imports: [SearchUsersSelectComponent, ReactiveFormsModule, CommonModule],
+  imports: [
+    SearchUsersSelectComponent,
+    ReactiveFormsModule,
+    CommonModule,
+    SearchUsersMultiSelectComponent,
+  ],
   templateUrl: './cases-me-view.component.html',
   styleUrl: './cases-me-view.component.css',
 })
@@ -26,7 +32,10 @@ export class CasesMeViewComponent implements OnInit {
     selectedUser: new FormControl<RestrictedUser | null>(null, [
       Validators.required,
     ]),
-    selectedUserTwo: new FormControl<RestrictedUser | null>(null, [Validators.required])
+    selectedUserTwo: new FormControl<RestrictedUser | null>(null, [
+      Validators.required,
+    ]),
+    selectedUsers: new FormControl<RestrictedUser[] | null>(null),
   });
 
   isLoading = true;

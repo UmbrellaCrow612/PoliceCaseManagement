@@ -7,8 +7,15 @@
   <div>Paged result with next pre buttoins</div>
 
   <form action="" [formGroup]="form">
-    <app-search-users-select formControlName="selectedUser" />
-    <app-search-users-select formControlName="selectedUserTwo" />
+    <app-search-users-select formControlName="selectedUser" displayText="d" />
+    <app-search-users-select
+      formControlName="selectedUserTwo"
+      displayText="d"
+    />
+    <app-search-users-multi-select
+      formControlName="selectedUsers"
+      displayText="Select users to search"
+    />
   </form>
 
   {{ form.value | json }}
