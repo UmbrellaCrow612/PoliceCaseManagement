@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list_container {
+  height: 200px;
+  overflow-y: scroll;
+}
+
+.btns {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

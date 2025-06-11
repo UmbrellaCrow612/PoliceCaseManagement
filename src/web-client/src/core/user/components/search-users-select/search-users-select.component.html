@@ -1,4 +1,4 @@
-<mat-form-field appearance="outline">
+<mat-form-field [appearance]="appearance()" [ngStyle]="styles()">
   <mat-label>
     {{ displayText() }}
   </mat-label>

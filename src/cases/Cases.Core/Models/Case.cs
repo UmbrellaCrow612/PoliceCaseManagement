@@ -1,6 +1,5 @@
 ﻿using Cases.Core.Models.Joins;
 using Events.Core;
-using Events.User;
 
 namespace Cases.Core.Models
 {

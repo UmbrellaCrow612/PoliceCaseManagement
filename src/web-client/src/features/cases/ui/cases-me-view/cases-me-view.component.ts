@@ -13,6 +13,7 @@ import { CaseStatusSelectComponent } from '../../../../core/cases/components/cas
 import { CasePagedResult } from '../../../../core/cases/type';
 import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { MatButtonModule } from '@angular/material/button';
+import { CaseGridListComponent } from '../../../../core/cases/components/case-grid-list/case-grid-list.component';
 
 @Component({
   selector: 'app-cases-me-view',
@@ -22,6 +23,7 @@ import { MatButtonModule } from '@angular/material/button';
     CasePrioritySelectComponent,
     CaseStatusSelectComponent,
     MatButtonModule,
+    CaseGridListComponent,
   ],
   templateUrl: './cases-me-view.component.html',
   styleUrl: './cases-me-view.component.css',
@@ -53,7 +55,22 @@ export class CasesMeViewComponent implements OnInit {
    */
   searchCasesResult: CasePagedResult | null = null;
 
-  fetchData() {
+  nextClicked() {
+    this.fetchData({
+      pageNumber: this.searchCasesResult?.hasNextPage
+        ? this.searchCasesResult.pageNumber + 1
+        : null,
+    });
+  }
+
+  previousClicked() {
+    this.fetchData({
+      pageNumber: this.searchCasesResult?.hasPreviousPage
+        ? this.searchCasesResult.pageNumber - 1
+        : null,
+    });
+  }
+  fetchData(options: Partial<{ pageNumber: number | null }> = {}) {
     this.isLoading = true;
     this.error = null;
     this.searchCasesResult = null;
@@ -63,6 +80,7 @@ export class CasesMeViewComponent implements OnInit {
         status: this.searchCasesForm.controls.status.value,
         priority: this.searchCasesForm.controls.priority.value,
         assignedUserIds: [this.currentUser?.id!],
+        pageNumber: options.pageNumber,
       })
       .subscribe({
         next: (result) => {

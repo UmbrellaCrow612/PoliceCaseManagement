@@ -20,9 +20,8 @@ import {
   CreateCase,
   CreateCaseAction,
 } from '../../../../../../core/cases/type';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { timer } from 'rxjs';
-import { CaseActionDetailsComponent } from '../case-action-details/case-action-details.component';
 
 interface CreateCaseActionDialogData {
   /**

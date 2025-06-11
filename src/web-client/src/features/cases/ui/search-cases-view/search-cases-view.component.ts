@@ -6,28 +6,20 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import {
-  CasePagedResult,
-  CasePriorityNames,
-  CaseStatusNames,
-} from '../../../../core/cases/type';
+import { CasePagedResult } from '../../../../core/cases/type';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { RestrictedUser } from '../../../../core/user/type';
-import { UserService } from '../../../../core/user/services/user.service';
-import { debounceTime, Subject, timer } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { IncidentTypeService } from '../../../../core/incident-type/services/incident-type-service.service';
 import { CaseService } from '../../../../core/cases/services/case.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { MatListModule } from '@angular/material/list';
-import { RouterLink } from '@angular/router';
-import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
-import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
 import { CaseStatusSelectComponent } from '../../../../core/cases/components/case-status-select/case-status-select.component';
 import { CasePrioritySelectComponent } from '../../../../core/cases/components/case-priority-select/case-priority-select.component';
 import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
 import { SearchUsersMultiSelectComponent } from '../../../../core/user/components/search-users-multi-select/search-users-multi-select.component';
+import { CaseGridListComponent } from '../../../../core/cases/components/case-grid-list/case-grid-list.component';
 
 @Component({
   selector: 'app-search-cases-view',
@@ -41,13 +33,11 @@ import { SearchUsersMultiSelectComponent } from '../../../../core/user/component
     MatSelectModule,
     MatAutocompleteModule,
     MatListModule,
-    RouterLink,
-    CaseStatusPipe,
-    CasePriorityPipe,
     CaseStatusSelectComponent,
     CasePrioritySelectComponent,
     SearchUsersSelectComponent,
     SearchUsersMultiSelectComponent,
+    CaseGridListComponent,
   ],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
@@ -63,9 +53,6 @@ export class SearchCasesViewComponent implements OnInit {
   @ViewChild('incidentTypeInput')
   incidentTypeInput: ElementRef<HTMLInputElement> | null = null;
 
-  @ViewChild('paginationButtons')
-  paginationButtonsContainer: ElementRef<HTMLDivElement> | null = null;
-
   searchCasesFrom = new FormGroup({
     caseNumber: new FormControl<string | null>(null),
     incidentDateTime: new FormControl<Date | null>(null),
@@ -77,9 +64,6 @@ export class SearchCasesViewComponent implements OnInit {
     incidentType: new FormControl<string | null>(null),
     assginedUsers: new FormControl<RestrictedUser[] | null>(null),
   });
-
-  caseStatus = CaseStatusNames;
-  casePrioritys = CasePriorityNames;
 
   isFetchingIncidentTypes = false;
   incidentTypes: IncidentType[] | null = null;
@@ -152,7 +136,6 @@ export class SearchCasesViewComponent implements OnInit {
         next: (result) => {
           this.casesPagedResult = result;
           this.isFetchingCases = false;
-          this.scrollToButtons();
         },
         error: (err: HttpErrorResponse) => {
           this.isFetchingCases = false;
@@ -174,15 +157,6 @@ export class SearchCasesViewComponent implements OnInit {
       pageNumber: this.casesPagedResult?.hasPreviousPage
         ? this.casesPagedResult.pageNumber - 1
         : null,
-    });
-  }
-
-  scrollToButtons() {
-    timer(100).subscribe(() => {
-      this.paginationButtonsContainer?.nativeElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
     });
   }
 

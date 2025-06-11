@@ -15,7 +15,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  MatFormFieldAppearance,
+  MatFormFieldModule,
+} from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
   MatAutocompleteModule,
@@ -23,6 +26,7 @@ import {
 } from '@angular/material/autocomplete';
 import { RestrictedUser } from '../../type';
 import { debounceTime, Subject } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-search-users-select',
@@ -31,6 +35,7 @@ import { debounceTime, Subject } from 'rxjs';
     MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './search-users-select.component.html',
   styleUrl: './search-users-select.component.css',
@@ -49,6 +54,16 @@ import { debounceTime, Subject } from 'rxjs';
 export class SearchUsersSelectComponent
   implements ControlValueAccessor, OnInit
 {
+  /**
+   * Extra styles to apply to the form field
+   */
+  styles = input<{ [key: string]: string }>();
+
+  /**
+   * Form field appearance
+   */
+  appearance = input.required<MatFormFieldAppearance>();
+
   /**
    * Optionally pass this to make the user select required or not
    */

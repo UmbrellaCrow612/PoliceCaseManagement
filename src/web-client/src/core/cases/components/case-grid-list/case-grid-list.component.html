@@ -1,0 +1,40 @@
+<div class="container">
+  <mat-nav-list role="list" class="list_container">
+    @for (case of casePagedResult().items; track $index) {
+    <a [routerLink]="['../', case.id]">
+      <mat-list-item role="listitem">
+        <strong>Case Number:</strong> {{ case.caseNumber }}
+        <strong>Incident date time: </strong>{{ case.incidentDateTime | date }}
+        <strong>Repoted date time: </strong>
+        {{ case.reportedDateTime | date }} <strong>Case status: </strong>
+        {{ case.status | caseStatusPipe }} <strong>Priority: </strong>
+        {{ case.priority | casePriorityPipe }}
+      </mat-list-item>
+    </a>
+    } @empty {
+    <mat-list-item role="listitem"> No Cases found </mat-list-item>
+    }
+  </mat-nav-list>
+
+  @if (casePagedResult().hasNextPage || casePagedResult().hasPreviousPage) {
+  <div class="btns">
+    <span class="details">
+      Page number: {{ casePagedResult().pageNumber }} Page size:
+      {{ casePagedResult().pageSize }} Total:
+      {{ casePagedResult().totalCount }} Total pages:{{
+        casePagedResult().totalPages
+      }}
+    </span>
+
+    @if (casePagedResult().hasPreviousPage) {
+    <button mat-button (click)="previousClicked.emit()">Previous</button>
+    }
+
+    <!---->
+
+    @if (casePagedResult().hasNextPage) {
+    <button mat-button (click)="nextClicked.emit()">Next</button>
+    }
+  </div>
+  }
+</div>

@@ -10,7 +10,7 @@
       Clear
     </button>
   </form>
-  
+
   @if (isLoading) {
   <div>Loading my cases</div>
   }
@@ -23,9 +23,7 @@
 
   <!---->
 
-  @if (!isLoading && !error) {
-  <div>
-    {{ searchCasesResult | json }}
-  </div>
+  @if (!isLoading && !error && searchCasesResult) {
+  <app-case-grid-list [casePagedResult]="searchCasesResult" (nextClicked)="nextClicked()" (previousClicked)="previousClicked()"/>
   }
 </div>

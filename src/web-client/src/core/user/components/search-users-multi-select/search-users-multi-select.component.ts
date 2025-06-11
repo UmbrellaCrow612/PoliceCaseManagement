@@ -197,7 +197,7 @@ export class SearchUsersMultiSelectComponent
   /**
    * The search inputt field
    */
-  SearchInputControl = new FormControl('');
+  SearchInputControl = new FormControl({ value: '', disabled: this.disabled });
 
   /**
    * List of users fetched
