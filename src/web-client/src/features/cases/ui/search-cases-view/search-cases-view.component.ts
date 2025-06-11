@@ -27,6 +27,7 @@ import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe'
 import { CaseStatusSelectComponent } from '../../../../core/cases/components/case-status-select/case-status-select.component';
 import { CasePrioritySelectComponent } from '../../../../core/cases/components/case-priority-select/case-priority-select.component';
 import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
+import { SearchUsersMultiSelectComponent } from '../../../../core/user/components/search-users-multi-select/search-users-multi-select.component';
 
 @Component({
   selector: 'app-search-cases-view',
@@ -46,6 +47,7 @@ import { SearchUsersSelectComponent } from '../../../../core/user/components/sea
     CaseStatusSelectComponent,
     CasePrioritySelectComponent,
     SearchUsersSelectComponent,
+    SearchUsersMultiSelectComponent,
   ],
   templateUrl: './search-cases-view.component.html',
   styleUrl: './search-cases-view.component.css',
@@ -73,6 +75,7 @@ export class SearchCasesViewComponent implements OnInit {
     reportingOfficer: new FormControl<RestrictedUser | null>(null),
     createdByUser: new FormControl<RestrictedUser | null>(null),
     incidentType: new FormControl<string | null>(null),
+    assginedUsers: new FormControl<RestrictedUser[] | null>(null),
   });
 
   caseStatus = CaseStatusNames;
@@ -141,6 +144,9 @@ export class SearchCasesViewComponent implements OnInit {
         pageNumber: options.pageNumber,
         createdById:
           this.searchCasesFrom.controls.createdByUser.getRawValue()?.id,
+        assignedUserIds: this.searchCasesFrom.controls.assginedUsers.value?.map(
+          (x) => x.id
+        ),
       })
       .subscribe({
         next: (result) => {

@@ -7,58 +7,72 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
 import { CommonModule } from '@angular/common';
-import { RestrictedUser } from '../../../../core/user/type';
-import { SearchUsersMultiSelectComponent } from '../../../../core/user/components/search-users-multi-select/search-users-multi-select.component';
+import { CasePrioritySelectComponent } from '../../../../core/cases/components/case-priority-select/case-priority-select.component';
+import { CaseStatusSelectComponent } from '../../../../core/cases/components/case-status-select/case-status-select.component';
+import { CasePagedResult } from '../../../../core/cases/type';
+import { formatBackendError } from '../../../../core/app/errors/formatError';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-cases-me-view',
   imports: [
-    SearchUsersSelectComponent,
     ReactiveFormsModule,
     CommonModule,
-    SearchUsersMultiSelectComponent,
+    CasePrioritySelectComponent,
+    CaseStatusSelectComponent,
+    MatButtonModule,
   ],
   templateUrl: './cases-me-view.component.html',
   styleUrl: './cases-me-view.component.css',
 })
 export class CasesMeViewComponent implements OnInit {
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.searchCasesForm.valueChanges.subscribe(() => {
+      this.fetchData();
+    });
+
+    this.fetchData();
+  }
+
   private currentUser = inject(UserService).USER;
   private readonly caseService = inject(CaseService);
-
-  form = new FormGroup({
-    selectedUser: new FormControl<RestrictedUser | null>(null, [
-      Validators.required,
-    ]),
-    selectedUserTwo: new FormControl<RestrictedUser | null>(null, [
-      Validators.required,
-    ]),
-    selectedUsers: new FormControl<RestrictedUser[] | null>(null),
-  });
 
   isLoading = true;
   error: string | null = null;
 
+  /**
+   * Form used to filter my cases
+   */
   searchCasesForm = new FormGroup({
-    status: new FormControl<string | null>(null),
     priority: new FormControl<string | null>(null),
+    status: new FormControl<string | null>(null),
   });
-
-  filterClicked() {
-    this.fetchData();
-  }
+  /**
+   * List of cases fetched
+   */
+  searchCasesResult: CasePagedResult | null = null;
 
   fetchData() {
     this.isLoading = true;
     this.error = null;
+    this.searchCasesResult = null;
 
-    this.caseService.searchCasesWithPagination({
-      status: this.searchCasesForm.controls.status.getRawValue(),
-      priority: this.searchCasesForm.controls.priority.getRawValue(),
-      createdById: this.currentUser?.id,
-      assignedUserIds: [this.currentUser?.id!],
-    });
+    this.caseService
+      .searchCasesWithPagination({
+        status: this.searchCasesForm.controls.status.value,
+        priority: this.searchCasesForm.controls.priority.value,
+        assignedUserIds: [this.currentUser?.id!],
+      })
+      .subscribe({
+        next: (result) => {
+          this.searchCasesResult = result;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.error = formatBackendError(err);
+          this.isLoading = false;
+        },
+      });
   }
 }

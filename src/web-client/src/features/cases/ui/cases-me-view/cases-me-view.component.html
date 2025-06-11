@@ -1,22 +1,31 @@
-<div>
+<div class="container">
   <h1>My Cases</h1>
-  <p>View cases you'r assigned to</p>
+  <p>Filter my cases</p>
 
-  <div>Filters for status and pri <button>Filter</button></div>
+  <form [formGroup]="searchCasesForm" class="search_form">
+    <app-case-priority-select formControlName="priority" />
+    <app-case-status-select formControlName="status" />
 
-  <div>Paged result with next pre buttoins</div>
-
-  <form action="" [formGroup]="form">
-    <app-search-users-select formControlName="selectedUser" displayText="d" />
-    <app-search-users-select
-      formControlName="selectedUserTwo"
-      displayText="d"
-    />
-    <app-search-users-multi-select
-      formControlName="selectedUsers"
-      displayText="Select users to search"
-    />
+    <button mat-button type="button" (click)="searchCasesForm.reset()">
+      Clear
+    </button>
   </form>
+  
+  @if (isLoading) {
+  <div>Loading my cases</div>
+  }
 
-  {{ form.value | json }}
+  <!---->
+
+  @if (!isLoading && error) {
+  <div>Error {{ error }}</div>
+  }
+
+  <!---->
+
+  @if (!isLoading && !error) {
+  <div>
+    {{ searchCasesResult | json }}
+  </div>
+  }
 </div>
