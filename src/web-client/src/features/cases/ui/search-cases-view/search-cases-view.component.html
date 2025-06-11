@@ -1,159 +1,164 @@
 <div class="container">
-    <form [formGroup]="searchCasesFrom" (ngSubmit)="onSubmit()" class="form">
-        <h2>Search for cases in the system</h2>
-        <div class="inputs">
-            <mat-form-field appearance="outline">
-                <mat-label>Case number</mat-label>
-                <input matInput formControlName="caseNumber">
-                <mat-hint>Can be partial case number</mat-hint>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Incident date time</mat-label>
-                <input matInput [matDatepicker]="incidentDateTimePicker" formControlName="incidentDateTime">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="incidentDateTimePicker"></mat-datepicker-toggle>
-                <mat-datepicker #incidentDateTimePicker></mat-datepicker>
+  <form [formGroup]="searchCasesFrom" (ngSubmit)="onSubmit()" class="form">
+    <h2>Search for cases in the system</h2>
+    <div class="inputs">
+      <mat-form-field appearance="outline">
+        <mat-label>Case number</mat-label>
+        <input matInput formControlName="caseNumber" />
+        <mat-hint>Can be partial case number</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Incident date time</mat-label>
+        <input
+          matInput
+          [matDatepicker]="incidentDateTimePicker"
+          formControlName="incidentDateTime"
+        />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="incidentDateTimePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #incidentDateTimePicker></mat-datepicker>
 
-                @if (searchCasesFrom.controls.incidentDateTime.hasError("matDatepickerParse")) {
-                <mat-error>
-                    Date time must be a valid date
-                </mat-error>
-                }
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Reported date time</mat-label>
-                <input matInput [matDatepicker]="reportedDateTimePicker" formControlName="reportedDateTime">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="reportedDateTimePicker"></mat-datepicker-toggle>
-                <mat-datepicker #reportedDateTimePicker></mat-datepicker>
-
-                @if (searchCasesFrom.controls.reportedDateTime.hasError("matDatepickerParse")) {
-                <mat-error>
-                    Date time must be a valid date
-                </mat-error>
-                }
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Case status</mat-label>
-                <mat-select formControlName="status">
-                    @for (status of caseStatus; track status) {
-                    <mat-option [value]="status.number.toString()">{{status.name}}</mat-option>
-                    }
-                </mat-select>
-
-                <mat-hint>Optional</mat-hint>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Case priority</mat-label>
-                <mat-select formControlName="priority">
-                    @for (priority of casePrioritys; track priority) {
-                    <mat-option [value]="priority.number.toString()">{{priority.name}}</mat-option>
-                    }
-                </mat-select>
-
-                <mat-hint>Optional</mat-hint>
-            </mat-form-field>
-
-
-            <mat-form-field appearance="outline">
-                <mat-label>Reporting officer</mat-label>
-                <input #reportingOfficerInput type="text" matInput [matAutocomplete]="reportingOfficerAuto"
-                    (input)="filterUsers()" formControlName="reportingOfficerUserName">
-
-                <mat-hint>
-                    Optional
-                </mat-hint>
-                <mat-autocomplete requireSelection #reportingOfficerAuto="matAutocomplete">
-
-                    @if (isFetchingUsers) {
-                    <mat-option disabled>Fetching users...</mat-option>
-                    }
-                    <!---->
-                    @if (!isFetchingUsers) {
-                    @for (user of users; track user.id) {
-                    <mat-option [value]="user.userName">{{user.userName}}</mat-option>
-                    } @empty { <mat-option>No officers found with search
-                        term</mat-option>}
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
-
-
-            <mat-form-field appearance="outline">
-                <mat-label>Incident type</mat-label>
-                <input #incidentTypeInput type="text" matInput formControlName="incidentType"
-                    [matAutocomplete]="incidentTypeAuto" (focus)="fetchIncidentTypes()" (input)="filterIncidentTypes()">
-
-                <mat-hint>
-                    Optional
-                </mat-hint>
-                <mat-autocomplete requireSelection #incidentTypeAuto="matAutocomplete">
-                    @if (isFetchingIncidentTypes) {
-                    <mat-option [value]="null" disabled>Fetching incident types</mat-option>
-                    }
-
-                    <!---->
-
-                    @if (!isFetchingIncidentTypes) {
-                    @for (incidentType of filteredIncidentTypes; track incidentType.id) {
-                    <mat-option [value]="incidentType.name">{{incidentType.name}}</mat-option>
-                    } @empty {
-                    <mat-option [value]="null">No incident types match search term</mat-option>
-                    }
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
-        </div>
-
-        <div class="btns">
-            <button mat-raised-button type="submit" [disabled]="isFetchingCases">Search</button>
-            <button mat-raised-button type="reset" (click)="clearClicked()">Clear</button>
-        </div>
-    </form>
-
-
-    <div class="cases_container" >
-        @if (isFetchingCases) {
-        <div>
-            Loading
-        </div>
+        @if
+        (searchCasesFrom.controls.incidentDateTime.hasError("matDatepickerParse"))
+        {
+        <mat-error> Date time must be a valid date </mat-error>
         }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Reported date time</mat-label>
+        <input
+          matInput
+          [matDatepicker]="reportedDateTimePicker"
+          formControlName="reportedDateTime"
+        />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="reportedDateTimePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #reportedDateTimePicker></mat-datepicker>
 
-        <!---->
-
-        @if (!isFetchingCases && casesPagedResult) {
-        <mat-selection-list role="list">
-            @for (case of casesPagedResult.items; track $index) {
-            <a [routerLink]="['../', case.id]">
-                <mat-list-item role="listitem">
-                    <strong>Case Number:</strong> {{case.caseNumber}} <strong>Incident date time:
-                    </strong>{{case.incidentDateTime | date}} <strong>Repoted date time: </strong>
-                    {{case.reportedDateTime | date}} <strong>Case status: </strong>
-                    {{case.status | caseStatusPipe}} <strong>Priority: </strong> {{case.priority | casePriorityPipe}}
-                </mat-list-item>
-            </a>
-
-            } @empty {
-            <mat-list-item role="listitem">
-                Nothing found for search term
-            </mat-list-item>
-            }
-        </mat-selection-list>
+        @if
+        (searchCasesFrom.controls.reportedDateTime.hasError("matDatepickerParse"))
+        {
+        <mat-error> Date time must be a valid date </mat-error>
         }
+      </mat-form-field>
+      <app-case-status-select formControlName="status" />
+      <app-case-priority-select formControlName="priority" />
+      <app-search-users-select
+        formControlName="reportingOfficer"
+        [requireSelection]="false"
+        displayText="Reporting Officer"
+      />
+      <app-search-users-select
+        formControlName="createdByUser"
+        [requireSelection]="false"
+        displayText="Created by Officer"
+      />
+
+      <mat-form-field appearance="outline">
+        <mat-label>Incident type</mat-label>
+        <input
+          #incidentTypeInput
+          type="text"
+          matInput
+          formControlName="incidentType"
+          [matAutocomplete]="incidentTypeAuto"
+          (focus)="fetchIncidentTypes()"
+          (input)="filterIncidentTypes()"
+        />
+
+        <mat-hint> Optional </mat-hint>
+        <mat-autocomplete requireSelection #incidentTypeAuto="matAutocomplete">
+          @if (isFetchingIncidentTypes) {
+          <mat-option [value]="null" disabled
+            >Fetching incident types</mat-option
+          >
+          }
+
+          <!---->
+
+          @if (!isFetchingIncidentTypes) { @for (incidentType of
+          filteredIncidentTypes; track incidentType.id) {
+          <mat-option [value]="incidentType.name">{{
+            incidentType.name
+          }}</mat-option>
+          } @empty {
+          <mat-option [value]="null"
+            >No incident types match search term</mat-option
+          >
+          } }
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <app-search-users-multi-select
+        displayText="Assigned users"
+        formControlName="assginedUsers"
+      />
     </div>
 
-    @if (casesPagedResult && casesPagedResult.items.length > 0) {
-    <div class="pagination_buttons" #paginationButtons>
-        <span>
-            Page: {{casesPagedResult.pageNumber}} Total pages: {{casesPagedResult.totalPages}}
-        </span>
-        @if (casesPagedResult.hasNextPage) {
-        <button mat-raised-button (click)="nextPageClicked()" type="button">Next</button>
-        }
-        <!---->
-        @if (casesPagedResult.hasPreviousPage) {
-        <button mat-raised-button (click)="previousPageClicked()" type="button">Previous</button>
-        }
+    <div class="btns">
+      <button mat-raised-button type="submit" [disabled]="isFetchingCases">
+        Search
+      </button>
+      <button mat-raised-button type="reset" (click)="clearClicked()">
+        Clear
+      </button>
     </div>
+  </form>
+
+  <div class="cases_container">
+    @if (isFetchingCases) {
+    <div>Loading</div>
     }
+
+    <!---->
+
+    @if (!isFetchingCases && casesPagedResult) {
+    <mat-selection-list role="list">
+      @for (case of casesPagedResult.items; track $index) {
+      <a [routerLink]="['../', case.id]">
+        <mat-list-item role="listitem">
+          <strong>Case Number:</strong> {{ case.caseNumber }}
+          <strong>Incident date time: </strong
+          >{{ case.incidentDateTime | date }}
+          <strong>Repoted date time: </strong>
+          {{ case.reportedDateTime | date }} <strong>Case status: </strong>
+          {{ case.status | caseStatusPipe }} <strong>Priority: </strong>
+          {{ case.priority | casePriorityPipe }}
+        </mat-list-item>
+      </a>
+
+      } @empty {
+      <mat-list-item role="listitem">
+        Nothing found for search term
+      </mat-list-item>
+      }
+    </mat-selection-list>
+    }
+  </div>
+
+  @if (casesPagedResult && casesPagedResult.items.length > 0) {
+  <div class="pagination_buttons" #paginationButtons>
+    <span>
+      Page: {{ casesPagedResult.pageNumber }} Total pages:
+      {{ casesPagedResult.totalPages }}
+    </span>
+    @if (casesPagedResult.hasNextPage) {
+    <button mat-raised-button (click)="nextPageClicked()" type="button">
+      Next
+    </button>
+    }
+    <!---->
+    @if (casesPagedResult.hasPreviousPage) {
+    <button mat-raised-button (click)="previousPageClicked()" type="button">
+      Previous
+    </button>
+    }
+  </div>
+  }
 </div>

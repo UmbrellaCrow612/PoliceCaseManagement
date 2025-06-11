@@ -1,0 +1,31 @@
+<div class="container">
+  <h1>My Cases</h1>
+  <p>Filter my cases</p>
+
+  <form [formGroup]="searchCasesForm" class="search_form">
+    <app-case-priority-select formControlName="priority" />
+    <app-case-status-select formControlName="status" />
+
+    <button mat-button type="button" (click)="searchCasesForm.reset()">
+      Clear
+    </button>
+  </form>
+  
+  @if (isLoading) {
+  <div>Loading my cases</div>
+  }
+
+  <!---->
+
+  @if (!isLoading && error) {
+  <div>Error {{ error }}</div>
+  }
+
+  <!---->
+
+  @if (!isLoading && !error) {
+  <div>
+    {{ searchCasesResult | json }}
+  </div>
+  }
+</div>

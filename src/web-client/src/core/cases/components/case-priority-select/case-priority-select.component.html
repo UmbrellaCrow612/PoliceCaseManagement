@@ -1,0 +1,18 @@
+<mat-form-field appearance="outline">
+  <mat-label>Case Priority</mat-label>
+  <mat-select
+    [value]="selectedValue"
+    (selectionChange)="onSelectionChange($event)"
+    (openedChange)="onOpenedChange($event)"
+    [disabled]="isDisabled"
+  >
+    <!-- Allow unselecting -->
+    <mat-option [value]="null">-- None --</mat-option>
+    @for (casePriority of casePriorityNames; track casePriority.number) {
+    <mat-option [value]="casePriority.number.toString()">{{
+      casePriority.name
+    }}</mat-option>
+    }
+  </mat-select>
+  <mat-hint>Optional</mat-hint>
+</mat-form-field>

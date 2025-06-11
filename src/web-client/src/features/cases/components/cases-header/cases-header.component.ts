@@ -34,7 +34,15 @@ export class CasesHeaderComponent {
       name: 'Home',
       children: [],
       icon: 'home',
-      permissionsNeeded: []
+      permissionsNeeded: [],
+    },
+    {
+      authorizedRoles: [],
+      href: '/cases/me',
+      name: 'My Cases',
+      children: [],
+      icon: 'person',
+      permissionsNeeded: [],
     },
     {
       authorizedRoles: [],
@@ -42,7 +50,7 @@ export class CasesHeaderComponent {
       name: 'Search',
       children: [],
       icon: 'search',
-      permissionsNeeded: []
+      permissionsNeeded: [],
     },
   ];
 }

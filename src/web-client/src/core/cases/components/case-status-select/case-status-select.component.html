@@ -1,0 +1,16 @@
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>Case status</mat-label>
+  <mat-select
+    [value]="selectedValue"
+    (selectionChange)="onSelectionChange($event)"
+    (openedChange)="onOpenedChange($event)"
+    [disabled]="isDisabled"
+  >
+    <!-- Allow unselecting -->
+    <mat-option [value]="null">-- None --</mat-option>
+    @for (caseStatus of caseStatusNames; track caseStatus.number) {
+    <mat-option [value]="caseStatus.number.toString()">{{ caseStatus.name }}</mat-option>
+    }
+  </mat-select>
+  <mat-hint>Optional</mat-hint>
+</mat-form-field>
