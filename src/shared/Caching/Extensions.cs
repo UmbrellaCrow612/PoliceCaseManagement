@@ -27,7 +27,6 @@ namespace Caching
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configurationOptions));
             services.AddScoped<IRedisService, RedisService>();
 
-
             return services;
         }
     }

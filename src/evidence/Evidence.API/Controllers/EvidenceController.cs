@@ -19,6 +19,26 @@ namespace Evidence.API.Controllers
         private readonly EvidenceMapping _evidenceMapping = new();
 
         [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateEvidence([FromBody] CreateEvidenceDto dto)
+        {
+            var evidence = _evidenceMapping.Create(dto);
+
+            // todo use a file upload service before this
+            var result = await _evidenceService.CreateAsync(evidence);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            var returnDto = _evidenceMapping.ToDto(evidence);
+
+            await _redisService.SetStringAsync(evidence.Id, returnDto);
+
+            return Ok(returnDto);
+        }
+
+        [Authorize]
         [HttpGet("{evidenceId}")]
         public async Task<IActionResult> GetEvidenceByIdAsync(string evidenceId)
         {
@@ -41,15 +61,49 @@ namespace Evidence.API.Controllers
             return Ok(dto);
         }
 
+        [Authorize]
+        [HttpPatch("{evidenceId}")]
+        public async Task<IActionResult> UpdateEvidenceByIdAsync(string evidenceId, [FromBody] UpdateEvidenceDto dto)
+        {
+            var evidence = await _evidenceService.FindByIdAsync(evidenceId);
+            if (evidence is null)
+            {
+                return NotFound();
+            }
+
+            _evidenceMapping.Update(evidence, dto);
+
+            var result = await _evidenceService.UpdateAsync(evidence);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            await _redisService.RemoveKeyAsync(evidence.Id);
+            var cacheEntry = _evidenceMapping.ToDto(evidence);
+            await _redisService.SetStringAsync<EvidenceDto>(evidence.Id, cacheEntry);
+
+            return NoContent();
+        }
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> CreateEvidence([FromBody] CreateEvidenceDto dto)
+        [HttpDelete("{evidenceId}")]
+        public async Task<IActionResult> DeleteEvidenceByIdAsync(string evidenceId)
         {
-            var evidence = _evidenceMapping.Create(dto);
-            
-            var result = await _evidenceService.cre
-            return Ok();
+            var evidence = await _evidenceService.FindByIdAsync(evidenceId);
+            if (evidence is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _evidenceService.DeleteAsync(evidence);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+            await _redisService.RemoveKeyAsync(evidence.Id);
+
+            return NoContent();
         }
     }
 }
