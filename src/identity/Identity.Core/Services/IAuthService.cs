@@ -1,5 +1,6 @@
 ﻿using Identity.Core.Models;
 using Identity.Core.ValueObjects;
+using Results.Abstractions;
 
 namespace Identity.Core.Services
 {
@@ -88,18 +89,18 @@ namespace Identity.Core.Services
         Task<bool> UserExists(string userId);
     }
 
-    public class AuthError : IServiceError
+    public class AuthError : IResultError
     {
         public required string Code { get; set; }
         public string? Message { get; set; } = null;
     }
 
     // Base result class for all authentication results
-    public class AuthResult : IServiceResult
+    public class AuthResult : IResult
     {
         public bool Succeeded { get; set; } = false;
 
-        public ICollection<IServiceError> Errors { get; set; } = [];
+        public ICollection<IResultError> Errors { get; set; } = [];
 
         /// <param name="code">Could be a <see cref="Result.Codes"/></param>
         public void AddError(string code, string? message = null)
