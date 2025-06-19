@@ -93,7 +93,27 @@ services:
   #   ports:
   #   - "8000:80"
 
+  evidence_cache:
+    image: redis:7.2
+    container_name: evidence_cache
+    command: ["redis-server", "--requirepass", "mysecretpassword"]
+    ports:
+      - "6382:6379"
+
+  evidence_db:
+    image: postgres:15
+    container_name: evidence_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: your_strong_password_here
+      POSTGRES_DB: evidencedb
+    ports:
+      - "5434:5432"
+    volumes:
+      - evidence_db_data:/var/lib/postgresql/data
+
 volumes:
   identity_db_data: {}
   cases_db_data: {}
-
+  evidence_db_data: {}

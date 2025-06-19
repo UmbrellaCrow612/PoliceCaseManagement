@@ -1,0 +1,50 @@
+// 
+// Contains all common Evidence-related gRPC service methods and responses.
+// 
+
+syntax = "proto3";
+
+package evidence.V1;
+
+// EvidenceService provides operations to interact with evidence entities in the system.
+service EvidenceService {
+
+  // Checks if an evidence item exists in the system.
+  rpc DoseEvidenceExist(DoesEvidenceExistRequest) returns (DoesEvidenceExistResponse);
+
+  // Retrieves an evidence item by its unique identifier.
+  rpc GetEvidenceById(GetEvidenceByIdRequest) returns (GetEvidenceByIdResponse);
+}
+
+// Request message for checking existence of evidence.
+message DoesEvidenceExistRequest {
+  // The unique identifier of the evidence.
+  string evidenceId = 1;
+}
+
+// Response message for evidence existence check.
+message DoesEvidenceExistResponse {
+  // Indicates whether the evidence exists.
+  bool exists = 1;
+}
+
+// Request message for retrieving evidence by ID.
+message GetEvidenceByIdRequest {
+  // The unique identifier of the evidence.
+  string evidenceId = 1;
+}
+
+// Response message containing evidence details.
+message GetEvidenceByIdResponse {
+  // The unique identifier of the evidence.
+  string evidenceId = 1;
+
+  // The name or title of the evidence.
+  string name = 2;
+
+  // The reference number associated with the evidence.
+  string referenceNumber = 3;
+
+  // The name of the file containing the evidence.
+  string fileName = 4;
+}

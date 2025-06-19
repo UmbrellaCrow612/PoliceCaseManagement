@@ -2,6 +2,7 @@
 using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Http;
+using Results.Abstractions;
 
 namespace Cases.Core.Services
 {
@@ -237,10 +238,10 @@ namespace Cases.Core.Services
     /// <summary>
     /// Standard result object used in a case service function
     /// </summary>
-    public class CaseResult : IServiceResult
+    public class CaseResult : IResult
     {
         public bool Succeeded { get; set; } = false;
-        public ICollection<IServiceError> Errors { get; set; } = [];
+        public ICollection<IResultError> Errors { get; set; } = [];
 
         public void AddError(string code, string? message = null)
         {
@@ -251,7 +252,7 @@ namespace Cases.Core.Services
     /// <summary>
     /// Standard case service error shape
     /// </summary>
-    public class CaseError : IServiceError
+    public class CaseError : IResultError
     {
         public required string Code { get; set; }
         public string? Message { get; set; }

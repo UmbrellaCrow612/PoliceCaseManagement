@@ -101,6 +101,11 @@ namespace Cases.Core.Models
         /// </summary>
         public ICollection<CasePermission> CasePermissions { get; set; } = [];
 
+        /// <summary>
+        /// List of Evidence this case is linked to
+        /// </summary>
+        public ICollection<CaseEvidence> CaseEvidences { get; set; } = [];
+
 
         // --- Audit Info ---
 

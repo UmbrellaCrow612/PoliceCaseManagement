@@ -1,5 +1,4 @@
-﻿using Events;
-using Events.Core;
+﻿using Events.Core;
 
 namespace Cases.Core.Models.Joins
 {
