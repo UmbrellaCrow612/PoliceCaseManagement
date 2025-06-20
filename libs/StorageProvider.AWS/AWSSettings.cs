@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace StorageProvider.AWS
 {
     /// <summary>
@@ -5,6 +7,16 @@ namespace StorageProvider.AWS
     /// </summary>
     public class AWSSettings
     {
+        [Required]
+        public required string AccessKey { get; set; }
 
+        [Required]
+        public required string SecretKey { get; set; }
+
+        [Required]
+        public required string Region { get; set; }
+
+        [Required]
+        public required string BucketName { get; set; }
     }
 }

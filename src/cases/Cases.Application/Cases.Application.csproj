@@ -16,11 +16,13 @@
     </PackageReference>
     <PackageReference Include="MassTransit" Version="8.4.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\StorageProvider.Abstractions\StorageProvider.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\libs\StorageProvider.AWS\StorageProvider.AWS.csproj" />
     <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\..\shared\Events\Events.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />

@@ -1,7 +1,6 @@
 ﻿using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
-using Microsoft.AspNetCore.Http;
 using Results.Abstractions;
 
 namespace Cases.Core.Services
@@ -129,7 +128,7 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="case">The case to add it to</param>
         /// <param name="file">The file to add</param>
-        Task<CaseResult> AddAttachment(Case @case, IFormFile file);
+        Task<CaseResult> AddAttachment(Case @case, string file);
 
         /// <summary>
         /// Get all <see cref="CaseAttachmentFile"/> linked to the given case
@@ -145,10 +144,10 @@ namespace Cases.Core.Services
         Task<CaseAttachmentFile?> FindCaseAttachmentById(string caseAttachmentId);
 
         /// <summary>
-        /// Download a <see cref="CaseAttachmentFile"/> as a stream
+        /// Download a <see cref="CaseAttachmentFile"/> as a a download URL for the client
         /// </summary>
         /// <param name="caseAttachmentFile">The file to download</param>
-        Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
+        Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
 
         /// <summary>
         /// Soft delete's a specific <see cref="CaseAttachmentFile"/>

@@ -5,46 +5,28 @@ using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
-using Cases.Infrastructure.Options;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using StorageProvider.Abstractions;
+using StorageProvider.AWS;
 using User.V1;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IFileUploadService fileUploadService, IOptions<AWSSettings> options) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider, IOptions<AWSSettings> options) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
-        private readonly IFileUploadService _fileUploadService = fileUploadService;
         private readonly AWSSettings _awsSettings = options.Value;
+        private readonly IStorageProvider _storageProvider = storageProvider;
 
-        public async Task<CaseResult> AddAttachment(Case @case, IFormFile file)
+        public Task<CaseResult> AddAttachment(Case @case, string file)
         {
-            var result = new CaseResult();
-
-            using var stream = file.OpenReadStream();
-            var fileKey = await _fileUploadService.UploadFileAsync(stream, file.FileName);
-
-            var fileMeta = new CaseAttachmentFile
-            {
-                CaseId = @case.Id,
-                BucketName = _awsSettings.BucketName,
-                ContentType = file.ContentType,
-                FileName = file.FileName,
-                S3Key = fileKey,
-                FileSize = file.Length
-            };
-            await _dbcontext.CaseAttachmentFiles.AddAsync(fileMeta);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
+            throw new NotImplementedException();
         }
 
         public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
@@ -416,9 +398,9 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
+        public Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
         {
-            return await _fileUploadService.DownloadFileAsync(caseAttachmentFile.S3Key);
+            throw new NotImplementedException();
         }
 
         public async Task<Case?> FindById(string caseId)
