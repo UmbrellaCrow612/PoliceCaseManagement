@@ -9,12 +9,14 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using StorageProvider.AWS;
 
 namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
@@ -26,6 +28,7 @@ namespace Cases.API.Controllers
         private readonly CaseUserMapping _caseUserMapping = new();
         private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
         private readonly CasePermissionMapping _casePermissionMapping = new();
+        private readonly AWSSettings _awsSettings = options.Value;
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -177,18 +180,32 @@ namespace Cases.API.Controllers
         /// </summary>
         [Authorize]
         [HttpPost("{caseId}/attachments/upload")]
-        public async Task<IActionResult> UploadAttachmentForCase(string caseId, IFormFile file)
+        public async Task<IActionResult> UploadAttachmentForCase(string caseId, UploadCaseAttachmentRequest dto)
         {
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var result = await _caseService.AddAttachment(_case, file);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
+            var fileId = Guid.NewGuid().ToString();
 
-            return NoContent();
+            var caseAttachmentFile = new CaseAttachmentFile
+            {
+                BucketName = _awsSettings.BucketName,
+                CaseId = caseId,
+                ContentType = dto.ContentType,
+                FileName = dto.FileName,
+                FileSize = dto.FileSize,
+                S3Key = $"uploads/{fileId}/{dto.FileName}",
+                Id = fileId,
+            };
+
+            var url = await _caseService.AddAttachment(_case, caseAttachmentFile);
+
+            var response = new UploadCaseAttachmentFileResponse
+            {
+                DownloadUrl = url
+            };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -221,9 +238,9 @@ namespace Cases.API.Controllers
                 return NotFound();
             }
 
-            var stream = await _caseService.DownloadCaseAttachment(file);
+            var url = await _caseService.DownloadCaseAttachment(file);
 
-            return File(stream, "application/octet-stream", Path.GetFileName(file.FileName));
+            return Ok(url);
         }
 
         /// <summary>

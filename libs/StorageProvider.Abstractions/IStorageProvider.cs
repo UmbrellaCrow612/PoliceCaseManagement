@@ -12,7 +12,7 @@ namespace StorageProvider.Abstractions
         /// <param name="filePath">The path (or key) where the file will be stored.</param>
         /// <param name="expirationInMinutes">Time in minutes until the URL expires.</param>
         /// <returns>A URL that allows uploading a file directly to storage.</returns>
-        Task<string> GetPreSignedUploadUrlAsync(string filePath, int expirationInMinutes);
+        Task<string> GetPreSignedUploadUrlAsync(string filePath, int? expirationInMinutes = 5);
 
         /// <summary>
         /// Generates a pre-signed URL to download a file.
@@ -20,7 +20,7 @@ namespace StorageProvider.Abstractions
         /// <param name="filePath">The path (or key) of the file to download.</param>
         /// <param name="expirationInMinutes">Time in minutes until the URL expires.</param>
         /// <returns>A URL that allows downloading the file directly from storage.</returns>
-        Task<string> GetPreSignedDownloadUrlAsync(string filePath, int expirationInMinutes);
+        Task<string> GetPreSignedDownloadUrlAsync(string filePath, int? expirationInMinutes = 5);
 
         /// <summary>
         /// Deletes a file from storage.

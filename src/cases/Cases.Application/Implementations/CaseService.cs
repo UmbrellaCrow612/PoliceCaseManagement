@@ -24,11 +24,15 @@ namespace Cases.Application.Implementations
         private readonly AWSSettings _awsSettings = options.Value;
         private readonly IStorageProvider _storageProvider = storageProvider;
 
-        public Task<CaseResult> AddAttachment(Case @case, string file)
+        public async Task<string> AddAttachment(Case @case, CaseAttachmentFile caseAttachmentFile)
         {
-            throw new NotImplementedException();
-        }
+            await _dbcontext.CaseAttachmentFiles.AddAsync(caseAttachmentFile);
+            var url = await _storageProvider.GetPreSignedUploadUrlAsync(caseAttachmentFile.S3Key);
 
+            await _dbcontext.SaveChangesAsync();
+            return url;
+        }
+         
         public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
         {
             _logger.LogInformation("Started trying to add a case action: {caseActionId} to a case: {caseId}", caseAction.Id, @case.Id);
@@ -398,9 +402,10 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
+        public async Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
         {
-            throw new NotImplementedException();
+            var url = await _storageProvider.GetPreSignedDownloadUrlAsync(caseAttachmentFile.S3Key);
+            return url;
         }
 
         public async Task<Case?> FindById(string caseId)

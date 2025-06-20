@@ -24,27 +24,27 @@ namespace StorageProvider.AWS
             await _amazonS3.DeleteObjectAsync(request);
         }
 
-        public Task<string> GetPreSignedDownloadUrlAsync(string filePath, int expirationInMinutes)
+        public Task<string> GetPreSignedDownloadUrlAsync(string filePath, int? expirationInMinutes = 5)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _settings.BucketName,
                 Key = filePath,
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMinutes(expirationInMinutes)
+                Expires = DateTime.UtcNow.AddMinutes((double)expirationInMinutes)
             };
 
             return Task.FromResult(_amazonS3.GetPreSignedURL(request));
         }
 
-        public Task<string> GetPreSignedUploadUrlAsync(string filePath, int expirationInMinutes = 5)
+        public Task<string> GetPreSignedUploadUrlAsync(string filePath, int? expirationInMinutes = 5)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _settings.BucketName,
                 Key = filePath,
                 Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMinutes(expirationInMinutes)
+                Expires = DateTime.UtcNow.AddMinutes((double)expirationInMinutes)
             };
 
             return Task.FromResult(_amazonS3.GetPreSignedURL(request));
