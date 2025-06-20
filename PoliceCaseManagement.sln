@@ -61,6 +61,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evidence.API", "src\evidenc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Abstractions", "libs\Results.Abstractions\Results.Abstractions.csproj", "{32FC289A-E997-4135-A1C5-15B0FFF9B667}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageProvider.Abstractions", "libs\StorageProvider.Abstractions\StorageProvider.Abstractions.csproj", "{056231BF-2535-4D15-974D-CC672CBF3030}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageProvider.AWS", "libs\StorageProvider.AWS\StorageProvider.AWS.csproj", "{4092DCBF-EB6D-4479-BE23-37A60AF994D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +159,14 @@ Global
 		{32FC289A-E997-4135-A1C5-15B0FFF9B667}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32FC289A-E997-4135-A1C5-15B0FFF9B667}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32FC289A-E997-4135-A1C5-15B0FFF9B667}.Release|Any CPU.Build.0 = Release|Any CPU
+		{056231BF-2535-4D15-974D-CC672CBF3030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{056231BF-2535-4D15-974D-CC672CBF3030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{056231BF-2535-4D15-974D-CC672CBF3030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{056231BF-2535-4D15-974D-CC672CBF3030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4092DCBF-EB6D-4479-BE23-37A60AF994D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4092DCBF-EB6D-4479-BE23-37A60AF994D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4092DCBF-EB6D-4479-BE23-37A60AF994D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4092DCBF-EB6D-4479-BE23-37A60AF994D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +197,8 @@ Global
 		{42581B49-274E-4D74-A071-BF76C4D62910} = {7758F3A0-3D11-4E0A-903A-7E1D09F3CB58}
 		{BE3E4028-0B6D-4DC5-A7B8-581EED871B36} = {7758F3A0-3D11-4E0A-903A-7E1D09F3CB58}
 		{32FC289A-E997-4135-A1C5-15B0FFF9B667} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
+		{056231BF-2535-4D15-974D-CC672CBF3030} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
+		{4092DCBF-EB6D-4479-BE23-37A60AF994D0} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}
