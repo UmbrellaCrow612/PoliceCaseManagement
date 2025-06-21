@@ -234,6 +234,12 @@ namespace Cases.Core.Services
         /// <param name="userId">The user to check for</param>
         /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
         Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId);
+
+        /// <summary>
+        /// Update a <see cref="CaseAttachmentFile"/> in the system
+        /// </summary>
+        /// <param name="caseAttachmentFile">The file to update with new properties</param>
+        Task<CaseResult> UpdateCaseAttachmentFile(CaseAttachmentFile caseAttachmentFile);
     }
 
     /// <summary>

@@ -162,6 +162,9 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("FileUploadStatus")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -267,6 +270,34 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("IncidentTypes");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.Joins.CaseEvidence", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvidenceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvidenceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvidenceReferenceNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CaseEvidence");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>
                 {
                     b.Property<string>("Id")
@@ -355,6 +386,17 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("Case");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.Joins.CaseEvidence", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CaseEvidences")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -390,6 +432,8 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("CaseActions");
 
                     b.Navigation("CaseAttachmentFiles");
+
+                    b.Navigation("CaseEvidences");
 
                     b.Navigation("CaseIncidentType");
 

@@ -176,11 +176,36 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
+        /// When the client uploads a file client side it then hits this endpoint to update the status of it
+        /// </summary>
+        /// <param name="attachmentId">The ID of the attachment file</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("/attachments/{attachmentId}/complete")]
+        public async Task<IActionResult> ConfirmClientSideUploadComplete(string attachmentId)
+        {
+            var attachment = await _caseService.FindCaseAttachmentById(attachmentId);
+            if (attachment is null)
+            {
+                return NotFound();
+            }
+            attachment.UploadComplete();
+
+            var result = await _caseService.UpdateCaseAttachmentFile(attachment);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Upload a file attachment to a case
         /// </summary>
         [Authorize]
         [HttpPost("{caseId}/attachments/upload")]
-        public async Task<IActionResult> UploadAttachmentForCase(string caseId, UploadCaseAttachmentRequest dto)
+        public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromQuery] UploadCaseAttachmentRequest dto)
         {
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
@@ -202,7 +227,8 @@ namespace Cases.API.Controllers
 
             var response = new UploadCaseAttachmentFileResponse
             {
-                DownloadUrl = url
+                DownloadUrl = url,
+                FileId = caseAttachmentFile.Id
             };
 
             return Ok(response);

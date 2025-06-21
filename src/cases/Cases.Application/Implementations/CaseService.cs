@@ -8,20 +8,17 @@ using Cases.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using StorageProvider.Abstractions;
-using StorageProvider.AWS;
 using User.V1;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider, IOptions<AWSSettings> options) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
-        private readonly AWSSettings _awsSettings = options.Value;
         private readonly IStorageProvider _storageProvider = storageProvider;
 
         public async Task<string> AddAttachment(Case @case, CaseAttachmentFile caseAttachmentFile)
@@ -649,6 +646,15 @@ namespace Cases.Application.Implementations
                 return result;
             }
 
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> UpdateCaseAttachmentFile(CaseAttachmentFile caseAttachmentFile)
+        {
+            var result = new CaseResult();
+            _dbcontext.CaseAttachmentFiles.Update(caseAttachmentFile);
+            await _dbcontext.SaveChangesAsync();
             result.Succeeded = true;
             return result;
         }
