@@ -4,6 +4,7 @@ using Identity.Core.Models;
 using Identity.Core.Repositorys;
 using Identity.Core.Services;
 using Microsoft.AspNetCore.Http;
+using Results.Abstractions;
 using UAParser;
 
 
@@ -51,15 +52,15 @@ namespace Identity.Application.Helpers
             }
         }
 
-        private class Err : IServiceError
+        private class Err : IResultError
         {
             public required string Code { get; set; }
             public string? Message { get; set; }
         }
 
-        public static (bool isValid, List<IServiceError> errors) VerifyRequestHasRequiredProperties(HttpRequest request)
+        public static (bool isValid, List<IResultError> errors) VerifyRequestHasRequiredProperties(HttpRequest request)
         {
-            List<IServiceError> errors = [];
+            List<IResultError> errors = [];
 
             string userAgent = request.Headers["User-Agent"].ToString();
             var deviceFingerprint = request.Headers[CustomHeaderOptions.XDeviceFingerprint].FirstOrDefault();

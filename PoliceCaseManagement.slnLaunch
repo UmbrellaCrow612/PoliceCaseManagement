@@ -16,11 +16,6 @@
         "Path": "src\\proxy\\proxy.csproj",
         "Action": "Start",
         "DebugTarget": "https"
-      },
-      {
-        "Path": "src\\evidence\\Evidence.API\\Evidence.API.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
       }
     ]
   }

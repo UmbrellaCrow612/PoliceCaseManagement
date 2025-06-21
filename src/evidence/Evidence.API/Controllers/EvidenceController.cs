@@ -24,7 +24,7 @@ namespace Evidence.API.Controllers
         {
             var evidence = _evidenceMapping.Create(dto);
 
-            // todo use a file upload service before this
+            // todo do it like case attachment file uplads suing client side URLS
             var result = await _evidenceService.CreateAsync(evidence);
             if (!result.Succeeded)
             {
