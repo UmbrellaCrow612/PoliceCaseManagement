@@ -1,4 +1,3 @@
-@ -0,0 +1,55 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.Options;
@@ -9,7 +8,7 @@ namespace StorageProvider.AWS
     /// <summary>
     /// Internal AWS implementation
     /// </summary>
-    public class AWSImpl(IOptions<AWSSettings> options, IAmazonS3 amazonS3) : IStorageProvider
+    internal class AWSImpl(IOptions<AWSSettings> options, IAmazonS3 amazonS3) : IStorageProvider
     {
         private readonly AWSSettings _settings = options.Value;
         private readonly IAmazonS3 _amazonS3 = amazonS3;
