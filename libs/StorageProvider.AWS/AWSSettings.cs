@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace Cases.Infrastructure.Options
+namespace StorageProvider.AWS
 {
     /// <summary>
-    /// AWS settings
+    /// Settings for AWS from the config file - uses options pattern
     /// </summary>
     public class AWSSettings
     {

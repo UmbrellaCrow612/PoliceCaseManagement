@@ -1,7 +1,7 @@
 ﻿using Cases.Core.Models;
 using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
-using Microsoft.AspNetCore.Http;
+using Results.Abstractions;
 
 namespace Cases.Core.Services
 {
@@ -127,8 +127,9 @@ namespace Cases.Core.Services
         /// Add a file to a case as a Attachment
         /// </summary>
         /// <param name="case">The case to add it to</param>
-        /// <param name="file">The file to add</param>
-        Task<CaseResult> AddAttachment(Case @case, IFormFile file);
+        /// <param name="metaData">The file to upload meta data</param>
+        /// <returns>Pre signed URL used to upload the file and the ID of the filet</returns>
+        Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, UploadCaseAttachmentFileMetaData metaData);
 
         /// <summary>
         /// Get all <see cref="CaseAttachmentFile"/> linked to the given case
@@ -144,10 +145,11 @@ namespace Cases.Core.Services
         Task<CaseAttachmentFile?> FindCaseAttachmentById(string caseAttachmentId);
 
         /// <summary>
-        /// Download a <see cref="CaseAttachmentFile"/> as a stream
+        /// Download a <see cref="CaseAttachmentFile"/> as a a download URL for the client
         /// </summary>
         /// <param name="caseAttachmentFile">The file to download</param>
-        Task<Stream> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
+        /// <returns>Download URL</returns>
+        Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile);
 
         /// <summary>
         /// Soft delete's a specific <see cref="CaseAttachmentFile"/>
@@ -232,15 +234,21 @@ namespace Cases.Core.Services
         /// <param name="userId">The user to check for</param>
         /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
         Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId);
+
+        /// <summary>
+        /// Update a <see cref="CaseAttachmentFile"/> in the system
+        /// </summary>
+        /// <param name="caseAttachmentFile">The file to update with new properties</param>
+        Task<CaseResult> UpdateCaseAttachmentFile(CaseAttachmentFile caseAttachmentFile);
     }
 
     /// <summary>
     /// Standard result object used in a case service function
     /// </summary>
-    public class CaseResult : IServiceResult
+    public class CaseResult : IResult
     {
         public bool Succeeded { get; set; } = false;
-        public ICollection<IServiceError> Errors { get; set; } = [];
+        public ICollection<IResultError> Errors { get; set; } = [];
 
         public void AddError(string code, string? message = null)
         {
@@ -251,7 +259,7 @@ namespace Cases.Core.Services
     /// <summary>
     /// Standard case service error shape
     /// </summary>
-    public class CaseError : IServiceError
+    public class CaseError : IResultError
     {
         public required string Code { get; set; }
         public string? Message { get; set; }

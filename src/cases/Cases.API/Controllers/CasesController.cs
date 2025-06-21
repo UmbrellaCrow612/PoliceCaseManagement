@@ -9,12 +9,14 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using StorageProvider.AWS;
 
 namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
@@ -26,6 +28,7 @@ namespace Cases.API.Controllers
         private readonly CaseUserMapping _caseUserMapping = new();
         private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
         private readonly CasePermissionMapping _casePermissionMapping = new();
+        private readonly AWSSettings _awsSettings = options.Value;
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -173,22 +176,49 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
-        /// Upload a file attachment to a case
+        /// When the client uploads a file client side it then hits this endpoint to update the status of it
         /// </summary>
+        /// <param name="attachmentId">The ID of the attachment file</param>
+        /// <returns></returns>
         [Authorize]
-        [HttpPost("{caseId}/attachments/upload")]
-        public async Task<IActionResult> UploadAttachmentForCase(string caseId, IFormFile file)
+        [HttpPost("/attachments/{attachmentId}/complete")]
+        public async Task<IActionResult> ConfirmClientSideUploadComplete(string attachmentId)
         {
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
+            var attachment = await _caseService.FindCaseAttachmentById(attachmentId);
+            if (attachment is null)
+            {
+                return NotFound();
+            }
+            attachment.UploadComplete();
 
-            var result = await _caseService.AddAttachment(_case, file);
+            var result = await _caseService.UpdateCaseAttachmentFile(attachment);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
             }
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Get a pre signed URL to upload a file for the client
+        /// </summary>
+        [Authorize]
+        [HttpPost("{caseId}/attachments/upload")]
+        public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromBody] UploadCaseAttachmentFileMetaData dto)
+        {
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null) return NotFound();
+
+            (string preSignedUrl,string fileId) = await _caseService.AddAttachment(_case, dto);
+
+            var response = new UploadCaseAttachmentFileResponse
+            {
+                UploadUrl = preSignedUrl,
+                FileId = fileId
+            };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -221,9 +251,9 @@ namespace Cases.API.Controllers
                 return NotFound();
             }
 
-            var stream = await _caseService.DownloadCaseAttachment(file);
+            var url = await _caseService.DownloadCaseAttachment(file);
 
-            return File(stream, "application/octet-stream", Path.GetFileName(file.FileName));
+            return Ok(url);
         }
 
         /// <summary>

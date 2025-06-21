@@ -1,4 +1,6 @@
-﻿namespace Identity.Core.Services
+﻿using Results.Abstractions;
+
+namespace Identity.Core.Services
 {
     /// <summary>
     /// Service to handle business logic todo with any user related model or action upon the user model
@@ -11,10 +13,10 @@
     /// <summary>
     /// Standard result object for user service operations
     /// </summary>
-    public class UserServiceResult : IServiceResult
+    public class UserServiceResult : IResult
     {
         public bool Succeeded { get; set; } = false;
-        public ICollection<IServiceError> Errors { get; set; } = [];
+        public ICollection<IResultError> Errors { get; set; } = [];
 
         public void AddError(string code, string? message = null)
         {
@@ -23,7 +25,7 @@
 
     }
 
-    public class UserServiceError : IServiceError
+    public class UserServiceError : IResultError
     {
         public required string Code { get; set; }
         public string? Message { get; set; } = null;

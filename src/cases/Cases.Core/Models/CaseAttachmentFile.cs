@@ -5,7 +5,7 @@
     /// </summary>
     public class CaseAttachmentFile : ISoftDelete
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public required string Id { get; set; }
 
         public required string FileName { get; set; }
 
@@ -18,6 +18,9 @@
         public required long FileSize { get; set; }
 
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+
+
+        public FileUploadStatus FileUploadStatus { get; set; } = FileUploadStatus.Failed;
 
 
         public required string CaseId { get; set; }
@@ -36,5 +39,21 @@
             IsDeleted = true;
             DeletedAt = DateTime.UtcNow;
         }
+
+
+
+        public void UploadComplete()
+        {
+            FileUploadStatus = FileUploadStatus.Uploaded;
+        }
+    }
+
+    /// <summary>
+    /// Enum to represent the state that a file is in
+    /// </summary>
+    public enum FileUploadStatus
+    {
+        Uploaded = 1,
+        Failed = 2,
     }
 }

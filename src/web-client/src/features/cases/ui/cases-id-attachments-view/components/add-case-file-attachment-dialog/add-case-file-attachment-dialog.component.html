@@ -9,12 +9,25 @@
   />
 
   @if (selectedFile) {
-  <div>
-    <p><strong>File:</strong> {{ selectedFile.name }}</p>
+  <div class="full">
+    <mat-form-field appearance="fill" class="pad">
+      <mat-label>File name:</mat-label>
+      <input matInput [formControl]="fileNameInput" />
+      <mat-hint>Change the name of the file</mat-hint>
+
+      @if (fileNameInput.hasError("required")) {
+      <mat-error> Required file name </mat-error>
+      }
+      <!---->
+      @if (fileNameInput.hasError("minlength")) {
+      <mat-error> File name needs ot be greater than 5 </mat-error>
+      }
+    </mat-form-field>
     <p>
       <strong>Size:</strong>
       {{ selectedFile.size / 1024 | number : "1.0-2" }} KB
     </p>
+    <strong> Type: {{ selectedFile.type }} </strong>
   </div>
 
   }
@@ -28,7 +41,9 @@
   <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
   <button
     mat-button
-    [disabled]="!selectedFile || errorMessage || isUploading"
+    [disabled]="
+      !selectedFile || errorMessage || isUploading || fileNameInput.invalid
+    "
     (click)="submit()"
   >
     @if (isUploading) { Loading } @else { Add }

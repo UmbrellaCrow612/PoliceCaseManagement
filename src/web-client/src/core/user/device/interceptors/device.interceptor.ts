@@ -8,11 +8,14 @@ export function deviceFingerPrintInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
+  if (req.url.includes('amazonaws.com')) {
+    return next(req);
+  }
 
   var deviceService = inject(DeviceService);
 
   var fingerprint = deviceService.GetDeviceFingerPrint();
-  
+
   const reqWithHeader = req.clone({
     headers: req.headers.set(CustomHeaderNames.DEVICE_FINGERPRINT, fingerprint),
   });
