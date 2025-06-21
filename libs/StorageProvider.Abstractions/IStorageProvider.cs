@@ -11,8 +11,9 @@ namespace StorageProvider.Abstractions
         /// </summary>
         /// <param name="filePath">The path (or key) where the file will be stored.</param>
         /// <param name="expirationInMinutes">Time in minutes until the URL expires.</param>
+        /// <param name="contentType">MIME type of the content</param>
         /// <returns>A URL that allows uploading a file directly to storage.</returns>
-        Task<string> GetPreSignedUploadUrlAsync(string filePath, int? expirationInMinutes = 5);
+        Task<string> GetPreSignedUploadUrlAsync(string filePath,string contentType, int? expirationInMinutes = 5);
 
         /// <summary>
         /// Generates a pre-signed URL to download a file.

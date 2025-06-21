@@ -7,6 +7,10 @@ export function jwtBearerInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
+  if (req.url.includes('amazonaws.com')) {
+    return next(req);
+  }
+
   const authService = inject(AuthenticationService);
   const authToken = authService.getJwtBearerToken();
 

@@ -127,9 +127,9 @@ namespace Cases.Core.Services
         /// Add a file to a case as a Attachment
         /// </summary>
         /// <param name="case">The case to add it to</param>
-        /// <param name="file">The file as a file path</param>
-        /// <returns>Upload file path URL for the client</returns>
-        Task<string> AddAttachment(Case @case, CaseAttachmentFile caseAttachmentFile);
+        /// <param name="metaData">The file to upload meta data</param>
+        /// <returns>Pre signed URL used to upload the file and the ID of the filet</returns>
+        Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, UploadCaseAttachmentFileMetaData metaData);
 
         /// <summary>
         /// Get all <see cref="CaseAttachmentFile"/> linked to the given case

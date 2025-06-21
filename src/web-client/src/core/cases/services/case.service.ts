@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import env from '../../../environments/environment';
 import {
@@ -229,20 +229,40 @@ export class CaseService {
   }
 
   /**
-   * Upload a case file attachament to a given case
-   * @param caseId The case to add it to
-   * @param file The file
+   * Get a pre signed URL to upload a specific ase file attachment to a case client side upload
+   * @param caseId The case to upload the file ot
+   * @param file The JavaScript File object
+   * @param newFileName A optional new name for the file instead of the JavaScript Object File File.name
+   * @returns Presigned URL response for the given file
    */
-  uploadAttachment(caseId: string, file: File) {
-    const formData = new FormData();
-    formData.append('file', file); // Must match parameter name in controller
-
-    return this.httpClient.post(
-      `${this.BASE_URL}/cases/${caseId}/attachments/upload`,
-      formData
-    );
+  getPreSignedUrlForCaseAttachmentFile(
+    caseId: string,
+    file: File,
+    newFileName: string | null = null
+  ) {
+    return this.httpClient.post<{
+      fileId: string;
+      uploadUrl: string;
+    }>(`${this.BASE_URL}/cases/${caseId}/attachments/upload`, {
+      contentType: file.type,
+      fileName: newFileName ? newFileName : file.name,
+      fileSize: file.size,
+    });
   }
 
+  /**
+   * Upload a file using a pre signed URL
+   * @param preSignedUrl A pre signed URL for the given file
+   * @param file The file to upload
+   * @returns HTTP response
+   */
+  uploadUsingPreSignedUrl(preSignedUrl: string, file: File) {
+    return this.httpClient.put(preSignedUrl, file, {
+      headers: new HttpHeaders({
+        'Content-Type': file.type,
+      }), // changed this bit observer
+    });
+  }
   /**
    * Download a specific case attachment
    * @param attachamentId The attachment id to download

@@ -2,7 +2,7 @@
 {
     public class UploadCaseAttachmentFileResponse
     {
-        public required string DownloadUrl {  get; set; }
+        public required string UploadUrl {  get; set; }
         public required string FileId { get; set; }
     }
 }

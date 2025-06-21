@@ -37,14 +37,16 @@ namespace StorageProvider.AWS
             return Task.FromResult(_amazonS3.GetPreSignedURL(request));
         }
 
-        public Task<string> GetPreSignedUploadUrlAsync(string filePath, int? expirationInMinutes = 5)
+        public Task<string> GetPreSignedUploadUrlAsync(string filePath,string contentType, int? expirationInMinutes = 5)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _settings.BucketName,
                 Key = filePath,
+                ContentType = contentType,
                 Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMinutes((double)expirationInMinutes)
+                Expires = DateTime.UtcNow.AddMinutes((double)expirationInMinutes),
+                
             };
 
             return Task.FromResult(_amazonS3.GetPreSignedURL(request));

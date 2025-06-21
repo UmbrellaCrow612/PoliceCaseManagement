@@ -201,34 +201,21 @@ namespace Cases.API.Controllers
         }
 
         /// <summary>
-        /// Upload a file attachment to a case
+        /// Get a pre signed URL to upload a file for the client
         /// </summary>
         [Authorize]
         [HttpPost("{caseId}/attachments/upload")]
-        public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromQuery] UploadCaseAttachmentRequest dto)
+        public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromBody] UploadCaseAttachmentFileMetaData dto)
         {
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var fileId = Guid.NewGuid().ToString();
-
-            var caseAttachmentFile = new CaseAttachmentFile
-            {
-                BucketName = _awsSettings.BucketName,
-                CaseId = caseId,
-                ContentType = dto.ContentType,
-                FileName = dto.FileName,
-                FileSize = dto.FileSize,
-                S3Key = $"uploads/{fileId}/{dto.FileName}",
-                Id = fileId,
-            };
-
-            var url = await _caseService.AddAttachment(_case, caseAttachmentFile);
+            (string preSignedUrl,string fileId) = await _caseService.AddAttachment(_case, dto);
 
             var response = new UploadCaseAttachmentFileResponse
             {
-                DownloadUrl = url,
-                FileId = caseAttachmentFile.Id
+                UploadUrl = preSignedUrl,
+                FileId = fileId
             };
 
             return Ok(response);

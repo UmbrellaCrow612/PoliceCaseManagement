@@ -38,6 +38,11 @@ export class AddCaseFileAttachmentDialogComponent implements OnInit {
     }
     return;
   }
+  fileNameInput = new FormControl<string | null>(null, [
+    Validators.required,
+    Validators.minLength(5),
+  ]);
+
   selectedFile: File | null = null;
 
   errorMessage: string = '';
@@ -64,26 +69,43 @@ export class AddCaseFileAttachmentDialogComponent implements OnInit {
       } else {
         this.selectedFile = file;
         this.errorMessage = '';
+        this.fileNameInput.setValue(file.name);
       }
     }
   }
 
   isUploading = false;
   submit() {
-    if (this.selectedFile && !this.errorMessage) {
+    if (this.selectedFile && !this.errorMessage && this.fileNameInput.valid) {
       this.isUploading = true;
 
       this.caseService
-        .uploadAttachment(this.caseId!, this.selectedFile)
+        .getPreSignedUrlForCaseAttachmentFile(
+          this.caseId!,
+          this.selectedFile,
+          this.fileNameInput.value!
+        )
         .subscribe({
-          next: () => {
-            this.dialogRef.close();
+          next: (response) => {
+            this.caseService
+              .uploadUsingPreSignedUrl(response.uploadUrl, this.selectedFile!)
+              .subscribe({
+                next: () => {
+                  this.dialogRef.close(); // TODO HIT COMPLETE OR FAIL ENDPOINT 
+                },
+                error: () => {
+                  this.errorMessage = 'Failed to upload amazon';
+                  this.isUploading = false;
+                },
+              });
           },
           error: (err) => {
-            this.errorMessage = formatBackendError(err);
+            this.errorMessage = 'Failed to upload file';
             this.isUploading = false;
           },
         });
+    } else {
+      this.errorMessage = 'Invalid state';
     }
   }
 }

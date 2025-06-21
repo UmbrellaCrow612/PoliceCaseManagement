@@ -8,28 +8,22 @@ using Cases.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StorageProvider.Abstractions;
+using StorageProvider.AWS;
 using User.V1;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider, IOptions<AWSSettings> options) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
         private readonly IStorageProvider _storageProvider = storageProvider;
+        private readonly AWSSettings _aWSSettings = options.Value;
 
-        public async Task<string> AddAttachment(Case @case, CaseAttachmentFile caseAttachmentFile)
-        {
-            await _dbcontext.CaseAttachmentFiles.AddAsync(caseAttachmentFile);
-            var url = await _storageProvider.GetPreSignedUploadUrlAsync(caseAttachmentFile.S3Key);
-
-            await _dbcontext.SaveChangesAsync();
-            return url;
-        }
-         
         public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
         {
             _logger.LogInformation("Started trying to add a case action: {caseActionId} to a case: {caseId}", caseAction.Id, @case.Id);
@@ -657,6 +651,29 @@ namespace Cases.Application.Implementations
             await _dbcontext.SaveChangesAsync();
             result.Succeeded = true;
             return result;
+        }
+
+        public async Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, UploadCaseAttachmentFileMetaData metaData)
+        {
+            var attachmentId = Guid.NewGuid().ToString();
+
+            var attachment = new CaseAttachmentFile
+            {
+                BucketName = _aWSSettings.BucketName,
+                CaseId = @case.Id,
+                ContentType = metaData.ContentType,
+                FileName = metaData.FileName,
+                FileSize = metaData.FileSize,
+                Id = attachmentId,
+                S3Key = $"{@case.Id}/attachments/{attachmentId}"
+            };
+            await _dbcontext.CaseAttachmentFiles.AddAsync(attachment);
+
+            var url = await _storageProvider.GetPreSignedUploadUrlAsync(attachment.S3Key, attachment.ContentType);
+
+            await _dbcontext.SaveChangesAsync();
+
+            return (url, attachmentId);
         }
     }
 }

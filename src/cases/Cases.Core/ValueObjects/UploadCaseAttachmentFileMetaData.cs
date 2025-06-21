@@ -1,6 +1,6 @@
-﻿namespace Cases.API.DTOs
+﻿namespace Cases.Core.ValueObjects
 {
-    public class UploadCaseAttachmentRequest
+    public class UploadCaseAttachmentFileMetaData
     {
         public required string ContentType { get; set; }
         public required string FileName { get; set; }
