@@ -1,6 +1,6 @@
 // File contains custom validators for reactive form controls
 
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 /**
  * Custom validator impletion for reactive forms
@@ -41,4 +41,46 @@ export function Validator_password(
     }
   }
   return { password: true };
+}
+
+/**
+ * Validator function to check if the size of a file exceeds a specified maximum size.
+ *
+ * @param maxFileSizeBytes - The **maximum allowed file size** in **bytes**.
+ * @returns A validator function that:
+ * - Checks the file size.
+ * - Returns a validation error object if the file size exceeds the limit.
+ * - Returns `null` if the file size is within the limit.
+ *
+ * **Validation error object shape:**
+ * ```ts
+ * {
+ *   maxFileSize: {
+ *     requiredMaxSize: number; // max allowed size in bytes
+ *     actualSize: number;      // actual file size in bytes
+ *   }
+ * }
+ * ```
+ *
+ * If `maxFileSizeBytes` is less than or equal to zero, the validator **skips validation**.
+ *
+ * **Example usage:**
+ * ```ts
+ * control.setValidators(Validator_maxFileSize(1048576)); // 1 MB max size
+ * ```
+ */
+export function Validator_maxFileSize(maxFileSizeBytes: number): ValidatorFn {
+  return (control: AbstractControl<File | null>): ValidationErrors | null => {
+    const file = control.value;
+
+    if (!file || !(file instanceof File) || maxFileSizeBytes <= 0) {
+      return null;
+    }
+
+    const size = file.size; 
+
+    return size > maxFileSizeBytes
+      ? { maxFileSize: { requiredMaxSize: maxFileSizeBytes, actualSize: size } }
+      : null;
+  };
 }

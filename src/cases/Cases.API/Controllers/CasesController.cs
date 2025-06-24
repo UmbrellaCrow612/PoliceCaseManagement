@@ -179,7 +179,6 @@ namespace Cases.API.Controllers
         /// When the client uploads a file client side it then hits this endpoint to update the status of it
         /// </summary>
         /// <param name="attachmentId">The ID of the attachment file</param>
-        /// <returns></returns>
         [Authorize]
         [HttpPost("/attachments/{attachmentId}/complete")]
         public async Task<IActionResult> ConfirmClientSideUploadComplete(string attachmentId)
@@ -187,7 +186,7 @@ namespace Cases.API.Controllers
             var attachment = await _caseService.FindCaseAttachmentById(attachmentId);
             if (attachment is null)
             {
-                return NotFound();
+                return NotFound(); // todo refactor to be inside res obj with bad req for already confirm
             }
             attachment.UploadComplete();
 

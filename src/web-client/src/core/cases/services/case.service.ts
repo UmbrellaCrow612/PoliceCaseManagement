@@ -263,6 +263,18 @@ export class CaseService {
       }), // changed this bit observer
     });
   }
+
+  /**
+   * Used to mark a case attachment file as uploaded succesfully fgrom the client side
+   * @param attachmentId The file attachment ID
+   * @returns HTTP Response
+   */
+  confirmUploadOfCaseAttachmentFile(attachmentId: string) {
+    return this.httpClient.post(
+      `${this.BASE_URL}/attachments/${attachmentId}/complete`,
+      {}
+    );
+  }
   /**
    * Download a specific case attachment
    * @param attachamentId The attachment id to download

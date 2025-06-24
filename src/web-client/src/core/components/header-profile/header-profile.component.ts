@@ -64,6 +64,13 @@ export class HeaderProfileComponent {
       iconName: 'hub',
       permissionsNeeded: []
     },
+    {
+      name: 'Evidence',
+      href: '/evidence',
+      authorizedRoles: [],
+      iconName: 'description',
+      permissionsNeeded: []
+    },
   ];
 
   logout() {

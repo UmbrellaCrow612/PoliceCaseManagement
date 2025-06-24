@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>Upload evidence</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="split">
+    <button mat-raised-button (click)="selectFileClicked()">
+      Select a file
+    </button>
+    <input
+      type="file"
+      #fileInput
+      style="display: none"
+      (change)="handleFileInput($event)"
+    />
+
+    @if (createEvidenceForm.controls.file.value) {
+    <p>File selected:</p>
+    <p>Type: {{ createEvidenceForm.controls.file.value.type }}</p>
+    <p>
+      Size:
+      {{ createEvidenceForm.controls.file.value.size | fileBytePipe }}
+    </p>
+
+    @if (createEvidenceForm.controls.file.hasError("maxFileSize")) {
+    <p>
+      File size to large
+      {{ createEvidenceForm.controls.file.value.size | fileBytePipe }} max size
+      Max size accepted:
+      {{
+        createEvidenceForm.controls.file.getError("maxFileSize")
+          ?.requiredMaxSize | fileBytePipe
+      }}
+    </p>
+    } } @else {
+    <p>No File selected</p>
+    }
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="createEvidenceForm.reset()">Clear</button>
+  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
+  <button
+    mat-button
+    [disabled]="createEvidenceForm.invalid || isLoading || errorMessage"
+  >
+    Create
+  </button>
+</mat-dialog-actions>

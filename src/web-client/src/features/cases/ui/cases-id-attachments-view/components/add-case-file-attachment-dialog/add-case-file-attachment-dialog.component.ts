@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CaseService } from '../../../../../../core/cases/services/case.service';
 import { formatBackendError } from '../../../../../../core/app/errors/formatError';
+import { catchError, EMPTY, finalize, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-add-case-file-attachment-dialog',
@@ -78,32 +79,43 @@ export class AddCaseFileAttachmentDialogComponent implements OnInit {
   submit() {
     if (this.selectedFile && !this.errorMessage && this.fileNameInput.valid) {
       this.isUploading = true;
-
       this.caseService
         .getPreSignedUrlForCaseAttachmentFile(
           this.caseId!,
           this.selectedFile,
           this.fileNameInput.value!
         )
-        .subscribe({
-          next: (response) => {
+        .pipe(
+          switchMap((response) =>
             this.caseService
               .uploadUsingPreSignedUrl(response.uploadUrl, this.selectedFile!)
-              .subscribe({
-                next: () => {
-                  this.dialogRef.close(); // TODO HIT COMPLETE OR FAIL ENDPOINT 
-                },
-                error: () => {
-                  this.errorMessage = 'Failed to upload amazon';
-                  this.isUploading = false;
-                },
-              });
-          },
-          error: (err) => {
-            this.errorMessage = 'Failed to upload file';
+              .pipe(
+                switchMap(() =>
+                  this.caseService.confirmUploadOfCaseAttachmentFile(
+                    response.fileId
+                  )
+                ),
+                tap(() => {
+                  this.dialogRef.close();
+                })
+              )
+          ),
+          catchError((err) => {
+            if (err?.message?.includes('invalid state')) {
+              this.errorMessage = 'Server error file in invalid state';
+            } else if (err?.message?.includes('upload')) {
+              this.errorMessage = 'Failed to upload amazon';
+            } else {
+              this.errorMessage = 'Failed to upload file';
+            }
             this.isUploading = false;
-          },
-        });
+            return EMPTY;
+          }),
+          finalize(() => {
+            this.isUploading = false;
+          })
+        )
+        .subscribe();
     } else {
       this.errorMessage = 'Invalid state';
     }

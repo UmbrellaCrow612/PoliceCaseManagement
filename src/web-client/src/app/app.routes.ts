@@ -65,4 +65,13 @@ export const routes: Routes = [
       requiredRoles: [], // Means there authenticated
     },
   },
+  {
+    path: appPaths.EVIDENCE,
+    loadChildren: () =>
+      import('../features/evidence/evidence.routes').then((r) => r.EVIDENCE_ROUTES),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [], // Means there authenticated
+    },
+  },
 ];

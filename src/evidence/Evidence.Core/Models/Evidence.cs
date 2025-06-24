@@ -55,6 +55,10 @@ namespace Evidence.Core.Models
         /// </summary>
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// When the piece of evidence was collected
+        /// </summary>
+        public required DateTime CollectionDate {  get; set; }
 
 
         // Denorm data for user
