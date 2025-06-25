@@ -8,6 +8,15 @@ namespace Evidence.Application.Implementations
     {
         private readonly EvidenceApplicationDbContext _dbcontext = dbContext;
 
+        public Task<EvidenceServiceResult> CreateAsync(Core.Models.Evidence evidence)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EvidenceServiceResult> DeleteAsync(Core.Models.Evidence evidence)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<bool> ExistsAsync(string evidenceId)
         {
@@ -17,6 +26,11 @@ namespace Evidence.Application.Implementations
         public async Task<Core.Models.Evidence?> FindByIdAsync(string evidenceId)
         {
             return await _dbcontext.Evidences.FindAsync(evidenceId);
+        }
+
+        public Task<EvidenceServiceResult> UpdateAsync(Core.Models.Evidence evidence)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Upload evidence</h2>
 <mat-dialog-content class="mat-typography">
-  <div class="split">
+  <form class="split" [formGroup]="createEvidenceForm">
     <button mat-raised-button (click)="selectFileClicked()">
       Select a file
     </button>
@@ -19,6 +19,68 @@
       {{ createEvidenceForm.controls.file.value.size | fileBytePipe }}
     </p>
 
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+      <mat-hint>Change the name of the file</mat-hint>
+
+      @if (createEvidenceForm.controls.name.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+
+      @if (createEvidenceForm.controls.name.hasError("minlength")) {
+      <mat-error> Min length is 5 </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+      <mat-hint
+        >Optional @if (createEvidenceForm.controls.description.value?.trim()) {
+        {{ createEvidenceForm.controls.description.value?.length }} / 200 }
+      </mat-hint>
+
+      @if (createEvidenceForm.controls.description.hasError("maxlength")) {
+      <mat-error> Max length is 200 </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Collection Date time</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="collectionDate"
+      />
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+
+      @if (createEvidenceForm.controls.collectionDate.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Reference Number</mat-label>
+      <input matInput formControlName="referenceNumber" />
+      <mat-hint>A unique reference number</mat-hint>
+
+      @if (createEvidenceForm.controls.referenceNumber.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+
+      @if (createEvidenceForm.controls.referenceNumber.hasError("minlength")) {
+      <mat-error> Min length is 5 </mat-error>
+      }
+    </mat-form-field>
+
     @if (createEvidenceForm.controls.file.hasError("maxFileSize")) {
     <p>
       File size to large
@@ -29,13 +91,15 @@
           ?.requiredMaxSize | fileBytePipe
       }}
     </p>
-    } } @else {
+    }
+    <!---->
+    } @else {
     <p>No File selected</p>
     }
-  </div>
+  </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="createEvidenceForm.reset()">Clear</button>
+  <button mat-button (click)="resetClicked()">Clear</button>
   <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
   <button
     mat-button

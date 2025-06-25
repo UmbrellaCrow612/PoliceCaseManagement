@@ -11,7 +11,7 @@ import { appPaths } from '../../../../core/app/constants/appPaths';
 import { HttpErrorResponse } from '@angular/common/http';
 import CODES from '../../../../core/server-responses/codes';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { isEmail } from '../../../../core/app/validators/isEmail';
+import { isEmail } from '../../../../core/app/utils/isEmail';
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 
 @Component({

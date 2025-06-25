@@ -4,3 +4,8 @@
   flex-direction: column;
   align-items: start;
 }
+
+
+.full {
+  width: 100%;
+}
