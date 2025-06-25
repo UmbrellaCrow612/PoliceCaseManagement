@@ -19,7 +19,7 @@ export class UniqueEvidenceReferenceNumberAsyncValidator
 
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
     return this.evidenceService.isReferenceNumberTaken(control.value).pipe(
-      map((isTaken) => (isTaken ? { uniqueReferenceNumber: true } : null)),
+      map((response) => (response.isTaken ? { uniqueReferenceNumber: true } : null)),
       catchError(() => of(null))
     );
   }

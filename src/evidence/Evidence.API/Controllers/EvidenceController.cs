@@ -105,5 +105,17 @@ namespace Evidence.API.Controllers
 
             return NoContent();
         }
+
+        /// <summary>
+        /// Check if a <see cref="Core.Models.Evidence.ReferenceNumber"/> is taken by another
+        /// </summary>
+        [Authorize]
+        [HttpPost("reference-numbers/is-taken")]
+        public async Task<IActionResult> IsReferenceNumberTaken([FromBody] ReferenceNumberRequest dto)
+        {
+            var isTaken = await _evidenceService.IsReferenceNumberTaken(dto.ReferenceNumber);
+
+            return Ok(new { isTaken });
+        }
     }
 }

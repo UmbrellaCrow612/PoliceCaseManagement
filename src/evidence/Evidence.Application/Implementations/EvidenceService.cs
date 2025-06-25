@@ -28,6 +28,11 @@ namespace Evidence.Application.Implementations
             return await _dbcontext.Evidences.FindAsync(evidenceId);
         }
 
+        public async Task<bool> IsReferenceNumberTaken(string referenceNumber)
+        {
+            return await _dbcontext.Evidences.AnyAsync(x => x.ReferenceNumber == referenceNumber);
+        }
+
         public Task<EvidenceServiceResult> UpdateAsync(Core.Models.Evidence evidence)
         {
             throw new NotImplementedException();

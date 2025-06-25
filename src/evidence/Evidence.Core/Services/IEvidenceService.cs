@@ -33,6 +33,13 @@ namespace Evidence.Core.Services
         /// </summary>
         /// <param name="evidence">The evidence to delete</param>
         Task<EvidenceServiceResult> DeleteAsync(Models.Evidence evidence);
+
+        /// <summary>
+        /// Check if a <see cref="Core.Models.Evidence.ReferenceNumber"/> is taken
+        /// </summary>
+        /// <param name="referenceNumber">The number to check</param>
+        /// <returns>Bool if it is or is not</returns>
+        Task<bool> IsReferenceNumberTaken(string referenceNumber);
     }
 
 

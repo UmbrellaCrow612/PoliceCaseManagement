@@ -79,6 +79,14 @@
       @if (createEvidenceForm.controls.referenceNumber.hasError("minlength")) {
       <mat-error> Min length is 5 </mat-error>
       }
+
+      <!---->
+
+      @if
+      (createEvidenceForm.controls.referenceNumber.hasError("uniqueReferenceNumber"))
+      {
+      <mat-error> Number taken </mat-error>
+      }
     </mat-form-field>
 
     @if (createEvidenceForm.controls.file.hasError("maxFileSize")) {

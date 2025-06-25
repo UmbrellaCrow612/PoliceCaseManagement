@@ -18,8 +18,11 @@ export class EvidenceService {
    * @returns HTTP Observable if it returns 200 it means it is not taken any other status code it has
    */
   isReferenceNumberTaken(referenceNumber: string) {
-    return this.http.post(``, {
-      referenceNumber: '',
-    });
+    return this.http.post<{ isTaken: boolean }>(
+      `${this.BASE_URL}/evidence/reference-numbers/is-taken`,
+      {
+        referenceNumber: referenceNumber,
+      }
+    );
   }
 }
