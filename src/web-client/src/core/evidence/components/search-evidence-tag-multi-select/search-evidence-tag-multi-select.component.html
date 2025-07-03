@@ -1,0 +1,28 @@
+<mat-form-field>
+  <mat-label>Tags</mat-label>
+  <input
+    #input
+    type="text"
+    matInput
+    [matAutocomplete]="auto"
+    [disabled]="_isDisabled"
+  />
+  <mat-autocomplete
+    #auto="matAutocomplete"
+    (optionSelected)="optionSelected($event)"
+  >
+    @if (_isLoading) {
+    <mat-option disabled>Loading...</mat-option>
+    }
+    <!---->
+    @if (_error && !_isLoading) {
+    <mat-option disabled>{{ _error }}</mat-option>
+    }
+    <!---->
+    @if (!_isLoading && !_error) {
+    <!-- @for (option of filteredOptions; track option) {
+        <mat-option [value]="option">{{option}}</mat-option>
+      } -->
+    }
+  </mat-autocomplete>
+</mat-form-field>

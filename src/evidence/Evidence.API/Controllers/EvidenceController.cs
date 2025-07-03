@@ -1,7 +1,9 @@
 ﻿using Caching;
 using Evidence.API.DTOs;
 using Evidence.API.Mappings;
+using Evidence.API.Validators;
 using Evidence.Core.Services;
+using Evidence.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +14,13 @@ namespace Evidence.API.Controllers
     /// </summary>
     [ApiController]
     [Route("evidence")]
-    public class EvidenceController(IEvidenceService evidenceService, IRedisService redisService) : ControllerBase
+    public class EvidenceController(IEvidenceService evidenceService, IRedisService redisService, ITagService tagService, SearchTagsQueryValidator searchTagsQueryValidator) : ControllerBase
     {
         private readonly IEvidenceService _evidenceService = evidenceService;
         private readonly IRedisService _redisService = redisService;
         private readonly EvidenceMapping _evidenceMapping = new();
+        private readonly ITagService _tagService = tagService;
+        private readonly SearchTagsQueryValidator _searchTagsQueryValidator = searchTagsQueryValidator;
 
         [Authorize]
         [HttpPost]
@@ -116,6 +120,22 @@ namespace Evidence.API.Controllers
             var isTaken = await _evidenceService.IsReferenceNumberTaken(dto.ReferenceNumber);
 
             return Ok(new { isTaken });
+        }
+
+
+        [Authorize]
+        [HttpGet("tags")]
+        public async Task<IActionResult> SearchTags([FromQuery] SearchTagsQuery query)
+        {
+            var validationResult = _searchTagsQueryValidator.Execute(query);
+            if (!validationResult.IsSuccessful)
+            {
+                return BadRequest(validationResult);
+            }
+
+            var tags = await _tagService.SearchAsync(query);
+            
+            return Ok(tags);
         }
     }
 }

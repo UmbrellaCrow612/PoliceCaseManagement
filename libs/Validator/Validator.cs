@@ -29,8 +29,7 @@
 
             foreach (var rule in _rules)
             {
-                var passed = rule.Func(item);
-                if (passed)
+                if (rule.Func(item))
                 {
                     result.ValidationErrors.Add(rule.Message ?? "No message provided");
                 }

@@ -1,8 +1,10 @@
+using Caching;
 using Evidence.API;
 using Evidence.API.Grpc;
 using Evidence.Application;
 using Evidence.Infrastructure;
-using Caching;
+using Scalar.AspNetCore;
+using Validator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +20,14 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddGrpc();
 
+builder.Services.AddValidators();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

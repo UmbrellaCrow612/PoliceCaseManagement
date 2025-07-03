@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import env from '../../../environments/environment';
+import { Tag } from '../types';
 
 /**
  * Central service to do all Evidence related business logic
@@ -24,5 +25,18 @@ export class EvidenceService {
         referenceNumber: referenceNumber,
       }
     );
+  }
+
+  /**
+   * Search for tags in the system
+   * @param searchQuery A query object to search by
+   * @returns List of tags matching the criteria
+   */
+  searchTags(searchQuery: { name: string }) {
+    let urlBuilder = new URL(`${this.BASE_URL}/evidence/tags`);
+
+    urlBuilder.searchParams.append('name', searchQuery.name);
+
+    return this.http.get<Tag[]>(urlBuilder.toString());
   }
 }

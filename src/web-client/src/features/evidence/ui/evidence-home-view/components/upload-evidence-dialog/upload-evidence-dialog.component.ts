@@ -51,11 +51,8 @@ export class UploadEvidenceDialogComponent {
           this.referenceNumberValidator
         ),
       ],
+      updateOn: 'blur',
     }),
-    fileName: new FormControl('', [
-      Validators.required,
-      Validators.minLength(5),
-    ]),
     collectionDate: new FormControl<Date>(new Date(), [Validators.required]),
     file: new FormControl<File | null>(null, [
       Validators.required,
@@ -71,7 +68,7 @@ export class UploadEvidenceDialogComponent {
   /**
    * Holds any error message state
    */
-  errorMessage = '';
+  errorMessage = null;
 
   /**
    * The UI button which triggers the underlying input file
@@ -98,7 +95,6 @@ export class UploadEvidenceDialogComponent {
       collectionDate: new Date(),
       description: null,
       file: null,
-      fileName: null,
       name: null,
       referenceNumber: null,
     });

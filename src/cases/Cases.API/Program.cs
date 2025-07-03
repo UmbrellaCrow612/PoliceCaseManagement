@@ -7,6 +7,7 @@ using Logging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using Validator;
 
 SerilogExtensions.ConfigureSerilog();
 
@@ -22,6 +23,7 @@ builder.Services.AddBaseAuthorization(config);
 builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
 builder.Services.AddCaching(config);
+
 builder.Services.AddValidators();
 
 var app = builder.Build();

@@ -11,6 +11,7 @@ namespace Evidence.Application
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IEvidenceService, EvidenceService>();
+            services.AddScoped<ITagService, TagService>();
 
             services.EnsureDenormalisedEntitiesHaveAConsumer();
 

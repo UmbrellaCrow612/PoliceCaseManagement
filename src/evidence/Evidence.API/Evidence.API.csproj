@@ -14,10 +14,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.5.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
+    <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
     <ProjectReference Include="..\..\shared\Caching\Caching.csproj" />
     <ProjectReference Include="..\Evidence.Application\Evidence.Application.csproj" />
     <ProjectReference Include="..\Evidence.Infrastructure\Evidence.Infrastructure.csproj" />
