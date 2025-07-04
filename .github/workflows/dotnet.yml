@@ -21,7 +21,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore PoliceCaseManagement.sln
     - name: Build
       run: dotnet build PoliceCaseManagement.sln --no-restore
     # - name: Test
