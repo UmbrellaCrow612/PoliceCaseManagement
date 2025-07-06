@@ -15,6 +15,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
 import { UniqueEvidenceReferenceNumberAsyncValidator } from '../../../../../../core/evidence/validators/uniqueEvidenceReferenceNumberAsyncValidator';
+import { SearchEvidenceTagMultiSelectComponent } from '../../../../../../core/evidence/components/search-evidence-tag-multi-select/search-evidence-tag-multi-select.component';
+import { Tag } from '../../../../../../core/evidence/types';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-upload-evidence-dialog',
@@ -27,6 +30,8 @@ import { UniqueEvidenceReferenceNumberAsyncValidator } from '../../../../../../c
     ReactiveFormsModule,
     MatDatepickerModule,
     MatIconModule,
+    SearchEvidenceTagMultiSelectComponent,
+    CommonModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './upload-evidence-dialog.component.html',
@@ -58,6 +63,7 @@ export class UploadEvidenceDialogComponent {
       Validators.required,
       Validator_maxFileSize(5e6),
     ]),
+    tags: new FormControl<Tag[] | null>(null),
   });
 
   /**

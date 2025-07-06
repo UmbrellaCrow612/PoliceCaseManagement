@@ -1,12 +1,16 @@
-<mat-form-field>
+<mat-form-field appearance="outline">
   <mat-label>Tags</mat-label>
   <input
     #input
     type="text"
     matInput
     [matAutocomplete]="auto"
-    [disabled]="_isDisabled"
+    [formControl]="searchTagsInputControl"
   />
+
+  @if (searchTagsInputControl.hasError("required")) {
+  <mat-error> Required </mat-error>
+  }
   <mat-autocomplete
     #auto="matAutocomplete"
     (optionSelected)="optionSelected($event)"
@@ -20,9 +24,13 @@
     }
     <!---->
     @if (!_isLoading && !_error) {
-    <!-- @for (option of filteredOptions; track option) {
-        <mat-option [value]="option">{{option}}</mat-option>
-      } -->
+    <!---->
+    @for (item of _searchedTagsResult?.data; track item) {
+    <mat-option [value]="item">{{ item.name }}</mat-option>
+    } @empty {
+    <mat-option disabled>No tags found</mat-option>
+    }
+    <!---->
     }
   </mat-autocomplete>
 </mat-form-field>

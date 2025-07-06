@@ -1,6 +1,12 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Tag } from '../../types';
+import { Component, inject, OnInit } from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Tag, TagPagedResult } from '../../types';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
@@ -8,13 +14,19 @@ import {
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { EvidenceService } from '../../services/evidence.service';
+import { debounceTime } from 'rxjs';
 
 /**
  * Custom component that used in reactive forms to select mutliple tags in a form group
  */
 @Component({
   selector: 'app-search-evidence-tag-multi-select',
-  imports: [MatFormFieldModule, MatInputModule, MatAutocompleteModule],
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './search-evidence-tag-multi-select.component.html',
   styleUrl: './search-evidence-tag-multi-select.component.css',
   providers: [
@@ -26,28 +38,29 @@ import { EvidenceService } from '../../services/evidence.service';
   ],
 })
 export class SearchEvidenceTagMultiSelectComponent
-  implements ControlValueAccessor
+  implements ControlValueAccessor, OnInit
 {
-  @ViewChild('input') input: ElementRef<HTMLInputElement> | null = null;
-
-  /**
-   * Form control of the search bar where users type the tag name
-   */
-  searchTagsInputControl = new FormControl(); // todo add custom asycn validator like case number one and happens on blur
-
   /**
    * Evidence service used to make calls
    */
   private readonly _evidenceService = inject(EvidenceService);
-  /**
-   * Internal state how what current tags are selected
-   */
-  _internalSelectedTags: Tag[] = [];
 
   /**
-   * Internal disabled state
+   * Form control of the search bar where users type the tag name
    */
-  _isDisabled: boolean = false;
+  searchTagsInputControl = new FormControl<string | null>('');
+
+  /**
+   * Visual list to display for the searched term opf tags
+   */
+  _searchedTagsResult: TagPagedResult | null = null;
+
+  /**
+   * Internal state what current tags are selected
+   */
+  _internalSelectedTags: Map<string, Tag> = new Map<string, Tag>();
+
+
 
   /**
    * Internal state for any loading state
@@ -59,8 +72,33 @@ export class SearchEvidenceTagMultiSelectComponent
    */
   _error: string | null = null;
 
-  writeValue(tags: Tag[]): void {
-    this._internalSelectedTags = tags;
+  ngOnInit(): void {
+    this.searchTagsInputControl.valueChanges
+      .pipe(debounceTime(1000))
+      .subscribe(() => {
+        let searchTerm = this.searchTagsInputControl.value;
+        if (searchTerm && searchTerm.trim() !== '') {
+          this._isLoading = true;
+          this._error = null;
+
+          this._evidenceService.searchTags({ name: searchTerm }).subscribe({
+            next: (response) => {
+              (this._searchedTagsResult = response), (this._isLoading = false);
+            },
+            error: (err) => {
+              this._isLoading = false;
+              this._error = 'Failed to fetch tags';
+            },
+          });
+        }
+      });
+  }
+
+  writeValue(tags: Tag[] | null): void {
+    this._internalSelectedTags = new Map<string, Tag>();
+    if (tags) {
+      tags.forEach((x) => this._internalSelectedTags.set(x.id, x));
+    }
   }
 
   registerOnChange(fn: any): void {
@@ -72,11 +110,16 @@ export class SearchEvidenceTagMultiSelectComponent
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this._isDisabled = isDisabled;
   }
 
   onChange: (tags: Tag[]) => void = () => {};
   onTouched: () => void = () => {};
 
-  optionSelected(event: MatAutocompleteSelectedEvent) {}
+  optionSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedTag: Tag = event.option.value;
+    this._internalSelectedTags.set(selectedTag.id, selectedTag);
+    this.searchTagsInputControl.setValue(null);
+    this.onTouched();
+    this.onChange(Array.from(this._internalSelectedTags.values()));
+  }
 }

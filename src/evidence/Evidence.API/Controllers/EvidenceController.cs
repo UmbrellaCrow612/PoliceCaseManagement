@@ -21,6 +21,7 @@ namespace Evidence.API.Controllers
         private readonly EvidenceMapping _evidenceMapping = new();
         private readonly ITagService _tagService = tagService;
         private readonly SearchTagsQueryValidator _searchTagsQueryValidator = searchTagsQueryValidator;
+        private readonly TagMapping _tagMapping = new();
 
         [Authorize]
         [HttpPost]
@@ -134,7 +135,7 @@ namespace Evidence.API.Controllers
             }
 
             var tags = await _tagService.SearchAsync(query);
-            
+
             return Ok(tags);
         }
     }

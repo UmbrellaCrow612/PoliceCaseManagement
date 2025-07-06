@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import env from '../../../environments/environment';
-import { Tag } from '../types';
+import { Tag, TagPagedResult } from '../types';
 
 /**
  * Central service to do all Evidence related business logic
@@ -37,6 +37,6 @@ export class EvidenceService {
 
     urlBuilder.searchParams.append('name', searchQuery.name);
 
-    return this.http.get<Tag[]>(urlBuilder.toString());
+    return this.http.get<TagPagedResult>(urlBuilder.toString());
   }
 }

@@ -101,6 +101,10 @@
     </p>
     }
     <!---->
+
+    <app-search-evidence-tag-multi-select formControlName="tags" />
+
+    {{ createEvidenceForm.value | json }}
     } @else {
     <p>No File selected</p>
     }
@@ -109,10 +113,7 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="resetClicked()">Clear</button>
   <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
-  <button
-    mat-button
-    [disabled]="createEvidenceForm.invalid || isLoading"
-  >
+  <button mat-button [disabled]="createEvidenceForm.invalid || isLoading">
     Create
   </button>
 </mat-dialog-actions>

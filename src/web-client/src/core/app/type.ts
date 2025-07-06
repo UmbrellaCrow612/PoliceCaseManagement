@@ -37,3 +37,48 @@ export interface PagedResult<T> {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
 }
+
+/**
+ * Generic base type similar to the backend generic PaginatedResult<T> which is used for any paginated result
+ */
+export interface PaginatedResult<T> {
+  /**
+   * A list of items
+   */
+  data: T[];
+
+  /**
+   * Meta data related to do with pagination
+   */
+  pagination: {
+    /**
+     * The current page number fetched
+     */
+    currentPage: number;
+
+    /**
+     * How many items where fetched for the given paghed result
+     */
+    pageSize: number;
+
+    /**
+     * Total amount of pages avaiable to fetch
+     */
+    totalPages: number;
+
+    /**
+     * Totoal amount of items
+     */
+    totalRecords: number;
+  };
+
+  /**
+   * If there is a next page to fetch
+   */
+  hasNextPage: boolean;
+
+  /**
+   * If there is a previous page to fetch
+   */
+  hasPreviousPage: boolean;
+}
