@@ -1,11 +1,23 @@
-<mat-form-field appearance="outline">
+<mat-form-field appearance="outline" class="full">
   <mat-label>Tags</mat-label>
+  <mat-chip-grid #chipGrid aria-label="Tag selected">
+    @for (tag of _internalSelectedTags.values(); track $index) {
+    <mat-chip-row (removed)="removeTagClicked(tag)">
+      {{ tag.name }}
+      <button matChipRemove [attr.aria-label]="'remove ' + tag.name">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+    }
+  </mat-chip-grid>
   <input
     #input
     type="text"
     matInput
     [matAutocomplete]="auto"
     [formControl]="searchTagsInputControl"
+    [matChipInputFor]="chipGrid"
+    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
   />
 
   @if (searchTagsInputControl.hasError("required")) {

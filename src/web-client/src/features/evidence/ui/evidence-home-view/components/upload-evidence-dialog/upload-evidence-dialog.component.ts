@@ -31,7 +31,7 @@ import { CommonModule } from '@angular/common';
     MatDatepickerModule,
     MatIconModule,
     SearchEvidenceTagMultiSelectComponent,
-    CommonModule
+    CommonModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './upload-evidence-dialog.component.html',

@@ -4,7 +4,6 @@ import {
   FormControl,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { Tag, TagPagedResult } from '../../types';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +14,9 @@ import {
 } from '@angular/material/autocomplete';
 import { EvidenceService } from '../../services/evidence.service';
 import { debounceTime } from 'rxjs';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 /**
  * Custom component that used in reactive forms to select mutliple tags in a form group
@@ -26,6 +28,8 @@ import { debounceTime } from 'rxjs';
     MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    MatChipsModule,
+    MatIconModule,
   ],
   templateUrl: './search-evidence-tag-multi-select.component.html',
   styleUrl: './search-evidence-tag-multi-select.component.css',
@@ -40,6 +44,8 @@ import { debounceTime } from 'rxjs';
 export class SearchEvidenceTagMultiSelectComponent
   implements ControlValueAccessor, OnInit
 {
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+
   /**
    * Evidence service used to make calls
    */
@@ -60,8 +66,6 @@ export class SearchEvidenceTagMultiSelectComponent
    */
   _internalSelectedTags: Map<string, Tag> = new Map<string, Tag>();
 
-
-
   /**
    * Internal state for any loading state
    */
@@ -74,7 +78,7 @@ export class SearchEvidenceTagMultiSelectComponent
 
   ngOnInit(): void {
     this.searchTagsInputControl.valueChanges
-      .pipe(debounceTime(1000))
+      .pipe(debounceTime(500))
       .subscribe(() => {
         let searchTerm = this.searchTagsInputControl.value;
         if (searchTerm && searchTerm.trim() !== '') {
@@ -109,8 +113,7 @@ export class SearchEvidenceTagMultiSelectComponent
     this.onTouched = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-  }
+  setDisabledState(isDisabled: boolean): void {}
 
   onChange: (tags: Tag[]) => void = () => {};
   onTouched: () => void = () => {};
@@ -120,6 +123,14 @@ export class SearchEvidenceTagMultiSelectComponent
     this._internalSelectedTags.set(selectedTag.id, selectedTag);
     this.searchTagsInputControl.setValue(null);
     this.onTouched();
+    this.onChange(Array.from(this._internalSelectedTags.values()));
+  }
+
+  /**
+   * Runs when a chip of a tag selected is clicked to be removed
+   */
+  removeTagClicked(tag: Tag) {
+    this._internalSelectedTags.delete(tag.id);
     this.onChange(Array.from(this._internalSelectedTags.values()));
   }
 }
