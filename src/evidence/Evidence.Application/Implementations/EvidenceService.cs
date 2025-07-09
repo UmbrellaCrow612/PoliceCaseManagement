@@ -72,9 +72,22 @@ namespace Evidence.Application.Implementations
             return await _dbcontext.Evidences.AnyAsync(x => x.ReferenceNumber == referenceNumber);
         }
 
-        public Task<EvidenceServiceResult> UpdateAsync(Core.Models.Evidence evidence)
+        public async Task<EvidenceServiceResult> UpdateAsync(Core.Models.Evidence evidence)
         {
-            throw new NotImplementedException();
+            var result = new EvidenceServiceResult();
+
+            var refNumberNotChanged = await _dbcontext.Evidences.AnyAsync(x => x.ReferenceNumber == evidence.ReferenceNumber);
+            if (!refNumberNotChanged)
+            {
+                result.AddError(BusinessRuleCodes.EVIDENCE_REFERENCE_CHANGED, "You cannot change the ref number");
+                return result;
+            }
+
+            _dbcontext.Evidences.Update(evidence);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

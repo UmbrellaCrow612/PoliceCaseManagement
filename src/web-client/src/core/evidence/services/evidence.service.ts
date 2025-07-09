@@ -77,4 +77,12 @@ export class EvidenceService {
       observe: 'events',
     });
   }
+
+  /**
+   * Mark a evidence as uploaded from the client side - we use client side upload - we inform backend that it was uploaded from the client
+   * @param evidenceId The evidence that was uploaded from the client
+   */
+  markEvidenceAsUploaded(evidenceId:string) {
+    return this.http.post(`${this.BASE_URL}/evidence/${evidenceId}/upload-complete`, {});
+  }
 }

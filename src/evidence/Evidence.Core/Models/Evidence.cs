@@ -74,6 +74,24 @@ namespace Evidence.Core.Models
 
 
         public FileUploadStatus FileUploadStatus { get; set; } = FileUploadStatus.Failed;
+
+
+        /// <summary>
+        /// Helper method to check if the current evidence item is already marked as uploaded
+        /// </summary>
+        /// <returns></returns>
+        public bool IsAlreadyUploaded()
+        {
+            return FileUploadStatus == FileUploadStatus.Uploaded;
+        }
+
+        /// <summary>
+        /// Helper method to mark this evidence as uploaded
+        /// </summary>
+        public void MarkAsUploaded()
+        {
+            FileUploadStatus = FileUploadStatus.Uploaded;
+        }
     }
 
     /// <summary>

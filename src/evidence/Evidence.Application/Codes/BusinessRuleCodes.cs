@@ -19,5 +19,10 @@
         /// UsE when a <see cref="Core.Models.Evidence"/> being created and it's ref number is already taken by another as they are unique
         /// </summary>
         public static readonly string EVIDENCE_REFERENCE_NUMBER_TAKEN = "EVIDENCE_REFERENCE_NUMBER_TAKEN";
+
+        /// <summary>
+        /// Use this when updating a evidence item and it's ref number has been changed - this is not allowed
+        /// </summary>
+        public static readonly string EVIDENCE_REFERENCE_CHANGED = "EVIDENCE_REFERENCE_CHANGED";
     }
 }

@@ -6,7 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FileBytePipe } from '../../../../../../core/app/pipes/fileBytePipe';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -42,6 +42,13 @@ export class UploadEvidenceDialogComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private readonly evidenceService = inject(EvidenceService);
+
+  /**
+   * The ref to the current open dialog of this component
+   */
+  private readonly dialogRef = inject(
+    MatDialogRef<UploadEvidenceDialogComponent>
+  );
 
   referenceNumberValidator = inject(
     UniqueEvidenceReferenceNumberAsyncValidator
@@ -133,6 +140,7 @@ export class UploadEvidenceDialogComponent {
       next: (response) => {
         const file: File = this.createEvidenceForm.controls.file.value!;
         const uploadUrl = response.uploadUrl;
+        const evidenceId = response.evidenceId;
 
         this.evidenceService.uploadFileToS3(uploadUrl, file).subscribe({
           next: (event) => {
@@ -144,8 +152,22 @@ export class UploadEvidenceDialogComponent {
               // Optionally show progress in the UI
             } else if (event.type === HttpEventType.Response) {
               console.log('Upload complete!');
-              this.isLoading = false;
-              // Optionally notify user, close dialog, etc.
+
+              this.evidenceService
+                .markEvidenceAsUploaded(evidenceId)
+                .subscribe({
+                  next: () => {
+                    console.log('Evidence marked as uploaded successfully.');
+                    this.dialogRef.close();
+                    this.isLoading = false;
+                  },
+                  error: (markError) => {
+                    this.errorMessage =
+                      'Upload completed, but failed to mark evidence: ' +
+                      formatBackendError(markError);
+                    this.isLoading = false;
+                  },
+                });
             }
           },
           error: (uploadError) => {

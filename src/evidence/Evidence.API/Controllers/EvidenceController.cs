@@ -42,7 +42,34 @@ namespace Evidence.API.Controllers
                 return BadRequest(result);
             }
 
-            return Ok(new { evidence.Id, result.UploadUrl });
+            return Ok(new { evidenceId = evidence.Id, result.UploadUrl });
+        }
+
+        /// <summary>
+        /// Hit this endpoint when the client side uploads a file ot the cloud to mark it as uploaded
+        /// </summary>
+        [Authorize]
+        [HttpPost("{evidenceId}/upload-complete")]
+        public async Task<IActionResult> EvidenceUploadComplete(string evidenceId)
+        {
+            var evidence = await _evidenceService.FindByIdAsync(evidenceId);
+            if (evidence is null)
+            {
+                return NotFound();
+            }
+            if (evidence.IsAlreadyUploaded())
+            {
+                return BadRequest();
+            }
+
+            evidence.MarkAsUploaded();
+            var result = await _evidenceService.UpdateAsync(evidence);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+            return NoContent();
         }
 
         [Authorize]
