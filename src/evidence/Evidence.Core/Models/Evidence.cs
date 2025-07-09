@@ -11,11 +11,6 @@ namespace Evidence.Core.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// A Name to describe what the evidence is.
-        /// </summary>
-        public required string Name { get; set; }
-
-        /// <summary>
         /// Optional Extra information about the evidence 
         /// </summary>
         public required string? Description { get; set; } = null;
@@ -72,11 +67,21 @@ namespace Evidence.Core.Models
         public required string UploadedByEmail { get; set; }
 
 
-
-
         /// <summary>
         /// Many to Many link join table between <see cref="Models.Evidence"/> and <see cref="Models.Tag"/>
         /// </summary>
         public ICollection<EvidenceTag> EvidenceTags { get; set; } = [];
+
+
+        public FileUploadStatus FileUploadStatus { get; set; } = FileUploadStatus.Failed;
+    }
+
+    /// <summary>
+    /// Status a file is currently in
+    /// </summary>
+    public enum FileUploadStatus
+    {
+        Uploaded = 0,
+        Failed = 1
     }
 }

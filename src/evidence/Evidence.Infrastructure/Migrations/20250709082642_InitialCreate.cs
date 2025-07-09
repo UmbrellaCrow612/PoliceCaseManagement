@@ -16,7 +16,6 @@ namespace Evidence.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ReferenceNumber = table.Column<string>(type: "text", nullable: false),
                     FileName = table.Column<string>(type: "text", nullable: false),
@@ -28,7 +27,8 @@ namespace Evidence.Infrastructure.Migrations
                     CollectionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UploadedById = table.Column<string>(type: "text", nullable: false),
                     UploadedByUsername = table.Column<string>(type: "text", nullable: false),
-                    UploadedByEmail = table.Column<string>(type: "text", nullable: false)
+                    UploadedByEmail = table.Column<string>(type: "text", nullable: false),
+                    FileUploadStatus = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

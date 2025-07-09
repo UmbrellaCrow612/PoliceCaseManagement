@@ -36,7 +36,6 @@ namespace Evidence.API.Grpc
             {
                 EvidenceId = evidence.Id,
                 FileName = evidence.FileName,
-                Name = evidence.Name,
                 ReferenceNumber = evidence.ReferenceNumber,
             };
             return response;

@@ -1,4 +1,4 @@
-// File contains custom validators for reactive form controls
+// File contains custom validators for reactive form controls none business specific
 
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 

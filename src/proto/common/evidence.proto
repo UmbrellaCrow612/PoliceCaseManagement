@@ -39,12 +39,9 @@ message GetEvidenceByIdResponse {
   // The unique identifier of the evidence.
   string evidenceId = 1;
 
-  // The name or title of the evidence.
-  string name = 2;
-
   // The reference number associated with the evidence.
-  string referenceNumber = 3;
+  string referenceNumber = 2;
 
   // The name of the file containing the evidence.
-  string fileName = 4;
+  string fileName = 3;
 }

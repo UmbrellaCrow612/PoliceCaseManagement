@@ -8,16 +8,18 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FileBytePipe } from '../../../../../../core/app/pipes/fileBytePipe';
-import { Validator_maxFileSize } from '../../../../../../core/app/validators/controls';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
 import { UniqueEvidenceReferenceNumberAsyncValidator } from '../../../../../../core/evidence/validators/uniqueEvidenceReferenceNumberAsyncValidator';
-import { SearchEvidenceTagMultiSelectComponent } from '../../../../../../core/evidence/components/search-evidence-tag-multi-select/search-evidence-tag-multi-select.component';
-import { Tag } from '../../../../../../core/evidence/types';
 import { CommonModule } from '@angular/common';
+import { EvidenceService } from '../../../../../../core/evidence/services/evidence.service';
+import { evidenceMaxFileSizeSyncValidator } from '../../../../../../core/evidence/validators/evidenceMaxFileSizeSyncValidator';
+import { formatBackendError } from '../../../../../../core/app/errors/formatError';
+import { HttpEventType } from '@angular/common/http';
+import { UploadEvidence } from '../../../../../../core/evidence/types';
 
 @Component({
   selector: 'app-upload-evidence-dialog',
@@ -30,7 +32,6 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     MatDatepickerModule,
     MatIconModule,
-    SearchEvidenceTagMultiSelectComponent,
     CommonModule,
   ],
   providers: [provideNativeDateAdapter()],
@@ -39,6 +40,8 @@ import { CommonModule } from '@angular/common';
 })
 export class UploadEvidenceDialogComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  private readonly evidenceService = inject(EvidenceService);
 
   referenceNumberValidator = inject(
     UniqueEvidenceReferenceNumberAsyncValidator
@@ -61,9 +64,8 @@ export class UploadEvidenceDialogComponent {
     collectionDate: new FormControl<Date>(new Date(), [Validators.required]),
     file: new FormControl<File | null>(null, [
       Validators.required,
-      Validator_maxFileSize(5e6),
+      evidenceMaxFileSizeSyncValidator(),
     ]),
-    tags: new FormControl<Tag[] | null>(null),
   });
 
   /**
@@ -74,7 +76,7 @@ export class UploadEvidenceDialogComponent {
   /**
    * Holds any error message state
    */
-  errorMessage = null;
+  errorMessage: string | null = null;
 
   /**
    * The UI button which triggers the underlying input file
@@ -108,5 +110,55 @@ export class UploadEvidenceDialogComponent {
     if (this.fileInput?.nativeElement) {
       this.fileInput.nativeElement.value = '';
     }
+  }
+
+  uploadFileClicked() {
+    if (!this.createEvidenceForm.valid) {
+      this.errorMessage = 'Invalid state of form';
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    let metaData: UploadEvidence = {
+      fileName: this.createEvidenceForm.controls.name.value!,
+      collectionDate: this.createEvidenceForm.controls.collectionDate.value!,
+      description: this.createEvidenceForm.controls.description.value!,
+      referenceNumber: this.createEvidenceForm.controls.referenceNumber.value!,
+      contentType: this.createEvidenceForm.controls.file.value?.type!,
+      fileSize: this.createEvidenceForm.controls.file.value?.size!,
+    };
+
+    this.evidenceService.getPreSignedUploadUrl(metaData).subscribe({
+      next: (response) => {
+        const file: File = this.createEvidenceForm.controls.file.value!;
+        const uploadUrl = response.uploadUrl;
+
+        this.evidenceService.uploadFileToS3(uploadUrl, file).subscribe({
+          next: (event) => {
+            if (event.type === HttpEventType.UploadProgress) {
+              const percentDone = Math.round(
+                (100 * event.loaded) / (event.total ?? 1)
+              );
+              console.log(`Upload progress: ${percentDone}%`);
+              // Optionally show progress in the UI
+            } else if (event.type === HttpEventType.Response) {
+              console.log('Upload complete!');
+              this.isLoading = false;
+              // Optionally notify user, close dialog, etc.
+            }
+          },
+          error: (uploadError) => {
+            this.errorMessage =
+              'Upload failed: ' + formatBackendError(uploadError);
+            this.isLoading = false;
+          },
+        });
+      },
+      error: (error) => {
+        this.errorMessage = formatBackendError(error);
+        this.isLoading = false;
+      },
+    });
   }
 }

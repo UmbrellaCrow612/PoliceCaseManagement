@@ -1,5 +1,11 @@
 <h2 mat-dialog-title>Upload evidence</h2>
 <mat-dialog-content class="mat-typography">
+  @if (errorMessage) {
+  <div>
+    {{ errorMessage }}
+  </div>
+  }
+  <!---->
   <form class="split" [formGroup]="createEvidenceForm">
     <button mat-raised-button (click)="selectFileClicked()">
       Select a file
@@ -91,18 +97,17 @@
 
     @if (createEvidenceForm.controls.file.hasError("maxFileSize")) {
     <p>
-      File size to large
-      {{ createEvidenceForm.controls.file.value.size | fileBytePipe }} max size
-      Max size accepted:
+      The limit for this file type
+      {{ createEvidenceForm.controls.file.getError("maxFileSize")?.mimeType }}
+      is
       {{
         createEvidenceForm.controls.file.getError("maxFileSize")
           ?.requiredMaxSize | fileBytePipe
       }}
+      file size:
+      {{ createEvidenceForm.controls.file.value.size | fileBytePipe }}
     </p>
     }
-    <!---->
-
-    <app-search-evidence-tag-multi-select formControlName="tags" class="full"/>
     <!---->
 
     {{ createEvidenceForm.value | json }}
@@ -114,7 +119,13 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="resetClicked()">Clear</button>
   <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
-  <button mat-button [disabled]="createEvidenceForm.invalid || isLoading">
-    Create
+  <button
+    mat-button
+    [disabled]="createEvidenceForm.invalid || isLoading || errorMessage"
+    (click)="uploadFileClicked()"
+  >
+    @if (isLoading) { Uploading... }
+    <!---->
+    @if (!isLoading) { Upload }
   </button>
 </mat-dialog-actions>

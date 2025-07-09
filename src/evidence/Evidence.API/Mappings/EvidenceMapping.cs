@@ -7,7 +7,20 @@ namespace Evidence.API.Mappings
     {
         public Core.Models.Evidence Create(CreateEvidenceDto createDto)
         {
-            throw new NotImplementedException();
+            return new Core.Models.Evidence
+            {
+                BucketName = "EMPTY", // EMPTY will be set later as we cannot do it here now
+                CollectionDate = createDto.CollectionDate,
+                ContentType = createDto.ContentType,
+                Description = createDto.Description,
+                FileName = createDto.FileName,
+                FileSize = createDto.FileSize,
+                ReferenceNumber = createDto.ReferenceNumber,
+                S3Key = "EMPTY",
+                UploadedByEmail = "EMPTY",
+                UploadedById = "EMPTY",
+                UploadedByUsername = "EMPTY",
+            };
         }
 
         public EvidenceDto ToDto(Core.Models.Evidence @base)

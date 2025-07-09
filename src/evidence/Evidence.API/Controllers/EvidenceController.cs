@@ -6,6 +6,7 @@ using Evidence.Core.Services;
 using Evidence.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Evidence.API.Controllers
 {
@@ -21,26 +22,27 @@ namespace Evidence.API.Controllers
         private readonly EvidenceMapping _evidenceMapping = new();
         private readonly ITagService _tagService = tagService;
         private readonly SearchTagsQueryValidator _searchTagsQueryValidator = searchTagsQueryValidator;
-        private readonly TagMapping _tagMapping = new();
 
+        /// <summary>
+        /// Create a piece of <see cref="Core.Models.Evidence"/> and returns a upload URL
+        /// </summary>
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> CreateEvidence([FromBody] CreateEvidenceDto dto)
+        [HttpGet]
+        public async Task<IActionResult> CreateEvidence([FromQuery] CreateEvidenceDto dto)
         {
-            var evidence = _evidenceMapping.Create(dto);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            // todo do it like case attachment file uplads suing client side URLS
+            var evidence = _evidenceMapping.Create(dto);
+            evidence.UploadedById = userId;
+
             var result = await _evidenceService.CreateAsync(evidence);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
             }
 
-            var returnDto = _evidenceMapping.ToDto(evidence);
-
-            await _redisService.SetStringAsync(evidence.Id, returnDto);
-
-            return Ok(returnDto);
+            return Ok(new { evidence.Id, result.UploadUrl });
         }
 
         [Authorize]

@@ -20,6 +20,6 @@
         /// </summary>
         /// <param name="code">A standardized string code representing the error.</param>
         /// <param name="message">An optional message describing the error.</param>
-        void AddError(string code, string? message);
+        void AddError(string code, string? message = null);
     }
 }

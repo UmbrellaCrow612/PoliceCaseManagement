@@ -47,8 +47,9 @@ namespace Evidence.Core.Services
     {
         public bool Succeeded { get; set; } = false;
         public ICollection<IResultError> Errors { get; set; } = [];
+        public string UploadUrl { get; set; } = "";
 
-        public void AddError(string code, string? message)
+        public void AddError(string code, string? message = null)
         {
             Errors.Add(new EvidenceServiceError { Code = code, Message = message });
         }

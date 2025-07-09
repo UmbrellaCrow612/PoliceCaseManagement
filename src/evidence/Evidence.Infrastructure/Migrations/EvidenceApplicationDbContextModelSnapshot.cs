@@ -48,9 +48,8 @@ namespace Evidence.Infrastructure.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("FileUploadStatus")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
