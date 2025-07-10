@@ -20,7 +20,7 @@ namespace Evidence.Core.Services
         /// Create a <see cref="Core.Models.Evidence"/> into the system
         /// </summary>
         /// <param name="evidence">The evidence you want to add</param>
-        Task<EvidenceServiceResult> CreateAsync(Models.Evidence evidence);
+        Task<CreateEvidenceResult> CreateAsync(Models.Evidence evidence);
 
         /// <summary>
         /// Update a <see cref="Models.Evidence"/>
@@ -42,12 +42,23 @@ namespace Evidence.Core.Services
         Task<bool> IsReferenceNumberTaken(string referenceNumber);
     }
 
+    public class CreateEvidenceResult : IResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<IResultError> Errors { get; set; } = [];
+        public string UploadUrl { get; set; } = "";
+
+        public void AddError(string code, string? message = null)
+        {
+            Errors.Add(new EvidenceServiceError { Code = code, Message = message });
+        }
+    }
+
 
     public class EvidenceServiceResult : IResult
     {
         public bool Succeeded { get; set; } = false;
         public ICollection<IResultError> Errors { get; set; } = [];
-        public string UploadUrl { get; set; } = "";
 
         public void AddError(string code, string? message = null)
         {

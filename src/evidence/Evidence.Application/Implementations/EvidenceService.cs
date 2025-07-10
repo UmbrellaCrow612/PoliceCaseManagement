@@ -15,9 +15,9 @@ namespace Evidence.Application.Implementations
         private readonly AWSSettings _awsSettings = awsSettings.Value;
         private readonly UserValidationService _userService = userValidationService;
 
-        public async Task<EvidenceServiceResult> CreateAsync(Core.Models.Evidence evidence)
+        public async Task<CreateEvidenceResult> CreateAsync(Core.Models.Evidence evidence)
         {
-            var result = new EvidenceServiceResult();
+            var result = new CreateEvidenceResult();
 
             var isRefNumberTaken = await _dbcontext.Evidences.AnyAsync(x => x.ReferenceNumber == evidence.ReferenceNumber);
             if (isRefNumberTaken)
