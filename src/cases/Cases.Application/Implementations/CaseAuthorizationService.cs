@@ -1,0 +1,38 @@
+﻿using Cases.Core.Services;
+using Cases.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cases.Application.Implementations
+{
+    public class CaseAuthorizationService(CasesApplicationDbContext dbContext) : ICaseAuthorizationService
+    {
+        private readonly CasesApplicationDbContext _dbContext = dbContext;
+
+        public async Task<bool> CanUserAddActions(string userId, string caseId)
+        {
+            return await _dbContext.CaseAccessLists.AnyAsync(
+            x => x.CaseId == caseId
+                 && x.UserId == userId
+                 && (x.CaseRole == Core.Models.CaseRole.Editor
+                     || x.CaseRole == Core.Models.CaseRole.Owner)
+            );
+        }
+
+        public async Task<bool> CanUserEditIncidentTypes(string userId, string caseId)
+        {
+            return await _dbContext.CaseAccessLists.AnyAsync(x => x.CaseId == caseId && x.UserId == userId 
+                && (x.CaseRole == Core.Models.CaseRole.Editor
+                     || x.CaseRole == Core.Models.CaseRole.Owner));
+        }
+
+        public Task<bool> CanUserViewCase(string userId, string caseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> CanUserViewCaseActions(string userId, string caseId)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

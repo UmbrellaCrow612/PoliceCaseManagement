@@ -517,7 +517,7 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, UploadCaseAttachmentFileMetaData metaData)
+        public async Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, CaseAttachmentFileMetaData metaData)
         {
             var attachmentId = Guid.NewGuid().ToString();
 

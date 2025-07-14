@@ -8,7 +8,7 @@ namespace Cases.Application.Implementations
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
 
-        public async Task<CaseAction?> GetCaseActionByIdAsync(string caseActionId)
+        public async Task<CaseAction?> FindByIdAsync(string caseActionId)
         {
             return await _dbcontext.CaseActions.FindAsync(caseActionId);
         }

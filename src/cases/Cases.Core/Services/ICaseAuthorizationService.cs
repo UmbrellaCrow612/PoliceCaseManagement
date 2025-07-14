@@ -12,5 +12,11 @@
         /// <param name="caseId"></param>
         /// <returns></returns>
         Task<bool> CanUserViewCase(string userId, string caseId);
-    }
+
+
+        Task<bool> CanUserEditIncidentTypes(string userId, string caseId);
+
+        Task<bool> CanUserAddActions(string userId, string caseId);
+
+        Task<bool> CanUserViewCaseActions(string userId, string caseId);
 }
