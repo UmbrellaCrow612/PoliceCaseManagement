@@ -1,5 +1,4 @@
 ﻿using Cases.Core.Models;
-using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
 using Results.Abstractions;
 
@@ -103,11 +102,6 @@ namespace Cases.Core.Services
         /// <param name="case">The case you want to get all case actions for</param>
         Task<List<CaseAction>> GetCaseActions(Case @case);
 
-        /// <summary>
-        /// Get all users linked to a case
-        /// </summary>
-        /// <param name="case">Case you want to get info for</param>
-        Task<List<CaseUser>> GetCaseUsers(Case @case);
 
         /// <summary>
         /// Assign a set of users to a case, gives them default permissions for the case
@@ -156,85 +150,7 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="file">The specific attachment to delete</param>
         Task<CaseResult> DeleteAttachment(CaseAttachmentFile file);
-
-
-        /// <summary>
-        /// Quick look up to check if a user has been assigned to to the given case <see cref="Case.CaseUsers"/> meaning that they can see it's details, this dose not check
-        /// there roles but only that they are linked
-        /// </summary>
-        /// <param name="caseId">The case ID to check</param>
-        /// <param name="userId">The user ID to check</param>
-        /// <returns>Result object, if it is <see cref="CaseResult.Succeeded"/> as true it means they can view it else they cannot</returns>
-        Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId);
-
-        /// <summary>
-        /// Get a list of <see cref="CasePermission"/> set on the given case
-        /// </summary>
-        /// <param name="case">The case to get the permissions for</param>
-        Task<List<CasePermission>> GetCasePermissions(Case @case);
-
-        /// <summary>
-        /// Find a <see cref="CasePermission"/> by it's ID
-        /// </summary>
-        /// <param name="permissionId">The case permission to find</param>
-        /// <param name="case">The parent case it is linked to</param>
-        Task<CasePermission?> FindCasePermissionById(Case @case, string permissionId);
-
-        /// <summary>
-        /// Update a <see cref="CasePermission"/>
-        /// </summary>
-        /// <param name="permission">The permission to update</param>
-        Task<CaseResult> UpdateCasePermission(CasePermission permission);
-
-        /// <summary>
-        /// Get a users case permission on a given case
-        /// </summary>
-        /// <param name="case">The case to get there permission for</param>
-        /// <param name="userId">The user who's permission you want to get</param>
-        /// <returns>List of permissions they have if the operation succeeds</returns>
-        Task<MyCasePermissionResult> GetUserCasePermissions(Case @case, string userId);
-
-        /// <summary>
-        /// Checks if a user has <see cref="CasePermission.CanViewPermissions"/> flag set to true for the given case
-        /// </summary>
-        /// <param name="caseId">The case to check it for</param>
-        /// <param name="userId">The ID of the user</param>
-        /// <returns>Result if it is <see cref="CaseResult.Succeeded"/> then they do have permissions to view them</returns>
-        Task<CaseResult> CanUserViewCasePermissions(string caseId, string userId);
-
-        /// <summary>
-        /// Checks if a user has <see cref="CasePermission.CanEditPermissions"/> flag set to true
-        /// </summary>
-        /// <param name="caseId">The case to check</param>
-        /// <param name="userId">The user to check for</param>
-        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
-        Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId);
-
-        /// <summary>
-        /// Checks to see if the given user has the permissions to view the actions taken on a case
-        /// </summary>
-        /// <param name="caseId">The ID of the case to check</param>
-        /// <param name="userId">The ID of the user to check</param>
-        /// <returns><see cref="CaseResult.Succeeded"/> if they can or not</returns>
-        Task<CaseResult> CanUserViewCaseActions(string caseId, string userId);
-
-        /// <summary>
-        /// Checks if a user can create actions on a given case
-        /// </summary>
-        /// <param name="caseId">The case to check</param>
-        /// <param name="userId">The user to check</param>
-        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
-        Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId);
-
-        /// <summary>
-        /// Checks if a user can edit linked incident types to a given case NOTE it dose not mean they can edit the incident type itself but a 
-        /// specific cases linked incident types i.e ones it it linked to
-        /// </summary>
-        /// <param name="caseId">The case to check for</param>
-        /// <param name="userId">The user to check for</param>
-        /// <returns><see cref="CaseResult.Succeeded"/> if they can or cannot</returns>
-        Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId);
-
+ 
         /// <summary>
         /// Update a <see cref="CaseAttachmentFile"/> in the system
         /// </summary>
@@ -263,10 +179,5 @@ namespace Cases.Core.Services
     {
         public required string Code { get; set; }
         public string? Message { get; set; }
-    }
-
-    public class MyCasePermissionResult : CaseResult
-    {
-        public List<string> Permissions { get; set; } = [];
     }
 }

@@ -16,7 +16,7 @@ namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options, ICaseAuthorizationService caseAuthorizationService) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
@@ -29,6 +29,7 @@ namespace Cases.API.Controllers
         private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
         private readonly CasePermissionMapping _casePermissionMapping = new();
         private readonly AWSSettings _awsSettings = options.Value;
+        private readonly ICaseAuthorizationService _caseAuthorizationService = caseAuthorizationService;
 
 
         private static readonly string _incidentTypesKey = "incident_types_key";
@@ -55,8 +56,8 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var result = await _caseService.CanUserViewCaseDetails(caseId, userId);
-            if (!result.Succeeded) return BadRequest(result);
+            var canView = await _caseAuthorizationService.CanUserViewCase(userId, caseId);
+            if (!canView) return Forbid();
 
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
             if (cache is not null)
@@ -74,78 +75,6 @@ namespace Cases.API.Controllers
             await _redisService.SetStringAsync<CaseDto>(_case.Id, dto);
 
             return Ok(dto);
-        }
-
-        /// <summary>
-        /// Return the permissions set on the case
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/permissions")]
-        public async Task<IActionResult> GetCasePermissions(string caseId)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var result = await _caseService.CanUserViewCasePermissions(caseId, userId);
-            if(!result.Succeeded) return BadRequest(result);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var permissions = await _caseService.GetCasePermissions(_case);
-
-            IEnumerable<CasePermissionDto> dto = permissions.Select(x => _casePermissionMapping.ToDto(x));
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Update a case permission
-        /// </summary>
-        /// <param name="permissionId">The permission to update</param>
-        /// <param name="caseId">The parent case it is linked to</param>
-        /// <param name="dto">Request body</param>
-        [Authorize] 
-        [HttpPut("{caseId}/permissions/{permissionId}")]
-        public async Task<IActionResult> UpdateCasePermission(string caseId, string permissionId, [FromBody] UpdateCasePermissionDto dto)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var res = await _caseService.CanUserEditCasePermissions(caseId, userId);
-            if (!res.Succeeded) return BadRequest(res);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var permission = await _caseService.FindCasePermissionById(_case, permissionId);
-            if (permission is null) return NotFound();
-
-            _casePermissionMapping.Update(permission, dto);
-
-            var result = await _caseService.UpdateCasePermission(permission);
-            if (!result.Succeeded) return BadRequest(result);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Get the current requesting users permissions on a given case - returns a list of permission they have strings
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/permissions/me")]
-        public async Task<IActionResult> GetMyCasePermissionForCase(string caseId)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var result = await _caseService.GetUserCasePermissions(_case, userId);
-            if (!result.Succeeded) return BadRequest(result);
-
-            return Ok(result.Permissions);
         }
 
         [Authorize]

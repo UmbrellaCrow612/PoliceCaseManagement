@@ -1,13 +1,17 @@
 ﻿using Events.Core;
 
-namespace Cases.Core.Models.Joins
+namespace Cases.Core.Models
 {
     /// <summary>
-    /// Stores user info for linked users - stores a ref and de norm data in here
+    /// A list for a specific <see cref="Core.Models.Case"/> contains all the users and there role on the given case - also used as a way of knowing if they 
+    /// are assigned to it
     /// </summary>
-    public class CaseUser : IDenormalizedEntity
+    public class CaseAccessList : IDenormalizedEntity
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
+
+        public required string CaseId { get; set; }
+        public Case? Case { get; set; } = null;
 
 
         [DenormalizedField("Application user", "Id", "Identity Service")]
@@ -20,7 +24,6 @@ namespace Cases.Core.Models.Joins
         public required string UserEmail { get; set; }
 
 
-        public required string CaseId { get; set; }
-        public Case Case { get; set; } = null!;
+        public required CaseRole CaseRole { get; set; }
     }
 }

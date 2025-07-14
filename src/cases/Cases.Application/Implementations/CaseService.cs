@@ -161,76 +161,6 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-
-            var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanAddActions == true).AnyAsync();
-            if (!hasPerm)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditPermissions == true).AnyAsync();
-            if (!hasPerm)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCaseActions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewActions == true).AnyAsync();
-            if (!hasPermission)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var linkExists = await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
-            if (!linkExists)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCasePermissions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPerms = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewPermissions == true).AnyAsync();
-            if (!hasPerms)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-            result.Succeeded = true;
-            return result;
-        }
-
         public async Task<CaseResult> CreateAsync(Case caseToCreate)
         {
             var result = new CaseResult();
@@ -409,11 +339,6 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
         }
 
-        public async Task<CasePermission?> FindCasePermissionById(Case @case, string permissionId)
-        {
-            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.Id == permissionId).FirstOrDefaultAsync();
-        }
-
         public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
         {
             return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
@@ -439,42 +364,6 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
         }
 
-        public async Task<MyCasePermissionResult> GetUserCasePermissions(Case @case, string userId)
-        {
-            var result = new MyCasePermissionResult();
-
-            var perm = await _dbcontext.CasePermissions
-                .Where(x => x.CaseId == @case.Id && x.UserId == userId)
-                .FirstOrDefaultAsync();
-
-            if (perm is null)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "Permissions not found");
-                return result;
-            }
-
-            var perms = typeof(CasePermission)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.PropertyType == typeof(bool))
-                .Where(p => (bool)p.GetValue(perm)!)
-                .Select(p => p.Name)
-                .ToList();
-
-            result.Permissions = perms;
-            result.Succeeded = true;
-            return result;
-        }
-
-
-        public async Task<List<CasePermission>> GetCasePermissions(Case @case)
-        {
-            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
-
-        public async Task<List<CaseUser>> GetCaseUsers(Case @case)
-        {
-            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
 
         public async Task<List<IncidentType>> GetIncidentTypes(Case @case)
         {
@@ -601,17 +490,6 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<CaseResult> UpdateCasePermission(CasePermission permission)
-        {
-            var result = new CaseResult();
-
-            _dbcontext.CasePermissions.Update(permission);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
         public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
         {
             var result = new CaseResult();
@@ -625,20 +503,6 @@ namespace Cases.Application.Implementations
 
             _dbcontext.IncidentTypes.Update(incidentType);
             await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditIncidentType == true).AnyAsync();
-            if (!hasPermission)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
 
             result.Succeeded = true;
             return result;
