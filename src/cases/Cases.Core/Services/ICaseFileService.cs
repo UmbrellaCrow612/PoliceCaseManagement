@@ -11,7 +11,7 @@ namespace Cases.Core.Services
     {
         Task<CaseAttachmentFile?> FindByIdAsync(string fileId);
 
-        Task<IResult> UpdateAsync(CaseAttachmentFile file);
+        Task<IResult> UploadComplete(CaseAttachmentFile file);
 
         Task<(string preSignedUrl, string fileId)> AddAsync(Case @case, CaseAttachmentFileMetaData fileMetaData);
 

@@ -18,6 +18,12 @@ namespace Cases.Application.Implementations
             );
         }
 
+        public async Task<bool> CanUserAssignCaseUsers(string userId, string caseId)
+        {
+            return await _dbContext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == caseId && (x.CaseRole == Core.Models.CaseRole.Editor
+                     || x.CaseRole == Core.Models.CaseRole.Owner));
+        }
+
         public async Task<bool> CanUserEditIncidentTypes(string userId, string caseId)
         {
             return await _dbContext.CaseAccessLists.AnyAsync(x => x.CaseId == caseId && x.UserId == userId 
@@ -25,14 +31,16 @@ namespace Cases.Application.Implementations
                      || x.CaseRole == Core.Models.CaseRole.Owner));
         }
 
-        public Task<bool> CanUserViewCase(string userId, string caseId)
+        public async Task<bool> CanUserViewCase(string userId, string caseId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == caseId && (x.CaseRole == Core.Models.CaseRole.Editor
+                   || x.CaseRole == Core.Models.CaseRole.Owner));
         }
 
-        public Task<bool> CanUserViewCaseActions(string userId, string caseId)
+        public async Task<bool> CanUserViewCaseActions(string userId, string caseId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == caseId && (x.CaseRole == Core.Models.CaseRole.Editor
+                   || x.CaseRole == Core.Models.CaseRole.Owner));
         }
     }
 }

@@ -45,9 +45,8 @@ namespace Cases.API.Controllers
             {
                 return NotFound();
             }
-            attachment.UploadComplete();
 
-            var result = await _caseFileService.UpdateAsync(attachment);
+            var result = await _caseFileService.UploadComplete(attachment);
             if (!result.Succeeded)
             {
                 return BadRequest(result);

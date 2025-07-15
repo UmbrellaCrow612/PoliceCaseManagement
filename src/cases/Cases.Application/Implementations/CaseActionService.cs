@@ -1,6 +1,7 @@
 ﻿using Cases.Core.Models;
 using Cases.Core.Services;
 using Cases.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Results.Abstractions;
 
 namespace Cases.Application.Implementations
@@ -22,9 +23,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseActions.FindAsync(caseActionId);
         }
 
-        public Task<List<CaseAction>> GetAsync(Case @case)
+        public async Task<List<CaseAction>> GetAsync(Case @case)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.CaseActions.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
 

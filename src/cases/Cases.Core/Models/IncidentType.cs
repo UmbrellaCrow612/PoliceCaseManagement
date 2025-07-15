@@ -19,7 +19,6 @@ namespace Cases.Core.Models
         /// </summary>
         public string? Description { get; set; } = null;
 
-        // --- Relationships (using IDs for simplicity, could be full objects later) ---
 
         public ICollection<CaseIncidentType> CaseIncidentType { get; set; } = [];
     }

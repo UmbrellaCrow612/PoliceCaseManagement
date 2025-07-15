@@ -42,7 +42,7 @@ namespace Cases.API.Controllers
         [HttpGet("{incidentTypeId}")]
         public async Task<IActionResult> GetIncidentTypeDetailsById(string incidentTypeId)
         {
-            var incidentType = await _incidentTypeService.(incidentTypeId);
+            var incidentType = await _incidentTypeService.FindByIdAsync(incidentTypeId);
             if (incidentType is null)
             {
                 return NotFound();
