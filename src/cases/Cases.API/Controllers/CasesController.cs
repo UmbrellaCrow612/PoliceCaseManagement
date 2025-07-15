@@ -7,15 +7,13 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using StorageProvider.AWS;
 using Pagination.Abstractions;
 
 namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options, ICaseAuthorizationService caseAuthorizationService, IIncidentTypeService incidentTypeService) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, ICaseAuthorizationService caseAuthorizationService, IIncidentTypeService incidentTypeService) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
@@ -23,9 +21,6 @@ namespace Cases.API.Controllers
         private readonly CaseValidator _caseValidator = caseValidator;
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
         private readonly IRedisService _redisService = redisService;
-        private readonly CaseUserMapping _caseUserMapping = new();
-        private readonly CasePermissionMapping _casePermissionMapping = new();
-        private readonly AWSSettings _awsSettings = options.Value;
         private readonly ICaseAuthorizationService _caseAuthorizationService = caseAuthorizationService;
         private readonly IIncidentTypeService _incidentTypeService = incidentTypeService;
 
@@ -41,7 +36,6 @@ namespace Cases.API.Controllers
 
             return Ok();
         }
-
 
         [Authorize]
         [HttpGet("{caseId}")]
@@ -151,7 +145,6 @@ namespace Cases.API.Controllers
 
             return Ok(dtoResult);
         }
-
 
         [Authorize]
         [HttpGet("{caseId}/incident-types")]
