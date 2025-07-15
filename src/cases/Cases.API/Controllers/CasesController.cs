@@ -176,16 +176,24 @@ namespace Cases.API.Controllers
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var users = await _caseService.GetCaseUsers(_case);
-            List<CaseUserDto> dto = [.. users.Select(x => _caseUserMapping.ToDto(x))];
+            var users = await _caseService.GetUsersAsync(_case);
 
-            return Ok(dto);
+            return Ok(users);
         }
 
         [Authorize]
         [HttpPost("{caseId}/users")]
         public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUserToCaseDto dto)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.CanUserAssignCaseUsers(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 

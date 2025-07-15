@@ -87,19 +87,15 @@ namespace Cases.Core.Models
         public ICollection<CaseAction> CaseActions { get; set; } = [];
 
         /// <summary>
-        /// All users linked to this case
+        /// All the users who are assigned to it and there role
         /// </summary>
-        public ICollection<CaseUser> CaseUsers { get; set; } = [];
+        public ICollection<CaseAccessList> CaseAccessLists { get; set; } = [];
 
         /// <summary>
         /// List of file meta data for attachments for the given case
         /// </summary>
         public ICollection<CaseAttachmentFile> CaseAttachmentFiles { get; set; } = [];
 
-        /// <summary>
-        /// List of ABAC for the case applied to user actions
-        /// </summary>
-        public ICollection<CasePermission> CasePermissions { get; set; } = [];
 
         /// <summary>
         /// List of Evidence this case is linked to

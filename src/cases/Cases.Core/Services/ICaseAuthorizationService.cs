@@ -19,4 +19,7 @@
         Task<bool> CanUserAddActions(string userId, string caseId);
 
         Task<bool> CanUserViewCaseActions(string userId, string caseId);
+
+        Task<bool> CanUserAssignCaseUsers(string userId, string caseId);
+    }
 }

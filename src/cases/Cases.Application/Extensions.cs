@@ -21,6 +21,8 @@ namespace Cases.Application
             services.AddScoped<ICaseService, CaseService>();
             services.AddScoped<ICaseActionService, CaseActionService>();
             services.AddScoped<ICaseAuthorizationService, CaseAuthorizationService>();
+            services.AddScoped<ICaseFileService, CaseFileService>();
+            services.AddScoped<IIncidentTypeService, IncidentTypeService>();
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()

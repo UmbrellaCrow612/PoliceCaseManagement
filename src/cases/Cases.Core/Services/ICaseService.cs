@@ -41,7 +41,7 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="case">The case to link to</param>
         /// <param name="userId">User id to link to it</param>
-        Task<CaseResult> AddUser(Case @case, string userId);
+        Task<IResult> AddUser(Case @case, string userId);
 
         /// <summary>
         /// Remove assigned user from a case
@@ -49,6 +49,13 @@ namespace Cases.Core.Services
         /// <param name="userId">The ID of he user to remove</param>
         /// <param name="case">The case you want to remove them from</param>
         Task<CaseResult> RemoveUser(Case @case, string userId);
+
+        /// <summary>
+        /// Get a list of <see cref="CaseAccessList"/> for the specific <see cref="Case"/> - these are all the people linked to them
+        /// </summary>
+        /// <param name="case"></param>
+        /// <returns></returns>
+        Task<List<CaseAccessList>> GetUsersAsync(Case @case);
     }
 
     /// <summary>
