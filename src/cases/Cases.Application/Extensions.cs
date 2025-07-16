@@ -31,9 +31,8 @@ namespace Cases.Application
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseActionDenormalizedFields>();
-                x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseUsersDenormalizedFields>();
                 x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseDenormalizedFields>();
-                x.AddConsumer<UserUpdatedEventConsumer_UpdateCasePermissionDenormalizedFields>();
+                x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseAccessListDenormalizedFields>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -46,9 +45,8 @@ namespace Cases.Application
                     cfg.ReceiveEndpoint("cases-queue-name", e =>
                     {
                         e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseActionDenormalizedFields>(context);
-                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseUsersDenormalizedFields>(context);
                         e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseDenormalizedFields>(context);
-                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCasePermissionDenormalizedFields>(context);
+                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseAccessListDenormalizedFields>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

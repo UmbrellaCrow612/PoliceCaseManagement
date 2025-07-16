@@ -25,9 +25,7 @@
   </div>
 
   <div #addButtonContainer>
-    @if (hasRequiredPerms([allPermissions.canAddActions],currentPermissions)) {
     <button mat-raised-button (click)="addCaseActionClicked()">Add</button>
-    }
   </div>
 </div>
 }

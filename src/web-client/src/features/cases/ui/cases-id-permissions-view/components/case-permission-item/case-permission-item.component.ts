@@ -10,7 +10,6 @@ import {
 import { CaseService } from '../../../../../../core/cases/services/case.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { formatBackendError } from '../../../../../../core/app/errors/formatError';
-import { hasRequiredPermissions } from '../../../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-case-permission-item',
@@ -24,14 +23,8 @@ export class CasePermissionItemComponent implements OnInit {
     private readonly snackBar: MatSnackBar
   ) {}
   ngOnInit(): void {
-    if (
-      !hasRequiredPermissions(
-        [this.casePermissionNames.canEditPermissions],
-        this.currentUserCasePermissions()
-      )
-    ) {
+  
       this.disbaleItem = true;
-    }
   }
   permissionData = input.required<CasePermission>();
 

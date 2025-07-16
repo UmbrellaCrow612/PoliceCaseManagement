@@ -34,42 +34,36 @@ export class HeaderProfileComponent {
       href: '/profile',
       authorizedRoles: [],
       iconName: 'person',
-      permissionsNeeded: []
     },
     {
       name: 'Administration',
       href: '/administration',
       authorizedRoles: [UserRoles.Admin],
       iconName: 'shield_person',
-      permissionsNeeded: []
     },
     {
       name: 'Dashboard',
       href: '/dashboard',
       authorizedRoles: [],
       iconName: 'dashboard',
-      permissionsNeeded: []
     },
     {
       name: 'Cases',
       href: '/cases',
       authorizedRoles: [],
       iconName: 'cases',
-      permissionsNeeded: []
     },
     {
       name: 'System',
       href: '/system',
       authorizedRoles: [UserRoles.Admin],
       iconName: 'hub',
-      permissionsNeeded: []
     },
     {
       name: 'Evidence',
       href: '/evidence',
       authorizedRoles: [],
       iconName: 'description',
-      permissionsNeeded: []
     },
   ];
 

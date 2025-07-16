@@ -15,7 +15,6 @@ import { AppLink } from '../../../../core/app/type';
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { hasRequiredPermissions } from '../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-cases-id-view',
@@ -59,7 +58,6 @@ export class CasesIdViewComponent implements OnInit {
   incidentTypes: IncidentType[] = [];
 
   hasRequiredRole = hasRequiredRole;
-  hasRequiredPermissions = hasRequiredPermissions;
   userRoles = UserRoles;
   currentUserRoles: string[] = [];
   currentPermissions: string[] = [];
@@ -80,7 +78,7 @@ export class CasesIdViewComponent implements OnInit {
     forkJoin([
       this.caseService.getCaseById(this.caseId),
       this.caseService.getIncidentTypes(this.caseId),
-      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+      this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
       next: ([caseDetails, incidentTypes, currentPerms]) => {
         this.caseDetails = caseDetails;
@@ -111,25 +109,21 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './actions',
       name: 'Actions',
-      permissionsNeeded: [CasePermissionNames.canViewActions],
     },
     {
       authorizedRoles: [],
       href: './assigned-users',
       name: 'Assigned Officers',
-      permissionsNeeded: [CasePermissionNames.canViewAssigned],
     },
     {
       authorizedRoles: [],
       href: './attachments',
       name: 'File attachments',
-      permissionsNeeded: [CasePermissionNames.canViewFileAttachments],
     },
     {
       authorizedRoles: [],
       href: './permissions',
       name: 'Permissions',
-      permissionsNeeded: [CasePermissionNames.canViewPermissions],
     },
   ];
 }

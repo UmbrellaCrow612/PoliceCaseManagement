@@ -71,7 +71,7 @@ export class CasesIdPermissionsViewComponent implements OnInit {
 
     forkJoin([
       this.caseService.getPermissions(this.caseId),
-      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+      this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
       next: ([perms, currentUserPerms]) => {
         this.permissions = perms.filter((x) => x.userId !== this.currentUserId); // remove current user perms from UI

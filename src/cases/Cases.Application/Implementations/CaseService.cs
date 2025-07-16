@@ -141,6 +141,11 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
         }
 
+        public async Task<bool> IsUserLinkedToCase(Case @case, string userId)
+        {
+            return await _dbcontext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == @case.Id);
+        }
+
         public async Task<CaseResult> RemoveUser(Case @case, string userId)
         {
             var result = new CaseResult();

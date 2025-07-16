@@ -217,5 +217,29 @@ namespace Cases.API.Controllers
 
             return NoContent();
         }
+
+        [Authorize]
+        [HttpGet("{caseId}/me")]
+        public async Task<IActionResult> GetCasePermissionForMe(string caseId)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var isLinked = await _caseService.IsUserLinkedToCase(_case, userId);
+            if (!isLinked)
+            {
+                return BadRequest();
+            }
+
+            var role = await _caseAuthorizationService.GetUserRole(_case, userId);
+
+            return Ok(role);
+        }
     }
 }

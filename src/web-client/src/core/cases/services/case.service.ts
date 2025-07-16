@@ -325,13 +325,13 @@ export class CaseService {
   }
 
   /**
-   * Get the current users permission for a given case - it will get the current context logeed in users permission for the given case
+   * Get the current users role for a given case - it will get the current context logeed in users role for the given case
    * @param caseId The Case to get the current requesting users permission for
-   * @returns The permission
+   * @returns The role
    */
-  getCurrentUsersPermissionForCase(caseId: string) {
+  getCurrentUsersRoleForCase(caseId: string) {
     return this.httpClient.get<string[]>(
-      `${this.BASE_URL}/cases/${caseId}/permissions/me`
+      `${this.BASE_URL}/cases/${caseId}/me`
     );
   }
 }

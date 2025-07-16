@@ -20,7 +20,6 @@ import { CaseActionDetailsComponent } from './components/case-action-details/cas
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { hasRequiredPermissions } from '../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-cases-id-actions-view',
@@ -59,10 +58,7 @@ export class CasesIdActionsViewComponent implements OnInit {
    * Copy of all case permissions in the system
    */
   readonly allPermissions = CasePermissionNames;
-  /**
-   * Copyt of the helper method to render stuff in UI based on perms
-   */
-  readonly hasRequiredPerms = hasRequiredPermissions;
+
   /**
    * Current user permissions they have on the given case
    */
@@ -99,7 +95,7 @@ export class CasesIdActionsViewComponent implements OnInit {
 
     forkJoin([
       this.caseService.getCaseActions(this.caseId),
-      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+      this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
       next: ([actions, perms]) => {
         this.caseActions = actions;

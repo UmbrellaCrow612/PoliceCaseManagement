@@ -10,6 +10,12 @@ from cases API project
 dotnet ef migrations add InitialCreate --project ../Cases.Infrastructure --startup-project .
 ```
 
+Then:
+
+```bash
+dotnet ef database update
+```
+
 
 Running
 

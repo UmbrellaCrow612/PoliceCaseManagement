@@ -56,6 +56,14 @@ namespace Cases.Core.Services
         /// <param name="case"></param>
         /// <returns></returns>
         Task<List<CaseAccessList>> GetUsersAsync(Case @case);
+
+        /// <summary>
+        /// Check to see if a user is linked to a specific <see cref="Case"/>
+        /// </summary>
+        /// <param name="case">The case to check against</param>
+        /// <param name="userId">The user to check</param>
+        /// <returns>A bool to indicate if they are or are not</returns>
+        Task<bool> IsUserLinkedToCase(Case @case, string userId);
     }
 
     /// <summary>
