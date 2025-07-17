@@ -22,6 +22,12 @@ namespace Cases.Core.Services
 
         Task<bool> CanUserViewCaseActions(string userId, string caseId);
 
+        /// <summary>
+        /// Checks if the current user is <see cref="CaseRole.Owner"/> of the case - only owners can assign new users to the case
+        /// </summary>
+        /// <param name="userId">The user to check</param>
+        /// <param name="caseId">The <see cref="Case"/> to check against</param>
+        /// <returns>A bool to indicate if they can or cannot perform the action</returns>
         Task<bool> CanUserAssignCaseUsers(string userId, string caseId);
 
         /// <summary>

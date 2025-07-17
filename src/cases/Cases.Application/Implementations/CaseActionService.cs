@@ -68,8 +68,5 @@ namespace Cases.Application.Implementations
             public required string Code { get; set; }
             public required string? Message { get; set; } = null;
         }
-
     }
-
-
 }

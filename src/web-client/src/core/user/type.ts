@@ -16,21 +16,19 @@ export interface RestrictedUser {
   userName: string;
 }
 
-
-
-export interface CaseUser {
-  /**
-   * NOTE: this is not the user ID but ID of the link between the case and user ID refer to user ID
-   */
-  id:string
-
+/**
+ * Details of a specific user linked to a specific case on there access list - contaisn there info and role on it
+ */
+export interface CaseAcessList {
+  id: string;
   /**
    * The given case they are linked to
    */
-  caseId:string
+  caseId: string;
 
+  userEmail: string;
+  userId: string;
+  userName: string;
 
-  userEmail:string
-  userId:string
-  userName:string
+  caseRole: number;
 }

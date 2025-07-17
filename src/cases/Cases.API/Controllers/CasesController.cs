@@ -26,6 +26,7 @@ namespace Cases.API.Controllers
         private readonly IIncidentTypeService _incidentTypeService = incidentTypeService;
         private readonly ICaseActionService _caseActionService = caseActionService;
         private readonly CaseActionMapping _caseActionMapping = new();
+        private readonly CaseAccessListMapping _caseAccessListMapping = new();
 
         [Authorize]
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
@@ -94,7 +95,6 @@ namespace Cases.API.Controllers
 
             return Ok(returnDto);
         }
-
      
         [Authorize]
         [HttpPost("{caseId}/incident-types/{incidentTypeId}")]
@@ -173,8 +173,9 @@ namespace Cases.API.Controllers
             if (_case is null) return NotFound();
 
             var users = await _caseService.GetUsersAsync(_case);
+            var dto = users.Select(x => _caseAccessListMapping.ToDto(x));
 
-            return Ok(users);
+            return Ok(dto);
         }
 
         [Authorize]
@@ -244,7 +245,6 @@ namespace Cases.API.Controllers
 
             return Ok(role);
         }
-
 
         [Authorize]
         [HttpPost("{caseId}/case-actions")]

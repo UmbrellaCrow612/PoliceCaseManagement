@@ -126,9 +126,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.FindAsync(caseId);
         }
 
-        public Task<List<CaseAccessList>> GetUsersAsync(Case @case)
+        public async Task<List<CaseAccessList>> GetUsersAsync(Case @case)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.CaseAccessLists.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<bool> IsCaseNumberTaken(string caseNumber)

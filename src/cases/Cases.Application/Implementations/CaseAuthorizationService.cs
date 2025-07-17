@@ -21,8 +21,7 @@ namespace Cases.Application.Implementations
 
         public async Task<bool> CanUserAssignCaseUsers(string userId, string caseId)
         {
-            return await _dbContext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == caseId && (x.CaseRole == Core.Models.CaseRole.Editor
-                     || x.CaseRole == Core.Models.CaseRole.Owner));
+            return await _dbContext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == caseId && x.CaseRole == CaseRole.Owner);
         }
 
         public async Task<bool> CanUserEditIncidentTypes(string userId, string caseId)

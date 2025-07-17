@@ -53,8 +53,6 @@ namespace Cases.Core.Services
         /// <summary>
         /// Get a list of <see cref="CaseAccessList"/> for the specific <see cref="Case"/> - these are all the people linked to them
         /// </summary>
-        /// <param name="case"></param>
-        /// <returns></returns>
         Task<List<CaseAccessList>> GetUsersAsync(Case @case);
 
         /// <summary>

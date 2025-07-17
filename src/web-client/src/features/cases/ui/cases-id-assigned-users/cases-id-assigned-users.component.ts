@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AssignUserDialogComponent } from './components/assign-user-dialog/assign-user-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { CaseService } from '../../../../core/cases/services/case.service';
-import { CaseUser, RestrictedUser } from '../../../../core/user/type';
+import { CaseAcessList, RestrictedUser } from '../../../../core/user/type';
 import { CommonModule } from '@angular/common';
 import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
@@ -30,7 +30,7 @@ export class CasesIdAssignedUsersComponent implements OnInit {
   }
 
   caseId: string | null = null;
-  assignedUsers: CaseUser[] = [];
+  assignedUsers: CaseAcessList[] = [];
   isLoading = true;
   error: string | null = null;
 
