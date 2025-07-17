@@ -25,7 +25,10 @@
   </div>
 
   <div #addButtonContainer>
+    @if (currentUserRole == copy_caseRoles.Owner || currentUserRole ==
+    copy_caseRoles.Editor) {
     <button mat-raised-button (click)="addCaseActionClicked()">Add</button>
+    }
   </div>
 </div>
 }

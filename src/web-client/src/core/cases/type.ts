@@ -49,35 +49,7 @@ export interface CaseAttachment {
   uploadedAt: Date;
 }
 
-export interface CasePermission {
-  /**
-   * This is the unique ID of the permission record (not the user's ID).
-   * Use the userId field to identify the user this permission belongs to.
-   */
-  id: string;
-
-  canEdit: boolean;
-  canViewPermissions: boolean;
-  canEditPermissions: boolean;
-
-  canViewFileAttachments: boolean;
-  canDeleteFileAttachments: boolean;
-
-  canViewAssigned: boolean;
-  canAssign: boolean;
-  canRemoveAssigned: boolean;
-
-  canViewActions: boolean;
-  canAddActions: boolean;
-  canEditActions: boolean;
-  canDeleteActions: boolean;
-
-  canEditIncidentType:boolean;
-
-  caseId: string;
-  userId: string;
-  userName: string;
-}
+export interface CasePagedResult extends PagedResult<Case> {}
 
 /**
  * Array containing the backend enum mapped here
@@ -106,48 +78,22 @@ export const CasePriorityNames: { name: string; number: number }[] = [
   { name: 'Critical', number: 4 },
 ];
 
-export interface CasePagedResult extends PagedResult<Case> {}
-
 /**
- * Contains all the permissions for cases mapped from the model table names
+ * The backend enum for CaseRole mapped over here
  */
-export const CasePermissionNames = {
-  canEdit: 'CanEdit',
-  canViewPermissions: 'CanViewPermissions',
-  canEditPermissions: 'CanEditPermissions',
-
-  canViewFileAttachments: 'CanViewFileAttachments',
-  canDeleteFileAttachments: 'CanDeleteFileAttachments',
-
-  canViewAssigned: 'CanViewAssigned',
-  canAssign: 'CanAssign',
-  canRemoveAssigned: 'CanRemoveAssigned',
-
-  canViewActions: 'CanViewActions',
-  canAddActions: 'CanAddActions',
-  canEditActions: 'CanEditActions',
-  canDeleteActions: 'CanDeleteActions',
-
-  canEditIncidentType: 'CanEditIncidentType',
+export const CaseRoleNames = {
+  /**
+   * The person who created the case
+   */
+  Owner: 0,
 
   /**
-   * Returns an array of all permission names
+   * A person who can view and edit some aspects of the case
    */
-  all(): string[] {
-    return [
-      this.canEdit,
-      this.canViewPermissions,
-      this.canEditPermissions,
-      this.canViewFileAttachments,
-      this.canDeleteFileAttachments,
-      this.canViewAssigned,
-      this.canAssign,
-      this.canRemoveAssigned,
-      this.canViewActions,
-      this.canAddActions,
-      this.canEditActions,
-      this.canDeleteActions,
-      this.canEditIncidentType,
-    ];
-  },
+  Editor: 1,
+
+  /**
+   * A person who can only view details
+   */
+  Viwer: 2,
 };

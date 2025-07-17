@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { canDeactivateGuard } from '../../core/app/guards/canDeactivateGuard';
-import { rolesAuthorizationGuard } from '../../core/authentication/guards/roles-authorization.guard';
-import { UserRoles } from '../../core/authentication/roles';
 
 export const CASES_ROUTES: Routes = [
   {
@@ -76,13 +74,7 @@ export const CASES_ROUTES: Routes = [
             './ui//cases-id-attachments-view/cases-id-attachments-view.component'
           ).then((c) => c.CasesIdAttachmentsViewComponent),
       },
-      {
-        path: ':caseId/permissions',
-        loadComponent: () =>
-          import(
-            './ui//cases-id-permissions-view/cases-id-permissions-view.component'
-          ).then((c) => c.CasesIdPermissionsViewComponent),
-      },
+     
     ],
   },
 ];

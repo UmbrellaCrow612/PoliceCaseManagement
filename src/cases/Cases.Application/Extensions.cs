@@ -8,6 +8,7 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StorageProvider.AWS;
+using System.Reflection;
 using User.V1;
 
 namespace Cases.Application
@@ -30,9 +31,7 @@ namespace Cases.Application
 
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseActionDenormalizedFields>();
-                x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseDenormalizedFields>();
-                x.AddConsumer<UserUpdatedEventConsumer_UpdateCaseAccessListDenormalizedFields>();
+                x.AddConsumers(Assembly.GetExecutingAssembly());
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -44,9 +43,7 @@ namespace Cases.Application
 
                     cfg.ReceiveEndpoint("cases-queue-name", e =>
                     {
-                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseActionDenormalizedFields>(context);
-                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseDenormalizedFields>(context);
-                        e.ConfigureConsumer<UserUpdatedEventConsumer_UpdateCaseAccessListDenormalizedFields>(context);
+                        cfg.ConfigureEndpoints(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

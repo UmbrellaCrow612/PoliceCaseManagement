@@ -6,7 +6,6 @@ import {
   CaseAction,
   CaseAttachment,
   CasePagedResult,
-  CasePermission,
   CreateCase,
   CreateCaseAction,
 } from '../type';
@@ -300,37 +299,14 @@ export class CaseService {
     );
   }
 
-  /**
-   * Get all the case level permissions set on a given case by it's ID - NOTE: Only admins can CRUD these
-   * @param caseId The ID of the case to fetch it for
-   * @returns List of permissions
-   */
-  getPermissions(caseId: string) {
-    return this.httpClient.get<CasePermission[]>(
-      `${this.BASE_URL}/cases/${caseId}/permissions`
-    );
-  }
-
-  /**
-   * Update a case permission
-   * @param permission The updated object
-   */
-  updatePermission(permission: CasePermission) {
-    return this.httpClient.put(
-      `${this.BASE_URL}/cases/${permission.caseId}/permissions/${permission.id}`,
-      {
-        ...permission,
-      }
-    );
-  }
 
   /**
    * Get the current users role for a given case - it will get the current context logeed in users role for the given case
    * @param caseId The Case to get the current requesting users permission for
-   * @returns The role
+   * @returns The role - enum number
    */
   getCurrentUsersRoleForCase(caseId: string) {
-    return this.httpClient.get<string[]>(
+    return this.httpClient.get<number>(
       `${this.BASE_URL}/cases/${caseId}/me`
     );
   }
