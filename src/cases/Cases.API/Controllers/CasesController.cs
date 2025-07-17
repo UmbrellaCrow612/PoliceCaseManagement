@@ -180,7 +180,7 @@ namespace Cases.API.Controllers
 
         [Authorize]
         [HttpPost("{caseId}/users")]
-        public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUserToCaseDto dto)
+        public async Task<IActionResult> AssignUserToCase(string caseId, [FromBody] AssignUserToCaseDto dto)
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();

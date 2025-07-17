@@ -15,17 +15,14 @@
   <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
   <h1>Assigned Officers</h1>
   <div class="assigned_users_list_container">
-    @for (caseUsers of assignedUsers; track $index) {
+    @for (caseUser of assignedUsers; track $index) {
     <div class="user_details">
       <span>
-        {{ caseUsers.userName }}
+        Username: {{ caseUser.userName }} Role: {{ caseUser.caseRole | caseRolePipe }}
       </span>
 
-      @if (caseUsers.userId !== currentUserId) {
-      <button
-        mat-button
-        (click)="removeUserClicked(caseUsers.userId)"
-      >
+      @if (caseUser.userId !== currentUserId) {
+      <button mat-button (click)="removeUserClicked(caseUser.userId)">
         Remove
       </button>
       }

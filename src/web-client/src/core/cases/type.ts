@@ -95,5 +95,24 @@ export const CaseRoleNames = {
   /**
    * A person who can only view details
    */
-  Viwer: 2,
-};
+  Viewer: 2,
+} as const;
+
+// Type: 'Owner' | 'Editor' | 'Viewer'
+/**
+ * String name value of CaseRoleNames
+ */
+export type CaseRoleName = keyof typeof CaseRoleNames;
+
+// Type: 0 | 1 | 2
+/**
+ * Values of CaseRoleNames which is a number
+ */
+export type CaseRoleValue = (typeof CaseRoleNames)[CaseRoleName];
+
+/**
+ * CaseRoleNames Map to be used with index access
+ */
+export const CaseRoleNameMap = Object.fromEntries(
+  Object.entries(CaseRoleNames).map(([key, value]) => [value, key])
+) as Record<CaseRoleValue, CaseRoleName>;

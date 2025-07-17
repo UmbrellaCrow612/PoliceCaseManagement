@@ -35,3 +35,4 @@ if (this.form.valid) {
 - Sync reactive form validators preface with `Validator` like `Validator_containsOnlyNumeric` - any none domain specific logic put it on `control.ts` else 
 make a specific folder within the business domain folder validators for example `cases/validators/...`
 - Async reactive form validators use `UniqueEvidenceReferenceNumberAsyncValidator` as a ref
+- Use `dialogs` for basic linking - editing and creating of items - refer to how case action is created through a dialog

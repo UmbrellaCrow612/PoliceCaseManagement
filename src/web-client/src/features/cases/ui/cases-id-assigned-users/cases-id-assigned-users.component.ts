@@ -10,10 +10,11 @@ import { formatBackendError } from '../../../../core/app/errors/formatError';
 import { BackNavigationButtonComponent } from '../../../../core/components/back-navigation-button/back-navigation-button.component';
 import { RemoveAssignedUserDialogComponent } from './components/remove-assigned-user-dialog/remove-assigned-user-dialog.component';
 import { UserService } from '../../../../core/user/services/user.service';
+import { CaseRolePipe } from '../../../../core/cases/pipes/caseRolePipe';
 
 @Component({
   selector: 'app-cases-id-assigned-users',
-  imports: [MatButtonModule, CommonModule, BackNavigationButtonComponent],
+  imports: [MatButtonModule, CommonModule, BackNavigationButtonComponent, CaseRolePipe],
   templateUrl: './cases-id-assigned-users.component.html',
   styleUrl: './cases-id-assigned-users.component.css',
 })

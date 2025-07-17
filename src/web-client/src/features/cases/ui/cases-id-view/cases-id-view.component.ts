@@ -96,6 +96,11 @@ export class CasesIdViewComponent implements OnInit {
     });
   }
 
+
+  editIncidentTypeClicked(){
+    
+  }
+
   links: AppLink[] = [
     {
       authorizedRoles: [],

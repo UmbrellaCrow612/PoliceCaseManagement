@@ -1,3 +1,5 @@
+import { CaseRoleValue } from '../cases/type';
+
 /**
  * Represents a user obj
  */
@@ -30,5 +32,5 @@ export interface CaseAcessList {
   userId: string;
   userName: string;
 
-  caseRole: number;
+  caseRole: CaseRoleValue;
 }
