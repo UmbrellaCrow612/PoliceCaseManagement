@@ -40,11 +40,14 @@
             DeletedAt = DateTime.UtcNow;
         }
 
-
-
-        public void UploadComplete()
+        public void MarkUploadComplete()
         {
             FileUploadStatus = FileUploadStatus.Uploaded;
+        }
+
+        public bool IsAlreadyUploadCompleted()
+        {
+            return FileUploadStatus == FileUploadStatus.Uploaded;
         }
     }
 

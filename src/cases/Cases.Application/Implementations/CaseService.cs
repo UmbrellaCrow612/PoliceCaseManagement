@@ -1,232 +1,53 @@
-﻿using System.Reflection;
-using Cases.Application.Codes;
+﻿using Cases.Application.Codes;
 using Cases.Core.Models;
-using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using StorageProvider.Abstractions;
-using StorageProvider.AWS;
-using User.V1;
+using Pagination.Abstractions;
+using Results.Abstractions;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, IStorageProvider storageProvider, IOptions<AWSSettings> options) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
-        private readonly IStorageProvider _storageProvider = storageProvider;
-        private readonly AWSSettings _aWSSettings = options.Value;
 
-        public async Task<CaseResult> AddCaseAction(Case @case, CaseAction caseAction)
+        public async Task<IResult> AddUser(Case @case, string userId)
         {
-            _logger.LogInformation("Started trying to add a case action: {caseActionId} to a case: {caseId}", caseAction.Id, @case.Id);
-
             var result = new CaseResult();
 
-            if (caseAction.CaseId is null)
+            var isUserAlreadyAssignedToCase = await _dbcontext.CaseAccessLists.AnyAsync(x => x.CaseId == @case.Id && x.UserId == userId);
+            if (isUserAlreadyAssignedToCase)
             {
-                result.AddError(BusinessRuleCodes.ValidationError, "Case Id for case action is null");
+                result.AddError(BusinessRuleCodes.UserAlreadyAssignedToCase, "User already assigned to case");
                 return result;
             }
 
-            if (caseAction.CaseId != @case.Id)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "Case action not properly linked to the provided case id");
-                return result;
-            }
-
-            if (caseAction.CreatedById is null)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "Case action created by ID is null");
-                return result;
-            }
-
-            var userExists = await _userValidationService.DoesUserExistAsync(caseAction.CreatedById);
+            var userExists = await _userValidationService.DoesUserExistAsync(userId);
             if (!userExists)
             {
-                result.AddError(BusinessRuleCodes.ValidationError, "Created by ID user dose not exist");
+                result.AddError(BusinessRuleCodes.UserNotFound, "User not found");
                 return result;
             }
 
-            var deNormUserDetails = await _userValidationService.GetUserById(caseAction.CreatedById);
-            caseAction.CreatedByName = deNormUserDetails.Username;
-            caseAction.CreatedByEmail = deNormUserDetails.Email;
+            var userDetails = await _userValidationService.GetUserById(userId);
 
-            await _dbcontext.CaseActions.AddAsync(caseAction);
-            await _dbcontext.SaveChangesAsync();
-
-            _logger.LogInformation("Saved and added case action: {caseActionId} to case: {caseId}.", caseAction.Id, @case.Id);
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> AddToIncidentType(Case @case, IncidentType incidentType)
-        {
-            var result = new CaseResult();
-
-            var isIncidentTypeAlreadyLinkedToCase = await _dbcontext.CaseIncidentTypes.AnyAsync(x => x.CaseId == @case.Id && x.IncidentTypeId == incidentType.Id);
-            if (isIncidentTypeAlreadyLinkedToCase)
-            {
-                result.AddError(BusinessRuleCodes.IncidentTypeAlreadyLinkedToCase, $@"Incident type ${incidentType.Name} already linked to case.");
-                return result;
-            }
-
-            var join = new CaseIncidentType
+            var link = new CaseAccessList
             {
                 CaseId = @case.Id,
-                IncidentTypeId = incidentType.Id
+                CaseRole = CaseRole.Viewer,
+                UserEmail = userDetails.Email,
+                UserId = userId,
+                UserName = userDetails.Username
             };
-            await _dbcontext.CaseIncidentTypes.AddAsync(join);
-            await _dbcontext.SaveChangesAsync();
+            await _dbcontext.CaseAccessLists.AddAsync(link);
 
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> AddUsers(Case @case, List<string> userIds)
-        {
-            var result = new CaseResult();
-
-            if (userIds.Count < 1)
-            {
-                result.Succeeded = true;
-                return result;
-            }
-
-            var currentAssignedUsers = await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
-
-            bool anyMatch = currentAssignedUsers.Any(cu => userIds.Contains(cu.UserId)); // we do not want to assign users currently assigned
-            if (anyMatch)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "Cannot assign a user to this case who is already assigned to it");
-                return result;
-            }
-
-            foreach (var userId in userIds)
-            {
-                var exists = await _userValidationService.DoesUserExistAsync(userId);
-                if (!exists)
-                {
-                    result.AddError(BusinessRuleCodes.ValidationError, "User to assign dose not exist");
-                    return result;
-                }
-            }
-
-            List<CasePermission> defaultCasePermissions = [];
-            List<GetUserByIdResponse> userDetails = [];
-            foreach (var userId in userIds)
-            {
-                userDetails.Add(await _userValidationService.GetUserById(userId));
-            }
-
-            foreach (var user in userDetails)
-            {
-                defaultCasePermissions.Add(new CasePermission
-                {
-                    CanAssign = false,
-                    CanEdit = false,
-                    CaseId = @case.Id,
-                    UserId = user.UserId,
-                    UserName = user.Username,
-                    CanAddActions = false,
-                    CanDeleteActions = false,
-                    CanDeleteFileAttachments = false,
-                    CanEditActions = false,
-                    CanEditPermissions = false,
-                    CanRemoveAssigned = false,
-                    CanViewActions = false,
-                    CanViewAssigned = false,
-                    CanViewFileAttachments = false,
-                    CanViewPermissions = false,
-                    CanEditIncidentType = false,
-                });
-            }
-
-            List<CaseUser> linksToThisCase = [.. userDetails.Select(x => new CaseUser { CaseId = @case.Id, UserEmail = x.Email, UserId = x.UserId, UserName = x.Username })];
-            await _dbcontext.CaseUsers.AddRangeAsync(linksToThisCase);
-
-            await _dbcontext.CasePermissions.AddRangeAsync(defaultCasePermissions);
-
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserCreateCaseActions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-
-            var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanAddActions == true).AnyAsync();
-            if (!hasPerm)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserEditCasePermissions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPerm = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditPermissions == true).AnyAsync();
-            if (!hasPerm)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCaseActions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewActions == true).AnyAsync();
-            if (!hasPermission)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCaseDetails(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var linkExists = await _dbcontext.CaseUsers.Where(x => x.CaseId == caseId && x.UserId == userId).AnyAsync();
-            if (!linkExists)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserViewCasePermissions(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPerms = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanViewPermissions == true).AnyAsync();
-            if (!hasPerms)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
             result.Succeeded = true;
             return result;
         }
@@ -264,139 +85,40 @@ namespace Cases.Application.Implementations
 
             if (caseToCreate.ReportingOfficerId != caseToCreate.CreatedById)
             {
-                var permissionsForCreator = new CasePermission
+                var creatorPermission = new CaseAccessList
                 {
-                    CanAssign = true,
-                    CanEdit = true,
-                    CanAddActions = true,
-                    CanDeleteActions = true,
-                    CanDeleteFileAttachments = true,
                     CaseId = caseToCreate.Id,
+                    CaseRole = CaseRole.Owner,
+                    UserEmail = createdByDetails.Email,
                     UserId = createdByDetails.UserId,
-                    UserName = createdByDetails.Username,
-                    CanEditActions = true,
-                    CanEditPermissions = true,
-                    CanRemoveAssigned = true,
-                    CanViewActions = true,
-                    CanViewAssigned = true,
-                    CanViewFileAttachments = true,
-                    CanViewPermissions = true,
-                    CanEditIncidentType = true,
+                    UserName = createdByDetails.Username
                 };
-                var permissionsForReportingOfficer = new CasePermission
+                var reportingOfficerPermission = new CaseAccessList
                 {
-                    CanAssign = true,
-                    CanEdit = true,
                     CaseId = caseToCreate.Id,
+                    CaseRole = CaseRole.Editor,
+                    UserEmail = reportingOfficerDetails.Email,
                     UserId = reportingOfficerDetails.UserId,
-                    UserName = reportingOfficerDetails.Username,
-                    CanAddActions = true,
-                    CanDeleteActions = true,
-                    CanDeleteFileAttachments = true,
-                    CanEditActions = true,
-                    CanEditPermissions = true,
-                    CanRemoveAssigned = true,
-                    CanViewActions = true,
-                    CanViewAssigned = true,
-                    CanViewFileAttachments = true,
-                    CanViewPermissions = true,
-                    CanEditIncidentType = true,
+                    UserName = reportingOfficerDetails.Username
                 };
-
-                var assignReportingOfficerToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = reportingOfficerDetails.Email, UserId = reportingOfficerDetails.UserId, UserName = reportingOfficerDetails.Username };
-                var assignCreatorToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
-
-                await _dbcontext.CasePermissions.AddRangeAsync([permissionsForCreator, permissionsForReportingOfficer]);
-                await _dbcontext.CaseUsers.AddRangeAsync([assignReportingOfficerToCaseLink, assignCreatorToCaseLink]);
-            }
-            else
+                await _dbcontext.CaseAccessLists.AddRangeAsync([creatorPermission, reportingOfficerPermission]);
+            } else
             {
-                var permission = new CasePermission
+                var creatorPermission = new CaseAccessList
                 {
-                    CanAssign = true,
-                    CanEdit = true,
                     CaseId = caseToCreate.Id,
+                    CaseRole = CaseRole.Owner,
+                    UserEmail = createdByDetails.Email,
                     UserId = createdByDetails.UserId,
-                    UserName = createdByDetails.Username,
-                    CanAddActions = true,
-                    CanDeleteActions = true,
-                    CanDeleteFileAttachments = true,
-                    CanEditActions = true,
-                    CanEditPermissions = true,
-                    CanRemoveAssigned = true,
-                    CanViewActions = true,
-                    CanViewAssigned = true,
-                    CanViewFileAttachments = true,
-                    CanViewPermissions = true,
-                    CanEditIncidentType = true,
+                    UserName = createdByDetails.Username
                 };
-                var assignUserToCaseLink = new CaseUser { CaseId = caseToCreate.Id, UserEmail = createdByDetails.Email, UserId = createdByDetails.UserId, UserName = createdByDetails.Username };
-
-                await _dbcontext.CasePermissions.AddAsync(permission);
-                await _dbcontext.CaseUsers.AddAsync(assignUserToCaseLink);
+                await _dbcontext.CaseAccessLists.AddAsync(creatorPermission);
             }
 
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
             return result;
-        }
-
-        public async Task<CaseResult> CreateIncidentType(IncidentType incidentType)
-        {
-            var result = new CaseResult();
-
-            var incidentTypeAlreadyExists = await _dbcontext.IncidentTypes.AnyAsync(x => x.Name == incidentType.Name);
-            if (incidentTypeAlreadyExists)
-            {
-                result.AddError(BusinessRuleCodes.IncidentTypeAlreadyExists, "Trying to create a Incident Type that already exists.");
-                return result;
-            }
-
-            await _dbcontext.IncidentTypes.AddAsync(incidentType);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-
-        public async Task<CaseResult> DeleteAttachment(CaseAttachmentFile file)
-        {
-            var result = new CaseResult();
-
-            if (file.IsDeleted)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "File already deleted");
-                return result;
-            }
-
-            file.Delete();
-            _dbcontext.CaseAttachmentFiles.Update(file);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> DeleteIncidentType(IncidentType incidentType)
-        {
-            var result = new CaseResult();
-
-            var joins = await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).ToListAsync();
-            _dbcontext.RemoveRange(joins);
-            _dbcontext.Remove(incidentType);
-
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<string> DownloadCaseAttachment(CaseAttachmentFile caseAttachmentFile)
-        {
-            var url = await _storageProvider.GetPreSignedDownloadUrlAsync(caseAttachmentFile.S3Key);
-            return url;
         }
 
         public async Task<Case?> FindById(string caseId)
@@ -404,81 +126,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.FindAsync(caseId);
         }
 
-        public async Task<CaseAttachmentFile?> FindCaseAttachmentById(string caseAttachmentId)
+        public async Task<List<CaseAccessList>> GetUsersAsync(Case @case)
         {
-            return await _dbcontext.CaseAttachmentFiles.FindAsync(caseAttachmentId);
-        }
-
-        public async Task<CasePermission?> FindCasePermissionById(Case @case, string permissionId)
-        {
-            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.Id == permissionId).FirstOrDefaultAsync();
-        }
-
-        public async Task<IncidentType?> FindIncidentTypeById(string incidentTypeId)
-        {
-            return await _dbcontext.IncidentTypes.FindAsync(incidentTypeId);
-        }
-
-        public async Task<List<IncidentType>> GetAllIncidentTypes()
-        {
-            return await _dbcontext.IncidentTypes.ToListAsync();
-        }
-
-        public async Task<List<CaseAction>> GetCaseActions(Case @case)
-        {
-            return await _dbcontext.CaseActions.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
-
-        public async Task<List<CaseAttachmentFile>> GetCaseAttachments(Case @case)
-        {
-            return await _dbcontext.CaseAttachmentFiles.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
-
-        public async Task<int> GetCaseIncidentCount(IncidentType incidentType)
-        {
-            return await _dbcontext.CaseIncidentTypes.Where(x => x.IncidentTypeId == incidentType.Id).CountAsync();
-        }
-
-        public async Task<MyCasePermissionResult> GetUserCasePermissions(Case @case, string userId)
-        {
-            var result = new MyCasePermissionResult();
-
-            var perm = await _dbcontext.CasePermissions
-                .Where(x => x.CaseId == @case.Id && x.UserId == userId)
-                .FirstOrDefaultAsync();
-
-            if (perm is null)
-            {
-                result.AddError(BusinessRuleCodes.ValidationError, "Permissions not found");
-                return result;
-            }
-
-            var perms = typeof(CasePermission)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.PropertyType == typeof(bool))
-                .Where(p => (bool)p.GetValue(perm)!)
-                .Select(p => p.Name)
-                .ToList();
-
-            result.Permissions = perms;
-            result.Succeeded = true;
-            return result;
-        }
-
-
-        public async Task<List<CasePermission>> GetCasePermissions(Case @case)
-        {
-            return await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
-
-        public async Task<List<CaseUser>> GetCaseUsers(Case @case)
-        {
-            return await _dbcontext.CaseUsers.Where(x => x.CaseId == @case.Id).ToListAsync();
-        }
-
-        public async Task<List<IncidentType>> GetIncidentTypes(Case @case)
-        {
-            return await _dbcontext.CaseIncidentTypes.Where(x => x.CaseId == @case.Id).Select(x => x.IncidentType).ToListAsync();
+            return await _dbcontext.CaseAccessLists.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
         public async Task<bool> IsCaseNumberTaken(string caseNumber)
@@ -491,31 +141,30 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
         }
 
+        public async Task<bool> IsUserLinkedToCase(Case @case, string userId)
+        {
+            return await _dbcontext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == @case.Id);
+        }
+
         public async Task<CaseResult> RemoveUser(Case @case, string userId)
         {
             var result = new CaseResult();
 
-            var join = await _dbcontext.CaseUsers.Where(x => x.UserId == userId && x.CaseId == @case.Id).FirstOrDefaultAsync();
-            if (join is null)
+            var caseAccessList = await _dbcontext.CaseAccessLists.Where(x => x.UserId == userId && x.CaseId == @case.Id).FirstOrDefaultAsync();
+            if (caseAccessList is null)
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "User is not linked to the given case already");
                 return result;
             }
 
-            var permissionForThisCase = await _dbcontext.CasePermissions.Where(x => x.CaseId == @case.Id && x.UserId == userId).FirstOrDefaultAsync();
-            if (permissionForThisCase is not null)
-            {
-                _dbcontext.CasePermissions.Remove(permissionForThisCase);
-            }
-
-            _dbcontext.CaseUsers.Remove(join);
+            _dbcontext.CaseAccessLists.Remove(caseAccessList);
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
             return result;
         }
 
-        public async Task<PagedResult<Case>> SearchCases(SearchCasesQuery query)
+        public async Task<PaginatedResult<Case>> SearchCases(SearchCasesQuery query)
         {
             IQueryable<Case> queryBuilder = _dbcontext.Cases.AsQueryable();
 
@@ -566,10 +215,11 @@ namespace Cases.Application.Implementations
 
             if (query.AssignedUserIds.Length != 0)
             {
-                queryBuilder = queryBuilder.Where(c => c.CaseUsers.Any(cu => query.AssignedUserIds.Contains(cu.UserId)));
+                queryBuilder = queryBuilder.Where(c => c.CaseAccessLists.Any(cu => query.AssignedUserIds.Contains(cu.UserId)));
             }
 
             var count = await queryBuilder.CountAsync();
+            var totalPages = count / query.PageSize;
 
             queryBuilder = queryBuilder.OrderBy(x => x.Id);
 
@@ -578,102 +228,18 @@ namespace Cases.Application.Implementations
                 .Take(query.PageSize)
                 .ToListAsync();
 
-            var result = new PagedResult<Case>(items, count, query.PageNumber, query.PageSize);
-            return result;
-        }
-
-        public async Task<CaseResult> UpdateCaseLinkedIncidentTypes(Case @case, List<IncidentType> incidentTypes)
-        {
-            var result = new CaseResult();
-
-            var currentlyLinkedIncidentTypes = await _dbcontext.CaseIncidentTypes.Where(x => x.CaseId == @case.Id).ToListAsync();
-            _dbcontext.CaseIncidentTypes.RemoveRange(currentlyLinkedIncidentTypes);
-
-            List<CaseIncidentType> newlyLinkedIncidentTypes = [];
-            foreach (var incidentType in incidentTypes)
-            {
-                newlyLinkedIncidentTypes.Add(new CaseIncidentType { CaseId = @case.Id, IncidentTypeId = incidentType.Id });
-            }
-            await _dbcontext.CaseIncidentTypes.AddRangeAsync(newlyLinkedIncidentTypes);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> UpdateCasePermission(CasePermission permission)
-        {
-            var result = new CaseResult();
-
-            _dbcontext.CasePermissions.Update(permission);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> UpdateIncidentType(IncidentType incidentType)
-        {
-            var result = new CaseResult();
-
-            var isIncidentTypeNameTaken = await _dbcontext.IncidentTypes.AnyAsync(x => x.Name == incidentType.Name && x.Id != incidentType.Id);
-            if (isIncidentTypeNameTaken)
-            {
-                result.AddError(BusinessRuleCodes.IncidentTypeAlreadyExists, $@"Incident type {incidentType.Name} is already taken, try another.");
-                return result;
-            }
-
-            _dbcontext.IncidentTypes.Update(incidentType);
-            await _dbcontext.SaveChangesAsync();
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> CanUserEditLinkedIncidentTypes(string caseId, string userId)
-        {
-            var result = new CaseResult();
-            var hasPermission = await _dbcontext.CasePermissions.Where(x => x.CaseId == caseId && x.UserId == userId && x.CanEditIncidentType == true).AnyAsync();
-            if (!hasPermission)
-            {
-                result.AddError(BusinessRuleCodes.CasePermissions);
-                return result;
-            }
-
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<CaseResult> UpdateCaseAttachmentFile(CaseAttachmentFile caseAttachmentFile)
-        {
-            var result = new CaseResult();
-            _dbcontext.CaseAttachmentFiles.Update(caseAttachmentFile);
-            await _dbcontext.SaveChangesAsync();
-            result.Succeeded = true;
-            return result;
-        }
-
-        public async Task<(string preSignedUrl, string fileId)> AddAttachment(Case @case, UploadCaseAttachmentFileMetaData metaData)
-        {
-            var attachmentId = Guid.NewGuid().ToString();
-
-            var attachment = new CaseAttachmentFile
-            {
-                BucketName = _aWSSettings.BucketName,
-                CaseId = @case.Id,
-                ContentType = metaData.ContentType,
-                FileName = metaData.FileName,
-                FileSize = metaData.FileSize,
-                Id = attachmentId,
-                S3Key = $"{@case.Id}/attachments/{attachmentId}"
+            return new PaginatedResult<Case> 
+            { 
+                HasNextPage = query.PageNumber < totalPages, 
+                HasPreviousPage = query.PageNumber - 1 > 1, 
+                Pagination = new PaginationMetadata 
+                {
+                    CurrentPage = query.PageNumber,
+                    PageSize = query.PageSize,
+                    TotalPages = totalPages, 
+                    TotalRecords = count
+                } 
             };
-            await _dbcontext.CaseAttachmentFiles.AddAsync(attachment);
-
-            var url = await _storageProvider.GetPreSignedUploadUrlAsync(attachment.S3Key, attachment.ContentType);
-
-            await _dbcontext.SaveChangesAsync();
-
-            return (url, attachmentId);
         }
     }
 }

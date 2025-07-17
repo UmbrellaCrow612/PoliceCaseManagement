@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   inject,
@@ -12,15 +11,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateCaseActionDialogComponent } from './components/create-case-action-dialog/create-case-action-dialog.component';
 import { forkJoin, timer } from 'rxjs';
 import { CaseService } from '../../../../core/cases/services/case.service';
-import { CaseAction, CasePermissionNames } from '../../../../core/cases/type';
+import { CaseAction, CaseRoleNames } from '../../../../core/cases/type';
 import { ActivatedRoute } from '@angular/router';
-import { ErrorService } from '../../../../core/app/errors/services/error.service';
 import { CommonModule } from '@angular/common';
 import { CaseActionDetailsComponent } from './components/case-action-details/case-action-details.component';
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { hasRequiredPermissions } from '../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-cases-id-actions-view',
@@ -56,22 +53,20 @@ export class CasesIdActionsViewComponent implements OnInit {
   caseActions: CaseAction[] = [];
 
   /**
-   * Copy of all case permissions in the system
-   */
-  readonly allPermissions = CasePermissionNames;
-  /**
-   * Copyt of the helper method to render stuff in UI based on perms
-   */
-  readonly hasRequiredPerms = hasRequiredPermissions;
-  /**
-   * Current user permissions they have on the given case
-   */
-  currentPermissions: string[] = [];
-  /**
    * Current case id from the URL
    */
   caseId: string | null = null;
   error: string | null = null;
+
+  /**
+   * Current users role on the given case
+   */
+  currentUserRole :number | null = null;
+
+  /**
+   * Local copy of all case role names enum
+   */
+  copy_caseRoles = CaseRoleNames
 
   addCaseActionClicked() {
     this.dialog
@@ -99,12 +94,12 @@ export class CasesIdActionsViewComponent implements OnInit {
 
     forkJoin([
       this.caseService.getCaseActions(this.caseId),
-      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+      this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
-      next: ([actions, perms]) => {
+      next: ([actions, caseRole]) => {
         this.caseActions = actions;
-        this.currentPermissions = perms;
-
+        this.currentUserRole = caseRole;
+        
         this.isLoading = false;
         this.scrollToAddButton();
       },

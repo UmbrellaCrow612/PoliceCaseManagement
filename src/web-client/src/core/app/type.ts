@@ -18,11 +18,6 @@ export interface AppLink {
    * The actual href to navigate to said resource view
    */
   href: string;
-
-  /**
-   * List of permissions needed
-   */
-  permissionsNeeded: string[];
 }
 
 /**

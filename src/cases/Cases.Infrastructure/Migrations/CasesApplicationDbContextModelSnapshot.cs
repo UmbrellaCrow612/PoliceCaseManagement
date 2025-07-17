@@ -92,6 +92,37 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("Cases");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.CaseAccessList", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("CaseRole")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CaseAccessLists");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.CaseAction", b =>
                 {
                     b.Property<string>("Id")
@@ -185,74 +216,6 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseAttachmentFiles");
                 });
 
-            modelBuilder.Entity("Cases.Core.Models.CasePermission", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("CanAddActions")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanAssign")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanDeleteActions")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanDeleteFileAttachments")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanEdit")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanEditActions")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanEditIncidentType")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanEditPermissions")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanRemoveAssigned")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanViewActions")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanViewAssigned")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanViewFileAttachments")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanViewPermissions")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("CaseId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CaseId");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CasePermissions");
-                });
-
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>
                 {
                     b.Property<string>("Id")
@@ -320,37 +283,15 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseIncidentTypes");
                 });
 
-            modelBuilder.Entity("Cases.Core.Models.Joins.CaseUser", b =>
+            modelBuilder.Entity("Cases.Core.Models.CaseAccessList", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany("CaseAccessLists")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("CaseId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CaseId");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CaseUsers");
+                    b.Navigation("Case");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.CaseAction", b =>
@@ -368,17 +309,6 @@ namespace Cases.Infrastructure.Migrations
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
                         .WithMany("CaseAttachmentFiles")
-                        .HasForeignKey("CaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Case");
-                });
-
-            modelBuilder.Entity("Cases.Core.Models.CasePermission", b =>
-                {
-                    b.HasOne("Cases.Core.Models.Case", "Case")
-                        .WithMany("CasePermissions")
                         .HasForeignKey("CaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -416,19 +346,10 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("IncidentType");
                 });
 
-            modelBuilder.Entity("Cases.Core.Models.Joins.CaseUser", b =>
-                {
-                    b.HasOne("Cases.Core.Models.Case", "Case")
-                        .WithMany("CaseUsers")
-                        .HasForeignKey("CaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Case");
-                });
-
             modelBuilder.Entity("Cases.Core.Models.Case", b =>
                 {
+                    b.Navigation("CaseAccessLists");
+
                     b.Navigation("CaseActions");
 
                     b.Navigation("CaseAttachmentFiles");
@@ -436,10 +357,6 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("CaseEvidences");
 
                     b.Navigation("CaseIncidentType");
-
-                    b.Navigation("CasePermissions");
-
-                    b.Navigation("CaseUsers");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.IncidentType", b =>

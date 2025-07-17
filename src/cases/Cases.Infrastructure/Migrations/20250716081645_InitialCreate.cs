@@ -51,6 +51,28 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseAccessLists",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    CaseId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
+                    UserEmail = table.Column<string>(type: "text", nullable: false),
+                    CaseRole = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseAccessLists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CaseAccessLists_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseActions",
                 columns: table => new
                 {
@@ -123,60 +145,6 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CasePermissions",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    CanEdit = table.Column<bool>(type: "boolean", nullable: false),
-                    CanViewPermissions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanEditPermissions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanViewFileAttachments = table.Column<bool>(type: "boolean", nullable: false),
-                    CanDeleteFileAttachments = table.Column<bool>(type: "boolean", nullable: false),
-                    CanViewAssigned = table.Column<bool>(type: "boolean", nullable: false),
-                    CanAssign = table.Column<bool>(type: "boolean", nullable: false),
-                    CanRemoveAssigned = table.Column<bool>(type: "boolean", nullable: false),
-                    CanViewActions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanAddActions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanEditActions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanDeleteActions = table.Column<bool>(type: "boolean", nullable: false),
-                    CanEditIncidentType = table.Column<bool>(type: "boolean", nullable: false),
-                    CaseId = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CasePermissions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CasePermissions_Cases_CaseId",
-                        column: x => x.CaseId,
-                        principalTable: "Cases",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CaseUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: false),
-                    UserEmail = table.Column<string>(type: "text", nullable: false),
-                    CaseId = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CaseUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CaseUsers_Cases_CaseId",
-                        column: x => x.CaseId,
-                        principalTable: "Cases",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CaseIncidentTypes",
                 columns: table => new
                 {
@@ -200,6 +168,11 @@ namespace Cases.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseAccessLists_CaseId",
+                table: "CaseAccessLists",
+                column: "CaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseActions_CaseId",
@@ -244,22 +217,6 @@ namespace Cases.Infrastructure.Migrations
                 column: "IncidentTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CasePermissions_CaseId",
-                table: "CasePermissions",
-                column: "CaseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CasePermissions_Id",
-                table: "CasePermissions",
-                column: "Id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CasePermissions_UserId",
-                table: "CasePermissions",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Cases_CaseNumber",
                 table: "Cases",
                 column: "CaseNumber",
@@ -275,27 +232,14 @@ namespace Cases.Infrastructure.Migrations
                 name: "IX_Cases_ReportingOfficerId",
                 table: "Cases",
                 column: "ReportingOfficerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CaseUsers_CaseId",
-                table: "CaseUsers",
-                column: "CaseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CaseUsers_Id",
-                table: "CaseUsers",
-                column: "Id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CaseUsers_UserId",
-                table: "CaseUsers",
-                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CaseAccessLists");
+
             migrationBuilder.DropTable(
                 name: "CaseActions");
 
@@ -309,16 +253,10 @@ namespace Cases.Infrastructure.Migrations
                 name: "CaseIncidentTypes");
 
             migrationBuilder.DropTable(
-                name: "CasePermissions");
-
-            migrationBuilder.DropTable(
-                name: "CaseUsers");
+                name: "Cases");
 
             migrationBuilder.DropTable(
                 name: "IncidentTypes");
-
-            migrationBuilder.DropTable(
-                name: "Cases");
         }
     }
 }

@@ -33,14 +33,12 @@ export class SystemHeaderComponent {
       name: 'Home',
       authorizedRoles: [],
       children: [],
-      permissionsNeeded: []
     },
     {
       href: '',
       icon: 'folder',
       name: 'Cases',
       authorizedRoles: [],
-      permissionsNeeded: [],
       children: [
         {
           authorizedRoles: [],
@@ -48,7 +46,6 @@ export class SystemHeaderComponent {
           href: 'cases/incident-types',
           icon: 'description',
           name: 'Incident Types',
-          permissionsNeeded: []
         },
       ],
     },

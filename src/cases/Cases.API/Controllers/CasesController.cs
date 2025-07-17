@@ -1,22 +1,20 @@
 ﻿using System.Security.Claims;
-using Authorization;
 using Caching;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
-using Cases.Core.Models;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using StorageProvider.AWS;
+using Pagination.Abstractions;
 
 namespace Cases.API.Controllers
 {
     [ApiController]
     [Route("cases")]
-    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, IRedisService redisService, IOptions<AWSSettings> options) : ControllerBase
+    public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, 
+        IRedisService redisService, ICaseAuthorizationService caseAuthorizationService, IIncidentTypeService incidentTypeService, ICaseActionService caseActionService) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
@@ -24,15 +22,11 @@ namespace Cases.API.Controllers
         private readonly CaseValidator _caseValidator = caseValidator;
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
         private readonly IRedisService _redisService = redisService;
+        private readonly ICaseAuthorizationService _caseAuthorizationService = caseAuthorizationService;
+        private readonly IIncidentTypeService _incidentTypeService = incidentTypeService;
+        private readonly ICaseActionService _caseActionService = caseActionService;
         private readonly CaseActionMapping _caseActionMapping = new();
-        private readonly CaseUserMapping _caseUserMapping = new();
-        private readonly CaseAttachmentFileMapping _caseAttachmentFileMapping = new();
-        private readonly CasePermissionMapping _casePermissionMapping = new();
-        private readonly AWSSettings _awsSettings = options.Value;
-
-
-        private static readonly string _incidentTypesKey = "incident_types_key";
-
+        private readonly CaseAccessListMapping _caseAccessListMapping = new();
 
         [Authorize]
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
@@ -47,7 +41,6 @@ namespace Cases.API.Controllers
             return Ok();
         }
 
-
         [Authorize]
         [HttpGet("{caseId}")]
         public async Task<ActionResult<CaseDto>> GetCaseById(string caseId)
@@ -55,8 +48,8 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var result = await _caseService.CanUserViewCaseDetails(caseId, userId);
-            if (!result.Succeeded) return BadRequest(result);
+            var canView = await _caseAuthorizationService.CanUserViewCase(userId, caseId);
+            if (!canView) return Forbid();
 
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
             if (cache is not null)
@@ -74,78 +67,6 @@ namespace Cases.API.Controllers
             await _redisService.SetStringAsync<CaseDto>(_case.Id, dto);
 
             return Ok(dto);
-        }
-
-        /// <summary>
-        /// Return the permissions set on the case
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/permissions")]
-        public async Task<IActionResult> GetCasePermissions(string caseId)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var result = await _caseService.CanUserViewCasePermissions(caseId, userId);
-            if(!result.Succeeded) return BadRequest(result);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var permissions = await _caseService.GetCasePermissions(_case);
-
-            IEnumerable<CasePermissionDto> dto = permissions.Select(x => _casePermissionMapping.ToDto(x));
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Update a case permission
-        /// </summary>
-        /// <param name="permissionId">The permission to update</param>
-        /// <param name="caseId">The parent case it is linked to</param>
-        /// <param name="dto">Request body</param>
-        [Authorize] 
-        [HttpPut("{caseId}/permissions/{permissionId}")]
-        public async Task<IActionResult> UpdateCasePermission(string caseId, string permissionId, [FromBody] UpdateCasePermissionDto dto)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var res = await _caseService.CanUserEditCasePermissions(caseId, userId);
-            if (!res.Succeeded) return BadRequest(res);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var permission = await _caseService.FindCasePermissionById(_case, permissionId);
-            if (permission is null) return NotFound();
-
-            _casePermissionMapping.Update(permission, dto);
-
-            var result = await _caseService.UpdateCasePermission(permission);
-            if (!result.Succeeded) return BadRequest(result);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Get the current requesting users permissions on a given case - returns a list of permission they have strings
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/permissions/me")]
-        public async Task<IActionResult> GetMyCasePermissionForCase(string caseId)
-        {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var result = await _caseService.GetUserCasePermissions(_case, userId);
-            if (!result.Succeeded) return BadRequest(result);
-
-            return Ok(result.Permissions);
         }
 
         [Authorize]
@@ -174,112 +95,7 @@ namespace Cases.API.Controllers
 
             return Ok(returnDto);
         }
-
-        /// <summary>
-        /// When the client uploads a file client side it then hits this endpoint to update the status of it
-        /// </summary>
-        /// <param name="attachmentId">The ID of the attachment file</param>
-        [Authorize]
-        [HttpPost("/attachments/{attachmentId}/complete")]
-        public async Task<IActionResult> ConfirmClientSideUploadComplete(string attachmentId)
-        {
-            var attachment = await _caseService.FindCaseAttachmentById(attachmentId);
-            if (attachment is null)
-            {
-                return NotFound(); // todo refactor to be inside res obj with bad req for already confirm
-            }
-            attachment.UploadComplete();
-
-            var result = await _caseService.UpdateCaseAttachmentFile(attachment);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Get a pre signed URL to upload a file for the client
-        /// </summary>
-        [Authorize]
-        [HttpPost("{caseId}/attachments/upload")]
-        public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromBody] UploadCaseAttachmentFileMetaData dto)
-        {
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            (string preSignedUrl,string fileId) = await _caseService.AddAttachment(_case, dto);
-
-            var response = new UploadCaseAttachmentFileResponse
-            {
-                UploadUrl = preSignedUrl,
-                FileId = fileId
-            };
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Get all case attachments stored in local db
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/attachments")]
-        public async Task<IActionResult> GetCaseAttachments(string caseId)
-        {
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null) return NotFound();
-
-            var files = await _caseService.GetCaseAttachments(_case);
-            var dto = files.Select(x => _caseAttachmentFileMapping.ToDto(x));
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Download a specific attachment 
-        /// </summary>
-        /// <param name="attachmentId">The attachment to download</param>
-        [Authorize]
-        [HttpGet("attachments/download/{attachmentId}")]
-        public async Task<IActionResult> DownloadCaseAttachmentFile(string attachmentId)
-        {
-            var file = await _caseService.FindCaseAttachmentById(attachmentId);
-            if (file is null)
-            {
-                return NotFound();
-            }
-
-            var url = await _caseService.DownloadCaseAttachment(file);
-
-            return Ok(url);
-        }
-
-        /// <summary>
-        /// Delete a specific <see cref="CaseAttachmentFile"/> by it's ID, only admins can do this
-        /// </summary>
-        [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("attachments/{attachmentId}")]
-        public async Task<IActionResult> DeleteCaseFileAttachments(string attachmentId)
-        {
-            var file = await _caseService.FindCaseAttachmentById(attachmentId);
-            if (file is null) return NotFound();
-
-            var result = await _caseService.DeleteAttachment(file);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Link a case to a incident type by there ID's
-        /// </summary>
-        /// <param name="caseId"></param>
-        /// <param name="incidentTypeId"></param>
-        /// <returns></returns>
+     
         [Authorize]
         [HttpPost("{caseId}/incident-types/{incidentTypeId}")]
         public async Task<IActionResult> AddIncidentTypeToCase(string caseId, string incidentTypeId)
@@ -289,186 +105,20 @@ namespace Cases.API.Controllers
             {
                 return NotFound();
             }
-            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
+
+            var incidentType = await _incidentTypeService.FindByIdAsync(incidentTypeId);
             if (incidentType is null)
             {
                 return NotFound();
             }
 
-            var result = await _caseService.AddToIncidentType(_case, incidentType);
+            var result = await _incidentTypeService.LinkToCase(_case, incidentType);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
             }
 
             return Ok();
-        }
-
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPost("incident-types")]
-        public async Task<ActionResult<IncidentTypeDto>> CreateIncidentType([FromBody] CreateIncidentTypeDto dto)
-        {
-            var incidentType = _incidentTypeMapping.Create(dto);
-            var result = await _caseService.CreateIncidentType(incidentType);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-            var returnDto = _incidentTypeMapping.ToDto(incidentType);
-            await _redisService.RemoveKeyAsync(_incidentTypesKey);
-
-            return Ok(returnDto);
-        }
-
-        /// <summary>
-        /// Get all incident types a case can be linked to.
-        /// </summary>
-        /// <returns></returns>
-        [Authorize]
-        [HttpGet("incident-types")]
-        public async Task<IActionResult> GetAllCaseIncidentTypes()
-        {
-            var value = await _redisService.GetStringAsync<List<IncidentTypeDto>>(_incidentTypesKey);
-            if (value is not null)
-            {
-                return Ok(value);
-            }
-
-            var incidentTypes = await _caseService.GetAllIncidentTypes();
-            List<IncidentTypeDto> dto = [];
-            foreach (var incidentType in incidentTypes)
-            {
-                dto.Add(_incidentTypeMapping.ToDto(incidentType));
-            }
-            await _redisService.SetStringAsync<List<IncidentTypeDto>>(_incidentTypesKey, dto);
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Get details about a incident type by there ID
-        /// </summary>
-        [Authorize]
-        [HttpGet("incident-types/{incidentTypeId}")]
-        public async Task<IActionResult> GetIncidentTypeDetailsById(string incidentTypeId)
-        {
-            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
-            if (incidentType is null)
-            {
-                return NotFound();
-            }
-
-            var dto = _incidentTypeMapping.ToDto(incidentType);
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Get the amount of time a incident type is linked to how many cases.
-        /// </summary>
-        /// <returns>The count as a number</returns>
-        [Authorize]
-        [HttpGet("incident-types/{incidentTypeId}/case-incidents/count")]
-        public async Task<IActionResult> GetCaseIncidentTypeCount(string incidentTypeId)
-        {
-            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
-            if (incidentType is null)
-            {
-                return NotFound();
-            }
-
-            var count = await _caseService.GetCaseIncidentCount(incidentType);
-
-            return Ok(new { count });
-        }
-
-
-        /// <summary>
-        /// Admin can delete a incident type - unlinks it from cases and the incident type itself is deleted.
-        /// </summary>
-        [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("incident-types/{incidentTypeId}")]
-        public async Task<IActionResult> DeleteIncidentType(string incidentTypeId)
-        {
-            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
-            if (incidentType is null)
-            {
-                return NotFound();
-            }
-
-            var result = await _caseService.DeleteIncidentType(incidentType);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Update a incident type - only admins can do this.
-        /// </summary>
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPut("incident-types/{incidentTypeId}")]
-        public async Task<IActionResult> UpdateIncidentType(string incidentTypeId, [FromBody] UpdateIncidentTypeDto dto)
-        {
-            var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
-            if (incidentType is null)
-            {
-                return NotFound();
-            }
-
-            _incidentTypeMapping.Update(incidentType, dto);
-
-            var result = await _caseService.UpdateIncidentType(incidentType);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-            await _redisService.RemoveKeyAsync(_incidentTypesKey);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Update a cases linked incident types - unlinks currently linked ones and links the new ones passed
-        /// </summary>
-        [Authorize]
-        [HttpPut("{caseId}/incident-types")]
-        public async Task<IActionResult> UpdateCasesLinkedIncidentTypes(string caseId, [FromBody] UpdateCasesLinkedIncidentTypesDto dto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var permResult = await _caseService.CanUserEditLinkedIncidentTypes(caseId, userId);
-            if (!permResult.Succeeded) return BadRequest(permResult);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null)
-            {
-                return NotFound("Case not found");
-            }
-
-            List<IncidentType> incidentTypes = [];
-
-            foreach (var incidentTypeId in dto.IncidentTypeIds)
-            {
-                var incidentType = await _caseService.FindIncidentTypeById(incidentTypeId);
-                if (incidentType is null)
-                {
-                    return NotFound("Incident type not found");
-                }
-                incidentTypes.Add(incidentType);
-            }
-
-            var result = await _caseService.UpdateCaseLinkedIncidentTypes(_case, incidentTypes);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            return NoContent();
         }
 
         [Authorize]
@@ -482,11 +132,22 @@ namespace Cases.API.Controllers
             }
 
             var result = await _caseService.SearchCases(query);
-            var dtoResult = new PagedResult<CaseDto>(result.Items.Select(x => _caseMapping.ToDto(x)).ToList(), result.TotalCount, result.PageNumber, result.PageSize);
+            var dtoResult = new PaginatedResult<CaseDto>
+            {
+                HasNextPage = result.HasNextPage,
+                HasPreviousPage = result.HasPreviousPage,
+                Data = result.Data.Select(x => _caseMapping.ToDto(x)),
+                Pagination = new PaginationMetadata
+                {
+                    CurrentPage = result.Pagination.CurrentPage,
+                    PageSize = result.Pagination.PageSize,
+                    TotalPages = result.Pagination.TotalPages,
+                    TotalRecords = result.Pagination.TotalRecords,
+                }
+            };
 
             return Ok(dtoResult);
         }
-
 
         [Authorize]
         [HttpGet("{caseId}/incident-types")]
@@ -498,74 +159,12 @@ namespace Cases.API.Controllers
                 return NotFound();
             }
 
-            var linkedIncidentTypes = await _caseService.GetIncidentTypes(_case);
+            var linkedIncidentTypes = await _incidentTypeService.GetAsync(_case);
 
             List<IncidentTypeDto> dto = [.. linkedIncidentTypes.Select(x => _incidentTypeMapping.ToDto(x))];
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Get all case actions for a given case by it's ID
-        /// </summary>
-        [Authorize]
-        [HttpGet("{caseId}/case-actions")]
-        public async Task<IActionResult> GetCaseActionsForCaseByIdAsync(string caseId)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var result = await _caseService.CanUserViewCaseActions(caseId, userId);
-            if (!result.Succeeded) return BadRequest(result);
-
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null)
-            {
-                return NotFound();
-            }
-
-            var actions = await _caseService.GetCaseActions(_case);
-            List<CaseActionDto> dto = [.. actions.Select(x => _caseActionMapping.ToDto(x))];
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Add a case action to a given case by there id
-        /// </summary>
-        /// <returns></returns>
-        [Authorize]
-        [HttpPost("{caseId}/case-actions")]
-        public async Task<IActionResult> AddCaseActionToCase(string caseId, [FromBody] CreateCaseActionDto dto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            var permResult = await _caseService.CanUserCreateCaseActions(caseId, userId);
-            if(!permResult.Succeeded) return BadRequest(permResult);
-            
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null)
-            {
-                return NotFound();
-            }
-            var action = _caseActionMapping.Create(dto);
-            action.CaseId = caseId;
-            action.CreatedById = userId;
-
-            var result = await _caseService.AddCaseAction(_case, action);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
-
-            var returnDto = _caseActionMapping.ToDto(action);
-
-            return Ok(returnDto);
-        }
-
-        /// <summary>
-        /// Get all users stored who are linked to a given case
-        /// </summary>
         [Authorize]
         [HttpGet("{caseId}/users")]
         public async Task<IActionResult> GetUsersLinkedToCaseById(string caseId)
@@ -573,23 +172,29 @@ namespace Cases.API.Controllers
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var users = await _caseService.GetCaseUsers(_case);
-            List<CaseUserDto> dto = [.. users.Select(x => _caseUserMapping.ToDto(x))];
+            var users = await _caseService.GetUsersAsync(_case);
+            var dto = users.Select(x => _caseAccessListMapping.ToDto(x));
 
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Assign a set of users to a case
-        /// </summary>
         [Authorize]
         [HttpPost("{caseId}/users")]
-        public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUsersToCaseDto dto)
+        public async Task<IActionResult> AssignUsersToCase(string caseId, [FromBody] AssignUserToCaseDto dto)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.CanUserAssignCaseUsers(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
             var _case = await _caseService.FindById(caseId);
             if (_case is null) return NotFound();
 
-            var result = await _caseService.AddUsers(_case, dto.UserIds);
+            var result = await _caseService.AddUser(_case, dto.UserId);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
@@ -598,12 +203,6 @@ namespace Cases.API.Controllers
             return NoContent();
         }
 
-
-        /// <summary>
-        /// Remove a assigned user from a given case, they will no longer be assigned to the given case after.
-        /// </summary>
-        /// <param name="caseId">The ID of the case</param>
-        /// <param name="userId">TThe ID of the user</param>
         [Authorize]
         [HttpDelete("{caseId}/users/{userId}")]
         public async Task<IActionResult> RemoveUserFromCaseAsync(string caseId, string userId)
@@ -621,6 +220,82 @@ namespace Cases.API.Controllers
             }
 
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{caseId}/me")]
+        public async Task<IActionResult> GetCasePermissionForMe(string caseId)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var isLinked = await _caseService.IsUserLinkedToCase(_case, userId);
+            if (!isLinked)
+            {
+                return BadRequest();
+            }
+
+            var role = await _caseAuthorizationService.GetUserRole(_case, userId);
+
+            return Ok(role);
+        }
+
+        [Authorize]
+        [HttpPost("{caseId}/case-actions")]
+        public async Task<IActionResult> AddCaseActionToCase(string caseId, [FromBody] CreateCaseActionDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var canAdd = await _caseAuthorizationService.CanUserAddActions(userId, caseId);
+            if (!canAdd) return Forbid();
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+            var action = _caseActionMapping.Create(dto);
+            action.CaseId = caseId;
+            action.CreatedById = userId;
+
+            var result = await _caseActionService.CreateAsync(_case, action);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            var returnDto = _caseActionMapping.ToDto(action);
+
+            return Ok(returnDto);
+        }
+
+        [Authorize]
+        [HttpGet("{caseId}/case-actions")]
+        public async Task<IActionResult> GetCaseActionsForCaseByIdAsync(string caseId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var canView = await _caseAuthorizationService.CanUserViewCaseActions(userId, caseId);
+            if (!canView) return Forbid();
+
+            var _case = await _caseService.FindById(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var actions = await _caseActionService.GetAsync(_case);
+            List<CaseActionDto> dto = [.. actions.Select(x => _caseActionMapping.ToDto(x))];
+
+            return Ok(dto);
         }
     }
 }

@@ -1,21 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { CaseService } from '../../../../core/cases/services/case.service';
-import { Case, CasePermissionNames } from '../../../../core/cases/type';
+import { Case, CaseRoleNames } from '../../../../core/cases/type';
 import { CommonModule } from '@angular/common';
 import { CasePriorityPipe } from '../../../../core/cases/pipes/casePriorityPipe';
 import { CaseStatusPipe } from '../../../../core/cases/pipes/caseStatusPipe';
 import { MatButtonModule } from '@angular/material/button';
-import { UserService } from '../../../../core/user/services/user.service';
-import { hasRequiredRole } from '../../../../core/authentication/utils/hasRequiredRole';
-import { UserRoles } from '../../../../core/authentication/roles';
 import { forkJoin } from 'rxjs';
 import { IncidentType } from '../../../../core/incident-type/types';
 import { AppLink } from '../../../../core/app/type';
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
-import { hasRequiredPermissions } from '../../../../core/authentication/utils/hasRequiredPermissions';
 
 @Component({
   selector: 'app-cases-id-view',
@@ -33,7 +29,6 @@ export class CasesIdViewComponent implements OnInit {
   constructor(
     private active: ActivatedRoute,
     private caseService: CaseService,
-    private userService: UserService,
     private readonly authService: AuthenticationService
   ) {}
 
@@ -49,7 +44,6 @@ export class CasesIdViewComponent implements OnInit {
     }
 
     this.fetchData();
-    this.currentUserRoles = this.userService.ROLES!;
   }
 
   caseId: string | null = null;
@@ -58,16 +52,12 @@ export class CasesIdViewComponent implements OnInit {
   caseDetails: Case | null = null;
   incidentTypes: IncidentType[] = [];
 
-  hasRequiredRole = hasRequiredRole;
-  hasRequiredPermissions = hasRequiredPermissions;
-  userRoles = UserRoles;
-  currentUserRoles: string[] = [];
-  currentPermissions: string[] = [];
+  copy_CaseRoleName = CaseRoleNames;
 
   /**
-   * Copy of the define one ot use in UI
+   * The users current role they have on the given case
    */
-  readonly casePermissionNames = CasePermissionNames;
+  currentUserCaseRole: number | null = null;
 
   fetchData() {
     if (!this.caseId) {
@@ -80,12 +70,12 @@ export class CasesIdViewComponent implements OnInit {
     forkJoin([
       this.caseService.getCaseById(this.caseId),
       this.caseService.getIncidentTypes(this.caseId),
-      this.caseService.getCurrentUsersPermissionForCase(this.caseId),
+      this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
-      next: ([caseDetails, incidentTypes, currentPerms]) => {
+      next: ([caseDetails, incidentTypes, currentRole]) => {
         this.caseDetails = caseDetails;
         this.incidentTypes = incidentTypes;
-        this.currentPermissions = currentPerms;
+        this.currentUserCaseRole = currentRole;
         this.isLoading = false;
       },
       error: (err) => {
@@ -111,25 +101,16 @@ export class CasesIdViewComponent implements OnInit {
       authorizedRoles: [],
       href: './actions',
       name: 'Actions',
-      permissionsNeeded: [CasePermissionNames.canViewActions],
     },
     {
       authorizedRoles: [],
       href: './assigned-users',
       name: 'Assigned Officers',
-      permissionsNeeded: [CasePermissionNames.canViewAssigned],
     },
     {
       authorizedRoles: [],
       href: './attachments',
       name: 'File attachments',
-      permissionsNeeded: [CasePermissionNames.canViewFileAttachments],
-    },
-    {
-      authorizedRoles: [],
-      href: './permissions',
-      name: 'Permissions',
-      permissionsNeeded: [CasePermissionNames.canViewPermissions],
     },
   ];
 }

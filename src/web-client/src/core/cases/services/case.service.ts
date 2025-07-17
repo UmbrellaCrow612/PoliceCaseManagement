@@ -6,12 +6,11 @@ import {
   CaseAction,
   CaseAttachment,
   CasePagedResult,
-  CasePermission,
   CreateCase,
   CreateCaseAction,
 } from '../type';
 import { IncidentType } from '../../incident-type/types';
-import { CaseUser, RestrictedUser } from '../../user/type';
+import { CaseAcessList, RestrictedUser } from '../../user/type';
 
 @Injectable({
   providedIn: 'root',
@@ -198,10 +197,10 @@ export class CaseService {
   /**
    * Get all users assigned to a given case.
    * @param caseId The ID of the case
-   * @returns List of users assigned to the given case
+   * @returns List of users assigned to the given case in the form of a access list
    */
   getAssignedUsers(caseId: string) {
-    return this.httpClient.get<CaseUser[]>(
+    return this.httpClient.get<CaseAcessList[]>(
       `${this.BASE_URL}/cases/${caseId}/users`
     );
   }
@@ -300,38 +299,15 @@ export class CaseService {
     );
   }
 
-  /**
-   * Get all the case level permissions set on a given case by it's ID - NOTE: Only admins can CRUD these
-   * @param caseId The ID of the case to fetch it for
-   * @returns List of permissions
-   */
-  getPermissions(caseId: string) {
-    return this.httpClient.get<CasePermission[]>(
-      `${this.BASE_URL}/cases/${caseId}/permissions`
-    );
-  }
 
   /**
-   * Update a case permission
-   * @param permission The updated object
-   */
-  updatePermission(permission: CasePermission) {
-    return this.httpClient.put(
-      `${this.BASE_URL}/cases/${permission.caseId}/permissions/${permission.id}`,
-      {
-        ...permission,
-      }
-    );
-  }
-
-  /**
-   * Get the current users permission for a given case - it will get the current context logeed in users permission for the given case
+   * Get the current users role for a given case - it will get the current context logeed in users role for the given case
    * @param caseId The Case to get the current requesting users permission for
-   * @returns The permission
+   * @returns The role - enum number
    */
-  getCurrentUsersPermissionForCase(caseId: string) {
-    return this.httpClient.get<string[]>(
-      `${this.BASE_URL}/cases/${caseId}/permissions/me`
+  getCurrentUsersRoleForCase(caseId: string) {
+    return this.httpClient.get<number>(
+      `${this.BASE_URL}/cases/${caseId}/me`
     );
   }
 }
