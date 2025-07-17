@@ -182,7 +182,6 @@ namespace Cases.Application.Implementations
             {
                 DateTime startDate = query.IncidentDateTime.Value.Date;
                 DateTime endDate = startDate.AddDays(1);
-
                 queryBuilder = queryBuilder.Where(x => x.IncidentDateTime >= startDate && x.IncidentDateTime < endDate);
             }
 
@@ -213,13 +212,13 @@ namespace Cases.Application.Implementations
                 queryBuilder = queryBuilder.Where(x => x.CreatedById == query.CreatedById);
             }
 
-            if (query.AssignedUserIds.Length != 0)
+            if (query.AssignedUserIds != null && query.AssignedUserIds.Length > 0)
             {
                 queryBuilder = queryBuilder.Where(c => c.CaseAccessLists.Any(cu => query.AssignedUserIds.Contains(cu.UserId)));
             }
 
-            var count = await queryBuilder.CountAsync();
-            var totalPages = count / query.PageSize;
+            int count = await queryBuilder.CountAsync();
+            int totalPages = (int)Math.Ceiling(count / (double)query.PageSize);
 
             queryBuilder = queryBuilder.OrderBy(x => x.Id);
 
@@ -228,18 +227,20 @@ namespace Cases.Application.Implementations
                 .Take(query.PageSize)
                 .ToListAsync();
 
-            return new PaginatedResult<Case> 
-            { 
-                HasNextPage = query.PageNumber < totalPages, 
-                HasPreviousPage = query.PageNumber - 1 > 1, 
-                Pagination = new PaginationMetadata 
+            return new PaginatedResult<Case>
+            {
+                HasNextPage = query.PageNumber < totalPages,
+                HasPreviousPage = query.PageNumber > 1,
+                Pagination = new PaginationMetadata
                 {
                     CurrentPage = query.PageNumber,
                     PageSize = query.PageSize,
-                    TotalPages = totalPages, 
+                    TotalPages = totalPages,
                     TotalRecords = count
-                } 
+                },
+                Data = items
             };
         }
+
     }
 }

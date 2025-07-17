@@ -1,4 +1,4 @@
-import { PagedResult } from '../app/type';
+import { PaginatedResult } from '../app/type';
 
 export interface CreateCase {
   caseNumber: string;
@@ -49,7 +49,7 @@ export interface CaseAttachment {
   uploadedAt: Date;
 }
 
-export interface CasePagedResult extends PagedResult<Case> {}
+export interface CasePagedResult extends PaginatedResult<Case> {}
 
 /**
  * Array containing the backend enum mapped here
@@ -98,15 +98,15 @@ export const CaseRoleNames = {
   Viewer: 2,
 } as const;
 
-// Type: 'Owner' | 'Editor' | 'Viewer'
 /**
  * String name value of CaseRoleNames
+ * Type Example: 'Owner' | 'Editor' | 'Viewer'
  */
 export type CaseRoleName = keyof typeof CaseRoleNames;
 
-// Type: 0 | 1 | 2
 /**
  * Values of CaseRoleNames which is a number
+ * Type example: 0 | 1 | 2
  */
 export type CaseRoleValue = (typeof CaseRoleNames)[CaseRoleName];
 

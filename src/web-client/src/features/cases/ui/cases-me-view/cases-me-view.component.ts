@@ -58,7 +58,7 @@ export class CasesMeViewComponent implements OnInit {
   nextClicked() {
     this.fetchData({
       pageNumber: this.searchCasesResult?.hasNextPage
-        ? this.searchCasesResult.pageNumber + 1
+        ? this.searchCasesResult.pagination.currentPage + 1
         : null,
     });
   }
@@ -66,7 +66,7 @@ export class CasesMeViewComponent implements OnInit {
   previousClicked() {
     this.fetchData({
       pageNumber: this.searchCasesResult?.hasPreviousPage
-        ? this.searchCasesResult.pageNumber - 1
+        ? this.searchCasesResult.pagination.currentPage - 1
         : null,
     });
   }

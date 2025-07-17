@@ -1,6 +1,6 @@
 <div class="container">
   <mat-nav-list role="list" class="list_container">
-    @for (case of casePagedResult().items; track $index) {
+    @for (case of casePagedResult().data; track $index) {
     <a [routerLink]="['../', case.id]">
       <mat-list-item role="listitem">
         <strong>Case Number:</strong> {{ case.caseNumber }}
@@ -19,10 +19,10 @@
   @if (casePagedResult().hasNextPage || casePagedResult().hasPreviousPage) {
   <div class="btns">
     <span class="details">
-      Page number: {{ casePagedResult().pageNumber }} Page size:
-      {{ casePagedResult().pageSize }} Total:
-      {{ casePagedResult().totalCount }} Total pages:{{
-        casePagedResult().totalPages
+      Page number: {{ casePagedResult().pagination.currentPage }} Page size:
+      {{ casePagedResult().pagination.pageSize }} Total:
+      {{ casePagedResult().pagination.totalRecords }} Total pages:{{
+        casePagedResult().pagination.totalPages
       }}
     </span>
 

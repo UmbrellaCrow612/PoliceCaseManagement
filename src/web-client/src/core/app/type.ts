@@ -21,19 +21,6 @@ export interface AppLink {
 }
 
 /**
- * Generic pagination result sent from backend
- */
-export interface PagedResult<T> {
-  items: T[];
-  pageNumber: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-/**
  * Generic base type similar to the backend generic PaginatedResult<T> which is used for any paginated result
  */
 export interface PaginatedResult<T> {

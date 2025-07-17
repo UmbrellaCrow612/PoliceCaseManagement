@@ -10,7 +10,7 @@
         /// <summary>
         /// The collection of data items for the current page.
         /// </summary>
-        public IEnumerable<T> Data { get; set; } = [];
+        public required IEnumerable<T> Data { get; set; } = [];
 
         /// <summary>
         /// Metadata describing the pagination state.
