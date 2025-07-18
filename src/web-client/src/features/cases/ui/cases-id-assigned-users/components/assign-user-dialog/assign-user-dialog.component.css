@@ -1,33 +1,20 @@
-.search_form {
+.form_group {
+  padding: 10px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 5px;
 }
 
-.full {
-  flex: 1;
+.full_width {
+  width: 100%;
 }
 
-.searched_users_display_list_container {
-  height: 150px;
+.searched_users_container {
+  height: 250px;
   overflow-y: scroll;
-}
-
-.selected_users_details_container {
-  height: 150px;
-  overflow-y: scroll;
-  gap: 5px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-}
-
-.selected_user_details_with_btn {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px;
-}
-
-.icon_colour {
-  color: red;
+  gap: 5px;
 }

@@ -4,13 +4,13 @@
 
 <!---->
 
-@if (error && !isLoading) {
-<div>Error occcured: {{ error }}</div>
+@if (errorMessage && !isLoading) {
+<div>Error occcured: {{ errorMessage }}</div>
 }
 
 <!---->
 
-@if (!isLoading && !error) {
+@if (!isLoading && !errorMessage) {
 <div class="container">
   <app-back-navigation-button navigationUrl="../"></app-back-navigation-button>
   <h1>Assigned Officers</h1>
@@ -21,7 +21,8 @@
         Username: {{ caseUser.userName }} {{ caseUser.caseRole | caseRolePipe }}
       </span>
 
-      @if (caseUser.userId !== currentUserId) {
+      @if (caseUser.userId !== currentUserId && currentUserCaseRole ==
+      copy_CaseRoleNames.Owner) {
       <button mat-button (click)="removeUserClicked(caseUser.userId)">
         Remove
       </button>
@@ -32,9 +33,11 @@
     }
   </div>
   <div>
+    @if (currentUserCaseRole == copy_CaseRoleNames.Owner) {
     <button mat-raised-button (click)="assignUserClicked()">
       assign officer
     </button>
+    }
   </div>
 </div>
 }

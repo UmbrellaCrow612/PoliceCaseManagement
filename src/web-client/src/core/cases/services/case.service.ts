@@ -185,13 +185,14 @@ export class CaseService {
   }
 
   /**
-   * Assign a set of users to a case
-   * @param usersToAssign List of users to assign to this case - make sure there unquie and do not contain already assigned users to the given case, will be validated on server anyways
-   * @param caseId The case to link to
+   * Assign a given user to a case
+   * @param caseId The case to assign it to
+   * @param user The user to assign
+   * @returns Result pattern
    */
-  assignUsersToCase(caseId: string, usersToAssign: RestrictedUser[]) {
+  assignUserToCase(caseId: string, user: RestrictedUser) {
     return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/users`, {
-      userIds: usersToAssign.map((x) => x.id),
+      userId: user.id,
     });
   }
 

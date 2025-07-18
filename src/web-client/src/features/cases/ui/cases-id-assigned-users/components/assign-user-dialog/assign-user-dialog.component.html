@@ -1,73 +1,53 @@
-<h2 mat-dialog-title>Assign Officers</h2>
+<h2 mat-dialog-title>Assign a officer</h2>
 <mat-dialog-content>
   <form
     [formGroup]="searchUsersForm"
-    class="search_form"
-    (submit)="searchUsersFormSubmit()"
+    class="form_group"
+    (ngSubmit)="searchUsersFormSubmit()"
   >
-    <mat-form-field class="full">
-      <mat-label>Search for users</mat-label>
+    <mat-form-field appearance="outline" class="full_width">
+      <mat-label>Search</mat-label>
       <input matInput formControlName="search" />
-
-      @if (searchUsersForm.controls.search.hasError("required")) {
-      <mat-error> Required </mat-error>
-      }
     </mat-form-field>
 
-    <button
-      type="submit"
-      [disabled]="searchUsersForm.invalid || isFetchingUsers"
-      mat-button
-    >
-      @if (isFetchingUsers) {
-      <span>Fetchinbg..</span>
-      } @else { Search }
-    </button>
+    <button type="submit" mat-button [disabled]="isLoading">Search</button>
   </form>
 
-  @if (fetchingUsersError) {
-  <span>
-    {{ fetchingUsersError }}
-  </span>
-  } @if (isSavingError) {
-  <span>
-    {{ isSavingError }}
-  </span>
-  }
-
-  <mat-selection-list
-    class="searched_users_display_list_container"
-    (selectionChange)="selectedUsersChangedListener($event)"
-  >
-    @for (user of searchedUsers; track user) {
-    <mat-list-option
-      [value]="user"
-      [selected]="selectedUsersMap.has(user.id)"
-      >{{ user.userName }}</mat-list-option
-    >
-    } @empty {
-    <mat-list-option disabled>No users found</mat-list-option>
+  <div class="searched_users_container">
+    @if (isLoading) {
+    <div>Fetching users...</div>
     }
-  </mat-selection-list>
 
-  <div class="selected_users_details_container">
-    <span>Selected Officers: </span>
+    <!---->
+    @if (!isLoading && errorMessage) {
+    <div>Failed {{ errorMessage }}</div>
+    }
 
-    @for (user of fromMap(); track $index) {
-    <div class="selected_user_details_with_btn">
-      <span>{{ user.userName }}</span>
-      <button mat-icon-button (click)="removedSelectedUser(user)">
-        <mat-icon class="icon_colour">close</mat-icon>
-      </button>
-    </div>
-    } @empty {
-    <span> No officers selected </span>
+    <!---->
+
+    @if (!isLoading && !errorMessage) {
+    <mat-selection-list
+      #usersList
+      [formControl]="selectedUserControl"
+      name="usersList"
+      [multiple]="false"
+    >
+      @for (user of searchUsersList; track user.id) {
+      <mat-list-option [value]="user">{{ user.userName }}</mat-list-option>
+      } @empty {
+      <mat-list-option [value]="null" disabled>No users found</mat-list-option>
+      }
+    </mat-selection-list>
     }
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button (click)="saveClicked()" [disabled]="isSavingUsers">
-    @if (isSavingUsers) { Saving... } @else { Save }
+  <button
+    mat-button
+    (click)="saveClicked()"
+    [disabled]="isLoading || errorMessage || selectedUserControl.invalid || isSaving"
+  >
+    Save
   </button>
 </mat-dialog-actions>

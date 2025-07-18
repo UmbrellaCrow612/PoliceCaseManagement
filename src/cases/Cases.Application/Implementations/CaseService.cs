@@ -47,6 +47,7 @@ namespace Cases.Application.Implementations
                 UserName = userDetails.Username
             };
             await _dbcontext.CaseAccessLists.AddAsync(link);
+            await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
             return result;

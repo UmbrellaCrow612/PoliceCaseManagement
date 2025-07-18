@@ -15,11 +15,10 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../../../../../core/user/services/user.service';
-import { RestrictedUser, User } from '../../../../../../core/user/type';
-import { MatListModule, MatSelectionListChange } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { CaseService } from '../../../../../../core/cases/services/case.service';
-import { formatBackendError } from '../../../../../../core/app/errors/formatError';
+import { RestrictedUser } from '../../../../../../core/user/type';
 
 @Component({
   selector: 'app-assign-user-dialog',
@@ -56,110 +55,98 @@ export class AssignUserDialogComponent {
   readonly dialogRef = inject(MatDialogRef<AssignUserDialogComponent>);
 
   /**
-   * List of selected user to be assigned to this case
+   * Holds loading state for fetching data
    */
-  selectedUsersMap = new Map<string, RestrictedUser>();
+  isLoading = false;
+
+  /**
+   * Holds any error state
+   */
+  errorMessage: string | null = null;
+
+  /**
+   * Form to be used to get the search form results
+   */
   searchUsersForm = new FormGroup({
     search: new FormControl('', [Validators.required]),
   });
-  isFetchingUsers = false;
-  fetchingUsersError: string | null = null;
-  searchedUsers: RestrictedUser[] = [];
-  isSavingUsers = false;
-  isSavingError: string | null = null;
+
+  /**
+   * Control to hold the current selected user
+   */
+  selectedUserControl = new FormControl<RestrictedUser | null>(null, [
+    Validators.required,
+  ]);
+
+  /**
+   * List of users fetched for the search term
+   */
+  searchUsersList: RestrictedUser[] = [];
+
+  /**
+   * Holds state for saving user state
+   */
+  isSaving = false;
 
   /**
    * Ran when the user submits the search form
    */
   searchUsersFormSubmit() {
     if (this.searchUsersForm.valid) {
-      this.isFetchingUsers = true;
-      this.fetchingUsersError = null;
+      this.isLoading = true;
+      this.errorMessage = null;
 
       this.userService
         .searchUsersByUsername(this.searchUsersForm.controls.search.value!)
         .subscribe({
           next: (users) => {
-            const assignedUserIds = new Set(this.data.currentAssignedUserIds);
-            this.searchedUsers = users.filter(
-              (user) => !assignedUserIds.has(user.id)
+            let alreadyAssignedUserIdsSet = new Set(
+              this.data.currentAssignedUserIds
             );
-            this.isFetchingUsers = false;
+
+            this.searchUsersList = users.filter(
+              // filter out users already assigned to the case
+              (x) => !alreadyAssignedUserIdsSet.has(x.id)
+            );
+
+            this.isLoading = false;
           },
           error: (error) => {
-            error = 'Failed to search users';
-            this.isFetchingUsers = false;
+            this.errorMessage = 'Failed to fetch users from backend';
+            this.isLoading = false;
           },
         });
     }
-  }
-
-  /**
-   *
-   * @returns retuns a list of selcted users
-   */
-  fromMap() {
-    return Array.from(this.selectedUsersMap.values());
-  }
-
-  /**
-   * Fired off every time a user is selected or de seclected from the mat list
-   * @param event EventEmitter<MatSelectionListChange>
-   */
-  selectedUsersChangedListener(event: MatSelectionListChange) {
-    const selectedMatListUsers: RestrictedUser[] =
-      event.source.selectedOptions.selected.map((option) => option.value);
-
-    const selectedIds = new Set(selectedMatListUsers.map((u) => u.id));
-
-    selectedMatListUsers.forEach((user) => {
-      if (!this.selectedUsersMap.has(user.id)) {
-        this.selectedUsersMap.set(user.id, user);
-      }
-    });
-
-    Array.from(this.selectedUsersMap.values()).forEach((user) => {
-      if (
-        this.searchedUsers.find((u) => u.id === user.id) &&
-        !selectedIds.has(user.id)
-      ) {
-        this.selectedUsersMap.delete(user.id);
-      }
-    });
   }
 
   /**
    * fired off when you want to save assignerd users to a case
    */
   saveClicked() {
-    if (!this.data.caseId) {
-      console.error('Case ID not passed');
+    if (!this.data.caseId || this.selectedUserControl.invalid) {
+      console.error('Invalid state');
       return;
     }
 
-    if (this.selectedUsersMap.size > 0) {
-      this.isSavingUsers = true;
-      this.isSavingError = null;
+    this.isSaving = true;
+    this.errorMessage = null;
 
-      this.caseService
-        .assignUsersToCase(this.data.caseId, this.fromMap())
-        .subscribe({
-          next: () => {
-            this.dialogRef.close();
-          },
-          error: (error) => {
-            (this.isSavingError = formatBackendError(error)),
-              (this.isSavingUsers = false);
-          },
-        });
-    }
-  }
+    // Extract the first user from the array (since multiple=false, there should only be one)
+    // multi select ends up retuning a array
+    const selectedUser = Array.isArray(this.selectedUserControl.value)
+      ? this.selectedUserControl.value[0]
+      : this.selectedUserControl.value;
 
-  /**
-   * Fired off when a user is selected then clicked to be removed off the selection list
-   * @param user User to remove
-   */
-  removedSelectedUser(user: RestrictedUser) {
-    this.selectedUsersMap.delete(user.id);
+    this.caseService
+      .assignUserToCase(this.data.caseId, selectedUser)
+      .subscribe({
+        next: () => {
+          this.dialogRef.close();
+        },
+        error: () => {
+          this.errorMessage = 'Failed to assign user to case';
+          this.isSaving = false;
+        },
+      });
   }
 }

@@ -103,7 +103,7 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            var hasPerm = await _caseAuthorizationService.IsEditor(userId, caseId);
             if (!hasPerm) return Forbid();
 
             var _case = await _caseService.FindByIdAsync(caseId);

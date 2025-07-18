@@ -1,6 +1,4 @@
-﻿using Cases.Core.Models;
-
-namespace Cases.API.DTOs
+﻿namespace Cases.API.DTOs
 {
     public class AssignUserToCaseDto
     {
