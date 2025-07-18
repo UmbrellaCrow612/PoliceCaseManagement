@@ -18,7 +18,7 @@
     @for (caseUser of assignedUsers; track $index) {
     <div class="user_details">
       <span>
-        Username: {{ caseUser.userName }} Role: {{ caseUser.caseRole | caseRolePipe }}
+        Username: {{ caseUser.userName }} {{ caseUser.caseRole | caseRolePipe }}
       </span>
 
       @if (caseUser.userId !== currentUserId) {

@@ -32,7 +32,7 @@ namespace Cases.API.Controllers
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
         public async Task<IActionResult> IsCaseNumberTaken(string caseNumber)
         {
-            var isTaken = await _caseService.IsCaseNumberTaken(caseNumber);
+            var isTaken = await _caseService.IsCaseNumberTakenAsync(caseNumber);
             if (isTaken)
             {
                 return BadRequest();
@@ -48,7 +48,7 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var canView = await _caseAuthorizationService.CanUserViewCase(userId, caseId);
+            var canView = await _caseAuthorizationService.IsAssigned(userId, caseId);
             if (!canView) return Forbid();
 
             var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
@@ -57,7 +57,7 @@ namespace Cases.API.Controllers
                 return Ok(cache);
             }
 
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();
@@ -100,23 +100,20 @@ namespace Cases.API.Controllers
         [HttpPost("{caseId}/incident-types/{incidentTypeId}")]
         public async Task<IActionResult> AddIncidentTypeToCase(string caseId, string incidentTypeId)
         {
-            var _case = await _caseService.FindById(caseId);
-            if (_case is null)
-            {
-                return NotFound();
-            }
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            if (!hasPerm) return Forbid();
+
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null) return NotFound();
 
             var incidentType = await _incidentTypeService.FindByIdAsync(incidentTypeId);
-            if (incidentType is null)
-            {
-                return NotFound();
-            }
+            if (incidentType is null) return NotFound();
 
             var result = await _incidentTypeService.LinkToCase(_case, incidentType);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
+            if (!result.Succeeded) return BadRequest(result);
 
             return Ok();
         }
@@ -131,7 +128,7 @@ namespace Cases.API.Controllers
                 return BadRequest(valResult);
             }
 
-            var result = await _caseService.SearchCases(query);
+            var result = await _caseService.SearchCasesAsync(query);
             var dtoResult = new PaginatedResult<CaseDto>
             {
                 HasNextPage = result.HasNextPage,
@@ -153,7 +150,16 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}/incident-types")]
         public async Task<ActionResult<List<IncidentTypeDto>>> GetCaseIncidentTypes(string caseId)
         {
-            var _case = await _caseService.FindById(caseId);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();
@@ -169,7 +175,16 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}/users")]
         public async Task<IActionResult> GetUsersLinkedToCaseById(string caseId)
         {
-            var _case = await _caseService.FindById(caseId);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null) return NotFound();
 
             var users = await _caseService.GetUsersAsync(_case);
@@ -185,16 +200,16 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var hasPerm = await _caseAuthorizationService.CanUserAssignCaseUsers(userId, caseId);
+            var hasPerm = await _caseAuthorizationService.IsOwner(userId, caseId);
             if (!hasPerm)
             {
                 return Forbid();
             }
 
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null) return NotFound();
 
-            var result = await _caseService.AddUser(_case, dto.UserId);
+            var result = await _caseService.AddUserAsync(_case, dto.UserId);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
@@ -207,13 +222,27 @@ namespace Cases.API.Controllers
         [HttpDelete("{caseId}/users/{userId}")]
         public async Task<IActionResult> RemoveUserFromCaseAsync(string caseId, string userId)
         {
-            var _case = await _caseService.FindById(caseId);
+            string? currentRequestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(currentRequestingUserId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsOwner(currentRequestingUserId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            if (currentRequestingUserId == userId) // check to stop the current user removing themselves from there own case
+            {
+                return BadRequest();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();
             }
 
-            var result = await _caseService.RemoveUser(_case, userId);
+            var result = await _caseService.RemoveUserAsync(_case, userId);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
@@ -229,13 +258,13 @@ namespace Cases.API.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();
             }
 
-            var isLinked = await _caseService.IsUserLinkedToCase(_case, userId);
+            var isLinked = await _caseAuthorizationService.IsAssigned(userId, caseId);
             if (!isLinked)
             {
                 return BadRequest();
@@ -243,7 +272,7 @@ namespace Cases.API.Controllers
 
             var role = await _caseAuthorizationService.GetUserRole(_case, userId);
 
-            return Ok(role);
+            return Ok(new { role });
         }
 
         [Authorize]
@@ -253,10 +282,10 @@ namespace Cases.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var canAdd = await _caseAuthorizationService.CanUserAddActions(userId, caseId);
+            var canAdd = await _caseAuthorizationService.IsEditor(userId, caseId);
             if (!canAdd) return Forbid();
 
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();
@@ -283,10 +312,13 @@ namespace Cases.API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-            var canView = await _caseAuthorizationService.CanUserViewCaseActions(userId, caseId);
-            if (!canView) return Forbid();
+            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
 
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null)
             {
                 return NotFound();

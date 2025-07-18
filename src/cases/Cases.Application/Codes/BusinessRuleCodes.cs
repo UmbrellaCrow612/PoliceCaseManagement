@@ -28,11 +28,6 @@
         public const string ValidationError = "VALIDATION_ERROR";
 
         /// <summary>
-        /// Indicates that the user trying to access the case  or some sub information cannot, as they do not have required perms, meaning they should not be able to see it's details or protected sub details
-        /// </summary>
-        public const string CasePermissions = "CASE_PERMISSION";
-
-        /// <summary>
         /// Indicates that the user is already linked to a case
         /// </summary>
         public const string UserAlreadyAssignedToCase = "USER_ALREADY_LINKED_TO_CASE";

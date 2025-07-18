@@ -96,9 +96,9 @@ export class CasesIdActionsViewComponent implements OnInit {
       this.caseService.getCaseActions(this.caseId),
       this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
-      next: ([actions, caseRole]) => {
+      next: ([actions, caseRoleResponse]) => {
         this.caseActions = actions;
-        this.currentUserRole = caseRole;
+        this.currentUserRole = caseRoleResponse.role;
         
         this.isLoading = false;
         this.scrollToAddButton();

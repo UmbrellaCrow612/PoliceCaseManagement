@@ -20,48 +20,40 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="caseId"></param>
         /// <returns></returns>
-        Task<Case?> FindById(string caseId);
+        Task<Case?> FindByIdAsync(string caseId);
 
         /// <summary>
         /// Checks if a <see cref="Case.CaseNumber"/> is taken by another case
         /// </summary>
         /// <param name="caseNumber">The case number</param>
         /// <returns>Flag to indicate if a case number is taken</returns>
-        Task<bool> IsCaseNumberTaken(string caseNumber);
+        Task<bool> IsCaseNumberTakenAsync(string caseNumber);
 
         /// <summary>
         /// Search for cases in the system with a query object
         /// </summary>
         /// <param name="query">The query object</param>
         /// <returns>Pagination result of cases</returns>
-        Task<PaginatedResult<Case>> SearchCases(SearchCasesQuery query);
+        Task<PaginatedResult<Case>> SearchCasesAsync(SearchCasesQuery query);
 
         /// <summary>
-        /// Assign user to a case
+        /// Assigns the  user to a case
         /// </summary>
         /// <param name="case">The case to link to</param>
         /// <param name="userId">User id to link to it</param>
-        Task<IResult> AddUser(Case @case, string userId);
+        Task<IResult> AddUserAsync(Case @case, string userId);
 
         /// <summary>
         /// Remove assigned user from a case
         /// </summary>
         /// <param name="userId">The ID of he user to remove</param>
         /// <param name="case">The case you want to remove them from</param>
-        Task<CaseResult> RemoveUser(Case @case, string userId);
+        Task<CaseResult> RemoveUserAsync(Case @case, string userId);
 
         /// <summary>
         /// Get a list of <see cref="CaseAccessList"/> for the specific <see cref="Case"/> - these are all the people linked to them
         /// </summary>
         Task<List<CaseAccessList>> GetUsersAsync(Case @case);
-
-        /// <summary>
-        /// Check to see if a user is linked to a specific <see cref="Case"/>
-        /// </summary>
-        /// <param name="case">The case to check against</param>
-        /// <param name="userId">The user to check</param>
-        /// <returns>A bool to indicate if they are or are not</returns>
-        Task<bool> IsUserLinkedToCase(Case @case, string userId);
     }
 
     /// <summary>

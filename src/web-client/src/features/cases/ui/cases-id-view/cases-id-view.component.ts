@@ -72,10 +72,10 @@ export class CasesIdViewComponent implements OnInit {
       this.caseService.getIncidentTypes(this.caseId),
       this.caseService.getCurrentUsersRoleForCase(this.caseId),
     ]).subscribe({
-      next: ([caseDetails, incidentTypes, currentRole]) => {
+      next: ([caseDetails, incidentTypes, caseRoleResponse]) => {
         this.caseDetails = caseDetails;
         this.incidentTypes = incidentTypes;
-        this.currentUserCaseRole = currentRole;
+        this.currentUserCaseRole = caseRoleResponse.role;
         this.isLoading = false;
       },
       error: (err) => {

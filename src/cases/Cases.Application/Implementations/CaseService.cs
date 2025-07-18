@@ -18,7 +18,7 @@ namespace Cases.Application.Implementations
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
 
-        public async Task<IResult> AddUser(Case @case, string userId)
+        public async Task<IResult> AddUserAsync(Case @case, string userId)
         {
             var result = new CaseResult();
 
@@ -56,7 +56,7 @@ namespace Cases.Application.Implementations
         {
             var result = new CaseResult();
 
-            var isCaseNumberTaken = await IsCaseNumberTaken(caseToCreate.CaseNumber);
+            var isCaseNumberTaken = await IsCaseNumberTakenAsync(caseToCreate.CaseNumber);
             if (isCaseNumberTaken)
             {
                 result.AddError(BusinessRuleCodes.CaseNumberTaken, $"Case number: {caseToCreate.CaseNumber} is taken.");
@@ -121,7 +121,7 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<Case?> FindById(string caseId)
+        public async Task<Case?> FindByIdAsync(string caseId)
         {
             return await _dbcontext.Cases.FindAsync(caseId);
         }
@@ -131,7 +131,7 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAccessLists.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
-        public async Task<bool> IsCaseNumberTaken(string caseNumber)
+        public async Task<bool> IsCaseNumberTakenAsync(string caseNumber)
         {
             if (string.IsNullOrWhiteSpace(caseNumber))
             {
@@ -141,12 +141,12 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.AnyAsync(x => x.CaseNumber == caseNumber);
         }
 
-        public async Task<bool> IsUserLinkedToCase(Case @case, string userId)
+        public async Task<bool> IsUserLinkedToCaseAsync(Case @case, string userId)
         {
             return await _dbcontext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == @case.Id);
         }
 
-        public async Task<CaseResult> RemoveUser(Case @case, string userId)
+        public async Task<CaseResult> RemoveUserAsync(Case @case, string userId)
         {
             var result = new CaseResult();
 
@@ -164,7 +164,7 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<PaginatedResult<Case>> SearchCases(SearchCasesQuery query)
+        public async Task<PaginatedResult<Case>> SearchCasesAsync(SearchCasesQuery query)
         {
             IQueryable<Case> queryBuilder = _dbcontext.Cases.AsQueryable();
 

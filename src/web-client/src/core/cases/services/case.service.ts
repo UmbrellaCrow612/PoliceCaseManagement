@@ -6,6 +6,7 @@ import {
   CaseAction,
   CaseAttachment,
   CasePagedResult,
+  CaseRoleValue,
   CreateCase,
   CreateCaseAction,
 } from '../type';
@@ -299,14 +300,13 @@ export class CaseService {
     );
   }
 
-
   /**
    * Get the current users role for a given case - it will get the current context logeed in users role for the given case
    * @param caseId The Case to get the current requesting users permission for
    * @returns The role - enum number
    */
   getCurrentUsersRoleForCase(caseId: string) {
-    return this.httpClient.get<number>(
+    return this.httpClient.get<{ role: CaseRoleValue }>(
       `${this.BASE_URL}/cases/${caseId}/me`
     );
   }

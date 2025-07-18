@@ -21,7 +21,7 @@ namespace Cases.API.Controllers
         [HttpPost("{caseId}/attachments/upload")]
         public async Task<IActionResult> UploadAttachmentForCase(string caseId, [FromBody] CaseAttachmentFileMetaData meta)
         {
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null) return NotFound();
 
             (string preSignedUrl, string fileId) = await _caseFileService.AddAsync(_case, meta);
@@ -60,7 +60,7 @@ namespace Cases.API.Controllers
         [HttpGet("{caseId}/attachments")]
         public async Task<IActionResult> GetCaseAttachments(string caseId)
         {
-            var _case = await _caseService.FindById(caseId);
+            var _case = await _caseService.FindByIdAsync(caseId);
             if (_case is null) return NotFound();
 
             var files = await _caseFileService.GetAsync(_case);
