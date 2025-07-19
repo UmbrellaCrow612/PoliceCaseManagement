@@ -12,6 +12,8 @@ import { AppLink } from '../../../../core/app/type';
 import { getBusinessErrorCode } from '../../../../core/server-responses/getBusinessErrorCode';
 import CODES from '../../../../core/server-responses/codes';
 import { AuthenticationService } from '../../../../core/authentication/services/authentication.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { StatusCodes } from '../../../../core/http/codes/status-codes';
 
 @Component({
   selector: 'app-cases-id-view',
@@ -78,17 +80,10 @@ export class CasesIdViewComponent implements OnInit {
         this.currentUserCaseRole = caseRoleResponse.role;
         this.isLoading = false;
       },
-      error: (err) => {
-        let code = getBusinessErrorCode(err);
-
-        switch (code) {
-          case CODES.CASE_PERMISSION:
-            this.authService.UnAuthorized();
-            break;
-
-          default:
-            this.errorMessage = 'Could not find case';
-            break;
+      error: (err: HttpErrorResponse) => {
+        if (err.status === StatusCodes.FORBIDDEN) {
+          this.authService.UnAuthorized();
+          return;
         }
 
         this.isLoading = false;
@@ -96,10 +91,7 @@ export class CasesIdViewComponent implements OnInit {
     });
   }
 
-
-  editIncidentTypeClicked(){
-    
-  }
+  editIncidentTypeClicked() {}
 
   links: AppLink[] = [
     {
