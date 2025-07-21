@@ -127,18 +127,18 @@ namespace Evidence.Application.Implementations
 
             if (query.UploadedAt.HasValue)
             {
-                var date = query.UploadedAt.Value.Date;
-                var nextDate = date.AddDays(1);
+                var dateUtc = query.UploadedAt.Value.Date;
+                var nextDateUtc = dateUtc.AddDays(1);
 
-                queryBuilder = queryBuilder.Where(x => x.UploadedAt >= date && x.UploadedAt < nextDate);
+                queryBuilder = queryBuilder.Where(x => x.UploadedAt >= dateUtc && x.UploadedAt < nextDateUtc);
             }
 
             if (query.CollectionDate.HasValue)
             {
-                var date = query.CollectionDate.Value.Date;
-                var nextDate = date.AddDays(1);
+                var dateUtc = query.CollectionDate.Value.Date;
+                var nextDateUtc = dateUtc.AddDays(1);
 
-                queryBuilder = queryBuilder.Where(x => x.CollectionDate >= date && x.CollectionDate < nextDate);
+                queryBuilder = queryBuilder.Where(x => x.CollectionDate >= dateUtc && x.CollectionDate < nextDateUtc);
             }
 
             queryBuilder = query.OrderBy switch
@@ -147,6 +147,11 @@ namespace Evidence.Application.Implementations
                 SearchEvidenceOrderByValues.UploadedAt => queryBuilder.OrderBy(x => x.UploadedAt),
                 _ => queryBuilder.OrderBy(x => x.Id),
             };
+
+            if (!string.IsNullOrWhiteSpace(query.UploadedById))
+            {
+                queryBuilder = queryBuilder.Where(x => x.UploadedById == query.UploadedById);
+            }
 
             int pageSize = query.PageSize ?? 10;
             int pageNumber = query.PageNumber > 0 ? query.PageNumber : 1;

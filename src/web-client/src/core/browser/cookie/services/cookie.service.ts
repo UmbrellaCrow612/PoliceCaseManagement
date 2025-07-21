@@ -72,7 +72,7 @@ export class CookieService {
       ) {
         const expires =
           finalOptions.Expires instanceof Date
-            ? finalOptions.Expires.toUTCString()
+            ? finalOptions.Expires.toISOString()
             : finalOptions.Expires;
         cookieString += `Expires=${expires}; `;
       }

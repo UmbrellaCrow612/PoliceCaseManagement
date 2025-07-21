@@ -5,7 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Tag, TagPagedResult } from '../../types';
+import { Tag } from '../../types';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
@@ -17,6 +17,7 @@ import { debounceTime } from 'rxjs';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { PaginatedResult } from '../../../app/type';
 
 /**
  * Custom component that used in reactive forms to select mutliple tags in a form group
@@ -59,7 +60,7 @@ export class SearchEvidenceTagMultiSelectComponent
   /**
    * Visual list to display for the searched term opf tags
    */
-  _searchedTagsResult: TagPagedResult | null = null;
+  _searchedTagsResult: PaginatedResult<Tag> | null = null;
 
   /**
    * Internal state what current tags are selected

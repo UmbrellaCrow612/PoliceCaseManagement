@@ -81,7 +81,7 @@ export class CaseService {
       const incidentDate = new Date(options.incidentDateTime);
       urlBuilder.searchParams.append(
         'incidentDateTime',
-        incidentDate.toUTCString()
+        incidentDate.toISOString()
       );
     }
 
@@ -89,7 +89,7 @@ export class CaseService {
       const reportedDate = new Date(options.reportedDateTime);
       urlBuilder.searchParams.append(
         'reportedDateTime',
-        reportedDate.toUTCString()
+        reportedDate.toISOString()
       );
     }
 

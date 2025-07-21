@@ -1,6 +1,83 @@
 <h1>Evidence Management</h1>
+<h2>Search and filter</h2>
 
+<form
+  [formGroup]="searchEvidenceForm"
+  (ngSubmit)="searchClicked()"
+  class="form_group"
+>
+  <mat-form-field appearance="outline">
+    <mat-label>Refrence number</mat-label>
+    <input matInput formControlName="referenceNumber" />
+  </mat-form-field>
 
-<button (click)="uploadClicked()">
-    Upload
-</button>
+  <mat-form-field appearance="outline">
+    <mat-label>File name</mat-label>
+    <input matInput formControlName="fileName" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Content type</mat-label>
+    <input matInput formControlName="contentType" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Uploaded date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="uploadedAtPicker"
+      formControlName="uploadedAt"
+    />
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="uploadedAtPicker"
+    ></mat-datepicker-toggle>
+    <mat-datepicker #uploadedAtPicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Collection date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="collectionDatePicker"
+      formControlName="collectionDate"
+    />
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="collectionDatePicker"
+    ></mat-datepicker-toggle>
+    <mat-datepicker #collectionDatePicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Order by</mat-label>
+    <mat-select formControlName="orderBy">
+      @for (item of copy_EvidenceOrderByNames; track $index) {
+      <mat-option [value]="item.value">{{ item.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <app-search-users-select
+    [appearance]="'outline'"
+    displayText="Uploaded By"
+    formControlName="uploadedBy"
+  />
+
+  <button mat-button type="submit">Search</button>
+
+  <button mat-button type="button" (click)="searchEvidenceForm.reset()">
+    Clear
+  </button>
+</form>
+
+<button (click)="uploadClicked()" mat-button>Upload</button>
+
+<div>
+  {{ searchEvidenceForm.value | json }}
+</div>
+<div>
+  {{ searchedEvidencePaginated | json }}
+</div>

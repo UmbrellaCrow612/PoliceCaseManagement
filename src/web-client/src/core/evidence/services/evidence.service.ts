@@ -1,7 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import env from '../../../environments/environment';
-import { Tag, TagPagedResult, UploadEvidence } from '../types';
+import {
+  Evidence,
+  SearchEvidenceQuery,
+  Tag,
+  UploadEvidence,
+} from '../types';
+import { Observable } from 'rxjs';
+import { PaginatedResult } from '../../app/type';
 
 /**
  * Central service to do all Evidence related business logic
@@ -37,7 +44,7 @@ export class EvidenceService {
 
     urlBuilder.searchParams.append('name', searchQuery.name);
 
-    return this.http.get<TagPagedResult>(urlBuilder.toString());
+    return this.http.get<PaginatedResult<Tag>>(urlBuilder.toString());
   }
 
   /**
@@ -82,7 +89,31 @@ export class EvidenceService {
    * Mark a evidence as uploaded from the client side - we use client side upload - we inform backend that it was uploaded from the client
    * @param evidenceId The evidence that was uploaded from the client
    */
-  markEvidenceAsUploaded(evidenceId:string) {
-    return this.http.post(`${this.BASE_URL}/evidence/${evidenceId}/upload-complete`, {});
+  markEvidenceAsUploaded(evidenceId: string) {
+    return this.http.post(
+      `${this.BASE_URL}/evidence/${evidenceId}/upload-complete`,
+      {}
+    );
+  }
+
+  /**
+   * Search evidence in the system
+   * @param query Contains all search query filter options
+   * @returns Matching evidence in a paginated format
+   */
+  search(query: SearchEvidenceQuery): Observable<PaginatedResult<Evidence>> {
+    var urlBuilder = new URL(`${this.BASE_URL}/evidence/search`);
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value === null || value == undefined) {
+        return;
+      }
+      if (value instanceof Date) {
+        urlBuilder.searchParams.append(key, value.toISOString());
+      } else {
+        urlBuilder.searchParams.append(key, value.toString());
+      }
+    });
+    return this.http.get<PaginatedResult<Evidence>>(urlBuilder.toString());
   }
 }

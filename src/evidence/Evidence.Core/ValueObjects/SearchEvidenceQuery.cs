@@ -44,5 +44,10 @@
         /// Order by <see cref="SearchEvidenceOrderByValues"/>
         /// </summary>
         public SearchEvidenceOrderByValues? OrderBy { get; set; } = null; 
+
+        /// <summary>
+        /// The ID of the user who uploaded the piece of evidence <see cref="Models.Evidence.UploadedById"/>
+        /// </summary>
+        public string? UploadedById { get; set; } = null;
     }
 }

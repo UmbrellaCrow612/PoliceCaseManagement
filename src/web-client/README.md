@@ -30,7 +30,7 @@ if (this.form.valid) {
 ```
 
 - Handle error codes that are send from the backend correctly and do specific actions based on them
-- `NOTE`: Use UTC time when sendid time data to backend so we use both utc on backend and frontend `toUTCString`
+- `NOTE`: Use UTC time when sending time data to backend so we use both utc on backend and frontend `toISOString` for date objects being sent
 - Sync reactive form validators preface with `Validator` like `Validator_containsOnlyNumeric` - any none domain specific logic put it on `control.ts` else 
 make a specific folder within the business domain folder validators for example `cases/validators/...`
 - Async reactive form validators use `UniqueEvidenceReferenceNumberAsyncValidator` as a ref
