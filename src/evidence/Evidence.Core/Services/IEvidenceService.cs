@@ -53,6 +53,25 @@ namespace Evidence.Core.Services
         /// <param name="query">Contains fields you can search by</param>
         /// <returns>Paginated result of matching items</returns>
         Task<PaginatedResult<Models.Evidence>> SearchAsync(SearchEvidenceQuery query);
+
+        /// <summary>
+        /// Download a piece of <see cref="Models.Evidence"/>
+        /// </summary>
+        /// <param name="evidence">The piece of evidence to download</param>
+        /// <returns>Result object and a client side download URL if successful</returns>
+        Task<DownloadEvidenceResult> DownloadAsync(Models.Evidence evidence);
+    }
+
+    public class DownloadEvidenceResult : IResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<IResultError> Errors { get; set; } = [];
+        public string DownloadUrl { get; set; } = "EMPTY";
+
+        public void AddError(string code, string? message = null)
+        {
+            Errors.Add(new EvidenceServiceError { Code = code, Message = message });
+        }
     }
 
     public class CreateEvidenceResult : IResult

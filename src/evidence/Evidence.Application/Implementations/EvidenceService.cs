@@ -74,6 +74,23 @@ namespace Evidence.Application.Implementations
             return result;
         }
 
+        public async Task<DownloadEvidenceResult> DownloadAsync(Core.Models.Evidence evidence)
+        {
+            var result = new DownloadEvidenceResult();
+
+            if (evidence.IsDeleted)
+            {
+                result.AddError(BusinessRuleCodes.EVIDENCE_DELETED, "Evidence deleted");
+                return result;
+            }
+
+            var downloadUrl = await _storageProvider.GetPreSignedDownloadUrlAsync(evidence.S3Key, 3);
+            result.DownloadUrl = downloadUrl;
+
+            result.Succeeded = true;
+            return result;
+        }
+
         public async Task<bool> ExistsAsync(string evidenceId)
         {
             return await _dbcontext.Evidences.AnyAsync(x => x.Id == evidenceId);

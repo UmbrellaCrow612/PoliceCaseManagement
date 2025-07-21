@@ -25,12 +25,27 @@ namespace Evidence.API.Mappings
 
         public EvidenceDto ToDto(Core.Models.Evidence @base)
         {
-            throw new NotImplementedException();
+            return new EvidenceDto
+            {
+                CollectionDate = @base.CollectionDate,
+                ContentType = @base.ContentType,
+                Description = @base.Description,
+                FileName = @base.FileName,
+                FileSize = @base.FileSize,
+                FileUploadStatus = @base.FileUploadStatus,
+                ReferenceNumber = @base.ReferenceNumber,
+                UploadedAt = @base.UploadedAt,
+                UploadedByEmail = @base.UploadedByEmail,
+                UploadedById = @base.UploadedById,
+                UploadedByUsername = @base.UploadedByUsername,
+            };
         }
 
         public void Update(Core.Models.Evidence @base, UpdateEvidenceDto updateDto)
         {
-            throw new NotImplementedException();
+            @base.Description = updateDto.Description;
+            @base.FileName = updateDto.FileName;
+            @base.CollectionDate = updateDto.CollectionDate;
         }
     }
 }

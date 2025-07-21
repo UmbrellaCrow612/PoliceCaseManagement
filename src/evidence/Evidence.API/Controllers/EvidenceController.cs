@@ -114,6 +114,7 @@ namespace Evidence.API.Controllers
             }
 
             await _redisService.RemoveKeyAsync(evidence.Id);
+
             var cacheEntry = _evidenceMapping.ToDto(evidence);
             await _redisService.SetStringAsync<EvidenceDto>(evidence.Id, cacheEntry);
 
@@ -141,6 +142,25 @@ namespace Evidence.API.Controllers
             await _redisService.RemoveKeyAsync(evidence.Id);
 
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{evidenceId}/download")]
+        public async Task<IActionResult> DownloadEvidenceAsync(string evidenceId)
+        {
+            var evidence = await _evidenceService.FindByIdAsync(evidenceId);
+            if (evidence is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _evidenceService.DownloadAsync(evidence);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new { result.DownloadUrl });
         }
 
         [Authorize]

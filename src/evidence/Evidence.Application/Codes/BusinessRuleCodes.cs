@@ -29,5 +29,10 @@
         /// Use when trying to delete a <see cref="Core.Models.Evidence"/> that is already deleted
         /// </summary>
         public static readonly string EVIDENCE_ALREADY_DELETED = "EVIDENCE_ALREADY_DELETED";
+
+        /// <summary>
+        /// Use when trying to download a <see cref="Core.Models.Evidence"/> that is already deleted
+        /// </summary>
+        public static readonly string EVIDENCE_DELETED = "EVIDENCE_DELETED";
     }
 }
