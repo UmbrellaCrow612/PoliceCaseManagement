@@ -6,6 +6,7 @@ using Evidence.Core.Services;
 using Evidence.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.Abstractions;
 using System.Security.Claims;
 
 namespace Evidence.API.Controllers
@@ -15,13 +16,12 @@ namespace Evidence.API.Controllers
     /// </summary>
     [ApiController]
     [Route("evidence")]
-    public class EvidenceController(IEvidenceService evidenceService, IRedisService redisService, ITagService tagService, SearchTagsQueryValidator searchTagsQueryValidator) : ControllerBase
+    public class EvidenceController(IEvidenceService evidenceService, IRedisService redisService, SearchEvidenceQueryValidator searchEvidenceQueryValidator) : ControllerBase
     {
         private readonly IEvidenceService _evidenceService = evidenceService;
         private readonly IRedisService _redisService = redisService;
         private readonly EvidenceMapping _evidenceMapping = new();
-        private readonly ITagService _tagService = tagService;
-        private readonly SearchTagsQueryValidator _searchTagsQueryValidator = searchTagsQueryValidator;
+        private readonly SearchEvidenceQueryValidator _searchEvidenceQueryValidator = searchEvidenceQueryValidator;
 
         /// <summary>
         /// Create a piece of <see cref="Core.Models.Evidence"/> and returns a upload URL
@@ -124,13 +124,16 @@ namespace Evidence.API.Controllers
         [HttpDelete("{evidenceId}")]
         public async Task<IActionResult> DeleteEvidenceByIdAsync(string evidenceId)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
             var evidence = await _evidenceService.FindByIdAsync(evidenceId);
             if (evidence is null)
             {
                 return NotFound();
             }
 
-            var result = await _evidenceService.DeleteAsync(evidence);
+            var result = await _evidenceService.DeleteAsync(evidence, userId);
             if (!result.Succeeded)
             {
                 return BadRequest(result);
@@ -140,9 +143,6 @@ namespace Evidence.API.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Check if a <see cref="Core.Models.Evidence.ReferenceNumber"/> is taken by another
-        /// </summary>
         [Authorize]
         [HttpPost("reference-numbers/is-taken")]
         public async Task<IActionResult> IsReferenceNumberTaken([FromBody] ReferenceNumberRequest dto)
@@ -152,20 +152,26 @@ namespace Evidence.API.Controllers
             return Ok(new { isTaken });
         }
 
-
         [Authorize]
-        [HttpGet("tags")]
-        public async Task<IActionResult> SearchTags([FromQuery] SearchTagsQuery query)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchEvidenceAsync([FromQuery] SearchEvidenceQuery query)
         {
-            var validationResult = _searchTagsQueryValidator.Execute(query);
-            if (!validationResult.IsSuccessful)
+            var queryValidatorResult = _searchEvidenceQueryValidator.Execute(query);
+            if (!queryValidatorResult.IsSuccessful)
             {
-                return BadRequest(validationResult);
+                return BadRequest(queryValidatorResult);
             }
 
-            var tags = await _tagService.SearchAsync(query);
+            var pagedResult = await _evidenceService.SearchAsync(query);
+            var dto = new PaginatedResult<EvidenceDto>
+            {
+                Data = pagedResult.Data.Select(x => _evidenceMapping.ToDto(x)),
+                HasNextPage = pagedResult.HasNextPage,
+                HasPreviousPage = pagedResult.HasPreviousPage,
+                Pagination = pagedResult.Pagination,
+            };
 
-            return Ok(tags);
+            return Ok(dto);
         }
     }
 }

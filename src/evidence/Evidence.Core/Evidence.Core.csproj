@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\Pagination.Abstractions\Pagination.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\libs\Results.Abstractions\Results.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\libs\SoftDelete.Abstractions\SoftDelete.Abstractions.csproj" />
     <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
   </ItemGroup>
 

@@ -38,6 +38,12 @@ namespace Evidence.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedById")
+                        .HasColumnType("text");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -50,6 +56,9 @@ namespace Evidence.Infrastructure.Migrations
 
                     b.Property<int>("FileUploadStatus")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()

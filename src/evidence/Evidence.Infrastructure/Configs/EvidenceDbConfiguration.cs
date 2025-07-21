@@ -13,6 +13,8 @@ namespace Evidence.Infrastructure.Configs
             builder.HasIndex(x => x.Id).IsUnique();
 
             builder.HasIndex(x => x.ReferenceNumber).IsUnique();
+
+            builder.HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

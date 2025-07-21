@@ -1,12 +1,13 @@
 ﻿using Events.Core;
 using Evidence.Core.Models.Joins;
+using SoftDelete.Abstractions;
 
 namespace Evidence.Core.Models
 {
     /// <summary>
     /// Represents a piece of evidence in the system
     /// </summary>
-    public class Evidence : IDenormalizedEntity
+    public class Evidence : IDenormalizedEntity, ISoftDelete
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -55,6 +56,19 @@ namespace Evidence.Core.Models
         /// </summary>
         public required DateTime CollectionDate {  get; set; }
 
+        /// <summary>
+        /// The status the file is currently in
+        /// </summary>
+        public FileUploadStatus FileUploadStatus { get; set; } = FileUploadStatus.Failed;
+
+
+
+        // delete fields
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; } = null;
+        public string? DeletedById { get; set; } = null;
+
+
 
         // Denorm data for user
         [DenormalizedField("Application user", "Id", "Identity Service")]
@@ -67,13 +81,20 @@ namespace Evidence.Core.Models
         public required string UploadedByEmail { get; set; }
 
 
+
         /// <summary>
         /// Many to Many link join table between <see cref="Models.Evidence"/> and <see cref="Models.Tag"/>
         /// </summary>
         public ICollection<EvidenceTag> EvidenceTags { get; set; } = [];
 
 
-        public FileUploadStatus FileUploadStatus { get; set; } = FileUploadStatus.Failed;
+
+        public void Delete(string deletedById)
+        {
+            IsDeleted = true;
+            DeletedAt = DateTime.UtcNow;
+            DeletedById = deletedById;
+        }
 
 
         /// <summary>

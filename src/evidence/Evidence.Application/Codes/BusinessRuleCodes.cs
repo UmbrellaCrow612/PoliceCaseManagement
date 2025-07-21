@@ -16,7 +16,7 @@
         public static readonly string USER_DOES_NOT_EXIST = "USER_DOES_NOT_EXIST";
 
         /// <summary>
-        /// UsE when a <see cref="Core.Models.Evidence"/> being created and it's ref number is already taken by another as they are unique
+        /// Use when a <see cref="Core.Models.Evidence"/> being created and it's ref number is already taken by another as they are unique
         /// </summary>
         public static readonly string EVIDENCE_REFERENCE_NUMBER_TAKEN = "EVIDENCE_REFERENCE_NUMBER_TAKEN";
 
@@ -24,5 +24,10 @@
         /// Use this when updating a evidence item and it's ref number has been changed - this is not allowed
         /// </summary>
         public static readonly string EVIDENCE_REFERENCE_CHANGED = "EVIDENCE_REFERENCE_CHANGED";
+
+        /// <summary>
+        /// Use when trying to delete a <see cref="Core.Models.Evidence"/> that is already deleted
+        /// </summary>
+        public static readonly string EVIDENCE_ALREADY_DELETED = "EVIDENCE_ALREADY_DELETED";
     }
 }

@@ -1,7 +1,12 @@
-﻿using Results.Abstractions;
+﻿using Evidence.Core.ValueObjects;
+using Pagination.Abstractions;
+using Results.Abstractions;
 
 namespace Evidence.Core.Services
 {
+    /// <summary>
+    /// Contract to interact with <see cref="Core.Models.Evidence"/>
+    /// </summary>
     public interface IEvidenceService
     {
         /// <summary>
@@ -32,7 +37,8 @@ namespace Evidence.Core.Services
         /// Delete a specific <see cref="Models.Evidence"/> from the system
         /// </summary>
         /// <param name="evidence">The evidence to delete</param>
-        Task<EvidenceServiceResult> DeleteAsync(Models.Evidence evidence);
+        /// <param name="userId">The ID of the user who is performing the action</param>
+        Task<EvidenceServiceResult> DeleteAsync(Models.Evidence evidence, string userId);
 
         /// <summary>
         /// Check if a <see cref="Core.Models.Evidence.ReferenceNumber"/> is taken
@@ -40,6 +46,13 @@ namespace Evidence.Core.Services
         /// <param name="referenceNumber">The number to check</param>
         /// <returns>Bool if it is or is not</returns>
         Task<bool> IsReferenceNumberTaken(string referenceNumber);
+
+        /// <summary>
+        /// Search <see cref="Models.Evidence"/> in the system using a query <see cref="SearchEvidenceQuery"/>
+        /// </summary>
+        /// <param name="query">Contains fields you can search by</param>
+        /// <returns>Paginated result of matching items</returns>
+        Task<PaginatedResult<Models.Evidence>> SearchAsync(SearchEvidenceQuery query);
     }
 
     public class CreateEvidenceResult : IResult
