@@ -4,6 +4,7 @@ namespace Evidence.API.DTOs
 {
     public class EvidenceDto
     {
+        public required string Id { get; set; }
         public required string? Description { get; set; } = null;
         public required string ReferenceNumber { get; set; }
         public required string FileName { get; set; }

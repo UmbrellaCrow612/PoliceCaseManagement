@@ -34,6 +34,12 @@ export const EvidenceOrderByNames: { value: number; name: string }[] = [
 ] as const;
 
 /**
+ * Represents the backend enum for file uploaded status for evidence
+ */
+export const EvidenceFileUploadStatusNames: { value: number; name: string }[] =
+  [];
+
+/**
  * Contaisn all the ways to search evidence in the system - mapped from backend query object for searching evidence
  */
 export interface SearchEvidenceQuery {
@@ -51,4 +57,17 @@ export interface SearchEvidenceQuery {
 /**
  * Represents a piece of evidence - backend Dto mapped here
  */
-export interface Evidence {}
+export interface Evidence {
+  id: string;
+  collectionDate: Date;
+  contentType: string;
+  description: string;
+  fileName: string;
+  fileSize: number;
+  fileUploadStatus: number;
+  referenceNumber: string;
+  uploadedAt: Date;
+  uploadedByEmail: string;
+  uploadedById: string;
+  uploadedByUsername: string;
+}

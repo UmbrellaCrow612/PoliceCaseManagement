@@ -1,0 +1,26 @@
+.container {
+  height: 250px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item {
+  padding: 10px;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  border-radius: 5px;
+  user-select: none;
+  transition: 0.2s;
+}
+
+.item:hover {
+  border-color: #999;
+}
+
+.selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}

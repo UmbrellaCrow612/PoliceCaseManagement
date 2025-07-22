@@ -1,0 +1,29 @@
+<div>
+  <ul class="container">
+    @for (item of items().data; track $index) {
+    <li
+      class="item"
+      [class.selected]="_internalSelectedEvidenceItem === item"
+      (click)="handleItemClicked(item)"
+      tabindex="0"
+      role="option"
+      (keydown)="handleItemKeyDownClicked($event, item)"
+    >
+      {{ item.fileName }}
+    </li>
+    } @empty {
+    <li>No items</li>
+    }
+  </ul>
+
+  <div>
+    @if (items().hasNextPage) {
+    <button (click)="handleNextClicked()">Next</button>
+
+    }
+    <!---->
+    @if (items().hasPreviousPage) {
+    <button (click)="handlePreviousClicked()">Previous</button>
+    }
+  </div>
+</div>

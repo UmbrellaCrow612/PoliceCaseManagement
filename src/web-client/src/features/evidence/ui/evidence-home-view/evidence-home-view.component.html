@@ -75,9 +75,6 @@
 
 <button (click)="uploadClicked()" mat-button>Upload</button>
 
-<div>
-  {{ searchEvidenceForm.value | json }}
-</div>
-<div>
-  {{ searchedEvidencePaginated | json }}
-</div>
+@if (searchedEvidencePaginated) {
+<app-evidence-grid-list [items]="searchedEvidencePaginated" />
+}

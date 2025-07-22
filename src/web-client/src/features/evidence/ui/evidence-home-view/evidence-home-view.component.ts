@@ -17,6 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { RestrictedUser } from '../../../../core/user/type';
 import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
+import { EvidenceGridListComponent } from "../../../../core/evidence/components/evidence-grid-list/evidence-grid-list.component";
 
 @Component({
   selector: 'app-evidence-home-view',
@@ -29,7 +30,8 @@ import { SearchUsersSelectComponent } from '../../../../core/user/components/sea
     MatDatepickerModule,
     MatSelectModule,
     SearchUsersSelectComponent,
-  ],
+    EvidenceGridListComponent
+],
   templateUrl: './evidence-home-view.component.html',
   styleUrl: './evidence-home-view.component.css',
   providers: [provideNativeDateAdapter()],

@@ -27,6 +27,7 @@ namespace Evidence.API.Mappings
         {
             return new EvidenceDto
             {
+                Id = @base.Id,
                 CollectionDate = @base.CollectionDate,
                 ContentType = @base.ContentType,
                 Description = @base.Description,
