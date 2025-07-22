@@ -17,7 +17,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { RestrictedUser } from '../../../../core/user/type';
 import { SearchUsersSelectComponent } from '../../../../core/user/components/search-users-select/search-users-select.component';
-import { EvidenceGridListComponent } from "../../../../core/evidence/components/evidence-grid-list/evidence-grid-list.component";
+import { EvidenceGridListComponent } from '../../../../core/evidence/components/evidence-grid-list/evidence-grid-list.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-evidence-home-view',
@@ -30,8 +31,8 @@ import { EvidenceGridListComponent } from "../../../../core/evidence/components/
     MatDatepickerModule,
     MatSelectModule,
     SearchUsersSelectComponent,
-    EvidenceGridListComponent
-],
+    EvidenceGridListComponent,
+  ],
   templateUrl: './evidence-home-view.component.html',
   styleUrl: './evidence-home-view.component.css',
   providers: [provideNativeDateAdapter()],
@@ -39,6 +40,8 @@ import { EvidenceGridListComponent } from "../../../../core/evidence/components/
 export class EvidenceHomeViewComponent {
   private readonly dialog = inject(MatDialog);
   private readonly evidenceService = inject(EvidenceService);
+  private readonly router = inject(Router);
+  private readonly active = inject(ActivatedRoute);
 
   /**
    * Local copy of EvidenceOrderByNames
@@ -82,7 +85,7 @@ export class EvidenceHomeViewComponent {
     this.errorMessage = null;
 
     this.evidenceService
-      .search({
+      .searchEvidence({
         collectionDate: this.searchEvidenceForm.controls.collectionDate.value,
         contentType: this.searchEvidenceForm.controls.contentType.value,
         fileName: this.searchEvidenceForm.controls.fileName.value,
@@ -115,6 +118,16 @@ export class EvidenceHomeViewComponent {
       maxWidth: '600px',
       height: '100%',
       maxHeight: '600px',
+    });
+  }
+
+  /**
+   * Runs when evidence grid item is selcted
+   * @param item The evidence selected
+   */
+  handleEvidenceItemClicked(item: Evidence) {
+    this.router.navigate([item.id], {
+      relativeTo: this.active,
     });
   }
 }

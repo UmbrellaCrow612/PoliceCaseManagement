@@ -16,6 +16,13 @@ export const EVIDENCE_ROUTES: Routes = [
             (e) => e.EvidenceHomeViewComponent
           ),
       },
+      {
+        path: ':evidenceId',
+        loadComponent: () =>
+          import('./ui/evidence-id-view/evidence-id-view.component').then(
+            (e) => e.EvidenceIdViewComponent
+          ),
+      },
     ],
   },
 ];

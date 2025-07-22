@@ -76,5 +76,5 @@
 <button (click)="uploadClicked()" mat-button>Upload</button>
 
 @if (searchedEvidencePaginated) {
-<app-evidence-grid-list [items]="searchedEvidencePaginated" />
+<app-evidence-grid-list [items]="searchedEvidencePaginated" (itemSelected)="handleEvidenceItemClicked($event)"/>
 }

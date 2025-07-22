@@ -34,5 +34,10 @@
         /// Use when trying to download a <see cref="Core.Models.Evidence"/> that is already deleted
         /// </summary>
         public static readonly string EVIDENCE_DELETED = "EVIDENCE_DELETED";
+
+        /// <summary>
+        /// Use when trying to download or view a piece of <see cref="Core.Models.Evidence"/> that is in a failed upload state
+        /// </summary>
+        public static readonly string EVIDENCE_FAILED_TO_UPLOAD = "EVIDENCE_FAILED_TO_UPLOAD";
     }
 }

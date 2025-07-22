@@ -1,12 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import env from '../../../environments/environment';
-import {
-  Evidence,
-  SearchEvidenceQuery,
-  Tag,
-  UploadEvidence,
-} from '../types';
+import { Evidence, SearchEvidenceQuery, Tag, UploadEvidence } from '../types';
 import { Observable } from 'rxjs';
 import { PaginatedResult } from '../../app/type';
 
@@ -101,7 +96,7 @@ export class EvidenceService {
    * @param query Contains all search query filter options
    * @returns Matching evidence in a paginated format
    */
-  search(query: SearchEvidenceQuery): Observable<PaginatedResult<Evidence>> {
+  searchEvidence(query: SearchEvidenceQuery): Observable<PaginatedResult<Evidence>> {
     var urlBuilder = new URL(`${this.BASE_URL}/evidence/search`);
 
     Object.entries(query).forEach(([key, value]) => {
@@ -115,5 +110,25 @@ export class EvidenceService {
       }
     });
     return this.http.get<PaginatedResult<Evidence>>(urlBuilder.toString());
+  }
+
+  /**
+   * Get a specific evidence by it's ID
+   * @param evidenceId The ID of the evidence to fetch
+   * @returns The evidence
+   */
+  getEvidenceById(evidenceId: string) {
+    return this.http.get<Evidence>(`${this.BASE_URL}/evidence/${evidenceId}`);
+  }
+
+  /**
+   * View a piece of evidencer within the browser without having to download it to the client machine but within there browser
+   * @param evidenceId The evidence to view
+   * @returns A url used to view a piece of evidence within the browser
+   */
+  getEvidenceInlineBrowserViewUrl(evidenceId: string) {
+    return this.http.get<{ viewUrl: string }>(
+      `${this.BASE_URL}/evidence/${evidenceId}/view`
+    );
   }
 }

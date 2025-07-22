@@ -24,6 +24,14 @@ namespace StorageProvider.Abstractions
         Task<string> GetPreSignedDownloadUrlAsync(string filePath, int? expirationInMinutes = 5);
 
         /// <summary>
+        /// Generate a view pre-signed url used to view a file
+        /// </summary>
+        /// <param name="filePath">The path (or key) of the file to download.</param>
+        /// <param name="expirationInMinutes">Time in minutes until the URL expires.</param>
+        /// <returns>A URL that allows viewing the file directly from storage.</returns>
+        Task<string> GetPreSignedViewUrlAsync(string filePath, int? expirationInMinutes = 5);
+
+        /// <summary>
         /// Deletes a file from storage.
         /// </summary>
         /// <param name="filePath">The path (or key) of the file to delete.</param>

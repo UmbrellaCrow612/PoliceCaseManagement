@@ -60,32 +60,29 @@ namespace Evidence.Core.Services
         /// <param name="evidence">The piece of evidence to download</param>
         /// <returns>Result object and a client side download URL if successful</returns>
         Task<DownloadEvidenceResult> DownloadAsync(Models.Evidence evidence);
+
+        /// <summary>
+        /// View a piece of <see cref="Models.Evidence"/>
+        /// </summary>
+        /// <param name="evidence">The evidence to view</param>
+        /// <returns>Result object</returns>
+        Task<ViewEvidenceResult> ViewAsync(Models.Evidence evidence);
     }
 
-    public class DownloadEvidenceResult : IResult
+    public class ViewEvidenceResult : EvidenceServiceResult
     {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<IResultError> Errors { get; set; } = [];
+        public string ViewUrl { get; set; } = "EMPTY";
+    }
+
+    public class DownloadEvidenceResult : EvidenceServiceResult
+    {
         public string DownloadUrl { get; set; } = "EMPTY";
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new EvidenceServiceError { Code = code, Message = message });
-        }
     }
 
-    public class CreateEvidenceResult : IResult
+    public class CreateEvidenceResult : EvidenceServiceResult
     {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<IResultError> Errors { get; set; } = [];
         public string UploadUrl { get; set; } = "";
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new EvidenceServiceError { Code = code, Message = message });
-        }
     }
-
 
     public class EvidenceServiceResult : IResult
     {

@@ -1,4 +1,5 @@
 ﻿using Evidence.Application.Codes;
+using Evidence.Core.Models;
 using Evidence.Core.Services;
 using Evidence.Core.ValueObjects;
 using Evidence.Infrastructure.Data;
@@ -81,6 +82,12 @@ namespace Evidence.Application.Implementations
             if (evidence.IsDeleted)
             {
                 result.AddError(BusinessRuleCodes.EVIDENCE_DELETED, "Evidence deleted");
+                return result;
+            }
+
+            if (evidence.FileUploadStatus == FileUploadStatus.Failed)
+            {
+                result.AddError(BusinessRuleCodes.EVIDENCE_FAILED_TO_UPLOAD, "Cannot download as file failed to upload");
                 return result;
             }
 
@@ -184,6 +191,29 @@ namespace Evidence.Application.Implementations
 
             _dbcontext.Evidences.Update(evidence);
             await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<ViewEvidenceResult> ViewAsync(Core.Models.Evidence evidence)
+        {
+            var result = new ViewEvidenceResult();
+
+            if (evidence.IsDeleted)
+            {
+                result.AddError(BusinessRuleCodes.EVIDENCE_DELETED, "Evidence deleted");
+                return result;
+            }
+
+            if (evidence.FileUploadStatus == FileUploadStatus.Failed)
+            {
+                result.AddError(BusinessRuleCodes.EVIDENCE_FAILED_TO_UPLOAD, "Evidence failed to upload cannot view");
+                return result;
+            }
+
+            var viewUrl = await _storageProvider.GetPreSignedViewUrlAsync(evidence.S3Key);
+            result.ViewUrl = viewUrl;
 
             result.Succeeded = true;
             return result;

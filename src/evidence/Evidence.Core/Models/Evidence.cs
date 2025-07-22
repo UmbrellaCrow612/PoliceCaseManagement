@@ -1,5 +1,6 @@
 ﻿using Events.Core;
 using Evidence.Core.Models.Joins;
+using Evidence.Core.ValueObjects;
 using SoftDelete.Abstractions;
 
 namespace Evidence.Core.Models
@@ -113,14 +114,5 @@ namespace Evidence.Core.Models
         {
             FileUploadStatus = FileUploadStatus.Uploaded;
         }
-    }
-
-    /// <summary>
-    /// Status a file is currently in
-    /// </summary>
-    public enum FileUploadStatus
-    {
-        Uploaded = 0,
-        Failed = 1
     }
 }

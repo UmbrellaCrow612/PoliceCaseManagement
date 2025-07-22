@@ -51,5 +51,22 @@ namespace StorageProvider.AWS
 
             return Task.FromResult(_amazonS3.GetPreSignedURL(request));
         }
+
+        public Task<string> GetPreSignedViewUrlAsync(string filePath, int? expirationInMinutes = 5)
+        {
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = filePath,
+                Expires = DateTime.UtcNow.AddMinutes((double)expirationInMinutes),
+                Verb = HttpVerb.GET,
+                ResponseHeaderOverrides = new ResponseHeaderOverrides
+                {
+                    ContentDisposition = "inline" // View in browser
+                }
+            };
+
+            return Task.FromResult(_amazonS3.GetPreSignedURL(request));
+        }
     }
 }

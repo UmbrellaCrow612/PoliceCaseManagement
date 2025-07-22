@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>View evidence file</h2>
+<mat-dialog-content class="mat-typography">
+  @if (isLoading) {
+  <div>Loading</div>
+  }
+
+  <!---->
+
+  @if (!isLoading && errorMessage) {
+  <div>Failed to load document</div>
+  }
+
+  <!---->
+
+  @if (!isLoading && !errorMessage && viewUrl) {
+  <div>
+    Content
+
+    <div>
+      <iframe
+        [src]="viewUrl | safePipe"
+        width="100%"
+        height="600px"
+        frameborder="0"
+      ></iframe>
+    </div>
+  </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
+  <button mat-button [disabled]="isLoading || errorMessage">Download</button>
+</mat-dialog-actions>

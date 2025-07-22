@@ -193,5 +193,25 @@ namespace Evidence.API.Controllers
 
             return Ok(dto);
         }
+
+
+        [Authorize]
+        [HttpGet("{evidenceId}/view")]
+        public async Task<IActionResult> ViewEvidenceByIdAsync(string evidenceId)
+        {
+            var evidence = await _evidenceService.FindByIdAsync(evidenceId);
+            if (evidence is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _evidenceService.ViewAsync(evidence);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new { result.ViewUrl });
+        }
     }
 }

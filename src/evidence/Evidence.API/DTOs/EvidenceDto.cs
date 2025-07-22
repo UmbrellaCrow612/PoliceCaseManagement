@@ -1,4 +1,5 @@
 ﻿using Evidence.Core.Models;
+using Evidence.Core.ValueObjects;
 
 namespace Evidence.API.DTOs
 {

@@ -1,0 +1,19 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (!isLoading && errorMessage) {
+<div>Page failed to load: {{ errorMessage }}</div>
+}
+
+<!---->
+
+@if (!isLoading && !errorMessage) {
+<div>Page {{ evidence | json }}</div>
+
+<div>
+  <button mat-button (click)="handleViewClicked()">View</button>
+</div>
+}
