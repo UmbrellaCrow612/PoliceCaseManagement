@@ -25,11 +25,12 @@
 - Create cases
 - Assign users to them
 - Add actions to them
-- Upload attachments to them
-- Fine grained permission per user
+- Upload file attachments to them - amazon s3
+- Fine grained permission per user per case
 
 # Evidence
 - Upload pieces of evidences to the system to be assigned to cases and more - amazon s3.
+- View specific evidence files - donwload and browser views - amazon s3 
 
 # Running
 
