@@ -1,10 +1,10 @@
 ﻿using Cases.Core.Models;
 using Cases.Infrastructure.Data;
 using Events.Core;
-using Events.User;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using User.Events.V1;
 
 namespace Cases.Application.Consumers
 {
@@ -23,7 +23,7 @@ namespace Cases.Application.Consumers
             _logger.LogInformation("{consumer} fired off for event {event} for user ID: {userId}", nameof(UserUpdatedEventConsumer_UpdateCaseActionDenormalizedFields), nameof(UserUpdatedEvent), context.Message.UserId);
 
             var newUsername = context.Message.UserName;
-            var newEmail = context.Message.Email;
+            var newEmail = context.Message.UserEmail;
             var userId = context.Message.UserId;
 
 

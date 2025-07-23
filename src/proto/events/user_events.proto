@@ -1,0 +1,30 @@
+/*
+    Contains all common user-related events for event-driven architecture.
+    Version: V1
+*/
+
+syntax = "proto3";
+
+package user.events.V1;
+
+// Published when a new user is registered in the system.
+message UserCreatedEvent {
+    // Unique identifier for the user.
+    string userId = 1;
+    // Display name of the user.
+    string userName = 2;
+     // Email address of the user.
+    string userEmail = 3;   
+}
+
+// Published when a user's information is updated.
+message UserUpdatedEvent {
+    // Unique identifier for the user.
+    string userId = 1;
+    // New or existing display name.
+    string userName = 2;
+    // New or existing email address.
+    string userEmail = 3;
+    // ISO 8601 formatted update timestamp.
+    string updatedAt = 4;   
+}

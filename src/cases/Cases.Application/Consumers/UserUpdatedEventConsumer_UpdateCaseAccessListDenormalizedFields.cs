@@ -1,7 +1,7 @@
 ﻿using Cases.Core.Models;
 using Events.Core;
-using Events.User;
 using MassTransit;
+using User.Events.V1;
 
 namespace Cases.Application.Consumers
 {

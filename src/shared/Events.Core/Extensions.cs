@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Events.Core.Settings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Events.Core
@@ -22,6 +24,20 @@ namespace Events.Core
                     return deNormClass.Name == modelName;
                 }) ?? throw new ApplicationException($"Model {deNormClass.Name} dose not have a {nameof(DenormalisedEventConsumer)} that updates it's {nameof(DenormalizedFieldAttribute)} fields");
             }
+
+            return services;
+        }
+
+
+        /// <summary>
+        /// Adds the rabbit mq section from the config into the DI and runs some validation on it.
+        /// </summary>
+        public static IServiceCollection AddRabbitMqSettings(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions<RabbitMqSettings>()
+                .Bind(configuration.GetSection("RabbitMqSettings"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             return services;
         }

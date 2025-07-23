@@ -1,12 +1,12 @@
-﻿using Events;
-using Events.Settings;
-using Identity.Application.Helpers;
+﻿using Identity.Application.Helpers;
 using Identity.Application.Implementations;
 using Identity.Application.Settings;
 using Identity.Core.Services;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Events.Core;
+using Events.Core.Settings;
 
 namespace Identity.Application
 {
@@ -39,7 +39,6 @@ namespace Identity.Application
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
-
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()

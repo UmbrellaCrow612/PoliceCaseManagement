@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Security.Cryptography;
-using Events.User;
 using Identity.Application.Codes;
 using Identity.Application.Helpers;
 using Identity.Application.Settings;
@@ -14,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OtpNet;
+using User.Events.V1;
 
 namespace Identity.Application.Implementations
 {
@@ -1354,7 +1354,7 @@ namespace Identity.Application.Implementations
 
             var message = new UserUpdatedEvent
             {
-                Email = user.Email!,
+                UserEmail = user.Email!,
                 UserId = user.Id,
                 UserName = user.UserName!
             };

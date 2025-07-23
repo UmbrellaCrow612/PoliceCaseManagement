@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Events.Settings
+namespace Events.Core.Settings
 {
     /// <summary>
     /// Settings object to get the section related to rabbit mq, and validate it and also provide it in the DI.

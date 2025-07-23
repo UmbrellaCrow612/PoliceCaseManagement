@@ -1,9 +1,7 @@
-﻿using Cases.Application.Consumers;
-using Cases.Application.Implementations;
+﻿using Cases.Application.Implementations;
 using Cases.Core.Services;
-using Events;
 using Events.Core;
-using Events.Settings;
+using Events.Core.Settings;
 using Evidence.V1;
 using MassTransit;
 using Microsoft.Extensions.Configuration;

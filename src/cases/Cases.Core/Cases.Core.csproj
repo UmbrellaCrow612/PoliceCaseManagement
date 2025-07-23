@@ -10,7 +10,6 @@
     <ProjectReference Include="..\..\..\libs\Pagination.Abstractions\Pagination.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\libs\Results.Abstractions\Results.Abstractions.csproj" />
     <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
-    <ProjectReference Include="..\..\shared\Events\Events.csproj" />
   </ItemGroup>
 
 </Project>
