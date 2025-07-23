@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250716081645_InitialCreate")]
+    [Migration("20250723100116_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -261,7 +261,7 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasIndex("CaseId");
 
-                    b.ToTable("CaseEvidence");
+                    b.ToTable("CaseEvidences");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>

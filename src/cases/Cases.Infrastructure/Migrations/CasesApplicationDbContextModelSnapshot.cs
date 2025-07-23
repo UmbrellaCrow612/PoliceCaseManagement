@@ -258,7 +258,7 @@ namespace Cases.Infrastructure.Migrations
 
                     b.HasIndex("CaseId");
 
-                    b.ToTable("CaseEvidence");
+                    b.ToTable("CaseEvidences");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.Joins.CaseIncidentType", b =>

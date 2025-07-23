@@ -1,4 +1,5 @@
 ﻿using Cases.Core.Models;
+using Cases.Core.Models.Joins;
 using Cases.Core.ValueObjects;
 using Pagination.Abstractions;
 using Results.Abstractions;
@@ -54,6 +55,29 @@ namespace Cases.Core.Services
         /// Get a list of <see cref="CaseAccessList"/> for the specific <see cref="Case"/> - these are all the people linked to them
         /// </summary>
         Task<List<CaseAccessList>> GetUsersAsync(Case @case);
+
+        /// <summary>
+        /// Get all evidence linked to a case <see cref="CaseEvidence"/>
+        /// </summary>
+        /// <param name="case">The case to get the linked evidence for</param>
+        /// <returns>List of evidence</returns>
+        Task<List<CaseEvidence>> GetEvidenceAsync(Case @case);
+
+        /// <summary>
+        /// Link a piece of evidence to a given <see cref="Case"/>
+        /// </summary>
+        /// <param name="case">The case to link it to</param>
+        /// <param name="evidenceId">The ID of the evidence to link</param>
+        /// <returns>Result object</returns>
+        Task<CaseResult> AddEvidenceAsync(Case @case, string evidenceId);
+
+        /// <summary>
+        /// Remove a piece of linked evidence from a case
+        /// </summary>
+        /// <param name="case">The case to remove the evidence from</param>
+        /// <param name="evidenceId">The ID of the evidence to remove</param>
+        /// <returns>Result object</returns>
+        Task<CaseResult> RemoveEvidenceAsync(Case @case, string evidenceId);
     }
 
     /// <summary>

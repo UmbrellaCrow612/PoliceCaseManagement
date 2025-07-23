@@ -4,6 +4,7 @@ using Cases.Core.Services;
 using Events;
 using Events.Core;
 using Events.Settings;
+using Evidence.V1;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,12 @@ namespace Cases.Application
                     cfg.ConfigureEndpoints(context);
                 });
             });
+
+            services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>
+            {
+                o.Address = new Uri("https://localhost:7078");
+            });
+            services.AddScoped<EvidenceValidationService>();
 
             services.AddGrpcClient<UserService.UserServiceClient>(o =>
             {

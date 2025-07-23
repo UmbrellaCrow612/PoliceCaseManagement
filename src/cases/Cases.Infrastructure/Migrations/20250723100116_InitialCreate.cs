@@ -124,7 +124,7 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CaseEvidence",
+                name: "CaseEvidences",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
@@ -135,9 +135,9 @@ namespace Cases.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CaseEvidence", x => x.Id);
+                    table.PrimaryKey("PK_CaseEvidences", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CaseEvidence_Cases_CaseId",
+                        name: "FK_CaseEvidences_Cases_CaseId",
                         column: x => x.CaseId,
                         principalTable: "Cases",
                         principalColumn: "Id",
@@ -202,8 +202,8 @@ namespace Cases.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CaseEvidence_CaseId",
-                table: "CaseEvidence",
+                name: "IX_CaseEvidences_CaseId",
+                table: "CaseEvidences",
                 column: "CaseId");
 
             migrationBuilder.CreateIndex(
@@ -247,7 +247,7 @@ namespace Cases.Infrastructure.Migrations
                 name: "CaseAttachmentFiles");
 
             migrationBuilder.DropTable(
-                name: "CaseEvidence");
+                name: "CaseEvidences");
 
             migrationBuilder.DropTable(
                 name: "CaseIncidentTypes");

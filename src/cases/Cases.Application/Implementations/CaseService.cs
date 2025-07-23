@@ -1,5 +1,6 @@
 ﻿using Cases.Application.Codes;
 using Cases.Core.Models;
+using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
@@ -11,12 +12,46 @@ using Results.Abstractions;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, EvidenceValidationService evidenceValidationService) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
+        private readonly EvidenceValidationService _evidenceService = evidenceValidationService;
+
+        public async Task<CaseResult> AddEvidenceAsync(Case @case, string evidenceId)
+        {
+            var result = new CaseResult();
+
+            var alreadyLinked = await _dbcontext.CaseEvidences.AnyAsync(x => x.CaseId == @case.Id && x.EvidenceId == evidenceId);
+            if (alreadyLinked)
+            {
+                result.AddError(BusinessRuleCodes.EvidenceAlreadyLinked, "Evidence already linked");
+                return result;
+            }
+
+            var evidenceExists = await _evidenceService.DoseEvidenceExistAsync(evidenceId);
+            if (!evidenceExists)
+            {
+                result.AddError(BusinessRuleCodes.EvidenceNotFound, "Evidence not found");
+                return result;
+            }
+            var evidenceDetails = await _evidenceService.GetEvidenceByIdAsync(evidenceId);
+
+            var link = new CaseEvidence
+            {
+                CaseId = @case.Id,
+                EvidenceId = evidenceId,
+                EvidenceName = evidenceDetails.FileName,
+                EvidenceReferenceNumber = evidenceDetails.ReferenceNumber,
+            };
+            await _dbcontext.CaseEvidences.AddAsync(link);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
 
         public async Task<IResult> AddUserAsync(Case @case, string userId)
         {
@@ -127,6 +162,11 @@ namespace Cases.Application.Implementations
             return await _dbcontext.Cases.FindAsync(caseId);
         }
 
+        public async Task<List<CaseEvidence>> GetEvidenceAsync(Case @case)
+        {
+            return await _dbcontext.CaseEvidences.Where(x => x.CaseId == @case.Id).ToListAsync();
+        }
+
         public async Task<List<CaseAccessList>> GetUsersAsync(Case @case)
         {
             return await _dbcontext.CaseAccessLists.Where(x => x.CaseId == @case.Id).ToListAsync();
@@ -145,6 +185,23 @@ namespace Cases.Application.Implementations
         public async Task<bool> IsUserLinkedToCaseAsync(Case @case, string userId)
         {
             return await _dbcontext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == @case.Id);
+        }
+
+        public async Task<CaseResult> RemoveEvidenceAsync(Case @case, string evidenceId)
+        {
+            var result = new CaseResult();
+
+            var link = await _dbcontext.CaseEvidences.Where(x => x.CaseId == @case.Id && x.EvidenceId == evidenceId).FirstOrDefaultAsync();
+            if (link is null)
+            {
+                result.AddError(BusinessRuleCodes.EvidenceNotLinked, "Evidence not linked to case already");
+                return result;
+            }
+            _dbcontext.CaseEvidences.Remove(link);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
 
         public async Task<CaseResult> RemoveUserAsync(Case @case, string userId)

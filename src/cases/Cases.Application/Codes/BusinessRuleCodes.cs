@@ -36,5 +36,20 @@
         /// Indicates that a user dose not exist
         /// </summary>
         public const string UserNotFound = "USER_NOT_FOUND";
+
+        /// <summary>
+        /// Indicates that a piece of evidence was not found
+        /// </summary>
+        public const string EvidenceNotFound = "EVIDENCE_NOT_FOUND";
+
+        /// <summary>
+        /// Indicates that a piece of evidence is already linked to a case
+        /// </summary>
+        public const string EvidenceAlreadyLinked = "EVIDENCE_ALREADY_LINKED";
+
+        /// <summary>
+        /// Indicates that a piece of evidence is not linked to a case
+        /// </summary>
+        public const string EvidenceNotLinked = "EVIDENCE_NOT_LINKED";
     }
 }

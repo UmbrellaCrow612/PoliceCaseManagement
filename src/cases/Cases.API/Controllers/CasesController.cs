@@ -27,6 +27,7 @@ namespace Cases.API.Controllers
         private readonly ICaseActionService _caseActionService = caseActionService;
         private readonly CaseActionMapping _caseActionMapping = new();
         private readonly CaseAccessListMapping _caseAccessListMapping = new();
+        private readonly CaseEvidenceMapping _caseEvidenceMapping = new();
 
         [Authorize]
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
@@ -328,6 +329,87 @@ namespace Cases.API.Controllers
             List<CaseActionDto> dto = [.. actions.Select(x => _caseActionMapping.ToDto(x))];
 
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpGet("{caseId}/evidence")]
+        public async Task<IActionResult> GetCasesLinkedEvidenceAsync(string caseId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsAssigned(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var caseEvidence = await _caseService.GetEvidenceAsync(_case);
+            List<CaseEvidenceDto> dto = [.. caseEvidence.Select(x => _caseEvidenceMapping.ToDto(x))];
+
+            return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpPost("{caseId}/evidence")]
+        public async Task<IActionResult> AssignEvidenceToCaseAsync(string caseId, [FromBody]AssignEvidenceToCaseDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsEditor(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.AddEvidenceAsync(_case, dto.EvidenceId);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpDelete("{caseId}/evidence/{evidenceId}")]
+        public async Task<IActionResult> RemoveEvidenceFromCase(string caseId, string evidenceId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var hasPerm = await _caseAuthorizationService.IsEditor(userId, caseId);
+            if (!hasPerm)
+            {
+                return Forbid();
+            }
+
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.RemoveEvidenceAsync(_case, evidenceId);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
     }
 }

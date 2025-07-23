@@ -194,7 +194,6 @@ namespace Evidence.API.Controllers
             return Ok(dto);
         }
 
-
         [Authorize]
         [HttpGet("{evidenceId}/view")]
         public async Task<IActionResult> ViewEvidenceByIdAsync(string evidenceId)

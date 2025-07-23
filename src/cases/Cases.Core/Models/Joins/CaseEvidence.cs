@@ -3,7 +3,7 @@
 namespace Cases.Core.Models.Joins
 {
     /// <summary>
-    /// Join between a case and apiece of Evidence
+    /// Join between a case and a piece of Evidence
     /// </summary>
     public class CaseEvidence : IDenormalizedEntity
     {
