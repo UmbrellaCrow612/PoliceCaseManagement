@@ -63,10 +63,16 @@ export const CASES_ROUTES: Routes = [
         path: ':caseId/attachments',
         loadComponent: () =>
           import(
-            './ui//cases-id-attachments-view/cases-id-attachments-view.component'
+            './ui/cases-id-attachments-view/cases-id-attachments-view.component'
           ).then((c) => c.CasesIdAttachmentsViewComponent),
       },
-     
+      {
+        path: ':caseId/evidence',
+        loadComponent: () =>
+          import(
+            './ui/cases-id-evidence-view/cases-id-evidence-view.component'
+          ).then((c) => c.CasesIdEvidenceViewComponent),
+      },
     ],
   },
 ];

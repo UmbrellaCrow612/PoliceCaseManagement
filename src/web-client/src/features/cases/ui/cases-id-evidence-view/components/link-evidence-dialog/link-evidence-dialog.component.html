@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Search evidence</h2>
+<mat-dialog-content class="mat-typography">
+  <form
+    (ngSubmit)="searchClicked()"
+    class="form_group"
+    [formGroup]="searchEvidenceForm"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Refrence number</mat-label>
+      <input matInput formControlName="refNumber" />
+    </mat-form-field>
+    <button mat-button type="submit">Search</button>
+  </form>
+
+  <!---->
+  @if (EvidenceList) {
+  <!---->
+  <mat-selection-list
+    #evidenceList
+    [formControl]="selectedEvidenceControl"
+    name="evidence"
+    [multiple]="false"
+  >
+    @for (item of EvidenceList.data; track item.id) {
+    <mat-list-option [value]="item"
+      >{{ item.referenceNumber }} {{ item.fileName }}</mat-list-option
+    >
+    } @empty {
+    <mat-list-option disabled [value]="null">No items found</mat-list-option>
+    } </mat-selection-list
+  >}
+
+  <!---->
+
+  @if (!EvidenceList && isLoading) {
+  <div>Loading</div>
+  }
+
+  <!---->
+
+  @if (!EvidenceList && !isLoading && errorMessage) {
+  <div>Failed to search</div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+
+  <button
+    mat-button
+    [disabled]="selectedEvidenceControl.invalid || isAdding"
+    (click)="handleAddClicked()"
+  >
+    @if (isAdding) { Adding.... } @else { Add }
+  </button>
+</mat-dialog-actions>

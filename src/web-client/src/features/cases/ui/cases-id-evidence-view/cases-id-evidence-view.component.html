@@ -1,0 +1,21 @@
+@if (isLoading) {
+<div>Loading</div>
+}
+
+<!---->
+
+@if (!isLoading && errorMessage) {
+<div>
+  {{ errorMessage }}
+</div>
+}
+
+<!---->
+
+@if (!isLoading && !errorMessage) {
+<div>
+  {{ caseEvidenceList | json }}
+
+  <button mat-raised-button (click)="handleLinkClick()">Link</button>
+</div>
+}

@@ -71,3 +71,14 @@ export interface Evidence {
   uploadedById: string;
   uploadedByUsername: string;
 }
+
+/**
+ * Represents the link between a case and a piece of evidence DTO mapped here
+ */
+export interface CaseEvidence {
+  id: string;
+  caseId: string;
+  evidenceId: string;
+  evidenceName: string;
+  evidenceReferenceNumber: string;
+}

@@ -12,6 +12,7 @@ import {
 } from '../type';
 import { IncidentType } from '../../incident-type/types';
 import { CaseAcessList, RestrictedUser } from '../../user/type';
+import { CaseEvidence, Evidence } from '../../evidence/types';
 
 @Injectable({
   providedIn: 'root',
@@ -310,5 +311,28 @@ export class CaseService {
     return this.httpClient.get<{ role: CaseRoleValue }>(
       `${this.BASE_URL}/cases/${caseId}/me`
     );
+  }
+
+  /**
+   * Get all linked evidence for a given case
+   * @param caseId The ID of the case to fetch evidence for
+   * @returns List of case evidence links
+   */
+  getEvidence(caseId: string) {
+    return this.httpClient.get<CaseEvidence[]>(
+      `${this.BASE_URL}/cases/${caseId}/evidence`
+    );
+  }
+
+  /**
+   * Link a piece of evidence to a given case
+   * @param caseId The case to link for
+   * @param evidenceId The evidence to link
+   * @returns Result object or success
+   */
+  addEvidence(caseId: string, evidenceId: string) {
+    return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/evidence`, {
+      evidenceId: evidenceId,
+    });
   }
 }
