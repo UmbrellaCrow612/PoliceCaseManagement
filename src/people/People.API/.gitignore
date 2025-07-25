@@ -27,3 +27,7 @@ vendor/
 # Go build files
 *.test
 *.prof
+
+
+# Env
+.env
