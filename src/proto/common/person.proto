@@ -1,0 +1,56 @@
+//
+// Contains all common person-related gRPC service methods and responses.
+//
+
+syntax = "proto3";
+
+package person.V1;
+
+// PersonService provides operations to interact with person entities in the system.
+service PersonService {
+
+    // Checks if a person exists in the system.
+    rpc DoesPersonExist(DoesPersonExistRequest) returns (DoesPersonExistResponse);
+
+    // Gets a person by their ID.
+    rpc GetPersonById(GetPersonByIdRequest) returns (GetPersonByIdResponse);
+}
+
+// Request message for checking existence of a person.
+message DoesPersonExistRequest {
+    // The unique identifier of the person.
+    string personId = 1;
+}
+
+// Response message for checking existence of a person.
+message DoesPersonExistResponse {
+    // Indicates whether the person exists.
+    bool exists = 1;
+}
+
+// Request message for retrieving a person by ID.
+message GetPersonByIdRequest {
+    // The unique identifier of the person.
+    string personId = 1;
+}
+
+// Response message containing details of a person.
+message GetPersonByIdResponse {
+    // The unique identifier of the person.
+    string personId = 1;
+
+    // The first name of the person.
+    string firstName = 2;
+
+    // The last name of the person.
+    string lastName = 3;
+
+    // The date of birth of the person (ISO format recommended).
+    string dateOfBirth = 4;
+
+    // The phone number of the person.
+    string phoneNumber = 5;
+
+    // The email address of the person.
+    string email = 6;
+}

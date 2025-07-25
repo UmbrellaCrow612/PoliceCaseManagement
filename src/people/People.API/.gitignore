@@ -1,0 +1,29 @@
+# Certs
+localhost-key.pem
+localhost.pem
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/out/
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+vendor/
+
+# Go build files
+*.test
+*.prof

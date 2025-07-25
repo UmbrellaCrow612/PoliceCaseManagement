@@ -1,0 +1,34 @@
+name: Go
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Navigate to People.API directory
+        working-directory: src/people/People.API
+        run: |
+          go mod tidy
+
+      - name: Build
+        working-directory: src/people/People.API
+        run: |
+          go build -v
+
+    # - name: Test
+    #   working-directory: src/people/People.API
+    #   run: go test ./...

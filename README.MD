@@ -26,7 +26,8 @@
 - Assign users to them
 - Add actions to them
 - Upload file attachments to them - amazon s3
-- Fine grained permission per user per case
+- Fine grained permission per user per case - Resource based access control
+- Link evidence to cases
 
 # Evidence
 - Upload pieces of evidences to the system to be assigned to cases and more - amazon s3.

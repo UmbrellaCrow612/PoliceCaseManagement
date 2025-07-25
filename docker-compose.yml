@@ -113,7 +113,21 @@ services:
     volumes:
       - evidence_db_data:/var/lib/postgresql/data
 
+  people_db:
+    image: postgres:15
+    container_name: people_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: your_strong_password_here
+      POSTGRES_DB: peopledb
+    ports:
+      - "5435:5432"
+    volumes:
+      - people_db_data:/var/lib/postgresql/data
+
 volumes:
   identity_db_data: {}
   cases_db_data: {}
   evidence_db_data: {}
+  people_db_data: {}
