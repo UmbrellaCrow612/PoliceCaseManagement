@@ -6,6 +6,8 @@ syntax = "proto3";
 
 package person.V1;
 
+option go_package = "github.com/UmbrellaCrow612/PoliceCaseManagement/src/people/People.API/gen/personv1;personv1";
+
 // PersonService provides operations to interact with person entities in the system.
 service PersonService {
 

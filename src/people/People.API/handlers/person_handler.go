@@ -31,3 +31,16 @@ func (h *PersonHandler) HandleGetPersonById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, person)
 }
+
+
+func(h *PersonHandler) HandleCreatePerson(c *gin.Context){
+
+}
+
+func(h *PersonHandler) HandlePutPerson(c *gin.Context){
+
+}
+
+func(h *PersonHandler) HandleDeletePerson(c *gin.Context){
+
+}

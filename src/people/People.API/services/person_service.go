@@ -16,3 +16,9 @@ func NewPersonService(repo repositories.PersonRepository) *PersonService {
 func (s *PersonService) GetPersonByID(id string) (*models.Person, error) {
 	return s.repo.GetByID(id)
 }
+
+
+func (s *PersonService) Exists(id string) (bool, error) {
+	return false, nil
+}
+
