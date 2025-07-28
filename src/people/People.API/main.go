@@ -6,7 +6,7 @@ import (
 	"os"
 	"people/api/db/repositories"
 	personv1 "people/api/gen/common"
-	grpc_servers "people/api/grpc"
+	grpcimpl "people/api/grpc_impl"
 	"people/api/handlers"
 	"people/api/middleware"
 	"people/api/models"
@@ -67,21 +67,23 @@ func main() {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}
 
-	// DI and services
 	personRepo := repositories.NewPersonRepository(db)
 	personService := services.NewPersonService(personRepo)
 	personHandler := handlers.NewPersonHandler(personService)
 
 	go func() {
-		lis, err := net.Listen("tcp", ": "+tcp_port)
+		lis, err := net.Listen("tcp", ":"+tcp_port)
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
 		}
 
 		grpcServer := grpc.NewServer()
-		personv1.RegisterPersonServiceServer(grpcServer, grpc_servers.NewPersonServiceServer(*personService))
 
-		log.Println("gRPC server listening on" + tcp_port)
+		personGrpcServerImpla := grpcimpl.NewPersonServerImpla(personService)
+
+		personv1.RegisterPersonServiceServer(grpcServer, personGrpcServerImpla)
+
+		log.Println("gRPC server listening on " + tcp_port)
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}

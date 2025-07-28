@@ -9,16 +9,16 @@ import (
 )
 
 type PersonHandler struct {
-	service *services.PersonService
+	service services.PersonService
 }
 
-func NewPersonHandler(service *services.PersonService) *PersonHandler {
+func NewPersonHandler(service services.PersonService) *PersonHandler {
 	return &PersonHandler{service: service}
 }
 
 func (h *PersonHandler) HandleGetPersonById(c *gin.Context) {
 	personId := c.Param("personId")
-	person, err := h.service.GetPersonByID(personId)
+	person, err := h.service.GetById(personId)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
