@@ -1,16 +1,18 @@
 package services
 
 import (
-	"people/api/db"
+	"people/api/db/repositories"
 	"people/api/models"
 )
 
-func FindPersonById(id uint) (models.Person, bool) {
-	var person models.Person
-	result := db.DB.First(&person, id)
-	if result.Error != nil {
-		return models.Person{}, false
-	}
-	return person, true
+type PersonService struct {
+	repo repositories.PersonRepository
 }
 
+func NewPersonService(repo repositories.PersonRepository) *PersonService {
+	return &PersonService{repo: repo}
+}
+
+func (s *PersonService) GetPersonByID(id string) (*models.Person, error) {
+	return s.repo.GetByID(id)
+}

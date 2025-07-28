@@ -5,7 +5,7 @@ import (
 )
 
 type Person struct {
-	ID          string    `gorm:"type:uuid;primaryKey" json:"id"`
+	ID          string    `gorm:"primaryKey" json:"id"`
 	FirstName   string    `json:"first_name"`
 	LastName    string    `json:"last_name"`
 	DateOfBirth time.Time `json:"date_of_birth"`
