@@ -18,8 +18,6 @@ make sure that `gen` folder exists if not make it
 protoc --proto_path=../../proto --go_out=gen --go_opt=paths=source_relative --go-grpc_out=gen --go-grpc_opt=paths=source_relative common/person.proto
 ```
 
-
-
 # Style guide
 
 - Make `repositories` for model db access 
@@ -39,3 +37,13 @@ var (
 
 if err == ErrRecordNotFound 
 ```
+
+# Testing 
+
+
+## GRPC 
+
+- Use postman 
+- `New` `gRPC`
+- Import proto file for the server to test
+- Invoke the method on the endpoint to test

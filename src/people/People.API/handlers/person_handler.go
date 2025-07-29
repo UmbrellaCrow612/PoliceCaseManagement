@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Public: Handles the function to run on a specific people endpoint
 type PersonHandler struct {
 	service services.PersonService
 }

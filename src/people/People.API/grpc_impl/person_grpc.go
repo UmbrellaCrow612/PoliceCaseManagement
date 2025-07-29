@@ -2,6 +2,7 @@ package grpcimpl
 
 import (
 	"context"
+	"errors"
 	personv1 "people/api/gen/common"
 	"people/api/services"
 )
@@ -16,6 +17,10 @@ func NewPersonServerImpl(s services.PersonService) *PersonServerImpl {
 }
 
 func (s *PersonServerImpl) DoesPersonExist(ctx context.Context, req *personv1.DoesPersonExistRequest) (*personv1.DoesPersonExistResponse, error) {
+	if req.GetPersonId() == "" {
+		return &personv1.DoesPersonExistResponse{Exists: false}, nil
+	}
+
 	exists, err := s.personService.Exists(req.GetPersonId())
 	if err != nil {
 		return &personv1.DoesPersonExistResponse{Exists: false}, err
@@ -27,6 +32,10 @@ func (s *PersonServerImpl) DoesPersonExist(ctx context.Context, req *personv1.Do
 }
 
 func (s *PersonServerImpl) GetPersonById(ctx context.Context, req *personv1.GetPersonByIdRequest) (*personv1.GetPersonByIdResponse, error) {
+	if req.GetPersonId() == "" {
+		return nil, errors.New("person ID not present")
+	}
+
 	person, err := s.personService.GetById(req.GetPersonId())
 	if err != nil {
 		return nil, err

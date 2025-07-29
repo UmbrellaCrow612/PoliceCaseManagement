@@ -10,6 +10,7 @@ import (
 	internalutils "people/api/internal_utils"
 	"people/api/middleware"
 	"people/api/models"
+	"people/api/routes"
 	"people/api/services"
 
 	"github.com/gin-gonic/gin"
@@ -59,11 +60,7 @@ func main() {
 
 	router.Use(middleware.Jwt(config.JwtSecret, config.JwtIssuer, config.JwtAudience))
 
-	people := router.Group("/people")
-	people.POST("/", personHandler.HandleCreatePerson)
-	people.GET("/:personId", personHandler.HandleGetPersonById)
-	people.PUT("/:personId", personHandler.HandlePutPerson)
-	people.DELETE("/:personId", personHandler.HandleDeletePerson)
+	routes.AddPeopleRoutes(router, personHandler)
 
 	router.Run(":" + config.Port)
 }
