@@ -17,3 +17,8 @@ func NewPersonService(repo repositories.PersonRepository) PersonService {
 func (p *personService) GetById(personId string) (*models.Person, error) {
 	return p.repo.GetByID(personId)
 }
+
+// Public: Exists implements PersonService.
+func (p *personService) Exists(personId string) (bool, error) {
+	return p.repo.Exists(personId)
+}
