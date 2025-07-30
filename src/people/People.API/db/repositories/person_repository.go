@@ -1,6 +1,9 @@
 package repositories
 
-import "people/api/models"
+import (
+	"people/api/models"
+	valueobjects "people/api/value_objects"
+)
 
 type PersonRepository interface {
 
@@ -17,5 +20,8 @@ type PersonRepository interface {
 	EmailTaken(email string) (bool, error)
 
 	// Public: Create a person
-	Create(person *models.Person) (error)
+	Create(person *models.Person) error
+
+	// Public: Search users
+	Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error)
 }

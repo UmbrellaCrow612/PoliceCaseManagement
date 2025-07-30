@@ -4,6 +4,7 @@ import (
 	apperrors "people/api/app_errors"
 	"people/api/db/repositories"
 	"people/api/models"
+	valueobjects "people/api/value_objects"
 )
 
 type personService struct {
@@ -48,4 +49,9 @@ func (p *personService) Create(person *models.Person) error {
 	}
 
 	return nil
+}
+
+// Public: Search implements PersonService.
+func (p *personService) Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error) {
+	return p.repo.Search(query)
 }

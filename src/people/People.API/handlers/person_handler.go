@@ -6,6 +6,7 @@ import (
 	apperrors "people/api/app_errors"
 	"people/api/models"
 	"people/api/services"
+	valueobjects "people/api/value_objects"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -83,4 +84,21 @@ func (h *PersonHandler) HandlePutPerson(c *gin.Context) {
 
 func (h *PersonHandler) HandleDeletePerson(c *gin.Context) {
 
+}
+
+func (h *PersonHandler) HandleSearchPeople(c *gin.Context) {
+	var req valueobjects.SearchPersonQuery
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := h.service.Search(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }

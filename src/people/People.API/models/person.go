@@ -22,3 +22,7 @@ func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
     }
     return
 }
+
+func (Person) TableName() string {
+	return "people"
+}
