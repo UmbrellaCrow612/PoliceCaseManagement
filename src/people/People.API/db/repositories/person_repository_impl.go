@@ -36,3 +36,34 @@ func (p *personRepository) Exists(personId string) (bool, error) {
 	}
 	return exists, nil
 }
+
+// Public: EmailTaken checks if a person with the given email already exists.
+func (p *personRepository) EmailTaken(email string) (bool, error) {
+	var exists bool
+	err := p.db.
+		Raw("SELECT EXISTS(SELECT 1 FROM people WHERE email = ?)", email).
+		Scan(&exists).Error
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+// Public: PhoneNumberTaken checks if a person with the given phone number already exists.
+func (p *personRepository) PhoneNumberTaken(phoneNumber string) (bool, error) {
+	var exists bool
+	err := p.db.
+		Raw("SELECT EXISTS(SELECT 1 FROM people WHERE phone_number = ?)", phoneNumber).
+		Scan(&exists).Error
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+
+// Create implements PersonRepository.
+func (p *personRepository) Create(person *models.Person) error {
+	result := p.db.Create(person)
+	return result.Error
+}
