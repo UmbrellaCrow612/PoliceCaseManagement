@@ -126,6 +126,16 @@ services:
     volumes:
       - people_db_data:/var/lib/postgresql/data
 
+  people_api:
+    build:
+      context: ./src/people/People.API
+      dockerfile: Dockerfile
+    container_name: people_api
+    depends_on:
+      - people_db
+    ports:
+      - "8083:7001"
+
 volumes:
   identity_db_data: {}
   cases_db_data: {}

@@ -1,8 +1,10 @@
 const env = {
   BaseUrls: {
-    authenticationBaseUrl: 'http://localhost:8082',
-    casesBaseUrl: 'http://localhost:8080', // here refer internal in container
+    authenticationBaseUrl: 'https://localhost:7101/identity-api',
+    casesBaseUrl: 'https://localhost:7101/cases-api', 
+    evidenceBaseUrl: 'https://localhost:7101/evidence-api', 
   },
+ 
 } as const;
 
 export default env;
