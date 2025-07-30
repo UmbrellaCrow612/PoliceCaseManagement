@@ -9,6 +9,7 @@ import (
 	"people/api/handlers"
 	internalutils "people/api/internal_utils"
 	"people/api/middleware"
+	grpcmiddleware "people/api/middleware/grpc"
 	"people/api/models"
 	"people/api/routes"
 	"people/api/services"
@@ -44,7 +45,7 @@ func main() {
 			log.Fatalf("failed to listen: %v", err)
 		}
 
-		grpcServer := grpc.NewServer()
+		grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcmiddleware.LogGrpc))
 
 		personGrpcServerImpla := grpcimpl.NewPersonServerImpl(personService)
 
