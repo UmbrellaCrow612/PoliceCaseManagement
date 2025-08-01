@@ -65,6 +65,12 @@ export class HeaderProfileComponent {
       authorizedRoles: [],
       iconName: 'description',
     },
+    {
+      name: 'People',
+      href: '/people',
+      authorizedRoles: [],
+      iconName: 'group',
+    },
   ];
 
   logout() {
