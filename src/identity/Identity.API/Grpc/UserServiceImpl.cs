@@ -1,10 +1,11 @@
 ﻿using Grpc.Core;
 using Identity.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using User.V1;
 
 namespace Identity.API.Grpc
 {
-
+    [Authorize]
     public class UserServiceImpl(IAuthService authService) : UserService.UserServiceBase
     {
         private readonly IAuthService _authService = authService;

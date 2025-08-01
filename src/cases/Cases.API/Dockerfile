@@ -13,15 +13,18 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/cases/Cases.API/Cases.API.csproj", "src/cases/Cases.API/"]
-COPY ["libs/CORS/CORS.csproj", "libs/CORS/"]
 COPY ["libs/Mapper/Mapper.csproj", "libs/Mapper/"]
 COPY ["libs/Validator/Validator.csproj", "libs/Validator/"]
 COPY ["src/shared/Authorization/Authorization.csproj", "src/shared/Authorization/"]
 COPY ["src/shared/Caching/Caching.csproj", "src/shared/Caching/"]
 COPY ["src/shared/Logging/Logging.csproj", "src/shared/Logging/"]
 COPY ["src/cases/Cases.Application/Cases.Application.csproj", "src/cases/Cases.Application/"]
-COPY ["src/shared/Events/Events.csproj", "src/shared/Events/"]
+COPY ["libs/StorageProvider.Abstractions/StorageProvider.Abstractions.csproj", "libs/StorageProvider.Abstractions/"]
+COPY ["libs/StorageProvider.AWS/StorageProvider.AWS.csproj", "libs/StorageProvider.AWS/"]
+COPY ["src/shared/Events.Core/Events.Core.csproj", "src/shared/Events.Core/"]
 COPY ["src/cases/Cases.Core/Cases.Core.csproj", "src/cases/Cases.Core/"]
+COPY ["libs/Pagination.Abstractions/Pagination.Abstractions.csproj", "libs/Pagination.Abstractions/"]
+COPY ["libs/Results.Abstractions/Results.Abstractions.csproj", "libs/Results.Abstractions/"]
 COPY ["src/cases/Cases.Infrastructure/Cases.Infrastructure.csproj", "src/cases/Cases.Infrastructure/"]
 RUN dotnet restore "./src/cases/Cases.API/Cases.API.csproj"
 COPY . .

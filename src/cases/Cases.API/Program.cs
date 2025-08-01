@@ -3,10 +3,14 @@ using Cases.API;
 using Cases.Application;
 using Cases.Infrastructure;
 using Cases.Infrastructure.Data;
+using Evidence.V1;
+using Grpc.JwtInterceptor;
+using Grpc.Net.ClientFactory;
 using Logging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using User.V1;
 using Validator;
 
 SerilogExtensions.ConfigureSerilog();
@@ -23,6 +27,17 @@ builder.Services.AddBaseAuthorization(config);
 builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
 builder.Services.AddCaching(config);
+
+builder.Services.AddGrpcJwtInterceptor();
+builder.Services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7078");
+}).AddInterceptor<JwtForwardInterceptor>(InterceptorScope.Client);
+
+builder.Services.AddGrpcClient<UserService.UserServiceClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7058");
+}).AddInterceptor<JwtForwardInterceptor>(InterceptorScope.Client);
 
 builder.Services.AddValidators();
 

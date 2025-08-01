@@ -11,6 +11,7 @@ func AddPeopleRoutes(r *gin.Engine, h *handlers.PersonHandler) {
 	people := r.Group("/people")
 	people.POST("/", h.HandleCreatePerson)
 	people.GET("/:personId", h.HandleGetPersonById)
+	people.GET("/search", h.HandleSearchPeople)
 	people.PUT("/:personId", h.HandlePutPerson)
 	people.DELETE("/:personId", h.HandleDeletePerson)
 }

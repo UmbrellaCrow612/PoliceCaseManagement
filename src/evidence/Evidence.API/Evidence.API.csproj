@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Grpc.JwtInterceptor\Grpc.JwtInterceptor.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
     <ProjectReference Include="..\..\shared\Caching\Caching.csproj" />

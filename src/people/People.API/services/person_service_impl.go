@@ -1,8 +1,10 @@
 package services
 
 import (
+	apperrors "people/api/app_errors"
 	"people/api/db/repositories"
 	"people/api/models"
+	valueobjects "people/api/value_objects"
 )
 
 type personService struct {
@@ -13,7 +15,7 @@ func NewPersonService(repo repositories.PersonRepository) PersonService {
 	return &personService{repo: repo}
 }
 
-// GetById implements PersonService.
+// public: GetById implements PersonService.
 func (p *personService) GetById(personId string) (*models.Person, error) {
 	return p.repo.GetByID(personId)
 }
@@ -21,4 +23,35 @@ func (p *personService) GetById(personId string) (*models.Person, error) {
 // Public: Exists implements PersonService.
 func (p *personService) Exists(personId string) (bool, error) {
 	return p.repo.Exists(personId)
+}
+
+// Public: Create implements PersonService.
+func (p *personService) Create(person *models.Person) error {
+	emailTaken, err := p.repo.EmailTaken(person.Email)
+	if err != nil {
+		return err
+	}
+	if emailTaken {
+		return apperrors.ErrEmailTaken
+	}
+
+	phoneNumberTaken, err := p.repo.PhoneNumberTaken(person.PhoneNumber)
+	if err != nil {
+		return err
+	}
+	if phoneNumberTaken {
+		return apperrors.ErrPhoneNumberTaken
+	}
+
+	err = p.repo.Create(person)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Public: Search implements PersonService.
+func (p *personService) Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error) {
+	return p.repo.Search(query)
 }

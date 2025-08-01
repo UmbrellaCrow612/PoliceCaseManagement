@@ -74,4 +74,13 @@ export const routes: Routes = [
       requiredRoles: [], // Means there authenticated
     },
   },
+  {
+    path: appPaths.PEOPLE,
+    loadChildren: () =>
+      import('../features/people/people.routes').then((r) => r.PEOPLE_ROUTES),
+    canActivate: [rolesAuthorizationGuard],
+    data: {
+      requiredRoles: [], // Means there authenticated
+    },
+  },
 ];

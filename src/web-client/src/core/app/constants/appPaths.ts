@@ -60,4 +60,5 @@ export const appPaths = {
   CASES: 'cases',
   PROFILE: 'profile',
   EVIDENCE: 'evidence',
+  PEOPLE: "people"
 } as const;
