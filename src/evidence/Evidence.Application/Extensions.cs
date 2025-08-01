@@ -4,7 +4,6 @@ using Evidence.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StorageProvider.AWS;
-using User.V1;
 
 namespace Evidence.Application
 {
@@ -19,10 +18,6 @@ namespace Evidence.Application
 
             services.EnsureDenormalisedEntitiesHaveAConsumer();
 
-            services.AddGrpcClient<UserService.UserServiceClient>(o =>
-            {
-                o.Address = new Uri("https://localhost:7058");
-            });
             services.AddScoped<UserValidationService>();
 
             return services;

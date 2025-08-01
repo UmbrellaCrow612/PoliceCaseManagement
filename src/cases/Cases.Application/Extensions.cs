@@ -23,6 +23,8 @@ namespace Cases.Application
             services.AddScoped<ICaseAuthorizationService, CaseAuthorizationService>();
             services.AddScoped<ICaseFileService, CaseFileService>();
             services.AddScoped<IIncidentTypeService, IncidentTypeService>();
+            services.AddScoped<EvidenceValidationService>();
+            services.AddScoped<UserValidationService>();
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()
@@ -48,18 +50,6 @@ namespace Cases.Application
                     cfg.ConfigureEndpoints(context);
                 });
             });
-
-            services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>
-            {
-                o.Address = new Uri("https://localhost:7078");
-            });
-            services.AddScoped<EvidenceValidationService>();
-
-            services.AddGrpcClient<UserService.UserServiceClient>(o =>
-            {
-                o.Address = new Uri("https://localhost:7058");
-            });
-            services.AddScoped<UserValidationService>();
 
             services.EnsureDenormalisedEntitiesHaveAConsumer();
 

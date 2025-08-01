@@ -1,12 +1,14 @@
 ﻿using Evidence.Core.Services;
-using Grpc.Core;
 using Evidence.V1;
+using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Evidence.API.Grpc
 {
     /// <summary>
     /// GRPC implementation of the grpc service 
     /// </summary>
+    [Authorize]
     public class GrpcEvidenceServiceImp(IEvidenceService evidenceService, ILogger<GrpcEvidenceServiceImp> logger) : EvidenceService.EvidenceServiceBase
     {
         private readonly IEvidenceService _evidenceService = evidenceService;

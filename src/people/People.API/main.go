@@ -45,7 +45,7 @@ func main() {
 			log.Fatalf("failed to listen: %v", err)
 		}
 
-		grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcmiddleware.LogGrpc))
+		grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(grpcmiddleware.LogGrpc, grpcmiddleware.JwtMiddleware(config.JwtSecret, config.JwtIssuer, config.JwtAudience)))
 
 		personGrpcServerImpla := grpcimpl.NewPersonServerImpl(personService)
 
