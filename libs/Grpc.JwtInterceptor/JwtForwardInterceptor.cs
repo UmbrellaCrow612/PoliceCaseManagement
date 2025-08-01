@@ -1,7 +1,8 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
+using Microsoft.AspNetCore.Http;
 
-namespace Evidence.API.Grpc
+namespace Grpc.JwtInterceptor
 {
     /// <summary>
     /// Interceptor that appends JWT bearer token to every gRPC call from this client
@@ -16,7 +17,7 @@ namespace Evidence.API.Grpc
            AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            var jwt = httpContext?.Request.Headers.Authorization.ToString();
+            var jwt = httpContext?.Request.Headers["Authorization"].ToString();
 
             var headers = new Metadata();
 

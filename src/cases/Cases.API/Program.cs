@@ -1,10 +1,10 @@
 using Caching;
 using Cases.API;
-using Cases.API.Grpc;
 using Cases.Application;
 using Cases.Infrastructure;
 using Cases.Infrastructure.Data;
 using Evidence.V1;
+using Grpc.JwtInterceptor;
 using Grpc.Net.ClientFactory;
 using Logging;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +28,7 @@ builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
 builder.Services.AddCaching(config);
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<JwtForwardInterceptor>();
+builder.Services.AddGrpcJwtInterceptor();
 builder.Services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>
 {
     o.Address = new Uri("https://localhost:7078");

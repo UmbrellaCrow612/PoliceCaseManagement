@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Grpc.JwtInterceptor\Grpc.JwtInterceptor.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
     <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
@@ -31,6 +32,10 @@
     <ProjectReference Include="..\Cases.Application\Cases.Application.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />
     <ProjectReference Include="..\Cases.Infrastructure\Cases.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Grpc\" />
   </ItemGroup>
 
 </Project>
