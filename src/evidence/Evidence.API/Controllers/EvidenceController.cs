@@ -1,4 +1,4 @@
-﻿using Caching;
+﻿using Cache.Abstractions;
 using Evidence.API.DTOs;
 using Evidence.API.Mappings;
 using Evidence.API.Validators;
@@ -16,10 +16,10 @@ namespace Evidence.API.Controllers
     /// </summary>
     [ApiController]
     [Route("evidence")]
-    public class EvidenceController(IEvidenceService evidenceService, IRedisService redisService, SearchEvidenceQueryValidator searchEvidenceQueryValidator) : ControllerBase
+    public class EvidenceController(IEvidenceService evidenceService, ICache cache, SearchEvidenceQueryValidator searchEvidenceQueryValidator) : ControllerBase
     {
         private readonly IEvidenceService _evidenceService = evidenceService;
-        private readonly IRedisService _redisService = redisService;
+        private readonly ICache _cache = cache;
         private readonly EvidenceMapping _evidenceMapping = new();
         private readonly SearchEvidenceQueryValidator _searchEvidenceQueryValidator = searchEvidenceQueryValidator;
 
@@ -76,7 +76,7 @@ namespace Evidence.API.Controllers
         [HttpGet("{evidenceId}")]
         public async Task<IActionResult> GetEvidenceByIdAsync(string evidenceId)
         {
-            var cache = await _redisService.GetStringAsync<EvidenceDto>(evidenceId);
+            var cache = await _cache.GetAsync<EvidenceDto>(evidenceId);
             if (cache is not null)
             {
                 return Ok(cache);
@@ -90,7 +90,7 @@ namespace Evidence.API.Controllers
 
             var dto = _evidenceMapping.ToDto(evidence);
 
-            await _redisService.SetStringAsync<EvidenceDto>(evidence.Id, dto);
+            await _cache.SetAsync<EvidenceDto>(evidence.Id, dto);
 
             return Ok(dto);
         }
@@ -113,10 +113,7 @@ namespace Evidence.API.Controllers
                 return BadRequest(result);
             }
 
-            await _redisService.RemoveKeyAsync(evidence.Id);
-
-            var cacheEntry = _evidenceMapping.ToDto(evidence);
-            await _redisService.SetStringAsync<EvidenceDto>(evidence.Id, cacheEntry);
+            await _cache.DeleteAsync(evidence.Id);
 
             return NoContent();
         }
@@ -139,7 +136,7 @@ namespace Evidence.API.Controllers
             {
                 return BadRequest(result);
             }
-            await _redisService.RemoveKeyAsync(evidence.Id);
+            await _cache.DeleteAsync(evidence.Id);
 
             return NoContent();
         }

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using Authorization;
-using Caching;
+using Cache.Abstractions;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
 using Identity.Core.Services;
@@ -12,13 +12,11 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController(IAuthService authService, IRedisService redisService, IUserService userService) : ControllerBase
+    public class UserController(IAuthService authService, ICache cache) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
         private readonly UserMapping _userMapping = new();
-        private readonly IRedisService _redisService = redisService;
-        private readonly IUserService _userService = userService;
-
+        private readonly ICache _cache = cache;
 
         /// <summary>
         /// This way to stop 401 being sent on load of app and getting stuck on login page
@@ -33,7 +31,7 @@ namespace Identity.API.Controllers
 
             if (userId is null) return BadRequest("User id missing");
 
-            var value = await _redisService.GetStringAsync<MeDto>(userId);
+            var value = await _cache.GetAsync<MeDto>(userId);
             if (value is not null)
             {
                 return Ok(value);
@@ -51,7 +49,7 @@ namespace Identity.API.Controllers
                 User = userDto
             };
 
-            await _redisService.SetStringAsync<MeDto>(userId, returnDto);
+            await _cache.SetAsync<MeDto>(userId, returnDto);
             return Ok(returnDto);
         }
 
@@ -138,7 +136,7 @@ namespace Identity.API.Controllers
                 return BadRequest(result.Errors);
             }
 
-            await _redisService.RemoveKeyAsync(userId);
+            await _cache.DeleteAsync(userId);
             return NoContent();
         }
 
@@ -169,7 +167,7 @@ namespace Identity.API.Controllers
                 return BadRequest(result.Errors);
             }
 
-            await _redisService.RemoveKeyAsync(userId);
+            await _cache.DeleteAsync(userId);
             return NoContent();
         }
 

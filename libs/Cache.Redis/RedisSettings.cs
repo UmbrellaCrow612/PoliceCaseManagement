@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Caching
+namespace Cache.Redis
 {
     /// <summary>
-    /// Settings object from the app settings for the Redis settings - can be accessed through IOptions through the DI
+    /// Represents the settings needed for redis to be configured - read from app settings, validated and added to the DI
     /// </summary>
     public class RedisSettings
     {

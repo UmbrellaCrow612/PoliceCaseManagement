@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Caching;
+using Cache.Abstractions;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.API.Validators;
@@ -14,14 +14,14 @@ namespace Cases.API.Controllers
     [ApiController]
     [Route("cases")]
     public class CasesController(ICaseService caseService, CaseValidator caseValidator, SearchCasesQueryValidator searchCasesQueryValidator, 
-        IRedisService redisService, ICaseAuthorizationService caseAuthorizationService, IIncidentTypeService incidentTypeService, ICaseActionService caseActionService) : ControllerBase
+        ICache cache, ICaseAuthorizationService caseAuthorizationService, IIncidentTypeService incidentTypeService, ICaseActionService caseActionService) : ControllerBase
     {
         private readonly ICaseService _caseService = caseService;
         private readonly IncidentTypeMapping _incidentTypeMapping = new();
         private readonly CasesMapping _caseMapping = new();
         private readonly CaseValidator _caseValidator = caseValidator;
         private readonly SearchCasesQueryValidator _searchCasesQueryValidator = searchCasesQueryValidator;
-        private readonly IRedisService _redisService = redisService;
+        private readonly ICache _cache = cache;
         private readonly ICaseAuthorizationService _caseAuthorizationService = caseAuthorizationService;
         private readonly IIncidentTypeService _incidentTypeService = incidentTypeService;
         private readonly ICaseActionService _caseActionService = caseActionService;
@@ -52,7 +52,7 @@ namespace Cases.API.Controllers
             var canView = await _caseAuthorizationService.IsAssigned(userId, caseId);
             if (!canView) return Forbid();
 
-            var cache = await _redisService.GetStringAsync<CaseDto>(caseId);
+            var cache = await _cache.GetAsync<CaseDto>(caseId);
             if (cache is not null)
             {
                 return Ok(cache);
@@ -65,7 +65,7 @@ namespace Cases.API.Controllers
             }
 
             var dto = _caseMapping.ToDto(_case);
-            await _redisService.SetStringAsync<CaseDto>(_case.Id, dto);
+            await _cache.SetAsync<CaseDto>(_case.Id, dto);
 
             return Ok(dto);
         }

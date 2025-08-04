@@ -1,4 +1,4 @@
-using Caching;
+using Cache.Redis;
 using Cases.API;
 using Cases.Application;
 using Cases.Infrastructure;
@@ -24,7 +24,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddCasesInfrastructure(config);
 builder.Services.AddCasesApplication(config);
-builder.Services.AddCaching(config);
+builder.Services.AddRedis(config);
 
 builder.Services.AddGrpcJwtInterceptor();
 builder.Services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>

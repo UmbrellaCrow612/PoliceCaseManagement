@@ -1,14 +1,12 @@
-using Caching;
+using Cache.Redis;
 using Identity.API.Extensions;
 using Identity.API.Grpc;
 using Identity.Application;
 using Identity.Core.Models;
 using Identity.Infrastructure;
-using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -25,7 +23,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplicationServices(config);
-builder.Services.AddCaching(config);
+builder.Services.AddRedis(config);
 
 var app = builder.Build();
 

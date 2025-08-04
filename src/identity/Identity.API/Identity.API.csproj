@@ -30,9 +30,10 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Cache.Abstractions\Cache.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\libs\Cache.Redis\Cache.Redis.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
-    <ProjectReference Include="..\..\shared\Caching\Caching.csproj" />
     <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />

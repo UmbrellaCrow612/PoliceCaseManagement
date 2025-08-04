@@ -1,4 +1,4 @@
-using Caching;
+using Cache.Redis;
 using Evidence.API;
 using Evidence.API.Grpc;
 using Evidence.Application;
@@ -16,7 +16,7 @@ var config = builder.Configuration;
 builder.Services.AddInfrastructure(config);
 builder.Services.AddApplication(config);
 builder.Services.AddBaseAuthorization(config);
-builder.Services.AddCaching(config);
+builder.Services.AddRedis(config);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
