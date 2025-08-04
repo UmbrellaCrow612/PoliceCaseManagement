@@ -73,16 +73,6 @@ export class SystemIncidentTypeHomeViewComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.incidentTypeService.getAllIncidentTypes().subscribe({
-      next: (incidentTypes) => {
-        this.incidentTypes = incidentTypes;
-        this.filteredIncidentTypes = incidentTypes;
-        this.isLoading = false;
-      },
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = `Error: ${err.error[0]?.code}`;
-        this.isLoading = false;
-      },
-    });
+   
   }
 }

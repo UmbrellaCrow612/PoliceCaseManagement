@@ -120,13 +120,15 @@ func (p *personRepository) Search(query *valueobjects.SearchPersonQuery) (*value
 	totalPages := int(math.Ceil(float64(totalRecords) / float64(pageSize)))
 
 	result := &valueobjects.PaginatedResult[models.Person]{
-		PageNumber:      pageNumber,
-		PageSize:        pageSize,
 		Data:            people,
 		HasNextPage:     pageNumber < totalPages,
 		HasPreviousPage: pageNumber > 1,
-		TotalPages:      totalPages,
-		TotalRecords:    int(totalRecords),
+		Pagination: valueobjects.PaginationMeta{
+			PageNumber:   pageNumber,
+			PageSize:     pageSize,
+			TotalPages:   totalPages,
+			TotalRecords: int(totalRecords),
+		},
 	}
 
 	return result, nil

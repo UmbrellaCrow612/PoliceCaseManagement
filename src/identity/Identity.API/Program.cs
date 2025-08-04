@@ -33,6 +33,15 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+
+    using var scope = app.Services.CreateScope();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    var seeder = new Seeder(userManager, roleManager);
+
+    await seeder.SeeRolesAsync();
+    await seeder.SeedUsersAndThereRolesAsync();
 }
 
 app.UseSerilogRequestLogging(options =>
@@ -48,23 +57,6 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.MapGrpcService<UserServiceImpl>();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    var seeder = new Seeder(userManager, roleManager);
-
-    await seeder.SeeRolesAsync();
-    await seeder.SeedUsersAndThereRolesAsync();
-}
 
 try
 {

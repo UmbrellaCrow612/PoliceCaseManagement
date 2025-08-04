@@ -12,14 +12,3 @@ type SearchPersonQuery struct {
     PageNumber  int        `form:"pageNumber" binding:"required,min=1"`
     PageSize    int        `form:"pageSize" binding:"required,min=1,max=100"`  
 }
-
-// Public: Generic paginated result object
-type PaginatedResult[T any] struct {
-	PageNumber      int
-	PageSize        int
-	Data            []T
-	HasNextPage     bool
-	HasPreviousPage bool
-	TotalPages      int
-	TotalRecords    int
-}

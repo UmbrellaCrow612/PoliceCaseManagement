@@ -9,10 +9,15 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 export function Validator_containsOnlyNumeric(
   control: AbstractControl
 ): ValidationErrors | null {
-  if (typeof control.value === 'string') {
+  const value = control.value;
+  if (typeof value === 'string') {
+    value as string;
+
+    if (value.trim() === '') {
+      return null;
+    }
     let regex = /^\d+$/;
-    const _value = control.value as string;
-    let isOnlyNumeric = regex.test(_value);
+    let isOnlyNumeric = regex.test(value);
 
     if (isOnlyNumeric) {
       return null;
@@ -20,7 +25,7 @@ export function Validator_containsOnlyNumeric(
       return { numeric: true };
     }
   }
-  return { numeric: true };
+  return null;
 }
 
 /**
@@ -77,7 +82,7 @@ export function Validator_maxFileSize(maxFileSizeBytes: number): ValidatorFn {
       return null;
     }
 
-    const size = file.size; 
+    const size = file.size;
 
     return size > maxFileSizeBytes
       ? { maxFileSize: { requiredMaxSize: maxFileSizeBytes, actualSize: size } }

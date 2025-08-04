@@ -15,9 +15,9 @@ export class IncidentTypeService {
    * Retrieve all incident types defined in the system
    * any role can do this.
    */
-  getAllIncidentTypes() {
+  search() {
     return this.httpClient.get<Array<IncidentType>>(
-      `${this.BASE_URL}/cases/incident-types`
+      `${this.BASE_URL}/incident-types` // todo fix ui and backend paginated impl
     );
   }
 

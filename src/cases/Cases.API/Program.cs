@@ -2,12 +2,10 @@ using Caching;
 using Cases.API;
 using Cases.Application;
 using Cases.Infrastructure;
-using Cases.Infrastructure.Data;
 using Evidence.V1;
 using Grpc.JwtInterceptor;
 using Grpc.Net.ClientFactory;
 using Logging;
-using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using User.V1;
@@ -59,11 +57,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<CasesApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
 
 app.Run();

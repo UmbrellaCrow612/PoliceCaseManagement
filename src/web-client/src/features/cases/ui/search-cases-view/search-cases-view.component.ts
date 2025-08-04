@@ -72,7 +72,7 @@ export class SearchCasesViewComponent implements OnInit {
     if (!this.incidentTypes && !this.isFetchingIncidentTypes) {
       this.isFetchingIncidentTypes = true;
 
-      this.incidentTypeService.getAllIncidentTypes().subscribe({
+      this.incidentTypeService.search().subscribe({
         next: (incidentTypes) => {
           this.incidentTypes = incidentTypes;
           this.filteredIncidentTypes = incidentTypes;

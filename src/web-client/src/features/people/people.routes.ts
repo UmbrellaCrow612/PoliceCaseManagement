@@ -2,12 +2,12 @@ import { Routes } from '@angular/router';
 
 export const PEOPLE_ROUTES: Routes = [
   {
+    title: 'People management',
     path: '',
     loadComponent: () =>
       import('./components/people-shell/people-shell.component').then(
         (c) => c.PeopleShellComponent
       ),
-    title: 'People management',
     children: [
       {
         path: '',

@@ -5,6 +5,7 @@ using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.Abstractions;
 
 namespace Cases.API.Controllers
 {
@@ -34,8 +35,16 @@ namespace Cases.API.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchIncidentTypes([FromQuery] SearchIncidentTypesQuery query)
         {
-            var incidentTypes = await _incidentTypeService.SearchAsync(query);
-            return Ok(incidentTypes);
+            var paginatedResponse = await _incidentTypeService.SearchAsync(query);
+            var dto = new PaginatedResult<IncidentTypeDto>
+            {
+                Data = paginatedResponse.Data.Select(x => _incidentTypeMapping.ToDto(x)),
+                HasNextPage = paginatedResponse.HasNextPage,
+                HasPreviousPage = paginatedResponse.HasPreviousPage,
+                Pagination = paginatedResponse.Pagination,
+            };
+
+            return Ok(dto);
         }
 
         [Authorize]

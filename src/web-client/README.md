@@ -36,3 +36,4 @@ make a specific folder within the business domain folder validators for example 
 - Async reactive form validators use `UniqueEvidenceReferenceNumberAsyncValidator` as a ref
 - Use `dialogs` for basic linking, editing and creating of items - refer to how case action is created through a dialog
 - For backend enums refer to `CaseRoleNames` for how to handle them properly in a nice and standard way
+- Methods that run when somthing is clicked or related to ui interactions name convetion is `handleSearchClicked` format  

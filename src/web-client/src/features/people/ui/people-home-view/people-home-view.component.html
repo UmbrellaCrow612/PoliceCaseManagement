@@ -1,1 +1,85 @@
-<p>people-home-view works!</p>
+<div>
+  <form
+    [formGroup]="searchPeopleForm"
+    (ngSubmit)="handleSearchClicked()"
+    class="search_people_form"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date of birth</mat-label>
+      <input
+        matInput
+        [matDatepicker]="dateOfBirthPicker"
+        formControlName="dateOfBirth"
+      />
+
+      @if (searchPeopleForm.controls.dateOfBirth.hasError("matDatepickerParse"))
+      {
+      <mat-error> Provide a valid date </mat-error>
+      }
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="dateOfBirthPicker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #dateOfBirthPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone number</mat-label>
+      <input matInput formControlName="phoneNumber" />
+
+      @if (searchPeopleForm.controls.phoneNumber.hasError("numeric")) {
+      <mat-error> Invalid phone number </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+
+      @if (searchPeopleForm.controls.email.hasError("email")) {
+      <mat-error> Provide a valid email </mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-button type="submit" [disabled]="isSearching">Search</button>
+
+    <button type="button" (click)="searchPeopleForm.reset()" mat-button>Clear</button>
+  </form>
+</div>
+
+<div>
+  Values:
+
+  <br />
+
+  {{ searchPeopleForm.value | json }}
+</div>
+
+<div>
+  @if (isSearching) {
+  <div>Searching</div>
+  }
+
+  <!---->
+
+  @if (!isSearching && searchError) {
+  <div>Failed search</div>
+  }
+
+  <!---->
+
+  @if (!isSearching && !searchError && searchedPeople) {
+  <!---->
+  {{ searchedPeople | json }} }
+</div>
