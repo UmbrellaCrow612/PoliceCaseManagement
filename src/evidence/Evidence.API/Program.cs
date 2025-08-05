@@ -5,11 +5,17 @@ using Evidence.Application;
 using Evidence.Infrastructure;
 using Grpc.JwtInterceptor;
 using Grpc.Net.ClientFactory;
+using Logging;
 using Scalar.AspNetCore;
+using Serilog;
 using User.V1;
 using Validator;
 
+SerilogExtensions.ConfigureSerilog();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 var config = builder.Configuration;
 
@@ -38,6 +44,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+});
 
 app.UseHttpsRedirection();
 

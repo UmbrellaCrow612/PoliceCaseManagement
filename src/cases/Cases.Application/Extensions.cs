@@ -2,13 +2,11 @@
 using Cases.Core.Services;
 using Events.Core;
 using Events.Core.Settings;
-using Evidence.V1;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StorageProvider.AWS;
 using System.Reflection;
-using User.V1;
 
 namespace Cases.Application
 {

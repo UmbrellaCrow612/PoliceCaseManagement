@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\..\..\libs\Results.Abstractions\Results.Abstractions.csproj" />
   </ItemGroup>
 </Project>

@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\..\libs\Grpc.JwtInterceptor\Grpc.JwtInterceptor.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
+    <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
     <ProjectReference Include="..\Evidence.Application\Evidence.Application.csproj" />
     <ProjectReference Include="..\Evidence.Infrastructure\Evidence.Infrastructure.csproj" />
   </ItemGroup>

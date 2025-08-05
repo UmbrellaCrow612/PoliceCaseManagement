@@ -21,9 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\..\..\libs\StorageProvider.Abstractions\StorageProvider.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\libs\StorageProvider.AWS\StorageProvider.AWS.csproj" />
-    <ProjectReference Include="..\..\shared\Events.Core\Events.Core.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />
     <ProjectReference Include="..\Cases.Infrastructure\Cases.Infrastructure.csproj" />
   </ItemGroup>
