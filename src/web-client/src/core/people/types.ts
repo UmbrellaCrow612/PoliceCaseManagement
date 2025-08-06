@@ -23,3 +23,14 @@ export interface SearchPersonQuery {
   pageNumber: number;
   pageSize: number;
 }
+
+/**
+ * Fields sent across to create a person
+ */
+export interface CreatePersonDto {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+  phoneNumber: string;
+  email: string;
+}

@@ -1,0 +1,101 @@
+<h2 mat-dialog-title>Create a person into the system</h2>
+<form
+  matDialogContent
+  class="mat-typography"
+  [formGroup]="createPersonForm"
+  (ngSubmit)="handleSubmitForm()"
+>
+  <div class="form_group">
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" />
+
+      @if (createPersonForm.controls.firstName.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" />
+
+      @if (createPersonForm.controls.lastName.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date of birth</mat-label>
+      <input
+        matInput
+        [matDatepicker]="dateOfBirthPicker"
+        formControlName="dateOfBirth"
+      />
+
+      @if (createPersonForm.controls.dateOfBirth.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+      @if (createPersonForm.controls.dateOfBirth.hasError("matDatepickerParse"))
+      {
+      <mat-error> Invalid date </mat-error>
+      }
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="dateOfBirthPicker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #dateOfBirthPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone number</mat-label>
+      <input matInput formControlName="phoneNumber" />
+
+      <mat-hint> Start with + then country code and number </mat-hint>
+
+      @if (createPersonForm.controls.phoneNumber.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+      @if (createPersonForm.controls.phoneNumber.hasError("phone")) {
+      <mat-error> Invalid </mat-error>
+      }
+      <!---->
+      @if (createPersonForm.controls.phoneNumber.hasError("uniquePhoneNumber"))
+      {
+      <mat-error> Phone number taken </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+
+      @if (createPersonForm.controls.email.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+      @if (createPersonForm.controls.email.hasError("email")) {
+      <mat-error> Invalid email </mat-error>
+      }
+      <!---->
+      @if (createPersonForm.controls.email.hasError("uniqueEmail")) {
+      <mat-error> Email taken </mat-error>
+      }
+    </mat-form-field>
+
+    {{ error }}
+
+    <button
+      mat-button
+      [disabled]="createPersonForm.invalid || isCreating"
+      type="submit"
+    >
+      Create
+    </button>
+  </div>
+</form>
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close mat-button cdkFocusInitial>Cancel</button>
+</mat-dialog-actions>

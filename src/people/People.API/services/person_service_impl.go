@@ -55,3 +55,13 @@ func (p *personService) Create(person *models.Person) error {
 func (p *personService) Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error) {
 	return p.repo.Search(query)
 }
+
+// Public: IsPhoneNumberTaken implements PersonService.
+func (p *personService) IsPhoneNumberTaken(phoneNumber string) (bool, error) {
+	return p.repo.PhoneNumberTaken(phoneNumber)
+}
+
+// Public: IsEmailTaken implements PersonService.
+func (p *personService) IsEmailTaken(email string) (bool, error) {
+	return p.repo.EmailTaken(email)
+}

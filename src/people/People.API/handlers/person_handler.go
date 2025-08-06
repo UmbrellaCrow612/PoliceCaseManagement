@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/mail"
 	apperrors "people/api/app_errors"
+	internalutils "people/api/internal_utils"
 	"people/api/models"
 	"people/api/services"
 	valueobjects "people/api/value_objects"
@@ -20,6 +21,23 @@ type createPersonDto struct {
 	DateOfBirth time.Time `json:"dateOfBirth" binding:"required"`
 	PhoneNumber string    `json:"phoneNumber" binding:"required"`
 	Email       string    `json:"email" binding:"required"`
+}
+
+// Private: dto to check if a phone number is taken
+type phoneNumberTakenDto struct {
+	PhoneNumber string `json:"phoneNumber" binding:"required"`
+}
+
+type phoneNumberTakenResponse struct {
+	Taken bool `json:"taken"`
+}
+
+type emailTakenDto struct {
+	Email string `json:"email" binding:"required"`
+}
+
+type emailTakenResponse struct {
+	Taken bool `json:"taken"`
 }
 
 // Public: Handles the function to run on a specific people endpoint
@@ -56,8 +74,15 @@ func (h *PersonHandler) HandleCreatePerson(c *gin.Context) {
 	}
 
 	_, err := mail.ParseAddress(req.Email)
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": apperrors.ErrInvalidEmail.Error()})
+		return
+	}
+
+	valid := internalutils.IsValidPhoneNumber(req.PhoneNumber)
+	if !valid {
+		c.JSON(http.StatusBadRequest, gin.H{"error": apperrors.ErrPhoneNumberInvalidFormat.Error()})
 		return
 	}
 
@@ -101,4 +126,38 @@ func (h *PersonHandler) HandleSearchPeople(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+func (h *PersonHandler) HandleIsPhoneNumberTaken(c *gin.Context) {
+	var req phoneNumberTakenDto
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	taken, err := h.service.IsPhoneNumberTaken(req.PhoneNumber)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, phoneNumberTakenResponse{Taken: taken})
+}
+
+func (h *PersonHandler) HandleIsEmailTaken(c *gin.Context) {
+	var req emailTakenDto
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	taken, err := h.service.IsEmailTaken(req.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, emailTakenResponse{Taken: taken})
 }

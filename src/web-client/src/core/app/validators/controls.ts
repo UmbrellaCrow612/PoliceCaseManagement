@@ -89,3 +89,28 @@ export function Validator_maxFileSize(maxFileSizeBytes: number): ValidatorFn {
       : null;
   };
 }
+
+
+/**
+ * Validator for international phone number format.
+ * Ensures the phone number:
+ * - Starts with a `+`
+ * - Is followed by digits only
+ * - Has a reasonable length (8+ digits including country code)
+ *
+ * Returns:
+ * - null if valid
+ * - { phone: true } if invalid
+ */
+export function Validator_phoneNumber(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+
+  if (typeof value !== 'string' || value.trim() === '') {
+    return null; // Let required validator handle empty if needed
+  }
+
+  // E.164 basic pattern: starts with + followed by 8 to 15 digits
+  const regex = /^\+\d{8,15}$/;
+
+  return regex.test(value) ? null : { phone: true };
+}

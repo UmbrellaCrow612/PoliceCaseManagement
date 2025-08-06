@@ -16,6 +16,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { CreatePersonDialogComponent } from './components/create-person-dialog/create-person-dialog.component';
 
 @Component({
   selector: 'app-people-home-view',
@@ -33,6 +35,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class PeopleHomeViewComponent {
   private readonly peopleService = inject(PeopleService);
+  private readonly dialog = inject(MatDialog);
 
   /**
    * Contains all the fields a person can  be searched with in the system
@@ -94,5 +97,12 @@ export class PeopleHomeViewComponent {
           this.isSearching = false;
         },
       });
+  }
+
+  /**
+   * Runs when add person is clicked
+   */
+  handleAddClicked() {
+    this.dialog.open(CreatePersonDialogComponent);
   }
 }

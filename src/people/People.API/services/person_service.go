@@ -19,4 +19,10 @@ type PersonService interface {
 
 	// Public: Search people
 	Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error)
+
+	// Public: Check if a phone number is taken by another person
+	IsPhoneNumberTaken(phoneNumber string) (bool, error)
+
+	// Public: Check is a email is taken by another person
+	IsEmailTaken(email string) (bool, error)
 }
