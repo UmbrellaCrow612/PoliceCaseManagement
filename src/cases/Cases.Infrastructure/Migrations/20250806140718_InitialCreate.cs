@@ -145,6 +145,31 @@ namespace Cases.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CasePeople",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    CaseId = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    PersonId = table.Column<string>(type: "text", nullable: false),
+                    PersonFirstName = table.Column<string>(type: "text", nullable: false),
+                    PersonLastName = table.Column<string>(type: "text", nullable: false),
+                    PersonDateBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PersonPhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    PersonEmail = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CasePeople", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CasePeople_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseIncidentTypes",
                 columns: table => new
                 {
@@ -217,6 +242,11 @@ namespace Cases.Infrastructure.Migrations
                 column: "IncidentTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CasePeople_CaseId",
+                table: "CasePeople",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cases_CaseNumber",
                 table: "Cases",
                 column: "CaseNumber",
@@ -253,10 +283,13 @@ namespace Cases.Infrastructure.Migrations
                 name: "CaseIncidentTypes");
 
             migrationBuilder.DropTable(
-                name: "Cases");
+                name: "CasePeople");
 
             migrationBuilder.DropTable(
                 name: "IncidentTypes");
+
+            migrationBuilder.DropTable(
+                name: "Cases");
         }
     }
 }

@@ -1,12 +1,10 @@
-//
-// Contains all common person-related gRPC service methods and responses.
-//
-
 syntax = "proto3";
 
 package person.V1;
 
-option go_package = "github.com/UmbrellaCrow612/PoliceCaseManagement/src/people/People.API/gen/personv1;personv1";
+option go_package = "gen/person/v1;personv1";
+
+import "google/protobuf/timestamp.proto";
 
 // PersonService provides operations to interact with person entities in the system.
 service PersonService {
@@ -47,8 +45,8 @@ message GetPersonByIdResponse {
     // The last name of the person.
     string lastName = 3;
 
-    // The date of birth of the person (ISO format recommended).
-    string dateOfBirth = 4;
+    // The date of birth of the person.
+    google.protobuf.Timestamp dateOfBirth = 4;
 
     // The phone number of the person.
     string phoneNumber = 5;

@@ -23,6 +23,7 @@ namespace Cases.Application
             services.AddScoped<IIncidentTypeService, IncidentTypeService>();
             services.AddScoped<EvidenceValidationService>();
             services.AddScoped<UserValidationService>();
+            services.AddScoped<PersonValidationService>();
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()

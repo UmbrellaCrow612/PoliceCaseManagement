@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 	"people/api/db/repositories"
-	personv1 "people/api/gen/common"
+	personv1 "people/api/gen/person/v1"
 	grpcimpl "people/api/grpc_impl"
 	"people/api/handlers"
 	internalutils "people/api/internal_utils"

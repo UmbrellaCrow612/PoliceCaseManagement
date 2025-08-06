@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cases.Infrastructure.Migrations
 {
     [DbContext(typeof(CasesApplicationDbContext))]
-    [Migration("20250723100116_InitialCreate")]
+    [Migration("20250806140718_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -286,6 +286,48 @@ namespace Cases.Infrastructure.Migrations
                     b.ToTable("CaseIncidentTypes");
                 });
 
+            modelBuilder.Entity("Cases.Core.Models.Joins.CasePerson", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PersonDateBirth")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PersonEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PersonFirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PersonId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PersonLastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PersonPhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.ToTable("CasePeople");
+                });
+
             modelBuilder.Entity("Cases.Core.Models.CaseAccessList", b =>
                 {
                     b.HasOne("Cases.Core.Models.Case", "Case")
@@ -347,6 +389,17 @@ namespace Cases.Infrastructure.Migrations
                     b.Navigation("Case");
 
                     b.Navigation("IncidentType");
+                });
+
+            modelBuilder.Entity("Cases.Core.Models.Joins.CasePerson", b =>
+                {
+                    b.HasOne("Cases.Core.Models.Case", "Case")
+                        .WithMany()
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
                 });
 
             modelBuilder.Entity("Cases.Core.Models.Case", b =>

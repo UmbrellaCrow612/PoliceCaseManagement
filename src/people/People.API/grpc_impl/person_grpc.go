@@ -3,8 +3,10 @@ package grpcimpl
 import (
 	"context"
 	"errors"
-	personv1 "people/api/gen/common"
+	personv1 "people/api/gen/person/v1"
 	"people/api/services"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type PersonServerImpl struct {
@@ -45,7 +47,7 @@ func (s *PersonServerImpl) GetPersonById(ctx context.Context, req *personv1.GetP
 		PersonId:    person.ID,
 		FirstName:   person.FirstName,
 		LastName:    person.LastName,
-		DateOfBirth: person.DateOfBirth.Format("2006-01-02"),
+		DateOfBirth: timestamppb.New(person.DateOfBirth),
 		PhoneNumber: person.PhoneNumber,
 		Email:       person.Email,
 	}, nil

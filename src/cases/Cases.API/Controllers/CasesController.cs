@@ -411,5 +411,24 @@ namespace Cases.API.Controllers
 
             return NoContent();
         }
+
+        [Authorize]
+        [HttpPost("{caseId}/people")]
+        public async Task<IActionResult> AssignPersonToCase(string caseId, [FromBody] AssignPersonToCase dto)
+        {
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _caseService.AddPerson(_case, dto.PersonId, dto.Role);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
     }
 }

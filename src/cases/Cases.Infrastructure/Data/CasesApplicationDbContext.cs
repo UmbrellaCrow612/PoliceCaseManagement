@@ -14,6 +14,7 @@ namespace Cases.Infrastructure.Data
         public DbSet<CaseAttachmentFile> CaseAttachmentFiles { get; set; }
         public DbSet<CaseAccessList> CaseAccessLists { get; set; }
         public DbSet<CaseEvidence> CaseEvidences { get; set; }
+        public DbSet<CasePerson> CasePeople { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

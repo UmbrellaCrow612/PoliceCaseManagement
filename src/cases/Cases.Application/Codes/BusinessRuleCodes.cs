@@ -51,5 +51,15 @@
         /// Indicates that a piece of evidence is not linked to a case
         /// </summary>
         public const string EvidenceNotLinked = "EVIDENCE_NOT_LINKED";
+
+        /// <summary>
+        /// Indicates that a person is already linked to a given case
+        /// </summary>
+        public const string PersonAlreadyLinkedToCase = "PERSON_ALREADY_LINKED_TO_CASE";
+
+        /// <summary>
+        /// Indicates that a person does not exist
+        /// </summary>
+        public const string PersonDoesNotExist = "PERSON_DOES_NOT_EXIST";
     }
 }

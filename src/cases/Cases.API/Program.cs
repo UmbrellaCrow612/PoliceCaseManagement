@@ -6,6 +6,7 @@ using Evidence.V1;
 using Grpc.JwtInterceptor;
 using Grpc.Net.ClientFactory;
 using Logging;
+using Person.V1;
 using Scalar.AspNetCore;
 using Serilog;
 using User.V1;
@@ -35,6 +36,11 @@ builder.Services.AddGrpcClient<EvidenceService.EvidenceServiceClient>(o =>
 builder.Services.AddGrpcClient<UserService.UserServiceClient>(o =>
 {
     o.Address = new Uri("https://localhost:7058");
+}).AddInterceptor<JwtForwardInterceptor>(InterceptorScope.Client);
+
+builder.Services.AddGrpcClient<PersonService.PersonServiceClient>(o =>
+{
+    o.Address = new Uri("http://localhost:8084");
 }).AddInterceptor<JwtForwardInterceptor>(InterceptorScope.Client);
 
 builder.Services.AddValidators();

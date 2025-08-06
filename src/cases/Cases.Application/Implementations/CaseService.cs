@@ -4,6 +4,7 @@ using Cases.Core.Models.Joins;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Cases.Infrastructure.Data;
+using Google.Protobuf;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,13 +13,14 @@ using Results.Abstractions;
 
 namespace Cases.Application.Implementations
 {
-    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, EvidenceValidationService evidenceValidationService) : ICaseService
+    internal class CaseService(CasesApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<CaseService> logger, UserValidationService userValidationService, EvidenceValidationService evidenceValidationService, PersonValidationService personValidationService) : ICaseService
     {
         private readonly CasesApplicationDbContext _dbcontext = dbContext;
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
         private readonly ILogger<CaseService> _logger = logger;
         private readonly UserValidationService _userValidationService = userValidationService;
         private readonly EvidenceValidationService _evidenceService = evidenceValidationService;
+        private readonly PersonValidationService _personService = personValidationService;
 
         public async Task<CaseResult> AddEvidenceAsync(Case @case, string evidenceId)
         {
@@ -47,6 +49,44 @@ namespace Cases.Application.Implementations
                 EvidenceReferenceNumber = evidenceDetails.ReferenceNumber,
             };
             await _dbcontext.CaseEvidences.AddAsync(link);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<CaseResult> AddPerson(Case @case, string personId, CasePersonRole role)
+        {
+            var result = new CaseResult();
+
+            var alreadyLinked = await _dbcontext.CasePeople.Where(x => x.CaseId == @case.Id && x.PersonId == personId).AnyAsync();
+            if (alreadyLinked)
+            {
+                result.AddError(BusinessRuleCodes.PersonAlreadyLinkedToCase, "Person already linked");
+                return result;
+            }
+
+            var personExists = await _personService.PersonExistsAsync(personId);
+            if (!personExists)
+            {
+                result.AddError(BusinessRuleCodes.PersonDoesNotExist, "Person not found");
+                return result;
+            }
+
+            var details = await _personService.GetPersonByIdAsync(personId);
+
+            var join = new CasePerson
+            {
+                CaseId = @case.Id,
+                PersonDateBirth = details.DateOfBirth.ToDateTime(),
+                PersonEmail = details.Email,
+                PersonFirstName = details.FirstName,
+                PersonId = personId,
+                PersonLastName = details.LastName,
+                PersonPhoneNumber = details.PhoneNumber,
+                Role = role
+            };
+            await _dbcontext.CasePeople.AddAsync(join);
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;

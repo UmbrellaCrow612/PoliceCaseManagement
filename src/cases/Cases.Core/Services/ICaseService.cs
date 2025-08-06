@@ -78,6 +78,15 @@ namespace Cases.Core.Services
         /// <param name="evidenceId">The ID of the evidence to remove</param>
         /// <returns>Result object</returns>
         Task<CaseResult> RemoveEvidenceAsync(Case @case, string evidenceId);
+
+        /// <summary>
+        /// Links a person to a case and gives them a role on that case
+        /// </summary>
+        /// <param name="case">Teh case to link it to</param>
+        /// <param name="personId">The ID of the person to link</param>
+        /// <param name="role">The role they have on the case</param>
+        /// <returns>Result object</returns>
+        Task<CaseResult> AddPerson(Case @case, string personId, CasePersonRole role);
     }
 
     /// <summary>

@@ -7,14 +7,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// Public: Person model
 type Person struct {
-	ID          string    `gorm:"primaryKey" json:"id"`
-	FirstName   string    `json:"first_name"`
-	LastName    string    `json:"last_name"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	PhoneNumber string    `gorm:"uniqueIndex" json:"phone_number"` 
-	Email       string    `gorm:"uniqueIndex" json:"email"`       
+	ID          string    `gorm:"primaryKey;column:id" json:"id"`
+	FirstName   string    `gorm:"column:firstName" json:"firstName"`
+	LastName    string    `gorm:"column:lastName" json:"lastName"`
+	DateOfBirth time.Time `gorm:"column:dateOfBirth" json:"dateOfBirth"`
+	PhoneNumber string    `gorm:"uniqueIndex;column:phoneNumber" json:"phoneNumber"`
+	Email       string    `gorm:"uniqueIndex;column:email" json:"email"`
 }
+
 
 func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
     if p.ID == "" {
