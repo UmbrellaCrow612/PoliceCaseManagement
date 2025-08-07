@@ -114,5 +114,10 @@ export class CasesIdViewComponent implements OnInit {
       href: './evidence',
       name: 'Evidence',
     },
+    {
+      authorizedRoles: [],
+      href: './people',
+      name: 'People',
+    },
   ];
 }

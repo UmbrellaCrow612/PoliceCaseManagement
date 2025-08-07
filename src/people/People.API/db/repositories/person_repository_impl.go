@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"context"
+	"errors"
 	"math"
 	"people/api/models"
 	valueobjects "people/api/value_objects"
@@ -9,91 +11,81 @@ import (
 )
 
 type personRepository struct {
-	db *gorm.DB
+	db  *gorm.DB
+	ctx *context.Context
 }
 
 // Public: Handles DB operations for a person
-func NewPersonRepository(db *gorm.DB) PersonRepository {
-	return &personRepository{db: db}
+func NewPersonRepository(db *gorm.DB, ctx *context.Context) PersonRepository {
+	return &personRepository{db: db, ctx: ctx}
 }
 
 // Public: GetByID implements PersonRepository.
 func (p *personRepository) GetByID(id string) (*models.Person, error) {
-	var person models.Person
-	result := p.db.First(&person, "id = ?", id)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &person, nil
-}
-
-// Public: Exists implements PersonRepository.
-func (p *personRepository) Exists(personId string) (bool, error) {
-	var exists bool
-	err := p.db.
-		Raw("SELECT EXISTS(SELECT 1 FROM people WHERE id = ?)", personId).
-		Scan(&exists).Error
+	person, err := gorm.G[models.Person](p.db).Where("id = ?", id).First(*p.ctx)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return exists, nil
+
+	return &person, nil
 }
 
 // Public: EmailTaken checks if a person with the given email already exists.
 func (p *personRepository) EmailTaken(email string) (bool, error) {
-	var exists bool
-	err := p.db.
-		Raw("SELECT EXISTS(SELECT 1 FROM people WHERE email = ?)", email).
-		Scan(&exists).Error
+	_, err := gorm.G[models.Person](p.db).Where(&models.Person{Email: email}).First(*p.ctx)
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, nil
+	}
+
 	if err != nil {
 		return false, err
 	}
-	return exists, nil
+	return true, nil
 }
 
 // Public: PhoneNumberTaken checks if a person with the given phone number already exists.
 func (p *personRepository) PhoneNumberTaken(phoneNumber string) (bool, error) {
-	var exists bool
-	err := p.db.
-		Raw("SELECT EXISTS(SELECT 1 FROM people WHERE phone_number = ?)", phoneNumber).
-		Scan(&exists).Error
+	_, err := gorm.G[models.Person](p.db).Where(&models.Person{PhoneNumber: phoneNumber}).First(*p.ctx)
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, nil
+	}
+
 	if err != nil {
 		return false, err
 	}
-	return exists, nil
+	return true, nil
 }
 
 // Create implements PersonRepository.
 func (p *personRepository) Create(person *models.Person) error {
-	result := p.db.Create(person)
-	return result.Error
+	err := gorm.G[models.Person](p.db).Create(*p.ctx, person)
+	return err
 }
 
 // Search implements PersonRepository.
 func (p *personRepository) Search(query *valueobjects.SearchPersonQuery) (*valueobjects.PaginatedResult[models.Person], error) {
-	var people []models.Person
-	var totalRecords int64
+	var queryBuilder gorm.ChainInterface[models.Person] = gorm.G[models.Person](p.db)
 
-	dbQuery := p.db.Model(&models.Person{})
-
-	// Apply filters if provided
 	if query.FirstName != "" {
-		dbQuery = dbQuery.Where("first_name ILIKE ?", "%"+query.FirstName+"%")
+		queryBuilder = queryBuilder.Where("first_name LIKE ?", "%"+query.FirstName+"%")
 	}
 	if query.LastName != "" {
-		dbQuery = dbQuery.Where("last_name ILIKE ?", "%"+query.LastName+"%")
+		queryBuilder = queryBuilder.Where("last_name LIKE ?", "%"+query.LastName+"%")
 	}
 	if query.DateOfBirth != nil {
-		dbQuery = dbQuery.Where("date_of_birth = ?", query.DateOfBirth.Format("2006-01-02"))
+		queryBuilder = queryBuilder.Where("DATE(date_of_birth) = ?", query.DateOfBirth.Format("2006-01-02"))
 	}
 	if query.PhoneNumber != "" {
-		dbQuery = dbQuery.Where("phone_number = ?", query.PhoneNumber)
+		queryBuilder = queryBuilder.Where("phone_number LIKE ?", "%"+query.PhoneNumber+"%")
 	}
 	if query.Email != "" {
-		dbQuery = dbQuery.Where("email = ?", query.Email)
+		queryBuilder = queryBuilder.Where("email LIKE ?", "%"+query.Email+"%")
 	}
 
-	if err := dbQuery.Count(&totalRecords).Error; err != nil {
+	totalRecords, err := queryBuilder.Count(*p.ctx, "*")
+	if err != nil {
 		return nil, err
 	}
 
@@ -109,10 +101,11 @@ func (p *personRepository) Search(query *valueobjects.SearchPersonQuery) (*value
 
 	offset := (pageNumber - 1) * pageSize
 
-	err := dbQuery.
+	people, err := queryBuilder.
 		Limit(pageSize).
 		Offset(offset).
-		Find(&people).Error
+		Find(*p.ctx)
+
 	if err != nil {
 		return nil, err
 	}

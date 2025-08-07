@@ -5,6 +5,7 @@ import (
 	"errors"
 	personv1 "people/api/gen/person/v1"
 	"people/api/services"
+	"strconv"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -23,13 +24,13 @@ func (s *PersonServerImpl) DoesPersonExist(ctx context.Context, req *personv1.Do
 		return &personv1.DoesPersonExistResponse{Exists: false}, nil
 	}
 
-	exists, err := s.personService.Exists(req.GetPersonId())
+	_, err := s.personService.GetById(req.GetPersonId())
 	if err != nil {
 		return &personv1.DoesPersonExistResponse{Exists: false}, err
 	}
 
 	return &personv1.DoesPersonExistResponse{
-		Exists: exists,
+		Exists: true,
 	}, nil
 }
 
@@ -44,7 +45,7 @@ func (s *PersonServerImpl) GetPersonById(ctx context.Context, req *personv1.GetP
 	}
 
 	return &personv1.GetPersonByIdResponse{
-		PersonId:    person.ID,
+		PersonId:    strconv.FormatUint(uint64(person.Model.ID), 10),
 		FirstName:   person.FirstName,
 		LastName:    person.LastName,
 		DateOfBirth: timestamppb.New(person.DateOfBirth),

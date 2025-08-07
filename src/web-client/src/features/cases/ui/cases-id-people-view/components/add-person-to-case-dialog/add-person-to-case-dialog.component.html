@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>Add person</h2>
+<mat-dialog-content class="mat-typography">
+  <form
+    [formGroup]="searchPeopleForm"
+    class="form_group"
+    (ngSubmit)="searchPeople()"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Date of birth</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dateOfBirth" />
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <button mat-button type="submit" [disabled]="isSearching">Search</button>
+  </form>
+
+  <div class="searched_people_container">
+    @if (isSearching) {
+    <div>Loading</div>
+    }
+
+    <!---->
+
+    @if (!isSearching && !error) {
+    {{ searchedPeople | json }}
+    }
+  </div>
+  <!---->
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
+  <button mat-button [disabled]="assignPersonForm.invalid">Save</button>
+</mat-dialog-actions>

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"people/api/db/repositories"
@@ -18,6 +19,7 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -26,16 +28,21 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	db, err := gorm.Open(postgres.Open(config.DSN), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(config.DSN), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info), 
+	})
+	
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
+
+	ctx := context.Background()
 
 	if err := db.AutoMigrate(&models.Person{}); err != nil {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}
 
-	personRepo := repositories.NewPersonRepository(db)
+	personRepo := repositories.NewPersonRepository(db, &ctx)
 	personService := services.NewPersonService(personRepo)
 	personHandler := handlers.NewPersonHandler(personService)
 

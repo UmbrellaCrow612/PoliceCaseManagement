@@ -8,6 +8,7 @@ import (
 	"people/api/models"
 	"people/api/services"
 	valueobjects "people/api/value_objects"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -72,6 +73,11 @@ func (h *PersonHandler) HandleCreatePerson(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	req.FirstName = strings.TrimSpace(req.FirstName)
+	req.LastName = strings.TrimSpace(req.LastName)
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	req.PhoneNumber = strings.TrimSpace(req.PhoneNumber)
 
 	_, err := mail.ParseAddress(req.Email)
 

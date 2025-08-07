@@ -34,6 +34,11 @@ var (
 
 if err == ErrRecordNotFound 
 ```
+- `GORM` use the default snake case in table name convention
+= `GORM` use the `generic API` for query building - pass the struct model and fields for matching unless unable to
+- API will sent over `camelCase` named convetion data transfer objects
+
+
 
 # Testing 
 

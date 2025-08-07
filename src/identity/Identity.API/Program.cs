@@ -7,6 +7,7 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Data.Seeding;
 using Logging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -33,6 +34,10 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 
     using var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider.GetRequiredService<Identity.Infrastructure.Data.IdentityApplicationDbContext>();
+    db.Database.Migrate();
+
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 

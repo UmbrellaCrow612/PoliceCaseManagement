@@ -1,0 +1,11 @@
+@if (error) {
+<div>
+  {{ error }}
+</div>
+}
+
+<!---->
+
+@if (!error) {
+<button mat-raised-button (click)="handleAddClicked()">Add</button>
+}

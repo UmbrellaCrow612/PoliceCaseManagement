@@ -1,0 +1,11 @@
+.form_group {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.searched_people_container {
+  height: 200px;
+  overflow-y: scroll;
+}

@@ -6,6 +6,7 @@ using Evidence.V1;
 using Grpc.JwtInterceptor;
 using Grpc.Net.ClientFactory;
 using Logging;
+using Microsoft.EntityFrameworkCore;
 using Person.V1;
 using Scalar.AspNetCore;
 using Serilog;
@@ -49,6 +50,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<Cases.Infrastructure.Data.CasesApplicationDbContext>();
+        db.Database.Migrate();
+    }
+
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
