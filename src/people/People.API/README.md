@@ -9,7 +9,7 @@
 - Have `choco` installed
 - Run `choco install protoc`
 
-From source level:
+From source level: `PoliceCaseManagement`
 
 ```bash
 protoc --proto_path=src/proto --proto_path=C:\ProgramData\chocolatey\lib\protoc\tools\include --go_out=src/people/people.API --go-grpc_out=src/people/people.API src/proto/common/person.proto
@@ -32,11 +32,13 @@ var (
 	ErrRecordNotFound = logger.ErrRecordNotFound
 )
 
-if err == ErrRecordNotFound 
+if err == ErrRecordNotFound // or some sort of check
 ```
 - `GORM` use the default snake case in table name convention
 = `GORM` use the `generic API` for query building - pass the struct model and fields for matching unless unable to
 - API will sent over `camelCase` named convetion data transfer objects
+- File name convention use snake case 
+- Packages of snake case files use the default option provided even if the names combine `grpcimpl` example
 
 
 

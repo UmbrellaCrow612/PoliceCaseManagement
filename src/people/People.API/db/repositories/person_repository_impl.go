@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"errors"
 	"math"
 	"people/api/models"
 	valueobjects "people/api/value_objects"
@@ -32,30 +31,26 @@ func (p *personRepository) GetByID(id string) (*models.Person, error) {
 
 // Public: EmailTaken checks if a person with the given email already exists.
 func (p *personRepository) EmailTaken(email string) (bool, error) {
-	_, err := gorm.G[models.Person](p.db).Where(&models.Person{Email: email}).First(*p.ctx)
+	var exists bool
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
-	}
-
+	err := gorm.G[models.Person](p.db).Raw("SELECT EXISTS ( SELECT 1 FROM people  WHERE email = ? AND deleted_at IS NULL )", email).Scan(*p.ctx, &exists)
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+
+	return exists, nil
 }
 
 // Public: PhoneNumberTaken checks if a person with the given phone number already exists.
 func (p *personRepository) PhoneNumberTaken(phoneNumber string) (bool, error) {
-	_, err := gorm.G[models.Person](p.db).Where(&models.Person{PhoneNumber: phoneNumber}).First(*p.ctx)
+	var exists bool
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
-	}
-
+	err := gorm.G[models.Person](p.db).Raw("SELECT EXISTS ( SELECT 1 FROM people  WHERE phone_number = ? AND deleted_at IS NULL )", phoneNumber).Scan(*p.ctx, &exists)
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+
+	return exists, nil
 }
 
 // Create implements PersonRepository.
