@@ -13,7 +13,7 @@ import {
 import { IncidentType } from '../../incident-type/types';
 import { CaseAcessList, RestrictedUser } from '../../user/type';
 import { CaseEvidence, Evidence } from '../../evidence/types';
-import { Person } from '../../people/types';
+import { CasePerson, Person } from '../../people/types';
 
 @Injectable({
   providedIn: 'root',
@@ -348,5 +348,14 @@ export class CaseService {
       personId: person.id,
       role: role,
     });
+  }
+
+  /**
+   * Get all case people / case person's linked to a given case
+   * @param caseId The case to fetch for
+   * @returns List of case people / case person's linked to a given case
+   */
+  getCasePeople(caseId: string) {
+    return this.httpClient.get<CasePerson[]>(`${this.BASE_URL}/cases/${caseId}/people`);
   }
 }

@@ -207,6 +207,11 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseEvidences.Where(x => x.CaseId == @case.Id).ToListAsync();
         }
 
+        public async Task<List<CasePerson>> GetPeopleAsync(Case @case)
+        {
+            return await _dbcontext.CasePeople.Where(x => x.CaseId == @case.Id).AsNoTracking().ToListAsync();
+        }
+
         public async Task<List<CaseAccessList>> GetUsersAsync(Case @case)
         {
             return await _dbcontext.CaseAccessLists.Where(x => x.CaseId == @case.Id).ToListAsync();

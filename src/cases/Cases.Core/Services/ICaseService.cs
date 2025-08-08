@@ -87,6 +87,13 @@ namespace Cases.Core.Services
         /// <param name="role">The role they have on the case</param>
         /// <returns>Result object</returns>
         Task<CaseResult> AddPerson(Case @case, string personId, CasePersonRole role);
+
+        /// <summary>
+        /// Get a list of case people / persons linked to a given case
+        /// </summary>
+        /// <param name="case">The case to fetch for</param>
+        /// <returns>List of case person's / people linked ot the case</returns>
+        Task<List<CasePerson>> GetPeopleAsync(Case @case);
     }
 
     /// <summary>

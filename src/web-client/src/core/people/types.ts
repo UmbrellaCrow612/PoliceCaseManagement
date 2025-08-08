@@ -42,7 +42,20 @@ export interface CreatePersonDto {
   email: string;
 }
 
-
+/**
+ * Backend dto mapped here for case person
+ */
+export interface CasePerson {
+  Id: string;
+  CaseId: string;
+  Role: number;
+  PersonId: string;
+  PersonFirstName: string;
+  PersonLastName: string;
+  PersonDateBirth: Date;
+  PersonPhoneNumber: string;
+  PersonEmail: string;
+}
 
 /**
  * Backend enum mapped here for CasePersonRole

@@ -28,6 +28,7 @@ namespace Cases.API.Controllers
         private readonly CaseActionMapping _caseActionMapping = new();
         private readonly CaseAccessListMapping _caseAccessListMapping = new();
         private readonly CaseEvidenceMapping _caseEvidenceMapping = new();
+        private readonly CasePersonMapping _casePersonMapping = new();
 
         [Authorize]
         [HttpGet("case-numbers/{caseNumber}/is-taken")]
@@ -429,6 +430,20 @@ namespace Cases.API.Controllers
             }
 
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{caseId}/people")]
+        public async Task<IActionResult> GetCasePeopleAsync(string caseId)
+        {
+            var _case = await _caseService.FindByIdAsync(caseId);
+            if (_case is null)
+            {
+                return NotFound();
+            }
+            var people = await _caseService.GetPeopleAsync(_case);
+            var peopleDto = people.Select(x => _casePersonMapping.ToDto(x));
+            return Ok(peopleDto);
         }
     }
 }

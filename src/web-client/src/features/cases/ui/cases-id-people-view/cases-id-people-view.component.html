@@ -5,7 +5,14 @@
 }
 
 <!---->
+@if (!error && isLoading) {
+<div>Loading</div>
+}
+<!---->
 
-@if (!error) {
+@if (!error && !isLoading) {
+  <div>
+    {{casePeople | json}}
+  </div>
 <button mat-raised-button (click)="handleAddClicked()">Add</button>
 }
