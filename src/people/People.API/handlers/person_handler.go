@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/mail"
 	apperrors "people/api/app_errors"
+	"people/api/dtos"
 	internalutils "people/api/internal_utils"
 	"people/api/models"
 	"people/api/services"
@@ -73,7 +74,7 @@ func (h *PersonHandler) HandleCreatePerson(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	req.FirstName = strings.TrimSpace(req.FirstName)
 	req.LastName = strings.TrimSpace(req.LastName)
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
@@ -131,7 +132,19 @@ func (h *PersonHandler) HandleSearchPeople(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	dtoList := make([]dtos.PersonDto, len(result.Data))
+	for i, person := range result.Data {
+		dtoList[i] = *person.ToJson()
+	}
+
+	dtoResult := valueobjects.PaginatedResult[dtos.PersonDto]{
+		Data:            dtoList,
+		Pagination:      result.Pagination,
+		HasNextPage:     result.HasNextPage,
+		HasPreviousPage: result.HasPreviousPage,
+	}
+
+	c.JSON(http.StatusOK, dtoResult)
 }
 
 func (h *PersonHandler) HandleIsPhoneNumberTaken(c *gin.Context) {

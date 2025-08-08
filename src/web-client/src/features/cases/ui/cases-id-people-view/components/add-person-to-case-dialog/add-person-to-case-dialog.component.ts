@@ -8,7 +8,10 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { PaginatedResult } from '../../../../../../core/app/type';
-import { Person } from '../../../../../../core/people/types';
+import {
+  CasePersonRoleNames,
+  Person,
+} from '../../../../../../core/people/types';
 import { CommonModule } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,6 +19,11 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { PeopleService } from '../../../../../../core/people/services/people.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatListModule } from '@angular/material/list';
+import { MatSelectModule } from '@angular/material/select';
+import Validator_CasePersonRole from '../../../../../../core/people/validators/casePersonRoleValidator';
+import { CaseService } from '../../../../../../core/cases/services/case.service';
+import { DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-add-person-to-case-dialog',
@@ -27,6 +35,8 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatFormField,
     MatInputModule,
     MatDatepickerModule,
+    MatListModule,
+    MatSelectModule,
   ],
   templateUrl: './add-person-to-case-dialog.component.html',
   styleUrl: './add-person-to-case-dialog.component.css',
@@ -34,6 +44,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class AddPersonToCaseDialogComponent implements OnInit {
   private readonly peopleService = inject(PeopleService);
+  private readonly caseService = inject(CaseService);
+  private readonly ref = inject(DialogRef<AddPersonToCaseDialogComponent>);
+
+  /**
+   * Local copy of CasePersonRoleNames object enum
+   */
+  readonly copy_CasePersonRoleNames = CasePersonRoleNames;
 
   /**
    * The ID of the case it is opened up for
@@ -61,14 +78,14 @@ export class AddPersonToCaseDialogComponent implements OnInit {
     /**
      * Holds the selected person to link to the case
      */
-    selectedPersonControl: new FormControl<Person | null>(null, {
+    selectedPersonControl: new FormControl<Person[] | null>(null, {
       validators: [Validators.required],
     }),
     /**
      * Role the person has on the case
      */
     personRoleControl: new FormControl<number | null>(null, {
-      validators: [Validators.required],
+      validators: [Validators.required, Validator_CasePersonRole],
     }),
   });
 
@@ -81,6 +98,11 @@ export class AddPersonToCaseDialogComponent implements OnInit {
    * Contains the loading state for when fetching people
    */
   isSearching = false;
+
+  /**
+   * Loading state for saving a person to a case
+   */
+  isSaving = false;
 
   ngOnInit(): void {
     if (!this.caseId) {
@@ -113,6 +135,45 @@ export class AddPersonToCaseDialogComponent implements OnInit {
         error: (err: HttpErrorResponse) => {
           this.isSearching = false;
           this.error = 'Failed to search people';
+        },
+      });
+  }
+
+  /**
+   * Runs when assigniong a person to a case uses the selected person and there role and try to save them
+   */
+  assignPersonToCase() {
+    if (this.assignPersonForm.invalid) {
+      this.error = 'Invalid state';
+      return;
+    }
+
+    this.error = null;
+    this.isSaving = true;
+
+    let person = this.assignPersonForm.controls.selectedPersonControl.value
+      ? this.assignPersonForm.controls.selectedPersonControl.value[0]
+      : null;
+
+    console.error(person)
+    if (!person) {
+      this.error = 'Invalid person';
+      return;
+    }
+
+    this.caseService
+      .assignPersonToCase(
+        this.caseId,
+        person,
+        this.assignPersonForm.controls.personRoleControl.value!
+      )
+      .subscribe({
+        next: () => {
+          this.ref.close();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error = 'Failed ot assign person';
+          this.isSaving = false;
         },
       });
   }

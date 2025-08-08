@@ -36,12 +36,45 @@
     <!---->
 
     @if (!isSearching && !error) {
-    {{ searchedPeople | json }}
+    <form [formGroup]="assignPersonForm">
+      <mat-selection-list
+        #shoesList
+        formControlName="selectedPersonControl"
+        name="people"
+        [multiple]="false"
+      >
+        @for (person of searchedPeople?.data; track person.id) {
+        <mat-list-option [value]="person"
+          >{{ person.firstName }} {{ person.lastName }}
+          {{ person.dateOfBirth | date }}</mat-list-option
+        >
+        }
+      </mat-selection-list>
+
+      <mat-form-field>
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="personRoleControl" required>
+          @for (option of copy_CasePersonRoleNames; track option.value) {
+          <mat-option [value]="option.value">{{ option.name }}</mat-option>
+          }
+        </mat-select>
+
+        @if (assignPersonForm.controls.personRoleControl.hasError("required")) {
+        <mat-error>Required</mat-error>
+        }
+        <!---->
+        @if
+        (assignPersonForm.controls.personRoleControl.hasError("casePersonRole"))
+        {
+        <mat-error>Invalid option</mat-error>
+        }
+      </mat-form-field>
+    </form>
     }
   </div>
   <!---->
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
-  <button mat-button [disabled]="assignPersonForm.invalid">Save</button>
+  <button mat-button [disabled]="assignPersonForm.invalid || isSaving" (click)="assignPersonToCase()">Save</button>
 </mat-dialog-actions>

@@ -6,7 +6,7 @@ import "time"
 type SearchPersonQuery struct {
     FirstName   string     `form:"firstName"`
     LastName    string     `form:"lastName"`
-    DateOfBirth *time.Time `form:"dateOfBirth" time_format:"2006-01-02"`
+    DateOfBirth *time.Time `form:"dateOfBirth"`
     PhoneNumber string     `form:"phoneNumber"`
     Email       string     `form:"email"`
     PageNumber  int        `form:"pageNumber" binding:"required,min=1"`

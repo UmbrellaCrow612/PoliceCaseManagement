@@ -13,6 +13,7 @@ import {
 import { IncidentType } from '../../incident-type/types';
 import { CaseAcessList, RestrictedUser } from '../../user/type';
 import { CaseEvidence, Evidence } from '../../evidence/types';
+import { Person } from '../../people/types';
 
 @Injectable({
   providedIn: 'root',
@@ -333,6 +334,19 @@ export class CaseService {
   addEvidence(caseId: string, evidenceId: string) {
     return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/evidence`, {
       evidenceId: evidenceId,
+    });
+  }
+
+  /**
+   * Assign a person to a given case
+   * @param caseId The case to link the person to
+   * @param person The person to link
+   * @param role The role of the person has on the case
+   */
+  assignPersonToCase(caseId: string, person: Person, role: number) {
+    return this.httpClient.post(`${this.BASE_URL}/cases/${caseId}/people`, {
+      personId: person.id,
+      role: role,
     });
   }
 }

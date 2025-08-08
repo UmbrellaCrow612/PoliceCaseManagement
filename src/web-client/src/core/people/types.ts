@@ -3,6 +3,13 @@
  */
 export interface Person {
   id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  phoneNumber: string;
+  email: string;
 }
 
 /**
@@ -34,3 +41,31 @@ export interface CreatePersonDto {
   phoneNumber: string;
   email: string;
 }
+
+
+
+/**
+ * Backend enum mapped here for CasePersonRole
+ */
+export const CasePersonRoleNames: { name: string; value: number }[] = [
+  {
+    name: 'Suspect',
+    value: 0,
+  },
+  {
+    name: 'Person Of Interest',
+    value: 1,
+  },
+  {
+    name: 'Witness',
+    value: 2,
+  },
+  {
+    name: 'Complainant',
+    value: 3,
+  },
+  {
+    name: 'Victim',
+    value: 4,
+  },
+];
