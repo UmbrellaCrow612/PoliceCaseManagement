@@ -8,5 +8,8 @@
         public string? UserName { get; set; } = null;
         public string? Email { get; set; } = null;
         public string? PhoneNumber { get; set; } = null;
+
+        public required int PageNumber { get; set; }
+        public required int PageSize { get; set; }
     }
 }

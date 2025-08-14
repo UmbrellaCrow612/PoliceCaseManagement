@@ -13,19 +13,14 @@ namespace Identity.Application
     public static class Extensions
     {
         /// <summary>
-        /// Adds the application service implementations from the service interfaces
+        /// Adds the application service implementations from the service interfaces and other options
         /// </summary>
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions<JwtBearerOptions>()
                .Bind(configuration.GetSection("Jwt"))
                .ValidateDataAnnotations()
                .ValidateOnStart();
-
-            services.AddScoped<JwtBearerHelper>();
-
-            services.AddScoped<IDeviceIdentification, DeviceIdentification>();
-            services.AddScoped<DeviceManager>();
 
             services.AddOptions<TimeWindows>()
                 .Bind(configuration.GetSection("TimeWindows"))
@@ -37,8 +32,14 @@ namespace Identity.Application
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthServiceImpl>();
+            services.AddScoped<IUserService, UserServiceImpl>();
+            services.AddScoped<IDeviceService, DeviceServiceImpl>();
+            services.AddScoped<IMfaService, MfaServiceImpl>();
+            services.AddScoped<IRoleService, RoleServiceImpl>();
+
+            services.AddScoped<JwtBearerHelper>();
+
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()

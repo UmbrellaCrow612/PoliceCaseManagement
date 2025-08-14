@@ -8,12 +8,15 @@ using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Identity.Application.Implementations
 {
-    internal class AuthService(UserManager<ApplicationUser> userManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper,
+    /// <summary>
+    /// Business implementation of the contract <see cref="IAuthService"/> - test this, as well when using it else where only use the <see cref="IAuthService"/>
+    /// interface not this class
+    /// </summary>
+    public class AuthServiceImpl(UserManager<ApplicationUser> userManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper,
         IOptions<JwtBearerOptions> jwtBearerOptions
         ,IDeviceService deviceService, IdentityApplicationDbContext dbContext) : IAuthService
     {

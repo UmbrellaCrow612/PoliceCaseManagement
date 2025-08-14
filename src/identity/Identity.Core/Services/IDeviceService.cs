@@ -13,6 +13,6 @@ namespace Identity.Core.Services
         /// </summary>
         /// <param name="userId">The user who's device you are getting</param>
         /// <param name="info">Information about the device</param>
-        Task<Device?> GetDeviceAsync(string userId, DeviceInfo info); 
+        Task<Device?> GetDeviceAsync(string userId, DeviceInfo info);
     }
 }

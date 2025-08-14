@@ -7,6 +7,7 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.Abstractions;
 
 namespace Identity.API.Controllers
 {
@@ -19,11 +20,7 @@ namespace Identity.API.Controllers
         private readonly ICache _cache = cache;
         private readonly IRoleService _roleService = roleService;
 
-        /// <summary>
-        /// This way to stop 401 being sent on load of app and getting stuck on login page
-        /// other endpoints send 401 as normal this endpoint in unique for it.
-        /// </summary>
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserByIdAsync()
         {
@@ -52,7 +49,6 @@ namespace Identity.API.Controllers
             await _cache.SetAsync<UserMeResponseDto>(userId, returnDto);
             return Ok(returnDto);
         }
-
      
         [HttpPost("usernames/is-taken")]
         [Authorize(Roles = Roles.Admin)]
@@ -63,45 +59,29 @@ namespace Identity.API.Controllers
             return Ok(new UsernameTakenResponseDto{ Taken = taken });
         }
 
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
         [HttpPost("emails/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> IsEmailTaken([FromBody] IsEmailTakenDto dto)
+        public async Task<IActionResult> IsEmailTaken([FromBody] EmailTakenDto dto)
         {
-            var result = await _authService.IsEmailTaken(dto.Email);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var taken = await _userService.IsEmailTaken(dto.Email);
 
-            return Ok();
+            return Ok(new EmailTakenResponseDto { Taken = taken });
         }
 
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
         [HttpPost("phone-numbers/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<UserDto>> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
+        public async Task<ActionResult<PhoneNumberTakenResponseDto>> IsPhoneNumberTaken([FromBody] PhoneNumberTakenDto dto)
         {
-            var result = await _authService.IsPhoneNumberTaken(dto.PhoneNumber);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var taken = await _userService.IsPhoneNumberTaken(dto.PhoneNumber);
 
-            return Ok();
+            return Ok(new PhoneNumberTakenResponseDto { Taken = taken });
         }
 
         [HttpGet("{userId}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetUserByIdAsync(string userId)
         {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
@@ -115,14 +95,15 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserByIdAsync(string userId, [FromBody] UpdateUserDto dto)
         {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
             }
 
             _userMapping.Update(user, dto);
-            var result = await _authService.UpdateUserAsync(user);
+
+            var result = await _userService.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -136,66 +117,47 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetUserRolesAsync(string userId)
         {
-            var roles = await _authService.GetUserRolesAsync(userId);
-
-            var dto = new { roles };
-
-            return Ok(dto);
-        }
-
-        [HttpPut("{userId}/roles")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> UpdateUserRolesByIdAsync(string userId, UpdateUserRolesDto dto)
-        {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
             }
 
-            var result = await _authService.UpdateUserRolesAsync(user, dto.Roles);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var roles = await _roleService.GetRolesAsync(user);
 
-            await _cache.DeleteAsync(userId);
-            return NoContent();
+            return Ok(new { roles });
         }
 
-        /// <summary>
-        /// Searching a user - admin - more privilege can see more details about users.
-        /// </summary>
         [HttpGet("admin/search")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<List<UserDto>>> AdminSearchUsersAsync([FromQuery] SearchUserQuery query)
+        public async Task<IActionResult> AdminSearchUsersAsync([FromQuery] SearchUserQuery query)
         {
-            var users = await _authService.SearchUsersByQuery(query);
+            var paginatedResult = await _userService.SearchAsync(query);
 
-            List<UserDto> dto = [];
-            foreach (var user in users)
+            var dto = new PaginatedResult<UserDto>
             {
-                dto.Add(_userMapping.ToDto(user));
-            }
+                Data = [.. paginatedResult.Data.Select(x => _userMapping.ToDto(x))],
+                HasNextPage = paginatedResult.HasNextPage,
+                HasPreviousPage = paginatedResult.HasPreviousPage,
+                Pagination = paginatedResult.Pagination,
+            };
 
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Search users - see less details about them for less privileged users.
-        /// </summary>
-        /// <returns></returns>
         [HttpGet("search")]
         [Authorize]
         public async Task<IActionResult> SearchUsersAsync([FromQuery] SearchUserQuery query)
         {
-            var users = await _authService.SearchUsersByQuery(query);
+            var paginatedResult = await _userService.SearchAsync(query);
 
-            List<RestrictedUserDto> dto = [];
-            foreach (var user in users)
+            var dto = new PaginatedResult<RestrictedUserDto>
             {
-                dto.Add(_userMapping.ToRestrictedUserDto(user));
-            }
+                Data = [.. paginatedResult.Data.Select(x => _userMapping.ToRestrictedUserDto(x))],
+                HasNextPage = paginatedResult.HasNextPage,
+                HasPreviousPage = paginatedResult.HasPreviousPage,
+                Pagination = paginatedResult.Pagination,
+            };
 
             return Ok(dto);
         }
