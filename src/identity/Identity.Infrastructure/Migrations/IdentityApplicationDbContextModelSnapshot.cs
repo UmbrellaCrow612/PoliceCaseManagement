@@ -161,7 +161,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.EmailVerificationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.EmailVerification", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -203,7 +203,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("EmailVerificationAttempts");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -343,7 +343,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("PasswordResetAttempts");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.PhoneConfirmationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.PhoneVerification", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -577,7 +577,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("TwoFactorEmailAttempts");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSms", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -619,7 +619,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("TwoFactorSmsAttempts");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -645,7 +645,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("UserDevices");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.UserDeviceChallengeAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.DeviceVerification", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -808,7 +808,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.EmailVerificationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.EmailVerification", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
                         .WithMany("EmailVerificationAttempts")
@@ -819,7 +819,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
                         .WithMany("LoginAttempts")
@@ -863,7 +863,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.PhoneConfirmationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.PhoneVerification", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
                         .WithMany("PhoneConfirmationAttempts")
@@ -937,18 +937,18 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Identity.Core.Models.TwoFactorEmailAttempt", b =>
                 {
-                    b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
+                    b.HasOne("Identity.Core.Models.Login", "Login")
                         .WithMany("TwoFactorEmailAttempts")
                         .HasForeignKey("LoginAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LoginAttempt");
+                    b.Navigation("Login");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSms", b =>
                 {
-                    b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
+                    b.HasOne("Identity.Core.Models.Login", "Login")
                         .WithMany("TwoFactorSmsAttempts")
                         .HasForeignKey("LoginAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -960,12 +960,12 @@ namespace Identity.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LoginAttempt");
+                    b.Navigation("Login");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
                         .WithMany("UserDevices")
@@ -976,9 +976,9 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.UserDeviceChallengeAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.DeviceVerification", b =>
                 {
-                    b.HasOne("Identity.Core.Models.UserDevice", "UserDevice")
+                    b.HasOne("Identity.Core.Models.Device", "Device")
                         .WithMany("UserDeviceChallengeAttempts")
                         .HasForeignKey("UserDeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -992,7 +992,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Navigation("User");
 
-                    b.Navigation("UserDevice");
+                    b.Navigation("Device");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1082,7 +1082,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
                     b.Navigation("TwoFactorEmailAttempts");
 
@@ -1094,7 +1094,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("TimeBasedOneTimePassCodeBackupCodes");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
                     b.Navigation("UserDeviceChallengeAttempts");
                 });

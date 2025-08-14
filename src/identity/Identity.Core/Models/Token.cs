@@ -1,42 +1,65 @@
 ﻿namespace Identity.Core.Models
 {
+    /// <summary>
+    /// Represents a token session for a user - contains information about JWt tokens issues to the user
+    /// </summary>
     public class Token
     {
+        /// <summary>
+        /// A unique ID - represents the refresh token value it self which is sent to the client as the refresh token value
+        /// </summary>
         public required string Id { get; set; }
+
+        /// <summary>
+        /// When it will be considered stale and invalid
+        /// </summary>
+        public required DateTime ExpiresAt { get; set; }
+
+        /// <summary>
+        /// If a token is revoked and the time it was
+        /// </summary>
+        public DateTime? RevokedAt { get; set; } = null;
+
+        /// <summary>
+        /// When it was created
+        /// </summary>
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// If and when the token was used for a new issue of tokens
+        /// </summary>
+        public DateTime? UsedAt { get; set; } = null;
+
+
+        public required string DeviceId { get; set; }
+        public Device? Device { get; set; } = null;
+
         public required string UserId { get; set; }
         public ApplicationUser? User { get; set; } = null;
-        public required DateTime RefreshTokenExpiresAt { get; set; }
-        public bool IsRevoked { get; set; } = false;
-        public DateTime? RevokedAt { get; set; } = null;
-        public string? RevokedReason { get; set; } = null;
-        public bool IsBlackListed { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public required string UserDeviceId { get; set; }
 
 
         /// <summary>
-        /// Checks if a Token is valid
+        /// Checks if a Token is valid - it has not been revoked or expired or the device it matches the one it was issued for
         /// </summary>
         /// <param name="deviceId">The device the token was issued to</param>
-        /// <returns>True or false</returns>
         public bool IsValid(string deviceId)
         {
-            if (IsRevoked)
+            if (RevokedAt.HasValue)
             {
                 return false;
             }
 
-            if (IsBlackListed)
+            if (UsedAt.HasValue)
             {
                 return false;
             }
 
-            if (DateTime.UtcNow > RefreshTokenExpiresAt)
+            if (DateTime.UtcNow > ExpiresAt)
             {
                 return false;
             }
 
-            if (UserDeviceId != deviceId)
+            if (DeviceId != deviceId)
             {
                 return false;
             }
@@ -47,17 +70,14 @@
         /// <summary>
         /// Helper method to revoke the current token
         /// </summary>
-        /// <param name="reason">Reason why it is being revoked</param>
-        public void Revoke(string reason)
+        public void Revoke()
         {
-            IsRevoked = true;
             RevokedAt = DateTime.UtcNow;
-            RevokedReason = reason;
         }
 
-        public void BlackList()
+        public void MarkUsed()
         {
-            IsBlackListed = true;
+            UsedAt = DateTime.UtcNow;
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using Identity.Application.Codes;
 using Identity.Application.Constants;
-using Identity.Core.Models;
-using Identity.Core.Repositorys;
-using Identity.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Results.Abstractions;
 using UAParser;
@@ -88,11 +85,11 @@ namespace Identity.Application.Helpers
             return (true, []);
         }
 
-        public async Task<UserDevice?> GetRequestingDevice(string userId, string deviceFingerprint, string userAgent)
+        public async Task<Core.Models.Device?> GetRequestingDevice(string userId, string deviceFingerprint, string userAgent)
         {
             var deviceId = _deviceIdentification.GenerateDeviceId(userId, userAgent, deviceFingerprint);
 
-            return await _unitOfWork.Repository<UserDevice>().FindByIdAsync(deviceId);
+            return await _unitOfWork.Repository<Core.Models.Device>().FindByIdAsync(deviceId);
         }
 
         public string GenerateDeviceId(string userId, string deviceFingerprint, string userAgent)

@@ -12,17 +12,17 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController(IAuthService authService, ICache cache) : ControllerBase
+    public class UserController(IUserService userService, ICache cache, IRoleService roleService) : ControllerBase
     {
-        private readonly IAuthService _authService = authService;
+        private readonly IUserService _userService = userService;
         private readonly UserMapping _userMapping = new();
         private readonly ICache _cache = cache;
+        private readonly IRoleService _roleService = roleService;
 
         /// <summary>
         /// This way to stop 401 being sent on load of app and getting stuck on login page
         /// other endpoints send 401 as normal this endpoint in unique for it.
         /// </summary>
-        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserByIdAsync()
@@ -31,44 +31,36 @@ namespace Identity.API.Controllers
 
             if (userId is null) return BadRequest("User id missing");
 
-            var value = await _cache.GetAsync<MeDto>(userId);
+            var value = await _cache.GetAsync<UserMeResponseDto>(userId);
             if (value is not null)
             {
                 return Ok(value);
             }
 
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            var roles = await _authService.GetUserRolesAsync(userId);
+            var roles = await _roleService.GetRolesAsync(user);
 
             var userDto = _userMapping.ToDto(user);
-            var returnDto = new MeDto
+            var returnDto = new UserMeResponseDto
             {
-                Roles = roles,
+                Roles = [.. roles.Select(x => x.Name)],
                 User = userDto
             };
 
-            await _cache.SetAsync<MeDto>(userId, returnDto);
+            await _cache.SetAsync<UserMeResponseDto>(userId, returnDto);
             return Ok(returnDto);
         }
 
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
+     
         [HttpPost("usernames/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> IsUsernameTaken([FromBody] IsUsernameTakenDto dto)
+        public async Task<IActionResult> IsUsernameTaken([FromBody] UsernameTakenDto dto)
         {
-            var result = await _authService.IsUsernameTaken(dto.Username);
+            var taken = await _userService.IsUsernameTaken(dto.Username);
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok();
+            return Ok(new UsernameTakenResponseDto{ Taken = taken });
         }
 
         /// <summary>

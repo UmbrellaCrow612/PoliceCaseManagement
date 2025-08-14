@@ -29,9 +29,9 @@ func main() {
 	}
 
 	db, err := gorm.Open(postgres.Open(config.DSN), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info), 
+		Logger: logger.Default.LogMode(logger.Info),
 	})
-	
+
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}

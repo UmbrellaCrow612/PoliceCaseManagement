@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Infrastructure.Data.Configs
 {
-    internal class UserDeviceChallengeAttemptConfig : IEntityTypeConfiguration<UserDeviceChallengeAttempt>
+    internal class UserDeviceChallengeAttemptConfig : IEntityTypeConfiguration<DeviceVerification>
     {
-        public void Configure(EntityTypeBuilder<UserDeviceChallengeAttempt> builder)
+        public void Configure(EntityTypeBuilder<DeviceVerification> builder)
         {
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.Id).IsUnique();
