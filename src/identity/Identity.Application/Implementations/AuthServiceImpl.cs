@@ -16,17 +16,19 @@ namespace Identity.Application.Implementations
     /// Business implementation of the contract <see cref="IAuthService"/> - test this, as well when using it else where only use the <see cref="IAuthService"/>
     /// interface not this class
     /// </summary>
-    public class AuthServiceImpl(UserManager<ApplicationUser> userManager, IOptions<TimeWindows> options, JwtBearerHelper jwtBearerHelper,
-        IOptions<JwtBearerOptions> jwtBearerOptions
-        ,IDeviceService deviceService, IdentityApplicationDbContext dbContext) : IAuthService
+    public class AuthServiceImpl(
+        UserManager<ApplicationUser> userManager
+        ,IDeviceService deviceService, 
+        IdentityApplicationDbContext dbContext,
+        ITokenService tokenService,
+        IOptions<TimeWindows> timeWindows
+        ) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly TimeWindows _timeWindows = options.Value;
-        private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
-        private readonly JwtBearerOptions _JwtBearerOptions = jwtBearerOptions.Value;
         private readonly IDeviceService _deviceService = deviceService;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly TimeWindows _timeWindows = timeWindows.Value;
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
@@ -43,7 +45,7 @@ namespace Identity.Application.Implementations
             var device = await _deviceService.GetDeviceAsync(user.Id, deviceInfo);
             if (device is null || !device.IsTrusted)
             {
-                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.Device);
                 return result;
             }
 
@@ -67,14 +69,6 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            if (user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
-            {
-                await _dbcontext.SaveChangesAsync();
-                result.AddError(BusinessRuleCodes.AccountLocked);
-
-                return result;
-            }
-
             if (!user.EmailConfirmed)
             {
                 await _dbcontext.SaveChangesAsync();
@@ -86,7 +80,7 @@ namespace Identity.Application.Implementations
             if (!user.PhoneNumberConfirmed)
             {
                 await _dbcontext.SaveChangesAsync();
-                result.AddError(BusinessRuleCodes.PhoneNumberNotConfirmed);
+                result.AddError(BusinessRuleCodes.PhoneNotConfirmed);
 
                 return result;
             }
@@ -114,14 +108,14 @@ namespace Identity.Application.Implementations
             var user = await _userManager.FindByIdAsync(token.UserId);
             if (user is null)
             {
-                result.AddError(BusinessRuleCodes.UserDoesNotExist, "User dose not exist");
+                result.AddError(BusinessRuleCodes.UserNotFound, "User dose not exist");
                 return result;
             }
 
             var device = await _deviceService.GetDeviceAsync(user.Id, deviceInfo);
             if (device is null || !device.IsTrusted)
             {
-                result.AddError(BusinessRuleCodes.DeviceNotConfirmed);
+                result.AddError(BusinessRuleCodes.Device);
                 return result;
             }
 
@@ -134,22 +128,9 @@ namespace Identity.Application.Implementations
             token.MarkUsed();
             _dbcontext.Tokens.Update(token);
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var tokens = await _tokenService.IssueTokens(user, device);
 
-            string jwtBearer = _jwtBearerHelper.GenerateBearerToken(user, roles);
-            var newRefresh = _jwtBearerHelper.GenerateRefreshToken();
-
-            result.Tokens.RefreshToken = newRefresh;
-            result.Tokens.JwtBearerToken = jwtBearer;
-
-            var newToken = new Token
-            {
-                Id = newRefresh,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_JwtBearerOptions.RefreshTokenExpiriesInMinutes),
-                DeviceId = device.Id,
-                UserId = user.Id
-            };
-            await _dbcontext.Tokens.AddAsync(newToken);
+            result.Tokens = tokens;
 
             await _dbcontext.SaveChangesAsync();
 

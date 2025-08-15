@@ -44,12 +44,32 @@ namespace Identity.Core.Services
         /// Update a user
         /// </summary>
         /// <param name="user">The user to update with updated fields</param>
-        Task<IResult> UpdateAsync(ApplicationUser user);
+        Task<UserServiceResult> UpdateAsync(ApplicationUser user);
 
         /// <summary>
         /// Search for a list of users
         /// </summary>
         /// <param name="query">Query containing the field you want to search for and by</param>
         Task<PaginatedResult<ApplicationUser>> SearchAsync(SearchUserQuery query);
+    }
+
+    public class UserServiceError : IResultError
+    {
+        public required string Code { get; set; }
+        public required string? Message { get; set; } = null;
+    }
+
+    /// <summary>
+    /// Result object to use for <see cref="IUserService"/> methods that return a <see cref="IResult"/>
+    /// </summary>
+    public class UserServiceResult : IResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<IResultError> Errors { get; set; } = [];
+
+        public void AddError(string code, string? message = null)
+        {
+            Errors.Add(new UserServiceError { Code = code, Message = message });
+        }
     }
 }

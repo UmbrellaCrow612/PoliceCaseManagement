@@ -27,18 +27,16 @@ namespace Identity.Application
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddOptions<PasswordConfigSettings>()
-                .Bind(configuration.GetSection("PasswordSettings"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
             services.AddScoped<IAuthService, AuthServiceImpl>();
             services.AddScoped<IUserService, UserServiceImpl>();
             services.AddScoped<IDeviceService, DeviceServiceImpl>();
             services.AddScoped<IMfaService, MfaServiceImpl>();
             services.AddScoped<IRoleService, RoleServiceImpl>();
+            services.AddScoped<ITokenService, TokenServiceImpl>();
 
-            services.AddScoped<JwtBearerHelper>();
+            services.AddSingleton<IDeviceIdentificationGenerator, DeviceIdentificationGeneratorImpl>();
+            services.AddSingleton<ITwoFactorCodeGenerator, TwoFactorCodeGeneratorImpl>();
+            services.AddSingleton<JwtBearerHelper>();
 
 
             services.AddRabbitMqSettings(configuration);

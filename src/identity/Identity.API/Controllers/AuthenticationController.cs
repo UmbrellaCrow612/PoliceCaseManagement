@@ -31,7 +31,6 @@ namespace Identity.API.Controllers
             return Ok(new { res.LoginId });
         }
 
-
         [RequireDeviceInformation]
         [HttpGet("refresh-token")]
         public async Task<ActionResult> RefreshToken()
@@ -55,7 +54,6 @@ namespace Identity.API.Controllers
             return Ok(new { result.Tokens.JwtBearerToken });
         }
 
-      
         [AllowAnonymous]
         [HttpGet("logout")]
         public async Task<ActionResult> Logout()

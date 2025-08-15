@@ -6,7 +6,7 @@
     public class Device
     {
         /// <summary>
-        /// A ID generated using hash algorithm based on the <see cref="ValueObjects.DeviceInfo"/> and <see cref="ApplicationUser"/>
+        /// A ID generated using <see cref="Services.IDeviceIdentificationGenerator.GenerateId(string, ValueObjects.DeviceInfo)"/>
         /// </summary>
         public required string Id { get; set; }
 

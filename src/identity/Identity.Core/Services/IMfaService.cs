@@ -16,7 +16,7 @@ namespace Identity.Core.Services
         Task<MfaResult> SendMfaSmsAsync(string loginId, DeviceInfo deviceInfo);
 
         /// <summary>
-        /// Verifies an SMS-based MFA attempt for a specified <see cref="Models.Login"/> using the code sent.
+        /// Verifies an SMS-based MFA attempt for a specified <see cref="Models.Login"/> using the code sent and issues tokens upon success.
         /// </summary>
         /// <param name="loginId">The ID of the login attempt the code was sent for.</param>
         /// <param name="code">The code that was sent via SMS.</param>

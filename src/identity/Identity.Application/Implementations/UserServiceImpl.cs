@@ -2,8 +2,8 @@
 using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Pagination.Abstractions;
-using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -15,34 +15,98 @@ namespace Identity.Application.Implementations
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
 
-        public Task<ApplicationUser?> FindByIdAsync(string userId)
+        public async Task<bool> ExistsAsync(string userId)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.Users.AnyAsync(x => x.Id == userId);
         }
 
-        public Task<bool> IsEmailTaken(string email)
+        public async Task<ApplicationUser?> FindByIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.Users.FindAsync(userId);
         }
 
-        public Task<bool> IsPhoneNumberTaken(string phoneNumber)
+        public async Task<bool> IsEmailTaken(string email)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.Users.AnyAsync(x => x.Email == email);
         }
 
-        public Task<bool> IsUsernameTaken(string username)
+        public async Task<bool> IsPhoneNumberTaken(string phoneNumber)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.Users.AnyAsync(x => x.PhoneNumber == phoneNumber);
         }
 
-        public Task<PaginatedResult<ApplicationUser>> SearchAsync(SearchUserQuery query)
+        public async Task<bool> IsUsernameTaken(string username)
         {
-            throw new NotImplementedException();
+            return await _dbcontext.Users.AnyAsync(x => x.UserName == username);
         }
 
-        public Task<IResult> UpdateAsync(ApplicationUser user)
+        public async Task<PaginatedResult<ApplicationUser>> SearchAsync(SearchUserQuery query)
         {
-            throw new NotImplementedException();
+            var queryBuilder = _dbcontext.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.UserName))
+            {
+                queryBuilder = queryBuilder.Where(x => x.UserName!.Contains(query.UserName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Email))
+            {
+                queryBuilder = queryBuilder.Where(x => x.Email!.Contains(query.Email));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.PhoneNumber))
+            {
+                queryBuilder = queryBuilder.Where(x => x.PhoneNumber!.Contains(query.PhoneNumber));
+            }
+
+            queryBuilder = query.OrderBy switch
+            {
+                SearchUserQueryOrderBy.Id => queryBuilder.OrderBy(x => x.Id),
+                SearchUserQueryOrderBy.UserNameAscending => queryBuilder.OrderBy(x => x.UserName),
+                SearchUserQueryOrderBy.UserNameDescending => queryBuilder.OrderByDescending(x => x.UserName),
+                SearchUserQueryOrderBy.UserEmailAscending => queryBuilder.OrderBy(x => x.Email),
+                SearchUserQueryOrderBy.UserEmailDescending => queryBuilder.OrderByDescending(x => x.Email),
+                SearchUserQueryOrderBy.UserPhoneNumberAscending => queryBuilder.OrderBy(x => x.PhoneNumber),
+                SearchUserQueryOrderBy.UserPhoneNumberDescending => queryBuilder.OrderByDescending(x => x.PhoneNumber),
+                _ => queryBuilder.OrderBy(x => x.Id),
+            };
+
+            int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+            int pageSize = query.PageSize > 100 ? 100 : query.PageSize < 1 ? 10 : query.PageSize;
+
+            int totalRecordCount = await queryBuilder.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalRecordCount / (double)pageSize);
+
+            var users = await queryBuilder
+                .AsNoTracking()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<ApplicationUser>
+            {
+                HasNextPage = pageNumber < totalPages,
+                HasPreviousPage = pageNumber > 1,
+                Data = users,
+                Pagination = new PaginationMetadata
+                {
+                    CurrentPage = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecordCount,
+                    TotalPages = totalPages
+                }
+            };
+        }
+
+        public async Task<UserServiceResult> UpdateAsync(ApplicationUser user)
+        {
+            var result = new UserServiceResult();
+            
+            _dbcontext.Users.Update(user);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

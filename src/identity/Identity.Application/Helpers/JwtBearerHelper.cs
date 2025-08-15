@@ -12,12 +12,12 @@ namespace Identity.Application.Helpers
         private readonly JwtBearerOptions _JWTOptions = JWTOptions.Value;
 
         /// <summary>
-        /// Generate a JWT Bearer token with claims
+        /// GenerateId a JWT Bearer token with claims
         /// </summary>
         /// <returns>
         /// Bearer token and it's ID
         /// </returns>
-        public string GenerateBearerToken<TUser>(TUser user, IList<string> roles)
+        public string GenerateBearerToken<TUser>(TUser user, List<string> roles)
         where TUser : IdentityUser
         {
             var handler = new JwtSecurityTokenHandler();

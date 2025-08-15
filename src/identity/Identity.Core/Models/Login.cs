@@ -61,6 +61,7 @@
         public void MarkUsed()
         {
             Status = LoginStatus.SUCCESS;
+            UsedAt = DateTime.UtcNow;
         }
     }
 
