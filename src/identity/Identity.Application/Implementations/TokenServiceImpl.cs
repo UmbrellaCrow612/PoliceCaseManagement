@@ -4,6 +4,7 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
 using MassTransit.Initializers;
+using Microsoft.Extensions.Options;
 
 namespace Identity.Application.Implementations
 {
@@ -11,11 +12,11 @@ namespace Identity.Application.Implementations
     /// Business implementation of the contract <see cref="ITokenService"/> - test this, as well when using it else where only use the <see cref="ITokenService"/>
     /// interface not this class
     /// </summary>
-    public class TokenServiceImpl(IRoleService roleService, JwtBearerHelper jwtBearerHelper, JwtBearerOptions jwtBearerOptions, IdentityApplicationDbContext dbContext) : ITokenService
+    public class TokenServiceImpl(IRoleService roleService, JwtBearerHelper jwtBearerHelper, IOptions<JwtBearerOptions> jwtBearerOptions, IdentityApplicationDbContext dbContext) : ITokenService
     {
         private readonly IRoleService _roleService = roleService;
         private readonly JwtBearerHelper _jwtBearerHelper = jwtBearerHelper;
-        private readonly JwtBearerOptions _jwtBearerOptions = jwtBearerOptions;
+        private readonly JwtBearerOptions _jwtBearerOptions = jwtBearerOptions.Value;
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
         public async Task<Tokens> IssueTokens(ApplicationUser user, Device device)

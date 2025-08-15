@@ -13,7 +13,7 @@ namespace Identity.Application.Implementations
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
-        public async Task<List<ApplicationRole>> GetRolesAsync(ApplicationUser use)
+        public async Task<List<ApplicationRole>> GetRolesAsync(ApplicationUser user)
         {
             var roleIds = await _dbContext.UserRoles
                 .Where(x => x.UserId == user.Id)

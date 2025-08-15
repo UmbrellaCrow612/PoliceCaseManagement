@@ -10,8 +10,6 @@ namespace Identity.Infrastructure.Data.Configs
         {
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.Id).IsUnique();
-
-            builder.HasIndex(x => x.Code).IsUnique();
         }
     }
 }

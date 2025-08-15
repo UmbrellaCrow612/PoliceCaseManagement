@@ -17,7 +17,7 @@ namespace Identity.Core.Models
 
         public ICollection<Login> Logins { get; set; } = [];
         public ICollection<Token> Tokens { get; set; } = [];
-        public ICollection<Device> UserDevices { get; set; } = [];
+        public ICollection<Device> Devices { get; set; } = [];
 
 
         public ICollection<PhoneVerification> PhoneVerifications { get; set; } = [];

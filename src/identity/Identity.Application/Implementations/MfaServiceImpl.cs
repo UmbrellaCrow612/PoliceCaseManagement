@@ -7,7 +7,6 @@ using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static MassTransit.ValidationResultExtensions;
 
 namespace Identity.Application.Implementations
 {
