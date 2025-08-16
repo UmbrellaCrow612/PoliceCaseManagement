@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Infrastructure.Data.Configs
 {
-    internal class EmailVerificationAttemptConfigs : IEntityTypeConfiguration<EmailVerificationAttempt>
+    internal class EmailVerificationAttemptConfigs : IEntityTypeConfiguration<EmailVerification>
     {
-        public void Configure(EntityTypeBuilder<EmailVerificationAttempt> builder)
+        public void Configure(EntityTypeBuilder<EmailVerification> builder)
         {
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.Id).IsUnique();

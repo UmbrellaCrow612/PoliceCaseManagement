@@ -4,9 +4,9 @@ using Mapper;
 
 namespace Identity.API.Mappings
 {
-    public class UserMapping : IMapper<ApplicationUser, UserDto, UpdateUserDto, RegisterRequestDto>
+    public class UserMapping : IMapper<ApplicationUser, UserDto, UpdateUserDto, CreateUserDto>
     {
-        public ApplicationUser Create(RegisterRequestDto createDto)
+        public ApplicationUser Create(CreateUserDto createDto)
         {
             return new ApplicationUser { UserName = createDto.UserName, Email = createDto.Email, PhoneNumber = createDto.PhoneNumber };
         }

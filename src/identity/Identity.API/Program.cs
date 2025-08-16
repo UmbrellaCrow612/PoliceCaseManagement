@@ -23,7 +23,7 @@ builder.Services.AddGrpc();
 builder.Services.AddOpenApi();
 builder.Services.AddBaseAuthorization(config);
 builder.Services.AddInfrastructure(config);
-builder.Services.AddApplicationServices(config);
+builder.Services.AddApplication(config);
 builder.Services.AddRedis(config);
 
 var app = builder.Build();

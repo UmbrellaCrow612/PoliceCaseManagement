@@ -10,37 +10,10 @@ import (
 	"people/api/services"
 	valueobjects "people/api/value_objects"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
-
-// Private: create person dto
-type createPersonDto struct {
-	FirstName   string    `json:"firstName" binding:"required"`
-	LastName    string    `json:"lastName" binding:"required"`
-	DateOfBirth time.Time `json:"dateOfBirth" binding:"required"`
-	PhoneNumber string    `json:"phoneNumber" binding:"required"`
-	Email       string    `json:"email" binding:"required"`
-}
-
-// Private: dto to check if a phone number is taken
-type phoneNumberTakenDto struct {
-	PhoneNumber string `json:"phoneNumber" binding:"required"`
-}
-
-type phoneNumberTakenResponse struct {
-	Taken bool `json:"taken"`
-}
-
-type emailTakenDto struct {
-	Email string `json:"email" binding:"required"`
-}
-
-type emailTakenResponse struct {
-	Taken bool `json:"taken"`
-}
 
 // Public: Handles the function to run on a specific people endpoint
 type PersonHandler struct {
@@ -68,7 +41,7 @@ func (h *PersonHandler) HandleGetPersonById(c *gin.Context) {
 }
 
 func (h *PersonHandler) HandleCreatePerson(c *gin.Context) {
-	var req createPersonDto
+	var req dtos.CreatePersonDto
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -148,7 +121,7 @@ func (h *PersonHandler) HandleSearchPeople(c *gin.Context) {
 }
 
 func (h *PersonHandler) HandleIsPhoneNumberTaken(c *gin.Context) {
-	var req phoneNumberTakenDto
+	var req dtos.PhoneNumberTakenDto
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -161,11 +134,11 @@ func (h *PersonHandler) HandleIsPhoneNumberTaken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, phoneNumberTakenResponse{Taken: taken})
+	c.JSON(http.StatusOK, dtos.PhoneNumberTakenResponse{Taken: taken})
 }
 
 func (h *PersonHandler) HandleIsEmailTaken(c *gin.Context) {
-	var req emailTakenDto
+	var req dtos.EmailTakenDto
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -178,5 +151,5 @@ func (h *PersonHandler) HandleIsEmailTaken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, emailTakenResponse{Taken: taken})
+	c.JSON(http.StatusOK, dtos.EmailTakenResponse{Taken: taken})
 }
