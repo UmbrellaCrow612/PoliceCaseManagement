@@ -17,6 +17,12 @@ namespace Identity.Core.Services
         Task<ApplicationUser?> FindByIdAsync(string userId);
 
         /// <summary>
+        /// Find a user by there email
+        /// </summary>
+        /// <param name="email">The email to search a user with</param>
+        Task<ApplicationUser?> FindByEmailAsync(string email);
+
+        /// <summary>
         /// Checks if a user exists
         /// </summary>
         /// <param name="userId">The ID of the user to check</param>

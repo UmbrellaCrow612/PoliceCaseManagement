@@ -33,5 +33,14 @@
 
         public ICollection<DeviceVerification> DeviceVerifications { get; set; } = [];
 
+
+        /// <summary>
+        /// Helper method to makr the device as trusted
+        /// </summary>
+        public void MarkTrusted()
+        {
+            IsTrusted = true;
+        }
+
     }
 }

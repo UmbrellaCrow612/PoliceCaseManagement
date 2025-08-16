@@ -18,7 +18,7 @@ namespace Identity.Application.Implementations
         IdentityApplicationDbContext dbContext, 
         IDeviceService deviceService, 
         ILogger<MfaServiceImpl> logger, 
-        ITwoFactorCodeGenerator twoFactorCodeGenerator, 
+        ICodeGenerator twoFactorCodeGenerator, 
         IOptions<TimeWindows> timeWindows, 
         IUserService userService,
         ITokenService tokenService
@@ -27,7 +27,7 @@ namespace Identity.Application.Implementations
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly IDeviceService _deviceService = deviceService;
         private readonly ILogger<MfaServiceImpl> _logger = logger;
-        private readonly ITwoFactorCodeGenerator _twoFactorCodeGenerator = twoFactorCodeGenerator;
+        private readonly ICodeGenerator _twoFactorCodeGenerator = twoFactorCodeGenerator;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;

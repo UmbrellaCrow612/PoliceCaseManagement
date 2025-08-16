@@ -22,6 +22,26 @@
         public const string Device = "DEVICE";
 
         /// <summary>
+        /// Indicates that there was a problem creating a device - used when trying ot create a device that already exists
+        /// </summary>
+        public const string DeviceExists = "DEVICE_EXISTS";
+
+        /// <summary>
+        /// Indicates that a device is already trusted - used when trying to re verify it 
+        /// </summary>
+        public const string DeviceAlreadyTrusted = "DEVICE_ALREADY_TRUSTED";
+
+        /// <summary>
+        /// Indicates that a valid device verification exists - used when trying to send new ones back to back whilst the previous one is valid and not yet expired 
+        /// </summary>
+        public const string DeviceVerificationExists = "DEVICE_VERIFICATION_EXISTS";
+
+        /// <summary>
+        /// Indicates that a valid device verification is invalid - used when attempt dose not exist for verification attempt or the attempt is invalid or expired
+        /// </summary>
+        public const string DeviceVerificationInvalid = "DEVICE_VERIFICATION_INVALID";
+
+        /// <summary>
         /// Indicates that there is a valid MFA SMS attempt already out for a login
         /// </summary>
         public const string MFASmsExists = "MFA_SMS_EXISTS";
@@ -54,5 +74,34 @@
         /// </summary>
 
         public const string PhoneNotConfirmed = "PHONE_NOT_CONFIRMED";
+
+        /// <summary>
+        /// Indicates that the username is taken by another user - usernames are unique 
+        /// </summary>
+
+        public const string UserNameTaken = "USERNAME_TAKEN";
+
+        /// <summary>
+        /// Indicates that the email is taken by another user - emails are unique 
+        /// </summary>
+
+        public const string UserEmailTaken = "USER_EMAIL_TAKEN";
+
+        /// <summary>
+        /// Indicates that the phone number is taken by another user - phone numbers are unique 
+        /// </summary>
+
+        public const string UserPhoneNumberTaken = "USER_PHONENUMBER_TAKEN";
+
+        /// <summary>
+        /// Indicates that a email is already verified - used when trying to verify a email that is already verified
+        /// </summary>
+
+        public const string EmailVerified = "EMAILL_VERIFIED";
+
+        /// <summary>
+        /// Indicates that there is a valid email verification - used when trying to send a email verificvation whena valid one already exists
+        /// </summary>
+        public const string EmailVerificationExists = "EMAIL_VERIFICATION_EXISTS";
     }
 }

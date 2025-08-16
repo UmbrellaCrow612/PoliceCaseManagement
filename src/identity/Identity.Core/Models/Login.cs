@@ -7,10 +7,7 @@
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
       
-        /// <summary>
-        /// The status the login is in - by default we assume failed
-        /// </summary>
-        public LoginStatus Status { get; set; } = LoginStatus.FAILED;
+        public required LoginStatus Status { get; set; }
 
         /// <summary>
         /// When it was created

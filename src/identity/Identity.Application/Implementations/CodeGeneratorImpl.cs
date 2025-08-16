@@ -4,10 +4,10 @@ using System.Security.Cryptography;
 namespace Identity.Application.Implementations
 {
     /// <summary>
-    /// Business implementation of the contract <see cref="ITwoFactorCodeGenerator"/> - test this, as well when using it else where only use the <see cref="ITwoFactorCodeGenerator"/>
+    /// Business implementation of the contract <see cref="ICodeGenerator"/> - test this, as well when using it else where only use the <see cref="ICodeGenerator"/>
     /// interface not this class
     /// </summary>
-    public class TwoFactorCodeGeneratorImpl : ITwoFactorCodeGenerator
+    public class CodeGeneratorImpl : ICodeGenerator
     {
         public string GenerateSixDigitCode()
         {

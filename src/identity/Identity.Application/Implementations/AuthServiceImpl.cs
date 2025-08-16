@@ -41,6 +41,25 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
+            if (!isPasswordCorrect)
+            {
+                result.AddError(BusinessRuleCodes.IncorrectCredentials);
+                return result;
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                result.AddError(BusinessRuleCodes.EmailNotConfirmed);
+                return result;
+            }
+
+            if (!user.PhoneNumberConfirmed)
+            {
+                result.AddError(BusinessRuleCodes.PhoneNotConfirmed);
+                return result;
+            }
+
             var device = await _deviceService.GetDeviceAsync(user.Id, deviceInfo);
             if (device is null || !device.IsTrusted)
             {
@@ -52,40 +71,12 @@ namespace Identity.Application.Implementations
             {
                 UserId = user.Id,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.LoginLifetime),
-                DeviceId = device.Id
+                DeviceId = device.Id,
+                Status = LoginStatus.TwoFactorAuthenticationReached
             };
-
             result.LoginId = login.Id;
 
             await _dbcontext.Logins.AddAsync(login);
-
-            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
-            if (!isPasswordCorrect)
-            {
-                await _dbcontext.SaveChangesAsync();
-                result.AddError(BusinessRuleCodes.IncorrectCredentials);
-
-                return result;
-            }
-
-            if (!user.EmailConfirmed)
-            {
-                await _dbcontext.SaveChangesAsync();
-                result.AddError(BusinessRuleCodes.EmailNotConfirmed);
-
-                return result;
-            }
-
-            if (!user.PhoneNumberConfirmed)
-            {
-                await _dbcontext.SaveChangesAsync();
-                result.AddError(BusinessRuleCodes.PhoneNotConfirmed);
-
-                return result;
-            }
-   
-
-            login.Status = LoginStatus.TwoFactorAuthenticationReached;
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;
@@ -125,7 +116,6 @@ namespace Identity.Application.Implementations
             }
 
             token.MarkUsed();
-            _dbcontext.Tokens.Update(token);
 
             var tokens = await _tokenService.IssueTokens(user, device);
 

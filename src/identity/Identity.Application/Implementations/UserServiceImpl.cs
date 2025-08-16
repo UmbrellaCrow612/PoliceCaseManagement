@@ -1,7 +1,9 @@
-﻿using Identity.Core.Models;
+﻿using Identity.Application.Codes;
+using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pagination.Abstractions;
 
@@ -11,13 +13,19 @@ namespace Identity.Application.Implementations
     /// Business implementation of the contract <see cref="IUserService"/> - test this, as well when using it else where only use the <see cref="IUserService"/>
     /// interface not this class
     /// </summary>
-    public class UserServiceImpl(IdentityApplicationDbContext dbContext) : IUserService
+    public class UserServiceImpl(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IUserService
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         public async Task<bool> ExistsAsync(string userId)
         {
             return await _dbcontext.Users.AnyAsync(x => x.Id == userId);
+        }
+
+        public async Task<ApplicationUser?> FindByEmailAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<ApplicationUser?> FindByIdAsync(string userId)
@@ -101,8 +109,28 @@ namespace Identity.Application.Implementations
         public async Task<UserServiceResult> UpdateAsync(ApplicationUser user)
         {
             var result = new UserServiceResult();
-            
-            _dbcontext.Users.Update(user);
+
+            var usernameTaken = await _dbcontext.Users.AnyAsync(x => x.UserName == user.UserName && x.Id != user.Id);
+            if (usernameTaken)
+            {
+                result.AddError(BusinessRuleCodes.UserNameTaken, "Username taken");
+                return result;
+            }
+
+            var emailTaken = await _dbcontext.Users.AnyAsync(x => x.Email == user.Email && x.Id != user.Id);
+            if (emailTaken)
+            {
+                result.AddError(BusinessRuleCodes.UserEmailTaken, "Email taken");
+                return result;
+            }
+
+            var phoneNumberTaken = await _dbcontext.Users.AnyAsync(x => x.PhoneNumber == user.PhoneNumber && x.Id != user.Id);
+            if (phoneNumberTaken)
+            {
+                result.AddError(BusinessRuleCodes.UserPhoneNumberTaken, "Phone number taken");
+                return result;
+            }
+
             await _dbcontext.SaveChangesAsync();
 
             result.Succeeded = true;

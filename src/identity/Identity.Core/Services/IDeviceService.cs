@@ -1,5 +1,6 @@
 ﻿using Identity.Core.Models;
 using Identity.Core.ValueObjects;
+using Results.Abstractions;
 
 namespace Identity.Core.Services
 {
@@ -16,9 +17,43 @@ namespace Identity.Core.Services
         Task<Device?> GetDeviceAsync(string userId, DeviceInfo info);
 
         /// <summary>
+        /// Check if a device exists
+        /// </summary>
+        /// <param name="userId">The user ID of the device to check</param>
+        /// <param name="info">The info of the device</param>
+        Task<bool> ExistsAsync(string userId, DeviceInfo info);
+
+        /// <summary>
         /// Find a device by it's ID
         /// </summary>
         /// <param name="deviceId">The ID of the device</param>
         Task<Device?> FindByIdAsync(string deviceId);
+
+        /// <summary>
+        /// Create a user device into the system
+        /// </summary>
+        /// <param name="user">The user to create it for </param>
+        /// <param name="deviceInfo">The info about the device </param>
+        Task<DeviceResult> CreateAsync(ApplicationUser user, DeviceInfo deviceInfo);
+    }
+
+    public class DeviceError : IResultError
+    {
+        public required string Code { get; set; }
+        public required string? Message { get; set; } = null;
+    }
+
+    /// <summary>
+    /// Result object to use for <see cref="IDeviceService"/> methods that return a <see cref="IResult"/>
+    /// </summary>
+    public class DeviceResult : IResult
+    {
+        public bool Succeeded { get; set; } = false;
+        public ICollection<IResultError> Errors { get; set; } = [];
+
+        public void AddError(string code, string? message = null)
+        {
+            Errors.Add(new UserServiceError { Code = code, Message = message });
+        }
     }
 }

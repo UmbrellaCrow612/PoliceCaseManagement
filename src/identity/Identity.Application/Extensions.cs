@@ -33,9 +33,10 @@ namespace Identity.Application
             services.AddScoped<IMfaService, MfaServiceImpl>();
             services.AddScoped<IRoleService, RoleServiceImpl>();
             services.AddScoped<ITokenService, TokenServiceImpl>();
+            services.AddScoped<IDeviceVerificationService, DeviceVerificationServiceImpl>();
 
             services.AddSingleton<IDeviceIdentificationGenerator, DeviceIdentificationGeneratorImpl>();
-            services.AddSingleton<ITwoFactorCodeGenerator, TwoFactorCodeGeneratorImpl>();
+            services.AddSingleton<ICodeGenerator, CodeGeneratorImpl>();
             services.AddSingleton<JwtBearerHelper>();
 
 

@@ -58,7 +58,7 @@
 
 
         /// <summary>
-        /// makr a attempt as used
+        /// Marks a attempt as used
         /// </summary>
         public void MarkUsed()
         {
