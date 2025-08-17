@@ -1,7 +1,5 @@
 ﻿using Identity.Core.Models;
-using Identity.Core.Repositorys;
 using Identity.Infrastructure.Data;
-using Identity.Infrastructure.Data.Repositorys;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,15 +21,6 @@ namespace Identity.Infrastructure
                 .AddRoles<ApplicationRole>()
                 .AddEntityFrameworkStores<IdentityApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.User.RequireUniqueEmail = true;
-            });
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-
 
             return services;
         }

@@ -7,22 +7,13 @@ namespace Identity.Infrastructure.Data
 {
     public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
-        public DbSet<TwoFactorSmsAttempt> TwoFactorSmsAttempts { get; set; }
-        public DbSet<PhoneConfirmationAttempt> PhoneConfirmationAttempts { get; set; }
-        public DbSet<UserDeviceChallengeAttempt> UserDeviceChallengeAttempts { get; set; }
-        public DbSet<UserDevice> UserDevices { get; set; }
-        public DbSet<EmailVerificationAttempt> EmailVerificationAttempts { get; set; }
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<LoginAttempt> LoginAttempts { get; set; }
+        public DbSet<TwoFactorSms> TwoFactorSms { get; set; }
+        public DbSet<PhoneVerification> PhoneVerifications { get; set; }
+        public DbSet<DeviceVerification> DeviceVerifications { get; set; }
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<EmailVerification> EmailVerifications { get; set; }
+        public DbSet<Login> Logins { get; set; }
         public DbSet<Token> Tokens { get; set; }
-        public DbSet<PasswordResetAttempt> PasswordResetAttempts { get; set; }
-        public DbSet<SecurityAudit> SecurityAudits { get; set; }
-        public DbSet<TwoFactorEmailAttempt> TwoFactorEmailAttempts { get; set; }
-        public DbSet<MagicLinkAttempt> MagicLinkAttempts { get; set; }
-        public DbSet<OTPAttempt> OTPAttempts { get; set; }
-        public DbSet<TimeBasedOneTimePassCode> TimeBasedOneTimePassCodes { get; set; }
-        public DbSet<TimeBasedOneTimePassCodeBackupCode> TimeBasedOneTimePassCodeBackupCodes { get; set; }
-        public DbSet<PreviousPassword> PreviousPasswords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -60,9 +60,6 @@ namespace Identity.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -70,17 +67,11 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("LastLoginDeviceId")
-                        .HasColumnType("text");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("MagicLinkAuthEnabled")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -89,12 +80,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("OTPAuthEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("PasswordCreatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
@@ -105,16 +90,13 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("RequiresPasswordChange")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<bool>("TimeBasedOneTimePassCodeEnabled")
+                    b.Property<bool>("TotpConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("TimeBasedOneTimePassCodeId")
+                    b.Property<string>("TotpSecret")
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -125,8 +107,6 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -147,21 +127,75 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.Department", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsTrusted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Devices");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.EmailVerificationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.DeviceVerification", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DeviceVerifications");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.EmailVerification", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -180,9 +214,6 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("UsedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -200,10 +231,10 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EmailVerificationAttempts");
+                    b.ToTable("EmailVerifications");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -211,48 +242,16 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FailureReason")
-                        .HasColumnType("text");
-
-                    b.Property<string>("IpAddress")
+                    b.Property<string>("DeviceId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LoginAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.MagicLinkAttempt", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("UsedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -262,12 +261,14 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DeviceId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("MagicLinkAttempts");
+                    b.ToTable("Logins");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.OTPAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.PhoneVerification", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -281,85 +282,6 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Method")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OTPAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PasswordResetAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PhoneConfirmationAttempt", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -376,131 +298,7 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PhoneConfirmationAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PreviousPassword", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PreviousPasswords");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.SecurityAudit", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AffectedResource")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Changes")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Details")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Event")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("IPAddress")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NewValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PreviousValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Severity")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SecurityAudits");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Secret")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("TimeBasedOneTimePassCodes");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCodeBackupCode", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("TimeBasedOneTimePassCodeId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TimeBasedOneTimePassCodeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TimeBasedOneTimePassCodeBackupCodes");
+                    b.ToTable("PhoneVerifications");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
@@ -511,24 +309,18 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsBlackListed")
-                        .HasColumnType("boolean");
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("RefreshTokenExpiresAt")
+                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("RevokedReason")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserDeviceId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -536,48 +328,14 @@ namespace Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DeviceId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Tokens");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorEmailAttempt", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsSuccessful")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("LoginAttemptId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("SuccessfulAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LoginAttemptId");
-
-                    b.ToTable("TwoFactorEmailAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSms", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -592,10 +350,7 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsSuccessful")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("LoginAttemptId")
+                    b.Property<string>("LoginId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -603,94 +358,20 @@ namespace Identity.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("SuccessfulAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LoginAttemptId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TwoFactorSmsAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DeviceName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsTrusted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserDevices");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.UserDeviceChallengeAttempt", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("UsedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UserDeviceId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UserDeviceId");
+                    b.HasIndex("LoginId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserDeviceChallengeAttempts");
+                    b.ToTable("TwoFactorSms");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -799,19 +480,10 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Identity.Core.Models.Department", "Department")
-                        .WithMany("Users")
-                        .HasForeignKey("DepartmentId");
-
-                    b.Navigation("Department");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.EmailVerificationAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("EmailVerificationAttempts")
+                        .WithMany("Devices")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -819,10 +491,29 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.DeviceVerification", b =>
+                {
+                    b.HasOne("Identity.Core.Models.Device", "Device")
+                        .WithMany("DeviceVerifications")
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
+                        .WithMany("DeviceVerifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Identity.Core.Models.EmailVerification", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("LoginAttempts")
+                        .WithMany("EmailVerifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -830,169 +521,72 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.MagicLinkAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
+                    b.HasOne("Identity.Core.Models.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("MagicLinkAttempts")
+                        .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Device");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.OTPAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.PhoneVerification", b =>
                 {
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("OTPAttempts")
+                        .WithMany("PhoneVerifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PasswordResetAttempt", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("PasswordResetAttempts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PhoneConfirmationAttempt", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("PhoneConfirmationAttempts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.PreviousPassword", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("PreviousPasswords")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.SecurityAudit", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("SecurityAudits")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithOne("TimeBasedOneTimePassCode")
-                        .HasForeignKey("Identity.Core.Models.TimeBasedOneTimePassCode", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCodeBackupCode", b =>
-                {
-                    b.HasOne("Identity.Core.Models.TimeBasedOneTimePassCode", "TimeBasedOneTimePassCode")
-                        .WithMany("TimeBasedOneTimePassCodeBackupCodes")
-                        .HasForeignKey("TimeBasedOneTimePassCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("TimeBasedOneTimePassCodeBackupCodes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TimeBasedOneTimePassCode");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Identity.Core.Models.Token", b =>
                 {
+                    b.HasOne("Identity.Core.Models.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Device");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorEmailAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.TwoFactorSms", b =>
                 {
-                    b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
-                        .WithMany("TwoFactorEmailAttempts")
-                        .HasForeignKey("LoginAttemptId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LoginAttempt");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TwoFactorSmsAttempt", b =>
-                {
-                    b.HasOne("Identity.Core.Models.LoginAttempt", "LoginAttempt")
-                        .WithMany("TwoFactorSmsAttempts")
-                        .HasForeignKey("LoginAttemptId")
+                    b.HasOne("Identity.Core.Models.Login", "Login")
+                        .WithMany("TwoFactorSms")
+                        .HasForeignKey("LoginId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("TwoFactorCodeAttempts")
+                        .WithMany("TwoFactorSms")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LoginAttempt");
+                    b.Navigation("Login");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
-                {
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("UserDevices")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.UserDeviceChallengeAttempt", b =>
-                {
-                    b.HasOne("Identity.Core.Models.UserDevice", "UserDevice")
-                        .WithMany("UserDeviceChallengeAttempts")
-                        .HasForeignKey("UserDeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Identity.Core.Models.ApplicationUser", "User")
-                        .WithMany("UserDeviceChallengeAttempts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("UserDevice");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1048,55 +642,29 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Identity.Core.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("EmailVerificationAttempts");
+                    b.Navigation("DeviceVerifications");
 
-                    b.Navigation("LoginAttempts");
+                    b.Navigation("Devices");
 
-                    b.Navigation("MagicLinkAttempts");
+                    b.Navigation("EmailVerifications");
 
-                    b.Navigation("OTPAttempts");
+                    b.Navigation("Logins");
 
-                    b.Navigation("PasswordResetAttempts");
-
-                    b.Navigation("PhoneConfirmationAttempts");
-
-                    b.Navigation("PreviousPasswords");
-
-                    b.Navigation("SecurityAudits");
-
-                    b.Navigation("TimeBasedOneTimePassCode");
-
-                    b.Navigation("TimeBasedOneTimePassCodeBackupCodes");
+                    b.Navigation("PhoneVerifications");
 
                     b.Navigation("Tokens");
 
-                    b.Navigation("TwoFactorCodeAttempts");
-
-                    b.Navigation("UserDeviceChallengeAttempts");
-
-                    b.Navigation("UserDevices");
+                    b.Navigation("TwoFactorSms");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.Department", b =>
+            modelBuilder.Entity("Identity.Core.Models.Device", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("DeviceVerifications");
                 });
 
-            modelBuilder.Entity("Identity.Core.Models.LoginAttempt", b =>
+            modelBuilder.Entity("Identity.Core.Models.Login", b =>
                 {
-                    b.Navigation("TwoFactorEmailAttempts");
-
-                    b.Navigation("TwoFactorSmsAttempts");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.TimeBasedOneTimePassCode", b =>
-                {
-                    b.Navigation("TimeBasedOneTimePassCodeBackupCodes");
-                });
-
-            modelBuilder.Entity("Identity.Core.Models.UserDevice", b =>
-                {
-                    b.Navigation("UserDeviceChallengeAttempts");
+                    b.Navigation("TwoFactorSms");
                 });
 #pragma warning restore 612, 618
         }

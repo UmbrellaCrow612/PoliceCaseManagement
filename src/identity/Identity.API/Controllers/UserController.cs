@@ -7,23 +7,26 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.Abstractions;
 
 namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController(IAuthService authService, ICache cache) : ControllerBase
+    public class UserController(
+        IUserService userService, 
+        ICache cache, 
+        IRoleService roleService,
+        ITotpService totpService
+        ) : ControllerBase
     {
-        private readonly IAuthService _authService = authService;
+        private readonly IUserService _userService = userService;
         private readonly UserMapping _userMapping = new();
         private readonly ICache _cache = cache;
+        private readonly IRoleService _roleService = roleService;
+        private readonly ITotpService _totpService = totpService;
 
-        /// <summary>
-        /// This way to stop 401 being sent on load of app and getting stuck on login page
-        /// other endpoints send 401 as normal this endpoint in unique for it.
-        /// </summary>
-        /// <returns></returns>
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserByIdAsync()
         {
@@ -31,85 +34,60 @@ namespace Identity.API.Controllers
 
             if (userId is null) return BadRequest("User id missing");
 
-            var value = await _cache.GetAsync<MeDto>(userId);
+            var value = await _cache.GetAsync<UserMeResponseDto>(userId);
             if (value is not null)
             {
                 return Ok(value);
             }
 
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null) return Unauthorized();
 
-            var roles = await _authService.GetUserRolesAsync(userId);
+            var roles = await _roleService.GetRolesAsync(user);
 
             var userDto = _userMapping.ToDto(user);
-            var returnDto = new MeDto
+            var returnDto = new UserMeResponseDto
             {
-                Roles = roles,
+                Roles = [.. roles.Select(x => x.Name)],
                 User = userDto
             };
 
-            await _cache.SetAsync<MeDto>(userId, returnDto);
+            await _cache.SetAsync<UserMeResponseDto>(userId, returnDto);
             return Ok(returnDto);
         }
-
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
+     
         [HttpPost("usernames/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> IsUsernameTaken([FromBody] IsUsernameTakenDto dto)
+        public async Task<IActionResult> IsUsernameTaken([FromBody] UsernameTakenDto dto)
         {
-            var result = await _authService.IsUsernameTaken(dto.Username);
+            var taken = await _userService.IsUsernameTakenAsync(dto.Username);
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok();
+            return Ok(new UsernameTakenResponseDto{ Taken = taken });
         }
 
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
         [HttpPost("emails/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> IsEmailTaken([FromBody] IsEmailTakenDto dto)
+        public async Task<IActionResult> IsEmailTaken([FromBody] EmailTakenDto dto)
         {
-            var result = await _authService.IsEmailTaken(dto.Email);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var taken = await _userService.IsEmailTakenAsync(dto.Email);
 
-            return Ok();
+            return Ok(new EmailTakenResponseDto { Taken = taken });
         }
 
-        /// <summary>
-        /// Used when creating a user to be hit while a admin types to create a user in the system
-        /// typically during there typing so they can know early on without having to hit the register endpoint
-        /// </summary>
         [HttpPost("phone-numbers/is-taken")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<UserDto>> IsPhoneNumberTaken([FromBody] IsPhoneNumberTakenDto dto)
+        public async Task<ActionResult<PhoneNumberTakenResponseDto>> IsPhoneNumberTaken([FromBody] PhoneNumberTakenDto dto)
         {
-            var result = await _authService.IsPhoneNumberTaken(dto.PhoneNumber);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var taken = await _userService.IsPhoneNumberTakenAsync(dto.PhoneNumber);
 
-            return Ok();
+            return Ok(new PhoneNumberTakenResponseDto { Taken = taken });
         }
 
         [HttpGet("{userId}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetUserByIdAsync(string userId)
         {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
@@ -123,14 +101,15 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateUserByIdAsync(string userId, [FromBody] UpdateUserDto dto)
         {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
             }
 
             _userMapping.Update(user, dto);
-            var result = await _authService.UpdateUserAsync(user);
+
+            var result = await _userService.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -144,68 +123,93 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> GetUserRolesAsync(string userId)
         {
-            var roles = await _authService.GetUserRolesAsync(userId);
-
-            var dto = new { roles };
-
-            return Ok(dto);
-        }
-
-        [HttpPut("{userId}/roles")]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> UpdateUserRolesByIdAsync(string userId, UpdateUserRolesDto dto)
-        {
-            var user = await _authService.GetUserByIdAsync(userId);
+            var user = await _userService.FindByIdAsync(userId);
             if (user is null)
             {
                 return NotFound();
             }
 
-            var result = await _authService.UpdateUserRolesAsync(user, dto.Roles);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            var roles = await _roleService.GetRolesAsync(user);
 
-            await _cache.DeleteAsync(userId);
-            return NoContent();
+            return Ok(new { roles });
         }
 
-        /// <summary>
-        /// Searching a user - admin - more privilege can see more details about users.
-        /// </summary>
         [HttpGet("admin/search")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<List<UserDto>>> AdminSearchUsersAsync([FromQuery] SearchUserQuery query)
+        public async Task<IActionResult> AdminSearchUsersAsync([FromQuery] SearchUserQuery query)
         {
-            var users = await _authService.SearchUsersByQuery(query);
+            var paginatedResult = await _userService.SearchAsync(query);
 
-            List<UserDto> dto = [];
-            foreach (var user in users)
+            var dto = new PaginatedResult<UserDto>
             {
-                dto.Add(_userMapping.ToDto(user));
-            }
+                Data = [.. paginatedResult.Data.Select(x => _userMapping.ToDto(x))],
+                HasNextPage = paginatedResult.HasNextPage,
+                HasPreviousPage = paginatedResult.HasPreviousPage,
+                Pagination = paginatedResult.Pagination,
+            };
 
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Search users - see less details about them for less privileged users.
-        /// </summary>
-        /// <returns></returns>
         [HttpGet("search")]
         [Authorize]
         public async Task<IActionResult> SearchUsersAsync([FromQuery] SearchUserQuery query)
         {
-            var users = await _authService.SearchUsersByQuery(query);
+            var paginatedResult = await _userService.SearchAsync(query);
 
-            List<RestrictedUserDto> dto = [];
-            foreach (var user in users)
+            var dto = new PaginatedResult<RestrictedUserDto>
             {
-                dto.Add(_userMapping.ToRestrictedUserDto(user));
-            }
+                Data = [.. paginatedResult.Data.Select(x => _userMapping.ToRestrictedUserDto(x))],
+                HasNextPage = paginatedResult.HasNextPage,
+                HasPreviousPage = paginatedResult.HasPreviousPage,
+                Pagination = paginatedResult.Pagination,
+            };
 
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpGet("totp")]
+        public async Task<IActionResult> CreateTotpForMe()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return BadRequest("User id missing");
+
+            var user = await _userService.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _totpService.GenerateTotp(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new { result.QrCodeBytes });
+        }
+
+        [Authorize]
+        [HttpDelete("totp")]
+        public async Task<IActionResult> ResetTotp()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return BadRequest("User id missing");
+
+            var user = await _userService.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _totpService.ResetTotp(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
     }
 }

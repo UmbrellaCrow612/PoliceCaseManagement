@@ -14,14 +14,6 @@ namespace Identity.Application.Settings
     public class TimeWindows
     {
         /// <summary>
-        /// Duration for which a password reset token remains valid.
-        /// Prevents indefinite password reset attempts.
-        /// </summary>
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "ResetPasswordTime must be greater than 0.")]
-        public required int ResetPasswordTime { get; set; }
-
-        /// <summary>
         /// Time window for email confirmation tokens.
         /// Limits the time users have to confirm their email address.
         /// </summary>
@@ -51,13 +43,6 @@ namespace Identity.Application.Settings
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "TwoFactorSmsTime must be greater than 0.")]
         public required int TwoFactorSmsTime { get; set; }
-
-        /// <summary>
-        /// Time allowed for a two factor code to be valid for.
-        /// </summary>
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "TwoFactorEmailTime must be greater than 0.")]
-        public required int TwoFactorEmailTime { get; set; }
 
         /// <summary>
         /// How long a login attempt is alive for it to be used to issue 2FA codes for.
