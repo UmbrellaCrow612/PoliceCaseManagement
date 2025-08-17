@@ -3,12 +3,10 @@
 ## Features so far
 - username password sign in 
 - MFA Time based One Time passwaord using google authenticator 
-- MFA SMS and Email codes
-- One time passcodes
+- MFA SMS
 - JWT auth strategy
 - Device Fingerptining
 - Refresh tokens
-- Magic link auth
 - Rabbit mq and mass tranit events 
 - GRPC communication between api's using proto files
 
