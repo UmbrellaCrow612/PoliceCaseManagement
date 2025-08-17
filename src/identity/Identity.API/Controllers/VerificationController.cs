@@ -79,7 +79,7 @@ namespace Identity.API.Controllers
         }
 
         [HttpPost("emails")]
-        public async Task<IActionResult> SendUserEmailVerificationCode([FromBody] SendEmailVerificationDto dto)
+        public async Task<IActionResult> SendEmailVerification([FromBody] SendEmailVerificationDto dto)
         {
             var user = await _userService.FindByEmailAsync(dto.Email);
             if (user is null)
@@ -106,6 +106,42 @@ namespace Identity.API.Controllers
             }
 
             var result = await _userVerificationService.VerifyEmail(user, dto.Code);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("phone-number")]
+        public async Task<IActionResult> SendPhoneVerification([FromBody] SendPhoneNumberVerificationDto dto)
+        {
+            var user = await _userService.FindByPhoneNumberAsync(dto.PhoneNumber);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userVerificationService.SendPhoneVerification(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("verify/phone-number")]
+        public async Task<IActionResult> VerifyPhoneNumber([FromBody] VerifyPhoneNumberDto dto)
+        {
+            var user = await _userService.FindByPhoneNumberAsync(dto.PhoneNumber);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userVerificationService.VerifyPhoneNumber(user, dto.Code);
             if (!result.Succeeded)
             {
                 return BadRequest(result);

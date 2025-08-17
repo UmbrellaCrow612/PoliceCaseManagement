@@ -19,5 +19,10 @@ namespace Identity.Application.Implementations
             // Limit to 6 digits
             return (randomNumber % 1000000).ToString("D6");
         }
+
+        public string GenerateUnique()
+        {
+            return Guid.NewGuid().ToString();
+        }
     }
 }

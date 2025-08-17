@@ -23,6 +23,12 @@ namespace Identity.Core.Services
         Task<ApplicationUser?> FindByEmailAsync(string email);
 
         /// <summary>
+        /// Find a user by there phone number
+        /// </summary>
+        /// <param name="phoneNumber">The phone number verified</param>
+        Task<ApplicationUser?> FindByPhoneNumberAsync(string phoneNumber);
+
+        /// <summary>
         /// Checks if a user exists
         /// </summary>
         /// <param name="userId">The ID of the user to check</param>
@@ -32,19 +38,19 @@ namespace Identity.Core.Services
         /// Checks if a username is taken
         /// </summary>
         /// <param name="username">The username to check</param>
-        Task<bool> IsUsernameTaken(string username);
+        Task<bool> IsUsernameTakenAsync(string username);
 
         /// <summary>
         /// Checks is email is taken
         /// </summary>
         /// <param name="email">The email to check</param>
-        Task<bool> IsEmailTaken(string email);
+        Task<bool> IsEmailTakenAsync(string email);
 
         /// <summary>
         /// Checks if a phone number is taken
         /// </summary>
         /// <param name="phoneNumber">Phone number to check</param>
-        Task<bool> IsPhoneNumberTaken(string phoneNumber);
+        Task<bool> IsPhoneNumberTakenAsync(string phoneNumber);
 
         /// <summary>
         /// Update a user

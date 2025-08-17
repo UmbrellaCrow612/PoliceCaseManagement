@@ -54,7 +54,7 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> IsUsernameTaken([FromBody] UsernameTakenDto dto)
         {
-            var taken = await _userService.IsUsernameTaken(dto.Username);
+            var taken = await _userService.IsUsernameTakenAsync(dto.Username);
 
             return Ok(new UsernameTakenResponseDto{ Taken = taken });
         }
@@ -63,7 +63,7 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> IsEmailTaken([FromBody] EmailTakenDto dto)
         {
-            var taken = await _userService.IsEmailTaken(dto.Email);
+            var taken = await _userService.IsEmailTakenAsync(dto.Email);
 
             return Ok(new EmailTakenResponseDto { Taken = taken });
         }
@@ -72,7 +72,7 @@ namespace Identity.API.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<PhoneNumberTakenResponseDto>> IsPhoneNumberTaken([FromBody] PhoneNumberTakenDto dto)
         {
-            var taken = await _userService.IsPhoneNumberTaken(dto.PhoneNumber);
+            var taken = await _userService.IsPhoneNumberTakenAsync(dto.PhoneNumber);
 
             return Ok(new PhoneNumberTakenResponseDto { Taken = taken });
         }

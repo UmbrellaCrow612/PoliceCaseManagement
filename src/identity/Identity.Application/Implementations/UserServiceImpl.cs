@@ -33,17 +33,22 @@ namespace Identity.Application.Implementations
             return await _dbcontext.Users.FindAsync(userId);
         }
 
-        public async Task<bool> IsEmailTaken(string email)
+        public async Task<ApplicationUser?> FindByPhoneNumberAsync(string phoneNumber)
+        {
+            return await _dbcontext.Users.Where(x => x.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsEmailTakenAsync(string email)
         {
             return await _dbcontext.Users.AnyAsync(x => x.Email == email);
         }
 
-        public async Task<bool> IsPhoneNumberTaken(string phoneNumber)
+        public async Task<bool> IsPhoneNumberTakenAsync(string phoneNumber)
         {
             return await _dbcontext.Users.AnyAsync(x => x.PhoneNumber == phoneNumber);
         }
 
-        public async Task<bool> IsUsernameTaken(string username)
+        public async Task<bool> IsUsernameTakenAsync(string username)
         {
             return await _dbcontext.Users.AnyAsync(x => x.UserName == username);
         }

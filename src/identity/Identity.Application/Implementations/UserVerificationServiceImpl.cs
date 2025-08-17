@@ -65,19 +65,103 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public Task<UserVerificationResult> SendPhoneVerification(ApplicationUser user)
+        public async Task<UserVerificationResult> SendPhoneVerification(ApplicationUser user)
         {
-            throw new NotImplementedException();
+            var result = new UserVerificationResult();
+
+            if(user.PhoneNumberConfirmed)
+            {
+                result.AddError(BusinessRuleCodes.PhoneNumberVerified, "Phone number verified");
+                return result;
+            }
+
+            var validPhoneVerificationExists = await _dbContext.PhoneVerifications.AnyAsync(x => x.UserId == user.Id && x.UsedAt == null && x.ExpiresAt > DateTime.UtcNow);
+            if (validPhoneVerificationExists)
+            {
+                result.AddError(BusinessRuleCodes.PhoneNumberVerificationExists, "Valid attempt exists");
+                return result;
+            }
+
+            var code = _codeGenerator.GenerateSixDigitCode();
+            var phoneVerification = new PhoneVerification
+            {
+                Code = code,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_timeWindows.PhoneConfirmationTime),
+                PhoneNumber = user.PhoneNumber!,
+                UserId = user.Id,
+            };
+
+            // send via sms code 
+            #if DEBUG
+            _logger.LogInformation("Phone verification sent for user: {userId} with code: {code}", user.Id, code);
+            #endif
+
+            await _dbContext.PhoneVerifications.AddAsync(phoneVerification);
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
 
-        public Task<UserVerificationResult> VerifyEmail(ApplicationUser user, string code)
+        public async Task<UserVerificationResult> VerifyEmail(ApplicationUser user, string code)
         {
-            throw new NotImplementedException();
+            var result = new UserVerificationResult();
+
+            if (user.EmailConfirmed)
+            {
+                result.AddError(BusinessRuleCodes.EmailVerified, "Email already verified");
+                return result;
+            }
+
+            var emailVerification = await _dbContext
+                .EmailVerifications
+                .Where(x => x.UserId == user.Id && x.UsedAt == null && x.ExpiresAt > DateTime.UtcNow && x.Code == code)
+                .FirstOrDefaultAsync();
+
+            if (emailVerification is null || !emailVerification.IsValid())
+            {
+                result.AddError(BusinessRuleCodes.EmailVerificationInvalid, "Incorrect code");
+                return result;
+            }
+
+            emailVerification.MarkUsed();
+            user.MarkEmailConfirmed();
+
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
 
-        public Task<UserVerificationResult> VerifyPhoneNumber(ApplicationUser user, string code)
+        public async Task<UserVerificationResult> VerifyPhoneNumber(ApplicationUser user, string code)
         {
-            throw new NotImplementedException();
+            var result = new UserVerificationResult();
+
+            if (user.PhoneNumberConfirmed)
+            {
+                result.AddError(BusinessRuleCodes.PhoneNumberVerified, "Phone number already verified");
+                return result;
+            }
+
+            var phoneConfirmation = await _dbContext
+                .PhoneVerifications
+                .Where(x => x.UserId == user.Id && x.UsedAt == null && x.ExpiresAt > DateTime.UtcNow && x.Code == code)
+                .FirstOrDefaultAsync();
+
+            if (phoneConfirmation is null || !phoneConfirmation.IsValid())
+            {
+                result.AddError(BusinessRuleCodes.PhoneNumberVerificationInvalid, "Incorrect code");
+                return result;
+            }
+
+            user.MarkPhoneNumberConfirmed();
+            phoneConfirmation.MarkUsed();
+
+
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

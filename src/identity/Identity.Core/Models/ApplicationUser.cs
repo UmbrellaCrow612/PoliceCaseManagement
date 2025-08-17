@@ -25,9 +25,17 @@ namespace Identity.Core.Models
         public ICollection<DeviceVerification> DeviceVerifications { get; set; } = [];
 
 
-        public bool IsEmailConfirmed()
+        /// <summary>
+        /// Marks a user's email as confirmed
+        /// </summary>
+        public void MarkEmailConfirmed()
         {
-            return EmailConfirmed;
+            EmailConfirmed = true;
+        }
+
+        public void MarkPhoneNumberConfirmed()
+        {
+            PhoneNumberConfirmed = true;
         }
     }
 }

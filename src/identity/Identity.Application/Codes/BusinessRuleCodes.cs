@@ -100,8 +100,31 @@
         public const string EmailVerified = "EMAILL_VERIFIED";
 
         /// <summary>
-        /// Indicates that there is a valid email verification - used when trying to send a email verificvation whena valid one already exists
+        /// Indicates that there is a valid email verification - used when trying to send a email verification when a valid one already exists
         /// </summary>
         public const string EmailVerificationExists = "EMAIL_VERIFICATION_EXISTS";
+
+        /// <summary>
+        /// Indicates that a email verification is invalid = used when the email verification was not found or invalid or expired
+        /// </summary>
+        public const string EmailVerificationInvalid = "EMAIL_VERIFICATION_INVALID";
+
+        /// <summary>
+        /// Indicates that a phone number is already verified
+        /// </summary>
+
+        public const string PhoneNumberVerified = "PHONE_NUMBER_VERIFIED";
+
+        /// <summary>
+        /// Indicates that a phone verification exists - used when a valid verification exists while trying to send a new one 
+        /// </summary>
+
+        public const string PhoneNumberVerificationExists = "PHONE_NUMBER_VERIFICATION_EXISTS";
+
+        /// <summary>
+        /// Indicates that a phone verification is invalid - used when it is expired, used or not found 
+        /// </summary>
+
+        public const string PhoneNumberVerificationInvalid = "PHONE_NUMBER_VERIFICATION_INVALID";
     }
 }
