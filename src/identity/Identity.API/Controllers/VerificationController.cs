@@ -19,7 +19,7 @@ namespace Identity.API.Controllers
         private readonly IUserVerificationService _userVerificationService = userVerificationService;
 
         [RequireDeviceInformation]
-        [HttpPost("device")]
+        [HttpPost("devices")]
         public async Task<IActionResult> SendDeviceVerification([FromBody] SendDeviceVerificationDto dto)
         {
             var user = await _userService.FindByEmailAsync(dto.Email);
@@ -54,7 +54,7 @@ namespace Identity.API.Controllers
         }
 
         [RequireDeviceInformation]
-        [HttpPost("verify/device")]
+        [HttpPost("verify/devices")]
         public async Task<IActionResult> VerifyDevice([FromBody] VerifyDeviceDto dto)
         {
             var user = await _userService.FindByEmailAsync(dto.Email);
@@ -114,7 +114,7 @@ namespace Identity.API.Controllers
             return NoContent();
         }
 
-        [HttpPost("phone-number")]
+        [HttpPost("phone-numbers")]
         public async Task<IActionResult> SendPhoneVerification([FromBody] SendPhoneNumberVerificationDto dto)
         {
             var user = await _userService.FindByPhoneNumberAsync(dto.PhoneNumber);
@@ -132,7 +132,7 @@ namespace Identity.API.Controllers
             return NoContent();
         }
 
-        [HttpPost("verify/phone-number")]
+        [HttpPost("verify/phone-numbers")]
         public async Task<IActionResult> VerifyPhoneNumber([FromBody] VerifyPhoneNumberDto dto)
         {
             var user = await _userService.FindByPhoneNumberAsync(dto.PhoneNumber);
