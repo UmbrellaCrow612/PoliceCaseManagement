@@ -1,5 +1,6 @@
 ﻿using Identity.Core.Services;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Identity.Application.Implementations
 {
@@ -9,6 +10,24 @@ namespace Identity.Application.Implementations
     /// </summary>
     public class CodeGeneratorImpl : ICodeGenerator
     {
+        private static readonly char[] Base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".ToCharArray();
+
+        public string GenerateBase32Secret(int length = 32)
+        {
+            byte[] randomBytes = new byte[length];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+
+            StringBuilder base32 = new StringBuilder(length);
+            foreach (byte b in randomBytes)
+            {
+                // Map each byte to a Base32 character
+                base32.Append(Base32Chars[b % Base32Chars.Length]);
+            }
+
+            return base32.ToString();
+        }
+
         public string GenerateSixDigitCode()
         {
             using var rng = RandomNumberGenerator.Create();

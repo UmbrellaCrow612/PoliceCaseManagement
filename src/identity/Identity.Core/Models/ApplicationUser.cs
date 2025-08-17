@@ -11,6 +11,17 @@ namespace Identity.Core.Models
         public override bool TwoFactorEnabled { get; set; } = true;
 
 
+        /// <summary>
+        /// TOTP (Time Based One Time Passcodes) secret field - used as part of totp to generate a totp code 
+        /// </summary>
+        public string? TotpSecret { get; set; } = null;
+
+        /// <summary>
+        /// Flag to indicate to if TOTP (Time Based One Time Passcodes) has been set up and verified and confirmed to be turned on
+        /// </summary>
+        public bool TotpConfirmed { get; set; } = false;
+
+
         public ICollection<TwoFactorSms> TwoFactorSms { get; set; } = [];
 
 
@@ -36,6 +47,17 @@ namespace Identity.Core.Models
         public void MarkPhoneNumberConfirmed()
         {
             PhoneNumberConfirmed = true;
+        }
+
+        public void ResetTotp()
+        {
+            TotpConfirmed = false;
+            TotpSecret = null;
+        }
+
+        public void MarkTotpConfirmed()
+        {
+            TotpConfirmed = true;
         }
     }
 }

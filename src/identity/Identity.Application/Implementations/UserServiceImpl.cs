@@ -13,7 +13,10 @@ namespace Identity.Application.Implementations
     /// Business implementation of the contract <see cref="IUserService"/> - test this, as well when using it else where only use the <see cref="IUserService"/>
     /// interface not this class
     /// </summary>
-    public class UserServiceImpl(IdentityApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IUserService
+    public class UserServiceImpl(
+        IdentityApplicationDbContext dbContext, 
+        UserManager<ApplicationUser> userManager
+        ) : IUserService
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
         private readonly UserManager<ApplicationUser> _userManager = userManager;

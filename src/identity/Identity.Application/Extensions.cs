@@ -35,6 +35,7 @@ namespace Identity.Application
             services.AddScoped<ITokenService, TokenServiceImpl>();
             services.AddScoped<IDeviceVerificationService, DeviceVerificationServiceImpl>();
             services.AddScoped<IUserVerificationService, UserVerificationServiceImpl>();
+            services.AddScoped<ITotpService, TotpServiceImpl>();
 
             services.AddSingleton<IDeviceIdentificationGenerator, DeviceIdentificationGeneratorImpl>();
             services.AddSingleton<ICodeGenerator, CodeGeneratorImpl>();

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityApplicationDbContext))]
-    [Migration("20250815141534_InitialCreate")]
+    [Migration("20250817143149_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,6 +94,12 @@ namespace Identity.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TotpConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TotpSecret")
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")

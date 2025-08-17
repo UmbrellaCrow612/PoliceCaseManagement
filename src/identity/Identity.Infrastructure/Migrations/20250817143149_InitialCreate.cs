@@ -33,6 +33,8 @@ namespace Identity.Infrastructure.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    TotpSecret = table.Column<string>(type: "text", nullable: true),
+                    TotpConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),

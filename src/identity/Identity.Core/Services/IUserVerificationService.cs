@@ -33,6 +33,14 @@ namespace Identity.Core.Services
         /// <param name="user">The user who's phone number you want to verify</param>
         /// <param name="code">The code that was sent to them</param>
         Task<UserVerificationResult> VerifyPhoneNumber(ApplicationUser user, string code);
+
+        /// <summary>
+        /// Verifies a TOTP (Time Based One Time Passcode) code is valid for the given user - based on there secret and checks if 
+        /// the code sent would have been generated with the secret, if it is valid the user flag for confirmed TOTP will be turned on for use
+        /// </summary>
+        /// <param name="user">The user to check</param>
+        /// <param name="code">The TOTP code</param>
+        Task<UserVerificationResult> VerifyTotp(ApplicationUser user, string code);
     }
 
     public class UserVerificationError : IResultError

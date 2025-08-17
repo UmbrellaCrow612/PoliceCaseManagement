@@ -126,5 +126,18 @@
         /// </summary>
 
         public const string PhoneNumberVerificationInvalid = "PHONE_NUMBER_VERIFICATION_INVALID";
+
+        /// <summary>
+        /// Indicates that a user has TOTP (Time Based One Time Passcode) has already been created for a user = used when trying to turn on TOTP for a user who already
+        /// has it 
+        /// </summary>
+
+        public const string TOTPExists = "TOTP_EXISTS";
+
+        /// <summary>
+        /// Indicates that a user dose not have TOTP (Time Based One Time Passcodes) - used when trying to reset a TOTP
+        /// </summary>
+
+        public const string TOTPReset = "TOTP_RESET";
     }
 }

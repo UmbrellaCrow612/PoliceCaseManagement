@@ -2,7 +2,9 @@
 using Identity.API.DTOs;
 using Identity.API.Extensions;
 using Identity.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Identity.API.Controllers
 {
@@ -142,6 +144,28 @@ namespace Identity.API.Controllers
             }
 
             var result = await _userVerificationService.VerifyPhoneNumber(user, dto.Code);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpPost("verify/totp")]
+        public async Task<IActionResult> VerifyTotp([FromBody]VerifyTotpDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return BadRequest("User id missing");
+
+            var user = await _userService.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userVerificationService.VerifyTotp(user, dto.Code);
             if (!result.Succeeded)
             {
                 return BadRequest(result);

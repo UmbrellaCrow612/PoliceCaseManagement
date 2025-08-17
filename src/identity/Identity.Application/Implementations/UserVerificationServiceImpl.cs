@@ -6,6 +6,7 @@ using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OtpNet;
 
 namespace Identity.Application.Implementations
 {
@@ -157,6 +158,33 @@ namespace Identity.Application.Implementations
             user.MarkPhoneNumberConfirmed();
             phoneConfirmation.MarkUsed();
 
+
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
+
+        public async Task<UserVerificationResult> VerifyTotp(ApplicationUser user, string code)
+        {
+            var result = new UserVerificationResult();
+
+            if (user.TotpConfirmed || string.IsNullOrWhiteSpace(user.TotpSecret))
+            {
+                result.AddError(BusinessRuleCodes.TOTPExists, "TOTP already verified or invalid state reset");
+                return result;
+            }
+
+            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+            string computedTotpCode = totp.ComputeTotp();
+
+            if (code != computedTotpCode)
+            {
+                result.AddError(BusinessRuleCodes.TOTPReset, "TOTP code invalid");
+                return result;
+            }
+
+            user.MarkTotpConfirmed();
 
             await _dbContext.SaveChangesAsync();
 

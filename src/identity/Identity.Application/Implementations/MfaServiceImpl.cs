@@ -7,6 +7,8 @@ using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OtpNet;
+using System.Security;
 
 namespace Identity.Application.Implementations
 {
@@ -123,9 +125,6 @@ namespace Identity.Application.Implementations
             login.MarkUsed();
             twoFactorSms.MarkUsed();
 
-            _dbContext.Logins.Update(login);
-            _dbContext.TwoFactorSms.Update(twoFactorSms);
-
             var tokens = await _tokenService.IssueTokens(user, device);
             result.Tokens = tokens;
 
@@ -135,9 +134,55 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public Task<VerifiedMfaResult> VerifyTotpAsync(string loginId, string code, DeviceInfo deviceInfo)
+        public async Task<VerifiedMfaResult> VerifyTotpAsync(string loginId, string code, DeviceInfo deviceInfo)
         {
-            throw new NotImplementedException();
+            var result = new VerifiedMfaResult();
+
+            var login = await _dbContext.Logins.FindAsync(loginId);
+            if (login is null || !login.IsValid())
+            {
+                result.AddError(BusinessRuleCodes.Login);
+                return result;
+            }
+
+            var user = await _userService.FindByIdAsync(login.UserId);
+            if (user is null)
+            {
+                result.AddError(BusinessRuleCodes.UserNotFound);
+                return result;
+            }
+
+            if (!user.TotpConfirmed || string.IsNullOrWhiteSpace(user.TotpSecret))
+            {
+                result.AddError(BusinessRuleCodes.TOTPReset, "TOTP not set on user or has not been confirmed");
+                return result;
+            }
+
+            var device = await _deviceService.GetDeviceAsync(login.UserId, deviceInfo);
+            if (device is null || !device.IsTrusted)
+            {
+                result.AddError(BusinessRuleCodes.Device);
+                return result;
+            }
+
+            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+            string computedTotpCode = totp.ComputeTotp();
+
+            if (code != computedTotpCode)
+            {
+                result.AddError(BusinessRuleCodes.MFAInvalid, "Incorrect code");
+                return result;
+            }
+
+            login.MarkUsed();
+
+            var tokens = await _tokenService.IssueTokens(user, device);
+            result.Tokens = tokens;
+
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
         }
     }
 }

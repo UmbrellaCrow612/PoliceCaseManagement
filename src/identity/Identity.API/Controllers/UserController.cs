@@ -13,12 +13,18 @@ namespace Identity.API.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController(IUserService userService, ICache cache, IRoleService roleService) : ControllerBase
+    public class UserController(
+        IUserService userService, 
+        ICache cache, 
+        IRoleService roleService,
+        ITotpService totpService
+        ) : ControllerBase
     {
         private readonly IUserService _userService = userService;
         private readonly UserMapping _userMapping = new();
         private readonly ICache _cache = cache;
         private readonly IRoleService _roleService = roleService;
+        private readonly ITotpService _totpService = totpService;
 
         [Authorize]
         [HttpGet("me")]
@@ -160,6 +166,50 @@ namespace Identity.API.Controllers
             };
 
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpGet("totp")]
+        public async Task<IActionResult> CreateTotpForMe()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return BadRequest("User id missing");
+
+            var user = await _userService.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _totpService.GenerateTotp(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new { result.QrCodeBytes });
+        }
+
+        [Authorize]
+        [HttpDelete("totp")]
+        public async Task<IActionResult> ResetTotp()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return BadRequest("User id missing");
+
+            var user = await _userService.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _totpService.ResetTotp(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
+
+            return NoContent();
         }
     }
 }
