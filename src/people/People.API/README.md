@@ -15,6 +15,12 @@ From source level: `PoliceCaseManagement`
 protoc --proto_path=src/proto --proto_path=C:\ProgramData\chocolatey\lib\protoc\tools\include --go_out=src/people/people.API --go-grpc_out=src/people/people.API src/proto/common/person.proto
 ```
 
+Events
+
+```bash
+protoc --proto_path=src/proto --proto_path=C:\ProgramData\chocolatey\lib\protoc\tools\include --go_out=src/people/people.API --go-grpc_out=src/people/people.API src/proto/common/person.proto src/proto/events/person_events.proto
+```
+
 # Style guide
 
 - Make `repositories` for model db access 

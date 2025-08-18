@@ -1,0 +1,60 @@
+/*
+    Contains all common person-related events for event-driven architecture.
+    Version: V1
+*/
+
+syntax = "proto3";
+
+package person.events.V1;
+
+option go_package = "gen/person/events/v1;personeventsv1";
+
+import "google/protobuf/timestamp.proto";
+
+// Event published when a new person is created.
+message PersonCreated {
+    // The unique identifier of the person.
+    string personId = 1;
+
+    // The first name of the person.
+    string firstName = 2;
+
+    // The last name of the person.
+    string lastName = 3;
+
+    // The date of birth of the person.
+    google.protobuf.Timestamp dateOfBirth = 4;
+
+    // The phone number of the person.
+    string phoneNumber = 5;
+
+    // The email address of the person.
+    string email = 6;
+
+    // When the event was created.
+    google.protobuf.Timestamp createdAt = 7;
+}
+
+// Event published when an existing person is updated.
+message PersonUpdated {
+    // The unique identifier of the person.
+    string personId = 1;
+
+    // The updated first name of the person.
+    string firstName = 2;
+
+    // The updated last name of the person.
+    string lastName = 3;
+
+    // The updated date of birth of the person.
+    google.protobuf.Timestamp dateOfBirth = 4;
+
+    // The updated phone number of the person.
+    string phoneNumber = 5;
+
+    // The updated email address of the person.
+    string email = 6;
+
+    // When the event was updated.
+    google.protobuf.Timestamp updatedAt = 7;
+}

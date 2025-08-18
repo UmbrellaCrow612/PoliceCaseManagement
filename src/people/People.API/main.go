@@ -16,6 +16,7 @@ import (
 	"people/api/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -28,6 +29,33 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	ctx := context.Background()
+
+	conn, err := amqp091.Dial(config.RabbitMqConnection)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+	}
+	defer conn.Close()
+
+	channel, err := conn.Channel()
+	if err != nil {
+		log.Fatalf("Failed to open channel: %v", err)
+	}
+	defer channel.Close()
+
+	queue, err := channel.QueueDeclare(
+		"people_events", // queue name
+		true,            // durable
+		false,           // delete when unused
+		false,           // exclusive
+		false,           // no-wait
+		nil,             // args
+	)
+
+	if err != nil {
+		log.Fatalf("Failed to declare queue: %v", err)
+	}
+
 	db, err := gorm.Open(postgres.Open(config.DSN), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
@@ -36,14 +64,12 @@ func main() {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
 
-	ctx := context.Background()
-
 	if err := db.AutoMigrate(&models.Person{}); err != nil {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}
 
 	personRepo := repositories.NewPersonRepository(db, &ctx)
-	personService := services.NewPersonService(personRepo)
+	personService := services.NewPersonService(personRepo, &queue, channel, &ctx)
 	personHandler := handlers.NewPersonHandler(personService)
 
 	go func() {

@@ -28,6 +28,9 @@ type Config struct {
 
 	// Public: Contains the TCP port to run the gRPC server on
 	TcpPort string
+
+	// Public: Contaisn the RabbitMq connection string - the connection string has the user and password within it
+	RabbitMqConnection string
 }
 
 // Public - Initialize all config values
@@ -76,6 +79,12 @@ func InitConfig() (*Config, error) {
 		tcpPort = "50051"
 	}
 	config.TcpPort = tcpPort
+
+	rabbitMqConnection := os.Getenv("RABBITMQ_CONNECTION")
+	if rabbitMqConnection == "" {
+		return &config, errors.New("failed to load rabbit mq connection from .env")
+	}
+	config.RabbitMqConnection = rabbitMqConnection
 
 	return &config, nil
 }
