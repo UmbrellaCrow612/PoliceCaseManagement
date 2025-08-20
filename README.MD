@@ -9,6 +9,7 @@
 - Refresh tokens
 - Rabbit mq and mass tranit events 
 - GRPC communication between api's using proto files
+- Custom `Identity` CLI tool which uses core and app libary to create / provision users through the CLI 
 
 ## Mobile app
 - Scan QR codes and show OTP or register TOTP codes like google authenticator
