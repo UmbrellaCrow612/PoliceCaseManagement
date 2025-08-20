@@ -64,7 +64,21 @@ namespace Identity.Core.Models
         public ICollection<DeviceVerification> DeviceVerifications { get; set; } = [];
         public ICollection<UserRole> UserRoles { get; set; } = [];
 
-
+        /// <summary>
+        /// Override the default to string to display user information in the console terminal
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $@"
+                --- Application User ---
+                ID: {Id}
+                Username: {UserName}
+                Email: {Email} (Confirmed: {EmailConfirmed})
+                Phone: {PhoneNumber} (Confirmed: {PhoneNumberConfirmed})
+                TOTP Enabled: {TotpConfirmed}
+                ------------------------";
+        }
 
 
         /// <summary>

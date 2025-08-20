@@ -15,35 +15,13 @@ namespace Identity.CLI
         /// </summary>
         /// <returns></returns>
         public async Task RunAsync() {
-            Console.WriteLine("Identity CLI started. Type 'exit' to quit.");
-            Console.WriteLine("Or type a user ID to search for that user.\n");
-
-            string? input;
             do
             {
-                Console.Write("> ");
-                input = Console.ReadLine()?.Trim();
+              var mainMenu = new MainMenu(userService);
 
-                if (string.IsNullOrWhiteSpace(input))
-                    continue;
+              await mainMenu.ShowAsync();
 
-                if (string.Equals(input, "exit", StringComparison.OrdinalIgnoreCase))
-                    break;
-
-                // Try to find the user by ID
-                var user = await userService.FindByIdAsync(input);
-
-                if (user != null)
-                {
-                    Console.WriteLine($"[FOUND] User ID: {user.Id}, Username: {user.UserName}, Email: {user.Email}");
-                }
-                else
-                {
-                    Console.WriteLine($"[NOT FOUND] No user exists with ID: {input}");
-                }
             } while (true);
-
-            Console.WriteLine("Shutting down...");
         }
     }
 }
