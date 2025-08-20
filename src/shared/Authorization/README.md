@@ -1,1 +1,1 @@
-﻿# Contaisn roles and pol and cookie names for auth shared
+﻿# Contains roles and policy and cookie names for authorization of the system

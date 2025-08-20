@@ -44,7 +44,6 @@ namespace Identity.CLI
             } while (true);
 
             Console.WriteLine("Shutting down...");
-
         }
     }
 }

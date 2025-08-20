@@ -4,16 +4,8 @@ using Identity.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-Console.WriteLine("Identity CLI running");
-
 /*
  
-- use Spectre.Console
-- Have it use the service from core, infra and application
-
-or be run the exe and runs a main loop with options console menu
-
-
 Console menu 
 
 -----

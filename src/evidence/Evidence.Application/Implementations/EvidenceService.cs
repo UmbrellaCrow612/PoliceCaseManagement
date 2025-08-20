@@ -6,6 +6,7 @@ using Evidence.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Pagination.Abstractions;
+using Results.Abstractions;
 using StorageProvider.Abstractions;
 using StorageProvider.AWS;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -56,9 +57,9 @@ namespace Evidence.Application.Implementations
             return result;
         }
 
-        public async Task<EvidenceServiceResult> DeleteAsync(Core.Models.Evidence evidence, string userId)
+        public async Task<IResult> DeleteAsync(Core.Models.Evidence evidence, string userId)
         {
-            var result = new EvidenceServiceResult();
+            var result = new Result();
 
             if (evidence.IsDeleted)
             {
@@ -185,9 +186,9 @@ namespace Evidence.Application.Implementations
             };
         }
 
-        public async Task<EvidenceServiceResult> UpdateAsync(Core.Models.Evidence evidence)
+        public async Task<IResult> UpdateAsync(Core.Models.Evidence evidence)
         {
-            var result = new EvidenceServiceResult();
+            var result = new Result();
 
             _dbcontext.Evidences.Update(evidence);
             await _dbcontext.SaveChangesAsync();

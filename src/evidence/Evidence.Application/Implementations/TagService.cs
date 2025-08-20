@@ -5,6 +5,7 @@ using Evidence.Core.ValueObjects;
 using Evidence.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Pagination.Abstractions;
+using Results.Abstractions;
 
 namespace Evidence.Application.Implementations
 {
@@ -12,9 +13,9 @@ namespace Evidence.Application.Implementations
     {
         private readonly EvidenceApplicationDbContext _dbcontext = dbContext;
 
-        public async Task<TagServiceResult> CreateAsync(Tag tag)
+        public async Task<IResult> CreateAsync(Tag tag)
         {
-            var result = new TagServiceResult();
+            var result = new Result();
 
             var isNameTaken = await _dbcontext.Tags.AnyAsync(x => x.Name == tag.Name);
             if (isNameTaken)
