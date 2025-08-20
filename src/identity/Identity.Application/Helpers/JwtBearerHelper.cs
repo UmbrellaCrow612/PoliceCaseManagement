@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
+using Identity.Core.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,8 +17,7 @@ namespace Identity.Application.Helpers
         /// <returns>
         /// Bearer token and it's ID
         /// </returns>
-        public string GenerateBearerToken<TUser>(TUser user, List<string> roles)
-        where TUser : IdentityUser
+        public string GenerateBearerToken(ApplicationUser user, List<string> roles)
         {
             var handler = new JwtSecurityTokenHandler();
 

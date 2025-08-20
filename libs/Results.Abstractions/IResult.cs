@@ -13,7 +13,7 @@
         /// <summary>
         /// A collection of errors that occurred during the operation.
         /// </summary>
-        ICollection<IResultError> Errors { get; set; }
+        List<IResultError> Errors { get; set; }
 
         /// <summary>
         /// Adds an error to the result object.

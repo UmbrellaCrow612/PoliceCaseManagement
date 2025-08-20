@@ -1,7 +1,9 @@
-﻿using Identity.Core.Models;
+﻿using Identity.Application.Codes;
+using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -12,6 +14,24 @@ namespace Identity.Application.Implementations
     public class RoleServiceImpl(IdentityApplicationDbContext dbContext) : IRoleService
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
+
+        public async Task<IResult> CreateAsync(ApplicationRole role)
+        {
+            var result = new Result();
+
+            var nameTaken = await _dbContext.Roles.AnyAsync(x => x.Name == role.Name);
+            if (nameTaken)
+            {
+                result.AddError(BusinessRuleCodes.RoleNameTaken, "Role name used already");
+                return result;
+            }
+
+            await _dbContext.Roles.AddAsync(role);
+            await _dbContext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
 
         public async Task<List<ApplicationRole>> GetRolesAsync(ApplicationUser user)
         {

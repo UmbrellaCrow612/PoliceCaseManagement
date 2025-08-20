@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cache.Redis", "libs\Cache.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Core", "libs\Events.Core\Events.Core.csproj", "{51FAB2E2-9F01-D905-A2E2-70B4EE646D21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.CLI", "src\identity\Identity.CLI\Identity.CLI.csproj", "{B77B50E9-B825-49E4-A877-93205058C3B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +187,10 @@ Global
 		{51FAB2E2-9F01-D905-A2E2-70B4EE646D21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51FAB2E2-9F01-D905-A2E2-70B4EE646D21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51FAB2E2-9F01-D905-A2E2-70B4EE646D21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B77B50E9-B825-49E4-A877-93205058C3B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B77B50E9-B825-49E4-A877-93205058C3B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B77B50E9-B825-49E4-A877-93205058C3B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B77B50E9-B825-49E4-A877-93205058C3B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -220,6 +226,7 @@ Global
 		{A4F9C4B7-E721-4D3F-8566-6C6A3C063BE6} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
 		{6071F8BE-9332-4AFA-B49B-766396CB542B} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
 		{51FAB2E2-9F01-D905-A2E2-70B4EE646D21} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
+		{B77B50E9-B825-49E4-A877-93205058C3B9} = {0BFDE38E-F7BF-434B-8E85-E17FFD526D23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}

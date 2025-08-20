@@ -2,11 +2,8 @@ using Cache.Redis;
 using Identity.API.Extensions;
 using Identity.API.Grpc;
 using Identity.Application;
-using Identity.Core.Models;
 using Identity.Infrastructure;
-using Identity.Infrastructure.Data.Seeding;
 using Logging;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
@@ -37,14 +34,6 @@ if (app.Environment.IsDevelopment())
 
     var db = scope.ServiceProvider.GetRequiredService<Identity.Infrastructure.Data.IdentityApplicationDbContext>();
     db.Database.Migrate();
-
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    var seeder = new Seeder(userManager, roleManager);
-
-    await seeder.SeeRolesAsync();
-    await seeder.SeedUsersAndThereRolesAsync();
 }
 
 app.UseSerilogRequestLogging(options =>

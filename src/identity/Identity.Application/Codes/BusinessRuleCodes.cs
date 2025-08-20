@@ -139,5 +139,18 @@
         /// </summary>
 
         public const string TOTPReset = "TOTP_RESET";
+
+        /// <summary>
+        /// Indicates that was a problem creating a user - could be a validation error, username, password validation errors or other stuff todo with it
+        /// </summary>
+
+        public const string UserCreation = "USER_CREATION";
+
+
+        /// <summary>
+        /// Indicates that was a problem creating a role - used when creating a role with same name
+        /// </summary>
+
+        public const string RoleNameTaken = "ROLE_NAME_TAKEN";
     }
 }

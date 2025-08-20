@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OtpNet;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -26,9 +27,9 @@ namespace Identity.Application.Implementations
         private readonly ICodeGenerator _codeGenerator = codeGenerator;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
 
-        public async Task<UserVerificationResult> SendEmailVerification(ApplicationUser user)
+        public async Task<IResult> SendEmailVerification(ApplicationUser user)
         {
-            var result = new UserVerificationResult();
+            var result = new Result();
 
             if (user.EmailConfirmed)
             {
@@ -66,9 +67,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<UserVerificationResult> SendPhoneVerification(ApplicationUser user)
+        public async Task<IResult> SendPhoneVerification(ApplicationUser user)
         {
-            var result = new UserVerificationResult();
+            var result = new Result();
 
             if(user.PhoneNumberConfirmed)
             {
@@ -104,9 +105,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<UserVerificationResult> VerifyEmail(ApplicationUser user, string code)
+        public async Task<IResult> VerifyEmail(ApplicationUser user, string code)
         {
-            var result = new UserVerificationResult();
+            var result = new Result();
 
             if (user.EmailConfirmed)
             {
@@ -134,9 +135,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<UserVerificationResult> VerifyPhoneNumber(ApplicationUser user, string code)
+        public async Task<IResult> VerifyPhoneNumber(ApplicationUser user, string code)
         {
-            var result = new UserVerificationResult();
+            var result = new Result();
 
             if (user.PhoneNumberConfirmed)
             {
@@ -165,9 +166,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<UserVerificationResult> VerifyTotp(ApplicationUser user, string code)
+        public async Task<IResult> VerifyTotp(ApplicationUser user, string code)
         {
-            var result = new UserVerificationResult();
+            var result = new Result();
 
             if (user.TotpConfirmed || string.IsNullOrWhiteSpace(user.TotpSecret))
             {

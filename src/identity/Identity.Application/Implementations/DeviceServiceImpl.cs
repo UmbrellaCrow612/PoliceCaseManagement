@@ -4,6 +4,7 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -16,9 +17,9 @@ namespace Identity.Application.Implementations
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly IDeviceIdentificationGenerator _deviceIdentificationGenerator = deviceIdentificationGenerator;
 
-        public async Task<DeviceResult> CreateAsync(ApplicationUser user, DeviceInfo deviceInfo)
+        public async Task<IResult> CreateAsync(ApplicationUser user, DeviceInfo deviceInfo)
         {
-            var result = new DeviceResult();
+            var result = new Result();
 
             var deviceId = _deviceIdentificationGenerator.GenerateId(user.Id, deviceInfo);
 

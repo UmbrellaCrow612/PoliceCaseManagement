@@ -1,13 +1,11 @@
-﻿using System.Data;
-using Identity.Application.Codes;
+﻿using Identity.Application.Codes;
 using Identity.Application.Settings;
 using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -16,24 +14,24 @@ namespace Identity.Application.Implementations
     /// interface not this class
     /// </summary>
     public class AuthServiceImpl(
-        UserManager<ApplicationUser> userManager
-        ,IDeviceService deviceService, 
+        IUserService userService,
+        IDeviceService deviceService, 
         IdentityApplicationDbContext dbContext,
         ITokenService tokenService,
         IOptions<TimeWindows> timeWindows
         ) : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IDeviceService _deviceService = deviceService;
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
         private readonly ITokenService _tokenService = tokenService;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
+        private readonly IUserService _userService = userService;
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
             var result = new LoginResult();
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userService.FindByEmailAsync(email);
 
             if (user is null)
             {
@@ -41,7 +39,7 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, password);
+            var isPasswordCorrect = _userService.CheckPassword(user, password);
             if (!isPasswordCorrect)
             {
                 result.AddError(BusinessRuleCodes.IncorrectCredentials);
@@ -87,7 +85,7 @@ namespace Identity.Application.Implementations
         {
             var result = new RefreshResult();
 
-            var token = await _dbcontext.Tokens.FindAsync(refreshToken);
+            var token = await _tokenService.FindAsync(refreshToken);
 
             if (token is null)
             {
@@ -95,7 +93,7 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            var user = await _userManager.FindByIdAsync(token.UserId);
+            var user = await _userService.FindByIdAsync(token.UserId);
             if (user is null)
             {
                 result.AddError(BusinessRuleCodes.UserNotFound, "User dose not exist");
@@ -127,15 +125,11 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<AuthResult> LogoutAsync(string userId)
+        public async Task<IResult> LogoutAsync(string userId)
         {
-            var result = new AuthResult();
+            var result = new Result();
 
-             await _dbcontext.Tokens
-                .Where(x => x.RevokedAt == null && x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.UsedAt == null)
-                .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(t => t.RevokedAt, DateTime.UtcNow)
-                );
+            await _tokenService.RevokeTokensAsync(userId);
 
             result.Succeeded = true;
             return result;

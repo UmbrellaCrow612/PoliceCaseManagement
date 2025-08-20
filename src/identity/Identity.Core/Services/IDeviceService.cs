@@ -34,26 +34,6 @@ namespace Identity.Core.Services
         /// </summary>
         /// <param name="user">The user to create it for </param>
         /// <param name="deviceInfo">The info about the device </param>
-        Task<DeviceResult> CreateAsync(ApplicationUser user, DeviceInfo deviceInfo);
-    }
-
-    public class DeviceError : IResultError
-    {
-        public required string Code { get; set; }
-        public required string? Message { get; set; } = null;
-    }
-
-    /// <summary>
-    /// Result object to use for <see cref="IDeviceService"/> methods that return a <see cref="IResult"/>
-    /// </summary>
-    public class DeviceResult : IResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<IResultError> Errors { get; set; } = [];
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new UserServiceError { Code = code, Message = message });
-        }
+        Task<IResult> CreateAsync(ApplicationUser user, DeviceInfo deviceInfo);
     }
 }

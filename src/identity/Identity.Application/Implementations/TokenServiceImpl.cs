@@ -19,6 +19,11 @@ namespace Identity.Application.Implementations
         private readonly JwtBearerOptions _jwtBearerOptions = jwtBearerOptions.Value;
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
 
+        public async Task<Token?> FindAsync(string refreshToken)
+        {
+            return await _dbContext.Tokens.FindAsync(refreshToken);
+        }
+
         public async Task<Tokens> IssueTokens(ApplicationUser user, Device device)
         {
             var roles = await _roleService.GetRolesAsync(user);
@@ -36,6 +41,11 @@ namespace Identity.Application.Implementations
             await _dbContext.Tokens.AddAsync(newToken);
 
             return new Tokens { JwtBearerToken = jwtBearer, RefreshToken = refresh };
+        }
+
+        public Task<int> RevokeTokensAsync(string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

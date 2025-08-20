@@ -1,6 +1,4 @@
-﻿using Identity.Core.Models;
-using Identity.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
+﻿using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +14,6 @@ namespace Identity.Infrastructure
 
             services.AddDbContext<IdentityApplicationDbContext>(
                 options => options.UseNpgsql(connectionString));
-
-            services.AddIdentityCore<ApplicationUser>()
-                .AddRoles<ApplicationRole>()
-                .AddEntityFrameworkStores<IdentityApplicationDbContext>()
-                .AddDefaultTokenProviders();
 
             return services;
         }
