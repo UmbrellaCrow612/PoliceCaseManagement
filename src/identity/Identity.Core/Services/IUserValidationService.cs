@@ -4,7 +4,7 @@ using Results.Abstractions;
 namespace Identity.Core.Services
 {
     /// <summary>
-    /// Contains all validation logic for <see cref="Core.Models.ApplicationUser"/>
+    /// Provides all validation logic for <see cref="Core.Models.ApplicationUser"/>
     /// </summary>
     public interface IUserValidationService
     {

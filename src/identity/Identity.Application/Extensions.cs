@@ -36,6 +36,7 @@ namespace Identity.Application
             services.AddScoped<IDeviceVerificationService, DeviceVerificationServiceImpl>();
             services.AddScoped<IUserVerificationService, UserVerificationServiceImpl>();
             services.AddScoped<ITotpService, TotpServiceImpl>();
+            services.AddScoped<IUserValidationService, UserValidationServiceImpl>();
 
             services.AddSingleton<IDeviceIdentificationGenerator, DeviceIdentificationGeneratorImpl>();
             services.AddSingleton<ICodeGenerator, CodeGeneratorImpl>();
@@ -75,7 +76,7 @@ namespace Identity.Application
         public static IServiceCollection AddConsoleApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserServiceImpl>();
-            services.AddScoped<IUserVerificationService, UserVerificationServiceImpl>();
+            services.AddScoped<IUserValidationService,UserValidationServiceImpl >();
             services.AddSingleton<IPasswordHasher, PasswordHasherImpl>();
             services.AddScoped<IRoleService, RoleServiceImpl>();
 

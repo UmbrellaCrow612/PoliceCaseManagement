@@ -22,9 +22,9 @@ namespace Cases.Application.Implementations
         private readonly EvidenceValidationService _evidenceService = evidenceValidationService;
         private readonly PersonValidationService _personService = personValidationService;
 
-        public async Task<CaseResult> AddEvidenceAsync(Case @case, string evidenceId)
+        public async Task<IResult> AddEvidenceAsync(Case @case, string evidenceId)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var alreadyLinked = await _dbcontext.CaseEvidences.AnyAsync(x => x.CaseId == @case.Id && x.EvidenceId == evidenceId);
             if (alreadyLinked)
@@ -55,9 +55,9 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<CaseResult> AddPerson(Case @case, string personId, CasePersonRole role)
+        public async Task<IResult> AddPerson(Case @case, string personId, CasePersonRole role)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var alreadyLinked = await _dbcontext.CasePeople.Where(x => x.CaseId == @case.Id && x.PersonId == personId).AnyAsync();
             if (alreadyLinked)
@@ -95,7 +95,7 @@ namespace Cases.Application.Implementations
 
         public async Task<IResult> AddUserAsync(Case @case, string userId)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var isUserAlreadyAssignedToCase = await _dbcontext.CaseAccessLists.AnyAsync(x => x.CaseId == @case.Id && x.UserId == userId);
             if (isUserAlreadyAssignedToCase)
@@ -128,9 +128,9 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<CaseResult> CreateAsync(Case caseToCreate)
+        public async Task<IResult> CreateAsync(Case caseToCreate)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var isCaseNumberTaken = await IsCaseNumberTakenAsync(caseToCreate.CaseNumber);
             if (isCaseNumberTaken)
@@ -232,9 +232,9 @@ namespace Cases.Application.Implementations
             return await _dbcontext.CaseAccessLists.AnyAsync(x => x.UserId == userId && x.CaseId == @case.Id);
         }
 
-        public async Task<CaseResult> RemoveEvidenceAsync(Case @case, string evidenceId)
+        public async Task<IResult> RemoveEvidenceAsync(Case @case, string evidenceId)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var link = await _dbcontext.CaseEvidences.Where(x => x.CaseId == @case.Id && x.EvidenceId == evidenceId).FirstOrDefaultAsync();
             if (link is null)
@@ -249,9 +249,9 @@ namespace Cases.Application.Implementations
             return result;
         }
 
-        public async Task<CaseResult> RemoveUserAsync(Case @case, string userId)
+        public async Task<IResult> RemoveUserAsync(Case @case, string userId)
         {
-            var result = new CaseResult();
+            var result = new Result();
 
             var caseAccessList = await _dbcontext.CaseAccessLists.Where(x => x.UserId == userId && x.CaseId == @case.Id).FirstOrDefaultAsync();
             if (caseAccessList is null)

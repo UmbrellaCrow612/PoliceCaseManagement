@@ -14,7 +14,7 @@ namespace Cases.Core.Services
         /// <summary>
         /// Create a case in the system.
         /// </summary>
-        Task<CaseResult> CreateAsync(Case caseToCreate);
+        Task<IResult> CreateAsync(Case caseToCreate);
 
         /// <summary>
         /// Find a case by it's <see cref="Case.Id"/>
@@ -49,7 +49,7 @@ namespace Cases.Core.Services
         /// </summary>
         /// <param name="userId">The ID of he user to remove</param>
         /// <param name="case">The case you want to remove them from</param>
-        Task<CaseResult> RemoveUserAsync(Case @case, string userId);
+        Task<IResult> RemoveUserAsync(Case @case, string userId);
 
         /// <summary>
         /// Get a list of <see cref="CaseAccessList"/> for the specific <see cref="Case"/> - these are all the people linked to them
@@ -69,7 +69,7 @@ namespace Cases.Core.Services
         /// <param name="case">The case to link it to</param>
         /// <param name="evidenceId">The ID of the evidence to link</param>
         /// <returns>Result object</returns>
-        Task<CaseResult> AddEvidenceAsync(Case @case, string evidenceId);
+        Task<IResult> AddEvidenceAsync(Case @case, string evidenceId);
 
         /// <summary>
         /// Remove a piece of linked evidence from a case
@@ -77,7 +77,7 @@ namespace Cases.Core.Services
         /// <param name="case">The case to remove the evidence from</param>
         /// <param name="evidenceId">The ID of the evidence to remove</param>
         /// <returns>Result object</returns>
-        Task<CaseResult> RemoveEvidenceAsync(Case @case, string evidenceId);
+        Task<IResult> RemoveEvidenceAsync(Case @case, string evidenceId);
 
         /// <summary>
         /// Links a person to a case and gives them a role on that case
@@ -86,7 +86,7 @@ namespace Cases.Core.Services
         /// <param name="personId">The ID of the person to link</param>
         /// <param name="role">The role they have on the case</param>
         /// <returns>Result object</returns>
-        Task<CaseResult> AddPerson(Case @case, string personId, CasePersonRole role);
+        Task<IResult> AddPerson(Case @case, string personId, CasePersonRole role);
 
         /// <summary>
         /// Get a list of case people / persons linked to a given case
@@ -94,28 +94,5 @@ namespace Cases.Core.Services
         /// <param name="case">The case to fetch for</param>
         /// <returns>List of case person's / people linked ot the case</returns>
         Task<List<CasePerson>> GetPeopleAsync(Case @case);
-    }
-
-    /// <summary>
-    /// Standard result object used in a case service function
-    /// </summary>
-    public class CaseResult : IResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<IResultError> Errors { get; set; } = [];
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new CaseError { Code = code, Message = message });
-        }
-    }
-
-    /// <summary>
-    /// Standard case service error shape
-    /// </summary>
-    public class CaseError : IResultError
-    {
-        public required string Code { get; set; }
-        public string? Message { get; set; }
     }
 }

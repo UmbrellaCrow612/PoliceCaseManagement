@@ -10,7 +10,7 @@ namespace Identity.API.Grpc
     /// </summary>
     /// <param name="authService"></param>
     [Authorize]
-    public class UserServiceImpl(IUserService userService) : UserService.UserServiceBase
+    public class GRPCUserServiceImpl(IUserService userService) : UserService.UserServiceBase
     {
         private readonly IUserService _userService = userService;
 

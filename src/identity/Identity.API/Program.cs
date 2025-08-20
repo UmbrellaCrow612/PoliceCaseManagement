@@ -48,7 +48,7 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-app.MapGrpcService<UserServiceImpl>();
+app.MapGrpcService<GRPCUserServiceImpl>();
 
 try
 {
