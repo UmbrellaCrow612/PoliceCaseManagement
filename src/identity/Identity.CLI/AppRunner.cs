@@ -7,7 +7,8 @@ namespace Identity.CLI
     /// </summary>
     internal class AppRunner
         (
-            IUserService userService
+            IUserService userService,
+            IUserValidationService userValidationService
         )
     {
         /// <summary>
@@ -17,7 +18,7 @@ namespace Identity.CLI
         public async Task RunAsync() {
             do
             {
-              var mainMenu = new MainMenu(userService);
+              var mainMenu = new MainMenu(userService, userValidationService);
 
               await mainMenu.ShowAsync();
 

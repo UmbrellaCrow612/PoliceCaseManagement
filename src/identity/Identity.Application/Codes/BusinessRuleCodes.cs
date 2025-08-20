@@ -152,5 +152,10 @@
         /// </summary>
 
         public const string RoleNameTaken = "ROLE_NAME_TAKEN";
+
+        /// <summary>
+        /// Used when there is a custom validation error
+        /// </summary>
+        public const string ValidationError = "VALIDATION";
     }
 }

@@ -14,6 +14,15 @@ namespace Results.Abstractions
         {
             Errors.Add(new ResultError { Code = code, Message = message });
         }
+
+        public override string ToString()
+        {
+            if (Errors == null || Errors.Count == 0)
+                return "No errors.";
+
+            return string.Join("; ", Errors.Select(e =>
+                string.IsNullOrEmpty(e.Message) ? e.Code : $"{e.Code}: {e.Message}"));
+        }
     }
 
     /// <inheritdoc />
