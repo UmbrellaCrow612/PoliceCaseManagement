@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OtpNet;
+using Results.Abstractions;
 using System.Security;
 
 namespace Identity.Application.Implementations
@@ -34,9 +35,9 @@ namespace Identity.Application.Implementations
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;
 
-        public async Task<MfaResult> SendMfaSmsAsync(string loginId, DeviceInfo deviceInfo)
+        public async Task<IResult> SendMfaSmsAsync(string loginId, DeviceInfo deviceInfo)
         {
-            var result = new MfaResult();
+            var result = new Result();
 
             var login = await _dbContext.Logins.FindAsync(loginId);
             if (login is null || !login.IsValid())

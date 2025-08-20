@@ -3,6 +3,7 @@ using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Infrastructure.Data;
 using QRCoder;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -63,9 +64,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<TotpServiceResult> ResetTotp(ApplicationUser user)
+        public async Task<IResult> ResetTotp(ApplicationUser user)
         {
-            var result = new TotpResult();
+            var result = new Result();
 
             user.ResetTotp();
 

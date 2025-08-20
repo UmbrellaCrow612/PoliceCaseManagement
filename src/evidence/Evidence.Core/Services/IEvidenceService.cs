@@ -31,14 +31,14 @@ namespace Evidence.Core.Services
         /// Update a <see cref="Models.Evidence"/>
         /// </summary>
         /// <param name="evidence">The evidence to update with updated properties</param>
-        Task<EvidenceServiceResult> UpdateAsync(Models.Evidence evidence);
+        Task<IResult> UpdateAsync(Models.Evidence evidence);
 
         /// <summary>
         /// Delete a specific <see cref="Models.Evidence"/> from the system
         /// </summary>
         /// <param name="evidence">The evidence to delete</param>
         /// <param name="userId">The ID of the user who is performing the action</param>
-        Task<EvidenceServiceResult> DeleteAsync(Models.Evidence evidence, string userId);
+        Task<IResult> DeleteAsync(Models.Evidence evidence, string userId);
 
         /// <summary>
         /// Check if a <see cref="Core.Models.Evidence.ReferenceNumber"/> is taken
@@ -69,35 +69,18 @@ namespace Evidence.Core.Services
         Task<ViewEvidenceResult> ViewAsync(Models.Evidence evidence);
     }
 
-    public class ViewEvidenceResult : EvidenceServiceResult
+    public class ViewEvidenceResult : Result
     {
         public string ViewUrl { get; set; } = "EMPTY";
     }
 
-    public class DownloadEvidenceResult : EvidenceServiceResult
+    public class DownloadEvidenceResult : Result
     {
         public string DownloadUrl { get; set; } = "EMPTY";
     }
 
-    public class CreateEvidenceResult : EvidenceServiceResult
+    public class CreateEvidenceResult : Result
     {
         public string UploadUrl { get; set; } = "";
-    }
-
-    public class EvidenceServiceResult : IResult
-    {
-        public bool Succeeded { get; set; } = false;
-        public ICollection<IResultError> Errors { get; set; } = [];
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new EvidenceServiceError { Code = code, Message = message });
-        }
-    }
-
-    public class EvidenceServiceError : IResultError
-    {
-        public required string Code { get; set; }
-        public required string? Message { get; set; }
     }
 }

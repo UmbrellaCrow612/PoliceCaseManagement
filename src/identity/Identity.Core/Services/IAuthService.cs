@@ -26,7 +26,7 @@ namespace Identity.Core.Services
         /// </summary>
         /// <param name="userId">The user ID to log out.</param>
         /// <returns>A <see cref="IResult"/> object indicating success or failure.</returns>
-        Task<AuthResult> LogoutAsync(string userId);
+        Task<IResult> LogoutAsync(string userId);
 
         /// <summary>
         /// Refreshes JWT tokens to issue a new set.
@@ -37,43 +37,12 @@ namespace Identity.Core.Services
         Task<RefreshResult> RefreshTokensAsync(string refreshToken, DeviceInfo deviceInfo);
     }
 
-    /// <summary>
-    /// Base auth service error
-    /// </summary>
-    public class AuthError : IResultError
-    {
-        public required string Code { get; set; }
-        public string? Message { get; set; } = null;
-    }
-
-    /// <summary>
-    /// Base result object for auth service
-    /// </summary>
-    public class AuthResult : IResult
-    {
-        public bool Succeeded { get; set; } = false;
-
-        public ICollection<IResultError> Errors { get; set; } = [];
-
-        /// <param name="code">Could be a <see cref="Result.Codes"/></param>
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new AuthError { Code = code, Message = message });
-        }
-    }
-
-    /// <summary>
-    /// Has the base <see cref="AuthResult"/> and also a <see cref="LoginId"/> of the <see cref="Models.Login"/>
-    /// </summary>
-    public class LoginResult : AuthResult
+    public class LoginResult : Result
     {
         public string? LoginId { get; set; }
     }
 
-    /// <summary>
-    /// Has the base <see cref="AuthResult"/> and also set of tokens <see cref="ValueObjects.Tokens"/> of new JWT and refresh
-    /// </summary>
-    public class RefreshResult : AuthResult
+    public class RefreshResult : Result
     {
         public Tokens Tokens { get; set; } = new Tokens { JwtBearerToken = "EMPTY", RefreshToken = "EMPTY" };
     }

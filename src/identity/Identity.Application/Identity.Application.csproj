@@ -29,10 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Consumers\" />
-  </ItemGroup>
-
-  <ItemGroup>
 	 <Protobuf Include="..\..\proto\events\user_events.proto" GrpcServices="Client" />
   </ItemGroup>
 

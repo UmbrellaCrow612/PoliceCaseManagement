@@ -6,6 +6,7 @@ using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -25,9 +26,9 @@ namespace Identity.Application.Implementations
         private readonly ICodeGenerator _codeGenerator = codeGenerator;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
 
-        public async Task<DeviceVerificationResult> SendVerification(ApplicationUser user, Device device)
+        public async Task<IResult> SendVerification(ApplicationUser user, Device device)
         {
-            var result = new DeviceVerificationResult();
+            var result = new Result();
 
             if (device.IsTrusted)
             {
@@ -63,9 +64,9 @@ namespace Identity.Application.Implementations
             return result;
         }
 
-        public async Task<DeviceVerificationResult> Verify(Device device, string code)
+        public async Task<IResult> Verify(Device device, string code)
         {
-            var result = new DeviceVerificationResult();
+            var result = new Result();
 
             if (device.IsTrusted)
             {

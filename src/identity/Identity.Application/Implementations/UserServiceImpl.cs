@@ -3,9 +3,9 @@ using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pagination.Abstractions;
+using Results.Abstractions;
 
 namespace Identity.Application.Implementations
 {
@@ -14,12 +14,71 @@ namespace Identity.Application.Implementations
     /// interface not this class
     /// </summary>
     public class UserServiceImpl(
-        IdentityApplicationDbContext dbContext, 
-        UserManager<ApplicationUser> userManager
+        IdentityApplicationDbContext dbContext,
+        IUserValidationService userValidationService,
+        IPasswordHasher passwordHasher
         ) : IUserService
     {
         private readonly IdentityApplicationDbContext _dbcontext = dbContext;
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IUserValidationService _userValidationService = userValidationService;
+        private readonly IPasswordHasher _passwordHasher = passwordHasher;
+
+        public bool CheckPassword(ApplicationUser user, string password)
+        {
+            return _passwordHasher.Verify(user.PasswordHash, password);
+        }
+
+        public async Task<IResult> CreateAsync(ApplicationUser user, string password)
+        {
+            var result = new Result();
+
+            var userValidation = _userValidationService.Validate(user);
+            if (!userValidation.Succeeded)
+            {
+                result.Errors.AddRange(userValidation.Errors);
+                return result;
+            }
+
+            var passwordValidation = _userValidationService.ValidatePassword(password);
+            if (!passwordValidation.Succeeded)
+            {
+                result.Errors.AddRange(passwordValidation.Errors);
+                return result;
+            }
+
+            if (!string.IsNullOrWhiteSpace(user.PasswordHash)) // users should not set this
+            {
+                result.AddError(BusinessRuleCodes.UserCreation);
+                return result;
+            }
+
+            if (await IsUsernameTakenAsync(user.UserName))
+            {
+                result.AddError(BusinessRuleCodes.UserCreation, "Username taken");
+                return result;
+            }
+
+            if (await IsEmailTakenAsync(user.Email))
+            {
+                result.AddError(BusinessRuleCodes.UserEmailTaken, "Email taken");
+                return result;
+            }
+
+            if (await IsPhoneNumberTakenAsync(user.PhoneNumber))
+            {
+                result.AddError(BusinessRuleCodes.UserPhoneNumberTaken, "Phone number taken");
+                return result;
+            }
+
+            var hashedPassword = _passwordHasher.Hash(password);
+            user.PasswordHash = hashedPassword;
+            
+            await _dbcontext.Users.AddAsync(user);
+            await _dbcontext.SaveChangesAsync();
+
+            result.Succeeded = true;
+            return result;
+        }
 
         public async Task<bool> ExistsAsync(string userId)
         {
@@ -28,7 +87,7 @@ namespace Identity.Application.Implementations
 
         public async Task<ApplicationUser?> FindByEmailAsync(string email)
         {
-            return await _userManager.FindByEmailAsync(email);
+            return await _dbcontext.Users.Where(x => x.Email == email).FirstOrDefaultAsync();
         }
 
         public async Task<ApplicationUser?> FindByIdAsync(string userId)
@@ -114,9 +173,9 @@ namespace Identity.Application.Implementations
             };
         }
 
-        public async Task<UserServiceResult> UpdateAsync(ApplicationUser user)
+        public async Task<IResult> UpdateAsync(ApplicationUser user)
         {
-            var result = new UserServiceResult();
+            var result = new Result();
 
             var usernameTaken = await _dbcontext.Users.AnyAsync(x => x.UserName == user.UserName && x.Id != user.Id);
             if (usernameTaken)

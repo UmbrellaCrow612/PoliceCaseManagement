@@ -13,7 +13,7 @@ namespace Identity.Core.Services
         /// </summary>
         /// <param name="loginId">The ID of the login attempt.</param>
         /// <param name="deviceInfo">Information about the device making the request.</param>
-        Task<MfaResult> SendMfaSmsAsync(string loginId, DeviceInfo deviceInfo);
+        Task<IResult> SendMfaSmsAsync(string loginId, DeviceInfo deviceInfo);
 
         /// <summary>
         /// Verifies an SMS-based MFA attempt for a specified <see cref="Models.Login"/> using the code sent and issues tokens upon success.
@@ -33,33 +33,9 @@ namespace Identity.Core.Services
     }
 
     /// <summary>
-    /// Represents a base MFA service error.
-    /// </summary>
-    public class MfaError : IResultError
-    {
-        public required string Code { get; set; }
-        public string? Message { get; set; } = null;
-    }
-
-    /// <summary>
-    /// Represents the result of an MFA service operation.
-    /// </summary>
-    public class MfaResult : IResult
-    {
-        public bool Succeeded { get; set; } = false;
-
-        public ICollection<IResultError> Errors { get; set; } = [];
-
-        public void AddError(string code, string? message = null)
-        {
-            Errors.Add(new MfaError { Code = code, Message = message });
-        }
-    }
-
-    /// <summary>
     /// Used when a operation produces session tokens
     /// </summary>
-    public class VerifiedMfaResult : MfaResult
+    public class VerifiedMfaResult : Result
     {
         public Tokens Tokens { get; set; } = new Tokens();
     }

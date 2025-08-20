@@ -1,12 +1,18 @@
 ﻿using System.Reflection;
 using Identity.Core.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Identity.Core.Models.Joins;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Data
 {
-    public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
+    /// <summary>
+    /// Db context for identity ef core database
+    /// </summary>
+    public class IdentityApplicationDbContext(DbContextOptions<IdentityApplicationDbContext> options) : DbContext(options)
     {
+        public DbSet<ApplicationRole> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<TwoFactorSms> TwoFactorSms { get; set; }
         public DbSet<PhoneVerification> PhoneVerifications { get; set; }
         public DbSet<DeviceVerification> DeviceVerifications { get; set; }

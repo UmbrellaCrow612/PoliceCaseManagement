@@ -13,7 +13,7 @@ namespace Identity.Application
     public static class Extensions
     {
         /// <summary>
-        /// Adds the application service implementations from the service interfaces and other options
+        /// Adds the application service implementations from the service interfaces and other options as well as other stuff - use for API's or other high level stuff
         /// </summary>
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
@@ -36,11 +36,12 @@ namespace Identity.Application
             services.AddScoped<IDeviceVerificationService, DeviceVerificationServiceImpl>();
             services.AddScoped<IUserVerificationService, UserVerificationServiceImpl>();
             services.AddScoped<ITotpService, TotpServiceImpl>();
+            services.AddScoped<IUserValidationService, UserValidationServiceImpl>();
 
             services.AddSingleton<IDeviceIdentificationGenerator, DeviceIdentificationGeneratorImpl>();
             services.AddSingleton<ICodeGenerator, CodeGeneratorImpl>();
             services.AddSingleton<JwtBearerHelper>();
-
+            services.AddSingleton<IPasswordHasher, PasswordHasherImpl>();
 
             services.AddRabbitMqSettings(configuration);
             var rabbitMqSettings = configuration.GetSection("RabbitMqSettings").Get<RabbitMqSettings>()
@@ -64,6 +65,20 @@ namespace Identity.Application
                     cfg.ConfigureEndpoints(context);
                 });
             });
+
+            return services;
+        }
+
+
+        /// <summary>
+        /// Adds all services to the DI required for the console CLI app to work - mainly used to seed users into the DB and roles
+        /// </summary>
+        public static IServiceCollection AddConsoleApplicationServices(this IServiceCollection services)
+        {
+            services.AddScoped<IUserService, UserServiceImpl>();
+            services.AddScoped<IUserValidationService,UserValidationServiceImpl >();
+            services.AddSingleton<IPasswordHasher, PasswordHasherImpl>();
+            services.AddScoped<IRoleService, RoleServiceImpl>();
 
             return services;
         }
