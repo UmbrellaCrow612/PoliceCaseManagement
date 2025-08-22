@@ -6,7 +6,11 @@ namespace Identity.CLI
 {
     public class MainMenu : MenuBase
     {
-        public MainMenu(IUserService userService, IUserValidationService userValidationService) : base("Main Menu", "Welcome to the Identity CLI")
+        public override string Name => "Main Menu";
+
+        public override string Description => "Identity CLI";
+
+        public MainMenu(IUserService userService, IUserValidationService userValidationService)
         {
             AddOption("1", "Find a user by there ID", async () =>
             {
@@ -88,6 +92,34 @@ namespace Identity.CLI
                     Console.WriteLine(user);
                 }
             });
+            
+            AddSubMenu("3", new SettingsMenu());
+            AddExitOption();
+        }
+
+    }
+
+    public class SecurityMenu : MenuBase
+    {
+        public override string Name => "Security";
+        public override string Description => "Manage authentication and access.";
+
+        public SecurityMenu()
+        {
+            AddOption("1", "Change password", () => Console.WriteLine("Password changed!"));
+            AddExitOption();
+        }
+    }
+
+    public class SettingsMenu : MenuBase
+    {
+        public override string Name => "Settings";
+        public override string Description => "Application settings.";
+
+        public SettingsMenu()
+        {
+            AddSubMenu("1", new SecurityMenu());
+            AddExitOption();
         }
     }
 }
