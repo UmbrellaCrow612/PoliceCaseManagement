@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.CLI", "src\identit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLIMenu", "libs\CLIMenu\CLIMenu.csproj", "{04521F20-66E4-4C86-909C-2B592052DC9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Core.Tests", "tests\Identity.Core.Tests\Identity.Core.Tests.csproj", "{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,10 @@ Global
 		{04521F20-66E4-4C86-909C-2B592052DC9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04521F20-66E4-4C86-909C-2B592052DC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04521F20-66E4-4C86-909C-2B592052DC9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -234,6 +240,7 @@ Global
 		{51FAB2E2-9F01-D905-A2E2-70B4EE646D21} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
 		{B77B50E9-B825-49E4-A877-93205058C3B9} = {0BFDE38E-F7BF-434B-8E85-E17FFD526D23}
 		{04521F20-66E4-4C86-909C-2B592052DC9E} = {A95667ED-3B5E-4DF0-98CD-AA37B7BD4A59}
+		{3E6FDECC-6E7E-41FF-8ADB-6E6411C62FC5} = {17B9A340-66A6-4AF6-BE06-DD67CADF7AC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8BFBC47-7122-46A3-84DB-8CF8EE996385}

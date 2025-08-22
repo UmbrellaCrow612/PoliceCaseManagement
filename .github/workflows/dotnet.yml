@@ -24,5 +24,5 @@ jobs:
       run: dotnet restore PoliceCaseManagement.sln
     - name: Build
       run: dotnet build PoliceCaseManagement.sln --no-restore
-    # - name: Test
-    #   run: dotnet test --no-build --verbosity normal
+    - name: Test
+      run: dotnet test PoliceCaseManagement.sln --no-build --verbosity normal

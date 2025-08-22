@@ -35,7 +35,7 @@
 
 
         /// <summary>
-        /// Helper method to makr the device as trusted
+        /// Helper method to mark the device as trusted
         /// </summary>
         public void MarkTrusted()
         {
