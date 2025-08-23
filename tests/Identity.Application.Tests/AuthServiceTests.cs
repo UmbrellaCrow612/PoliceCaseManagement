@@ -294,5 +294,162 @@ namespace Identity.Application.Tests
         }
         #endregion
 
+        #region RefreshTokensAsync Tests 
+        [TestMethod]
+        public async Task RefreshTokensAsync_ShouldIssueValidTokensForValidRefreshAndDevice()
+        {
+            // Arrange
+            // add a valid token to db then refresh it 
+            var device = await _deviceService.GetDeviceAsync(_priv_user.Id, _priv_user_device_info);
+            Assert.IsNotNull(device);
+
+            var token = new Token
+            {
+                DeviceId = device.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(2),
+                Id = Guid.NewGuid().ToString(),
+                UserId = _priv_user.Id
+            };
+
+            await _dbContext.Tokens.AddAsync(token);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
+
+            // Assert
+            Assert.IsTrue(result.Succeeded);
+            Assert.AreNotEqual("EMPTY", result.Tokens.JwtBearerToken);
+            Assert.AreNotEqual("EMPTY", result.Tokens.RefreshToken);
+        }
+
+        [TestMethod]
+        public async Task RefreshTokensAsync_ShouldNotIssueTokensIfDifferentDevice()
+        {
+            // Arrange
+            // add a valid token to db then refresh it 
+           
+            var differentDeviceInfo = new DeviceInfo { DeviceFingerPrint = "nmekonklnfl", IpAddress = "efef", UserAgent="dw" };
+            var createDeviceResult = await _deviceService.CreateAsync(_priv_user, differentDeviceInfo);
+            Assert.IsTrue(createDeviceResult.Succeeded);
+
+            var diffDevice = await _deviceService.GetDeviceAsync(_priv_user.Id, differentDeviceInfo);
+            Assert.IsNotNull(diffDevice);
+
+            var token = new Token
+            {
+                DeviceId = diffDevice.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(2),
+                Id = Guid.NewGuid().ToString(),
+                UserId = _priv_user.Id
+            };
+
+            await _dbContext.Tokens.AddAsync(token);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
+            Assert.IsFalse(result.Succeeded);
+
+            // Assert
+            Assert.IsFalse(result.Succeeded);
+            Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
+        }
+
+        [TestMethod]
+        public async Task RefreshTokensAsync_WithNonExistentToken_ShouldFail()
+        {
+            // Arrange
+            var nonExistentToken = Guid.NewGuid().ToString();
+
+            // Act
+            var result = await _authService.RefreshTokensAsync(nonExistentToken, _priv_user_device_info);
+
+            // Assert
+            Assert.IsFalse(result.Succeeded);
+            Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
+        }
+
+        [TestMethod]
+        public async Task RefreshTokensAsync_WithUsedToken_ShouldFail()
+        {
+            // Arrange
+            var device = await _deviceService.GetDeviceAsync(_priv_user.Id, _priv_user_device_info);
+            Assert.IsNotNull(device);
+
+            var token = new Token
+            {
+                DeviceId = device.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                Id = Guid.NewGuid().ToString(),
+                UserId = _priv_user.Id
+            };
+            token.MarkUsed(); // Mark the token as used before the test
+            await _dbContext.Tokens.AddAsync(token);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
+
+            // Assert
+            Assert.IsFalse(result.Succeeded);
+            Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
+        }
+
+        [TestMethod]
+        public async Task RefreshTokensAsync_WithExpiredToken_ShouldFail()
+        {
+            // Arrange
+            var device = await _deviceService.GetDeviceAsync(_priv_user.Id, _priv_user_device_info);
+            Assert.IsNotNull(device);
+
+            var token = new Token
+            {
+                DeviceId = device.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(-5), // Token has expired
+                Id = Guid.NewGuid().ToString(),
+                UserId = _priv_user.Id
+            };
+            await _dbContext.Tokens.AddAsync(token);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
+
+            // Assert
+            Assert.IsFalse(result.Succeeded);
+            Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
+        }
+
+        [TestMethod]
+        public async Task RefreshTokensAsync_WithUntrustedDevice_ShouldFail()
+        {
+            // Arrange
+            // Create a new device but DO NOT mark it as trusted
+            var untrustedDeviceInfo = new DeviceInfo { DeviceFingerPrint = "untrusted-fingerprint", IpAddress = "127.0.0.1", UserAgent = "untrusted-agent" };
+            var deviceResult = await _deviceService.CreateAsync(_priv_user, untrustedDeviceInfo);
+            Assert.IsTrue(deviceResult.Succeeded);
+            var device = await _deviceService.GetDeviceAsync(_priv_user.Id, untrustedDeviceInfo);
+            Assert.IsNotNull(device);
+            Assert.IsFalse(device.IsTrusted); // Ensure it's not trusted
+
+            var token = new Token
+            {
+                DeviceId = device.Id,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                Id = Guid.NewGuid().ToString(),
+                UserId = _priv_user.Id,
+            };
+            await _dbContext.Tokens.AddAsync(token);
+            await _dbContext.SaveChangesAsync();
+
+            // Act: Attempt to refresh from the untrusted device
+            var result = await _authService.RefreshTokensAsync(token.Id, untrustedDeviceInfo);
+
+            // Assert
+            Assert.IsFalse(result.Succeeded);
+            Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.Device));
+        }
+        #endregion
     }
 }
