@@ -4,6 +4,7 @@ using Identity.Core.Services;
 using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
 using MassTransit.Initializers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Identity.Application.Implementations
@@ -43,9 +44,17 @@ namespace Identity.Application.Implementations
             return new Tokens { JwtBearerToken = jwtBearer, RefreshToken = refresh };
         }
 
-        public Task<int> RevokeTokensAsync(string userId)
+        public async Task<int> RevokeTokensAsync(string userId)
         {
-            throw new NotImplementedException();
+            var c = await _dbContext.Set<Token>()
+                .Where(t => t.UserId == userId &&
+                      t.RevokedAt == null &&
+                      t.UsedAt == null &&
+                      t.ExpiresAt > DateTime.UtcNow)
+                .ExecuteUpdateAsync(setters => setters
+                .SetProperty(t => t.RevokedAt, _ => DateTime.UtcNow));
+
+            return c;
         }
     }
 }
