@@ -10,7 +10,8 @@ namespace Cases.Infrastructure.Data.Configs
         {
             builder.HasIndex(x => x.Id).IsUnique();
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            /// used for <see cref="SoftDelete.Abstractions.ISoftDelete"/> 
+            builder.HasQueryFilter(x => x.DeletedAt == null);
         }
     }
 }

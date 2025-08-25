@@ -14,7 +14,10 @@ namespace Evidence.Infrastructure.Configs
 
             builder.HasIndex(x => x.ReferenceNumber).IsUnique();
 
-            builder.HasQueryFilter(e => !e.IsDeleted);
+            /// <summary>
+            /// Used for <see cref="SoftDelete.Abstractions.ISoftDelete"/>
+            /// </summary>
+            builder.HasQueryFilter(e => e.DeletedAt == null);
         }
     }
 }

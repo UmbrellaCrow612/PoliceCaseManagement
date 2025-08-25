@@ -44,7 +44,7 @@ namespace Cases.Application.Implementations
         {
             var result = new Result();
 
-            if (file.IsDeleted)
+            if (file.IsDeleted())
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "File already deleted");
                 return result;

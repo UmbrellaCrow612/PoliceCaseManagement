@@ -1,4 +1,6 @@
-﻿namespace Cases.Core.Models
+﻿using SoftDelete.Abstractions;
+
+namespace Cases.Core.Models
 {
     /// <summary>
     /// Stores the meta data of a cases file attachment 
@@ -27,18 +29,21 @@
         public Case Case { get; set; } = null!;
 
 
-        public bool IsDeleted { get; set; } = false;
-        public DateTime? DeletedAt { get; set; } = null;
+        public DateTime? DeletedAt { get; set; }
+        public string? DeletedById { get; set; }
 
-
-        /// <summary>
-        /// Marks the model as deleted
-        /// </summary>
-        public void Delete()
+        public void Delete(string? deletedById = null)
         {
-            IsDeleted = true;
             DeletedAt = DateTime.UtcNow;
+            DeletedById = deletedById;
         }
+
+        public bool IsDeleted()
+        {
+            return DeletedAt.HasValue && string.IsNullOrWhiteSpace(DeletedById);
+        }
+
+
 
         public void MarkUploadComplete()
         {
@@ -49,6 +54,8 @@
         {
             return FileUploadStatus == FileUploadStatus.Uploaded;
         }
+
+       
     }
 
     /// <summary>

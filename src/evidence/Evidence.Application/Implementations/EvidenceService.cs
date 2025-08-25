@@ -61,7 +61,7 @@ namespace Evidence.Application.Implementations
         {
             var result = new Result();
 
-            if (evidence.IsDeleted)
+            if (evidence.IsDeleted())
             {
                 result.AddError(BusinessRuleCodes.EVIDENCE_ALREADY_DELETED, "Item already deleted");
                 return result;
@@ -80,7 +80,7 @@ namespace Evidence.Application.Implementations
         {
             var result = new DownloadEvidenceResult();
 
-            if (evidence.IsDeleted)
+            if (evidence.IsDeleted())
             {
                 result.AddError(BusinessRuleCodes.EVIDENCE_DELETED, "Evidence deleted");
                 return result;
@@ -201,7 +201,7 @@ namespace Evidence.Application.Implementations
         {
             var result = new ViewEvidenceResult();
 
-            if (evidence.IsDeleted)
+            if (evidence.IsDeleted())
             {
                 result.AddError(BusinessRuleCodes.EVIDENCE_DELETED, "Evidence deleted");
                 return result;

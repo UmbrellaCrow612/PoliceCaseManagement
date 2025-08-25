@@ -65,7 +65,6 @@ namespace Evidence.Core.Models
 
 
         // delete fields
-        public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; } = null;
         public string? DeletedById { get; set; } = null;
 
@@ -90,11 +89,15 @@ namespace Evidence.Core.Models
 
 
 
-        public void Delete(string deletedById)
+        public void Delete(string? deletedById = null)
         {
-            IsDeleted = true;
             DeletedAt = DateTime.UtcNow;
             DeletedById = deletedById;
+        }
+
+        public bool IsDeleted()
+        {
+            return DeletedAt.HasValue && string.IsNullOrWhiteSpace(DeletedById);
         }
 
 
@@ -106,6 +109,8 @@ namespace Evidence.Core.Models
         {
             return FileUploadStatus == FileUploadStatus.Uploaded;
         }
+
+    
 
         /// <summary>
         /// Helper method to mark this evidence as uploaded
