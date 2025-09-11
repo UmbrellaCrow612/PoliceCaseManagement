@@ -1,4 +1,5 @@
 using Email.Worker;
+using Email.Worker.Consumers;
 using Events.Core;
 using Events.Core.Settings;
 using MassTransit;
@@ -13,6 +14,8 @@ var rabbitMqSettings = config.GetSection("RabbitMqSettings").Get<RabbitMqSetting
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<EmailRequestConsumer>();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(rabbitMqSettings.Host, "/", h =>

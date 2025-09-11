@@ -26,7 +26,6 @@ namespace Evidence.Infrastructure.Migrations
                     UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CollectionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FileUploadStatus = table.Column<int>(type: "integer", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedById = table.Column<string>(type: "text", nullable: true),
                     UploadedById = table.Column<string>(type: "text", nullable: false),

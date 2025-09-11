@@ -1,8 +1,10 @@
-﻿using Identity.Application.Codes;
+﻿using Email.Events.V1;
+using Identity.Application.Codes;
 using Identity.Application.Settings;
 using Identity.Core.Models;
 using Identity.Core.Services;
 using Identity.Infrastructure.Data;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,13 +21,15 @@ namespace Identity.Application.Implementations
         IdentityApplicationDbContext dbContext,
         ILogger<UserVerificationServiceImpl> logger,
         ICodeGenerator codeGenerator,
-        IOptions<TimeWindows> timeWindows
+        IOptions<TimeWindows> timeWindows,
+        IPublishEndpoint publishEndpoint
         ) : IUserVerificationService
     {
         private readonly IdentityApplicationDbContext _dbContext = dbContext;
         private readonly ILogger<UserVerificationServiceImpl> _logger = logger;
         private readonly ICodeGenerator _codeGenerator = codeGenerator;
         private readonly TimeWindows _timeWindows = timeWindows.Value;
+        private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
 
         public async Task<IResult> SendEmailVerification(ApplicationUser user)
         {
@@ -55,6 +59,15 @@ namespace Identity.Application.Implementations
 
             // send via email service a email with link domain/some?code=code so they click link and it extract it 
             // and automatically sends it as it will be a big code ID
+
+            var email = new EmailRequestEvent
+            {
+                To = user.Email!,
+                Subject = "Email ver",
+                Body = $"code: /domain/url/somthing?code={emailVerification.Code}",
+                Format = EmailBodyFormat.Html
+            };
+            await _publishEndpoint.Publish(email);
 
             #if DEBUG
             _logger.LogInformation("Email verification sent for user: {userId} with code: {code}", user.Id, code);

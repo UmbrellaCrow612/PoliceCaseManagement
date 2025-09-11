@@ -186,6 +186,9 @@ namespace Cases.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DeletedById")
+                        .HasColumnType("text");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -195,9 +198,6 @@ namespace Cases.Infrastructure.Migrations
 
                     b.Property<int>("FileUploadStatus")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("S3Key")
                         .IsRequired()

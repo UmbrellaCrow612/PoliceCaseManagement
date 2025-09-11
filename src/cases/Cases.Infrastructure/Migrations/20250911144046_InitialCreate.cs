@@ -109,8 +109,8 @@ namespace Cases.Infrastructure.Migrations
                     UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FileUploadStatus = table.Column<int>(type: "integer", nullable: false),
                     CaseId = table.Column<string>(type: "text", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedById = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

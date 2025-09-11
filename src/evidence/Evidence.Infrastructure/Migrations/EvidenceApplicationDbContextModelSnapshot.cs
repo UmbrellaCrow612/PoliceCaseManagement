@@ -57,9 +57,6 @@ namespace Evidence.Infrastructure.Migrations
                     b.Property<int>("FileUploadStatus")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
                         .HasColumnType("text");

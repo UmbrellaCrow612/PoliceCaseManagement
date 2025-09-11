@@ -138,13 +138,13 @@ services:
       - "8083:7001"
       - "8084:50051"
 
-  email_worker:
-    container_name: email_worker
-    build:
-      context: .src/email/Email.Worker
-      dockerfile: Dockerfile
-    depends_on:
-    - broker
+  # email_worker:
+  #   container_name: email_worker
+  #   build:
+  #     context: ./src/email/Email.Worker
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #   - broker
 
 volumes:
   identity_db_data: {}

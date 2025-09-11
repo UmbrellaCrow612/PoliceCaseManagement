@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Evidence.Infrastructure.Migrations
 {
     [DbContext(typeof(EvidenceApplicationDbContext))]
-    [Migration("20250801145822_InitialCreate")]
+    [Migration("20250911143906_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -59,9 +59,6 @@ namespace Evidence.Infrastructure.Migrations
 
                     b.Property<int>("FileUploadStatus")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
