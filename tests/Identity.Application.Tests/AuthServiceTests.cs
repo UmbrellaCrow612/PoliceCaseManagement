@@ -29,6 +29,12 @@ namespace Identity.Application.Tests
         private JwtBearerHelper _jwtBearerHelper;
         private IOptions<JwtBearerOptions> _jwtBearerOptions;
 
+        private static readonly HashSet<string> ValidBusinessRuleCodes =
+        [.. typeof(BusinessRuleCodes)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Where(f => f.FieldType == typeof(string))
+            .Select(f => (string)f.GetValue(null)!)];
+
         /// <summary>
         /// User has email and phone number confirmed - created at the beginning 
         /// </summary>
@@ -246,6 +252,107 @@ namespace Identity.Application.Tests
             Assert.AreEqual(testUser.Id, loginRecord.UserId);
             Assert.AreEqual(device.Id, loginRecord.DeviceId);
             Assert.AreEqual(LoginStatus.TwoFactorAuthenticationReached, loginRecord.Status);
+        }
+
+        [TestMethod]
+        public async Task LoginAsync_Fuzz_ShouldHandleInvalidInputsGracefully() 
+        {
+            // By using a fixed seed, any failure becomes 100% reproducible.
+            // If a test fails, you can run it again with the same seed to debug.
+            var random = new Random(12345);
+            int iterations = 200;
+
+            for (int i = 0; i < iterations; i++)
+            {
+                // Use a dedicated generator for more targeted "bad" data
+                string email = LoginFuzzDataGenerator.GenerateFuzzedEmail(random);
+                string password = LoginFuzzDataGenerator.GenerateFuzzedString(random);
+                DeviceInfo deviceInfo = LoginFuzzDataGenerator.GenerateFuzzedDeviceInfo(random);
+
+                try
+                {
+                    // The service method now gets nullable types, matching its likely signature
+                    var result = await _authService.LoginAsync(email, password, deviceInfo);
+
+                    // Invariant 1: result should always be non-null
+                    Assert.IsNotNull(result, $"Result was null on iteration {i}");
+
+                    // Invariant 2: if it failed, errors must be from known BusinessRuleCodes
+                    foreach (var error in result.Errors)
+                    {
+                        Assert.IsTrue(ValidBusinessRuleCodes.Contains(error.Code),
+                            $"Unexpected error code '{error.Code}' on iteration {i} with email: '{email}'");
+                    }
+                }
+                catch (ArgumentNullException)
+                {
+                    // This is an acceptable outcome for null inputs if you have guard clauses.
+                }
+                catch (ArgumentException)
+                {
+                    // This is an acceptable outcome for invalid inputs (e.g., empty strings).
+                }
+                catch (Exception ex)
+                {
+                    // Any other exception is a failure of the test.
+                    Assert.Fail($"Unexpected exception {ex.GetType().Name}: {ex.Message} (iteration {i}) with email: '{email}'");
+                }
+            }
+        }
+
+        // Helper class for generating more realistic and targeted "bad" data
+        private static class LoginFuzzDataGenerator
+        {
+            public static string GenerateFuzzedEmail(Random random)
+            {
+                int choice = random.Next(0, 10);
+                return choice switch
+                {
+                    0 => null,                                      // Null
+                    1 => "",                                        // Empty
+                    2 => "   ",                                     // Whitespace
+                    3 => new string('a', 300) + "@test.com",         // Very long
+                    4 => "test@domain",                             // Structurally invalid (no TLD)
+                    5 => "test.domain.com",                         // Structurally invalid (no @)
+                    6 => "test@.com",                               // Structurally invalid (empty domain)
+                    7 => "你好@世界.com",                           // Unicode characters
+                    _ => GenerateRandomString(random, 5, 50)       // Chaotically random
+                };
+            }
+
+            public static string GenerateFuzzedString(Random random)
+            {
+                int choice = random.Next(0, 5);
+                return choice switch
+                {
+                    0 => null,
+                    1 => "",
+                    2 => "   ",
+                    3 => new string('x', 1024), // Very long string
+                    _ => GenerateRandomString(random, 1, 50)
+                };
+            }
+
+            public static DeviceInfo GenerateFuzzedDeviceInfo(Random random)
+            {
+                int choice = random.Next(0, 5);
+                if (choice == 0) return null;
+
+                return new DeviceInfo
+                {
+                    DeviceFingerPrint = GenerateFuzzedString(random),
+                    IpAddress = GenerateFuzzedString(random),
+                    UserAgent = GenerateFuzzedString(random)
+                };
+            }
+
+            private static string GenerateRandomString(Random random, int minLength, int maxLength)
+            {
+                int length = random.Next(minLength, maxLength);
+                const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+ {}|:\"<>?[]\\;',./`~";
+                return new string(Enumerable.Repeat(chars, length)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+            }
         }
 
         #endregion
