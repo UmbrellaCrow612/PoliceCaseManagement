@@ -6,6 +6,7 @@ using Identity.Core.ValueObjects;
 using Identity.Infrastructure.Data;
 using Microsoft.Extensions.Options;
 using Results.Abstractions;
+using A;
 
 namespace Identity.Application.Implementations
 {
@@ -29,6 +30,8 @@ namespace Identity.Application.Implementations
 
         public async Task<LoginResult> LoginAsync(string email, string password, DeviceInfo deviceInfo)
         {
+            AS.AssertNotNull((email, nameof(email)), (password, nameof(password)), (deviceInfo, nameof(deviceInfo)));
+
             var result = new LoginResult();
 
             var user = await _userService.FindByEmailAsync(email);

@@ -126,7 +126,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync("nonexistent@user.com", "Password@123", new DeviceInfo { DeviceFingerPrint = "123", IpAddress = "123", UserAgent = "123"});
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.IncorrectCredentials));
         }
@@ -137,7 +137,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync(_priv_user.Email, "WrongPassword!", _priv_user_device_info);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.IncorrectCredentials));
         }
@@ -158,7 +158,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync(testUser.Email, "Password@123", new DeviceInfo { DeviceFingerPrint = "123", IpAddress="efef", UserAgent = "efef"});
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.EmailNotConfirmed));
         }
@@ -180,7 +180,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync(testUser.Email, "Password@123", new DeviceInfo { DeviceFingerPrint = "123", IpAddress = "efef", UserAgent = "efef" });
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.PhoneNotConfirmed));
         }
@@ -203,7 +203,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync(testUser.Email, "Password@123", new DeviceInfo { DeviceFingerPrint=Guid.NewGuid().ToString(), IpAddress = "123", UserAgent = "123"});
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.Device));
         }
@@ -236,7 +236,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LoginAsync(testUser.Email, "Password@123", testUserDeviceInfo);
 
-            // Assert
+            // AssertNotNull
             Assert.IsTrue(result.Succeeded);
             Assert.AreEqual(0, result.Errors.Count);
 
@@ -283,7 +283,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.LogoutAsync(_priv_user.Id);
 
-            // Assert
+            // AssertNotNull
             Assert.IsTrue(result.Succeeded);
 
             // check there is not any valid tokens still in db for user
@@ -317,7 +317,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
 
-            // Assert
+            // AssertNotNull
             Assert.IsTrue(result.Succeeded);
             Assert.AreNotEqual("EMPTY", result.Tokens.JwtBearerToken);
             Assert.AreNotEqual("EMPTY", result.Tokens.RefreshToken);
@@ -351,7 +351,7 @@ namespace Identity.Application.Tests
             var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
             Assert.IsFalse(result.Succeeded);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
         }
@@ -365,7 +365,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.RefreshTokensAsync(nonExistentToken, _priv_user_device_info);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
         }
@@ -391,7 +391,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
         }
@@ -416,7 +416,7 @@ namespace Identity.Application.Tests
             // Act
             var result = await _authService.RefreshTokensAsync(token.Id, _priv_user_device_info);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.RefreshToken));
         }
@@ -446,7 +446,7 @@ namespace Identity.Application.Tests
             // Act: Attempt to refresh from the untrusted device
             var result = await _authService.RefreshTokensAsync(token.Id, untrustedDeviceInfo);
 
-            // Assert
+            // AssertNotNull
             Assert.IsFalse(result.Succeeded);
             Assert.IsTrue(result.Errors.Any(e => e.Code == BusinessRuleCodes.Device));
         }

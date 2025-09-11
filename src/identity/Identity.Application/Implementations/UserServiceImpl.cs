@@ -6,6 +6,7 @@ using Identity.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Pagination.Abstractions;
 using Results.Abstractions;
+using A;
 
 namespace Identity.Application.Implementations
 {
@@ -30,6 +31,8 @@ namespace Identity.Application.Implementations
 
         public async Task<IResult> CreateAsync(ApplicationUser user, string password)
         {
+            AS.AssertNotNull((user, nameof(user)), (password, nameof(password)));
+
             var result = new Result();
 
             var userValidation = _userValidationService.Validate(user);

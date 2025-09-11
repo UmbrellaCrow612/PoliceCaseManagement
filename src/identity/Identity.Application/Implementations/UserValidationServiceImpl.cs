@@ -1,8 +1,8 @@
 ﻿using Identity.Application.Codes;
 using Identity.Core.Models;
+using Identity.Core.RegexHelpers;
 using Identity.Core.Services;
 using Results.Abstractions;
-using System.Text.RegularExpressions;
 
 namespace Identity.Application.Implementations
 {
@@ -52,8 +52,7 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            if (!Regex.IsMatch(email, emailRegex))
+            if (!UserRegex.EmailRegex().IsMatch(email))
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Email format is invalid.");
                 return result;
@@ -73,10 +72,7 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            // Simple regex: at least 8 chars, at least one letter and one number
-            var passwordRegex = @"^(?=.*[A-Za-z])(?=.*\d).{8,}$";
-
-            if (!Regex.IsMatch(password, passwordRegex))
+            if (!UserRegex.PasswordRegex().IsMatch(password))
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Password must be at least 8 characters long and include at least one letter and one number.");
                 return result;
@@ -96,10 +92,7 @@ namespace Identity.Application.Implementations
                 return result;
             }
 
-            // Regex: must start with +, followed by 1-3 digit country code, then 4-14 digits
-            var phoneRegex = @"^\+\d{1,3}\d{4,14}$";
-
-            if (!Regex.IsMatch(phoneNumber, phoneRegex))
+            if (!UserRegex.PhoneNumberRegex().IsMatch(phoneNumber))
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Phone number must start with '+' followed by country code and number.");
                 return result;
@@ -124,8 +117,7 @@ namespace Identity.Application.Implementations
                 result.AddError(BusinessRuleCodes.ValidationError, "Username must be between 3 and 20 characters long.");
             }
 
-            // Only letters, numbers, and special characters (_-@! etc.), no dots
-            if (!Regex.IsMatch(username, @"^[a-zA-Z0-9_\-@!]+$"))
+            if (!UserRegex.UsernameRegex().IsMatch(username))
             {
                 result.AddError(BusinessRuleCodes.ValidationError, "Username can only contain letters, numbers, and allowed special characters (_-@!).");
             }

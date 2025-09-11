@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package email.events.V1;
+
+// Enum to specify the format of the email body.
+enum EmailBodyFormat {
+    // Plain text content
+    PLAIN_TEXT = 0;
+    // HTML content 
+    HTML = 1;       
+}
+
+// Represents the data required to send an email via an event.
+message EmailRequestEvent {
+    // The primary recipient's email address.
+    string to = 1;
+
+    // The subject of the email.
+    string subject = 2;
+
+    // The body of the email.
+    string body = 3;
+
+    // Optional list of CC (carbon copy) recipients.
+    repeated string cc = 4;
+
+    // Optional list of BCC (blind carbon copy) recipients.
+    repeated string bcc = 5;
+
+    // Format of the body
+    EmailBodyFormat format = 6; 
+}
