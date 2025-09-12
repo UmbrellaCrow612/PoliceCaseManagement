@@ -1,11 +1,9 @@
-using Email.Worker;
-using Email.Worker.Consumers;
 using Events.Core;
 using Events.Core.Settings;
 using MassTransit;
+using SMS.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-
 var config = builder.Configuration;
 
 builder.Services.AddRabbitMqSettings(config);
@@ -14,7 +12,7 @@ var rabbitMqSettings = config.GetSection("RabbitMqSettings").Get<RabbitMqSetting
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<EmailRequestConsumer>();
+    x.AddConsumer<SmsRequestEventConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {

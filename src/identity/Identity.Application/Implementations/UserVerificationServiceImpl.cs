@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OtpNet;
 using Results.Abstractions;
+using Sms.Events.V1;
 
 namespace Identity.Application.Implementations
 {
@@ -57,9 +58,6 @@ namespace Identity.Application.Implementations
                 UserId = user.Id,
             };
 
-            // send via email service a email with link domain/some?code=code so they click link and it extract it 
-            // and automatically sends it as it will be a big code ID
-
             var email = new EmailRequestEvent
             {
                 To = user.Email!,
@@ -68,10 +66,6 @@ namespace Identity.Application.Implementations
                 Format = EmailBodyFormat.Html
             };
             await _publishEndpoint.Publish(email);
-
-            #if DEBUG
-            _logger.LogInformation("Email verification sent for user: {userId} with code: {code}", user.Id, code);
-            #endif
 
             await _dbContext.EmailVerifications.AddAsync(emailVerification);
             await _dbContext.SaveChangesAsync();
@@ -106,10 +100,14 @@ namespace Identity.Application.Implementations
                 UserId = user.Id,
             };
 
-            // send via sms code 
-            #if DEBUG
-            _logger.LogInformation("Phone verification sent for user: {userId} with code: {code}", user.Id, code);
-            #endif
+            var smsMessage = new SmsRequestEvent
+            {
+                FromNumber = "+848484842284", // company number
+                Message = $"Phone con code {code}",
+                RequestId = Guid.NewGuid().ToString(),
+                ToNumber = user.PhoneNumber
+            };
+            await _publishEndpoint.Publish(smsMessage);
 
             await _dbContext.PhoneVerifications.AddAsync(phoneVerification);
             await _dbContext.SaveChangesAsync();

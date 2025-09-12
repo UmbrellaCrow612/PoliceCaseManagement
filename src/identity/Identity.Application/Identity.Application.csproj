@@ -32,5 +32,6 @@
   <ItemGroup>
 	 <Protobuf Include="..\..\proto\events\user_events.proto" GrpcServices="Client" />
 	 <Protobuf Include="..\..\proto\events\email_events.proto" GrpcServices="Client" />
+	 <Protobuf Include="..\..\proto\events\sms_events.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

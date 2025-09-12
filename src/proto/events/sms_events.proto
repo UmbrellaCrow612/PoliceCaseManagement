@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sms.events.v1;
+
+// Represents the data required to send an SMS via an event.
+message SmsRequestEvent {
+  // The unique identifier for the SMS request (e.g., UUID).
+  string request_id = 1;
+
+  // The phone number to send the SMS to (E.164 format, e.g., +15551234567).
+  string to_number = 2;
+
+  // The phone number or sender ID of the sender (may be short code or alphanumeric).
+  string from_number = 3;
+
+  // The message content to send.
+  string message = 4;
+}
