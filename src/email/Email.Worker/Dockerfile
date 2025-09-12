@@ -11,6 +11,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/email/Email.Worker/Email.Worker.csproj", "src/email/Email.Worker/"]
+COPY ["libs/Events.Core/Events.Core.csproj", "libs/Events.Core/"]
 RUN dotnet restore "./src/email/Email.Worker/Email.Worker.csproj"
 COPY . .
 WORKDIR "/src/src/email/Email.Worker"

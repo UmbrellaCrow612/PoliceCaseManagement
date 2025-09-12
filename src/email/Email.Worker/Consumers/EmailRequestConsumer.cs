@@ -7,9 +7,8 @@ namespace Email.Worker.Consumers
     {
         public async Task Consume(ConsumeContext<EmailRequestEvent> context)
         {
-            #if DEBUG
-                logger.LogInformation("Email sent to {to} body: {body}", context.Message.To, context.Message.Body);
-            #endif
+            // this would not be here in prod but using email service 
+              logger.LogInformation("Email sent to {to} body: {body}", context.Message.To, context.Message.Body);
         }
     }
 }
