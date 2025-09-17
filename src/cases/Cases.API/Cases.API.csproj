@@ -19,6 +19,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.7" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.31" />
   </ItemGroup>
 
@@ -28,8 +30,8 @@
     <ProjectReference Include="..\..\..\libs\Grpc.JwtInterceptor\Grpc.JwtInterceptor.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
-    <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
-    <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
+    <ProjectReference Include="..\..\auth\Auth.csproj" />
+    <ProjectReference Include="..\..\sharedLogging\SharedLogging.csproj" />
     <ProjectReference Include="..\Cases.Application\Cases.Application.csproj" />
     <ProjectReference Include="..\Cases.Core\Cases.Core.csproj" />
     <ProjectReference Include="..\Cases.Infrastructure\Cases.Infrastructure.csproj" />

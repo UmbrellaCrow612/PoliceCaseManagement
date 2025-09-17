@@ -3,17 +3,16 @@ using Identity.API.Extensions;
 using Identity.API.Grpc;
 using Identity.Application;
 using Identity.Infrastructure;
-using Logging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using SharedLogging;
 using Serilog;
 
-SerilogExtensions.ConfigureSerilog();
-
 var builder = WebApplication.CreateBuilder(args);
-var config = builder.Configuration;
 
-builder.Host.UseSerilog();
+LoggingConfigurator.ConfigureLogging(builder);
+
+var config = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.AddGrpc();
@@ -36,13 +35,10 @@ if (app.Environment.IsDevelopment())
     db.Database.Migrate();
 }
 
-app.UseSerilogRequestLogging(options =>
-{
-    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-});
-
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
@@ -50,17 +46,6 @@ app.MapControllers();
 
 app.MapGrpcService<GRPCUserServiceImpl>();
 
-try
-{
-    Log.Information("Starting web application");
+app.Run();
 
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+

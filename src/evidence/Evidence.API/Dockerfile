@@ -12,35 +12,34 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/cases/Cases.API/Cases.API.csproj", "src/cases/Cases.API/"]
+COPY ["src/evidence/Evidence.API/Evidence.API.csproj", "src/evidence/Evidence.API/"]
 COPY ["libs/Cache.Abstractions/Cache.Abstractions.csproj", "libs/Cache.Abstractions/"]
 COPY ["libs/Cache.Redis/Cache.Redis.csproj", "libs/Cache.Redis/"]
 COPY ["libs/Grpc.JwtInterceptor/Grpc.JwtInterceptor.csproj", "libs/Grpc.JwtInterceptor/"]
 COPY ["libs/Mapper/Mapper.csproj", "libs/Mapper/"]
 COPY ["libs/Validator/Validator.csproj", "libs/Validator/"]
-COPY ["src/auth/Auth.csproj", "src/auth/"]
 COPY ["src/sharedLogging/SharedLogging.csproj", "src/sharedLogging/"]
-COPY ["src/cases/Cases.Application/Cases.Application.csproj", "src/cases/Cases.Application/"]
+COPY ["src/evidence/Evidence.Application/Evidence.Application.csproj", "src/evidence/Evidence.Application/"]
 COPY ["libs/Events.Core/Events.Core.csproj", "libs/Events.Core/"]
 COPY ["libs/StorageProvider.Abstractions/StorageProvider.Abstractions.csproj", "libs/StorageProvider.Abstractions/"]
 COPY ["libs/StorageProvider.AWS/StorageProvider.AWS.csproj", "libs/StorageProvider.AWS/"]
-COPY ["src/cases/Cases.Core/Cases.Core.csproj", "src/cases/Cases.Core/"]
+COPY ["src/evidence/Evidence.Core/Evidence.Core.csproj", "src/evidence/Evidence.Core/"]
 COPY ["libs/Pagination.Abstractions/Pagination.Abstractions.csproj", "libs/Pagination.Abstractions/"]
 COPY ["libs/Results.Abstractions/Results.Abstractions.csproj", "libs/Results.Abstractions/"]
 COPY ["libs/SoftDelete.Abstractions/SoftDelete.Abstractions.csproj", "libs/SoftDelete.Abstractions/"]
-COPY ["src/cases/Cases.Infrastructure/Cases.Infrastructure.csproj", "src/cases/Cases.Infrastructure/"]
-RUN dotnet restore "./src/cases/Cases.API/Cases.API.csproj"
+COPY ["src/evidence/Evidence.Infrastructure/Evidence.Infrastructure.csproj", "src/evidence/Evidence.Infrastructure/"]
+RUN dotnet restore "./src/evidence/Evidence.API/Evidence.API.csproj"
 COPY . .
-WORKDIR "/src/src/cases/Cases.API"
-RUN dotnet build "./Cases.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/evidence/Evidence.API"
+RUN dotnet build "./Evidence.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Cases.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Evidence.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Cases.API.dll"]
+ENTRYPOINT ["dotnet", "Evidence.API.dll"]

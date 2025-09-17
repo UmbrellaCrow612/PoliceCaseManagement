@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Authorization;
 using Cache.Abstractions;
 using Identity.API.DTOs;
 using Identity.API.Mappings;
@@ -8,6 +7,7 @@ using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.Abstractions;
+using Auth;
 
 namespace Identity.API.Controllers
 {

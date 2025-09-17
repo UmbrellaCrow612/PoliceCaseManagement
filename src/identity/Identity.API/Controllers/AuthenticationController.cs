@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Authorization;
+using Auth;
 using Identity.API.Annotations;
 using Identity.API.DTOs;
 using Identity.API.Extensions;

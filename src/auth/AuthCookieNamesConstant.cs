@@ -1,4 +1,4 @@
-﻿namespace Authorization
+﻿namespace Auth
 {
     public static class AuthCookieNamesConstant
     {

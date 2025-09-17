@@ -4,6 +4,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>86dfcad6-d8bb-4d78-b447-0ed0ac3dd8a1</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +18,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.5.3" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +29,7 @@
     <ProjectReference Include="..\..\..\libs\Grpc.JwtInterceptor\Grpc.JwtInterceptor.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
     <ProjectReference Include="..\..\..\libs\Validator\Validator.csproj" />
-    <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
+    <ProjectReference Include="..\..\sharedLogging\SharedLogging.csproj" />
     <ProjectReference Include="..\Evidence.Application\Evidence.Application.csproj" />
     <ProjectReference Include="..\Evidence.Infrastructure\Evidence.Infrastructure.csproj" />
   </ItemGroup>

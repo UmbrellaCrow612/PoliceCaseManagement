@@ -1,11 +1,11 @@
-﻿using Authorization;
-using Cases.API.DTOs;
+﻿using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.Core.Services;
 using Cases.Core.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.Abstractions;
+using Auth;
 
 namespace Cases.API.Controllers
 {

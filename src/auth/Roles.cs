@@ -1,4 +1,4 @@
-﻿namespace Authorization
+﻿namespace Auth
 {
     /// <summary>
     /// Authorization roles used throughout the system 

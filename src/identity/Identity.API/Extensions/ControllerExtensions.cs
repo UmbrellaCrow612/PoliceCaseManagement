@@ -1,9 +1,8 @@
-﻿using Authorization;
-using Identity.Application.Constants;
+﻿using Identity.Application.Constants;
 using Identity.Application.Helpers;
 using Identity.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
-
+using Auth;
 
 namespace Identity.API.Extensions
 {

@@ -1,11 +1,9 @@
-using Email.Worker;
 using Email.Worker.Consumers;
 using Events.Core;
 using Events.Core.Settings;
 using MassTransit;
 
 var builder = Host.CreateApplicationBuilder(args);
-
 var config = builder.Configuration;
 
 builder.Services.AddRabbitMqSettings(config);

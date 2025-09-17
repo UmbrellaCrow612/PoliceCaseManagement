@@ -28,13 +28,14 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\Cache.Abstractions\Cache.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\libs\Cache.Redis\Cache.Redis.csproj" />
     <ProjectReference Include="..\..\..\libs\Mapper\Mapper.csproj" />
-    <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
-    <ProjectReference Include="..\..\shared\Logging\Logging.csproj" />
+    <ProjectReference Include="..\..\auth\Auth.csproj" />
+    <ProjectReference Include="..\..\sharedLogging\SharedLogging.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />

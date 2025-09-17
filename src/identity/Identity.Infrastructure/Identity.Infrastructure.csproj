@@ -12,7 +12,6 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\shared\Authorization\Authorization.csproj" />
     <ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
   </ItemGroup>
 </Project>

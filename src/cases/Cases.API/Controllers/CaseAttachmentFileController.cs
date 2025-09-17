@@ -1,4 +1,4 @@
-﻿using Authorization;
+﻿using Auth;
 using Cases.API.DTOs;
 using Cases.API.Mappings;
 using Cases.Core.Services;
