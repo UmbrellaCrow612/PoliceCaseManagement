@@ -10,7 +10,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LoggingConfigurator.ConfigureLogging(builder);
+LoggingConfigurator.ConfigureLogging(builder, "identityapi");
 
 var config = builder.Configuration;
 

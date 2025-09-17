@@ -15,7 +15,7 @@ using SharedLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LoggingConfigurator.ConfigureLogging(builder);
+LoggingConfigurator.ConfigureLogging(builder, "casesapi");
 
 var config = builder.Configuration;
 

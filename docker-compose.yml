@@ -124,19 +124,6 @@ services:
       networks:
         - elk
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.11.1
-    container_name: logstash
-    volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
-    ports:
-      - "5044:5044"   # Beats input
-      - "5000:5000"   # TCP input (optional)
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.1
     container_name: kibana

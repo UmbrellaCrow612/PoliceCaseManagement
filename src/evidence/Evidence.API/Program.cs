@@ -14,7 +14,7 @@ using SharedLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LoggingConfigurator.ConfigureLogging(builder);
+LoggingConfigurator.ConfigureLogging(builder, "evidenceapi");
 
 var config = builder.Configuration;
 
