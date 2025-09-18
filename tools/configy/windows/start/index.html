@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+
+    <script type="module" src="./render.mjs"></script>
+    <title>Configy</title>
+  </head>
+  <body>
+    <h1>
+      Welcome to configy - pick solution to find and modify .NET configs in a
+      central and easy place
+    </h1>
+
+    <button id="load_solution_folder_btn">Load solution folder</button>
+
+    <div id="continue_and_cancel_container">
+      <button>Continue</button>
+
+      <button>Cancel</button>
+    </div>
+  </body>
+</html>

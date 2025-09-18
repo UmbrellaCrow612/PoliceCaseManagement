@@ -1,0 +1,13 @@
+const STORE = {
+  dotnetProjects: {
+    projectOne: {
+      launchSettingsFilePath: "",
+      launchSettings: "string json of the file",
+      appSettingsFilePath: "",
+      appSettings: "string json of the file",
+      appSettingsDevelopmentFilePath: "",
+      appSettingsDevelopment: "string json of the file",
+      csprojFilePath: "",
+    },
+  },
+};
