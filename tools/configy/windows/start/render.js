@@ -9,6 +9,11 @@ if (!_window.electronAPI.works()) {
   throw new Error("electronAPI dosent work from preload");
 }
 
+/**
+ * @type {string | null}
+ */
+var folderPathSelected = null;
+
 const selectedFolderContainer = document.getElementById("selected_folder_path");
 if (!selectedFolderContainer)
   throw new Error("Could not find selected_folder_path");
@@ -50,6 +55,7 @@ loadBtn.addEventListener("click", async () => {
   }
 
   const folderPath = resValue.filePaths[0];
+  folderPathSelected = folderPath;
   console.log(folderPath);
 
   // Render selected folder path
@@ -64,8 +70,19 @@ loadBtn.addEventListener("click", async () => {
 });
 
 // Add listeners for Continue and Cancel
-continueButton?.addEventListener("click", () => {
+continueButton?.addEventListener("click", async () => {
   console.log("Continue clicked! Folder is selected.");
+  if (!folderPathSelected) {
+    throw new Error("folderPathSelected is null ");
+  }
+
+  /**
+   * @type {Array<{filePath: string; fileName: string; fileContent: string;}>}
+   */
+  var files = await _window.electronAPI.ReadAllJsonFilesFromDir(
+    folderPathSelected
+  );
+  console.log(files);
 });
 
 cancelButton?.addEventListener("click", () => {
