@@ -2,10 +2,9 @@
   "name": "configy",
   "version": "1.0.0",
   "description": "Config tool",
-  "main": "main.mjs",
-  "type": "module",
+  "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --trace-warnings",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "yousaf wazir",

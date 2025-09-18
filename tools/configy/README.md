@@ -20,6 +20,4 @@ Example features
 Fort now just support dotnet and .env files
 
 
-read docs https://www.electronjs.org/docs/latest/api/ipc-main
-use `mjs` files
-use JS doc and js complier checks
+use `js` files use strict and js doc and async style
