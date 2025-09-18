@@ -23,6 +23,15 @@ const continueCancelParent = document.getElementById(
   "continue_and_cancel_container"
 );
 
+/** @type {HTMLButtonElement | null} */
+const continueButton = /** @type {HTMLButtonElement | null} */ (
+  document.getElementById("continue_button")
+);
+/** @type {HTMLButtonElement | null} */
+const cancelButton = /** @type {HTMLButtonElement | null} */ (
+  document.getElementById("cancel_button")
+);
+
 removeContinueCancelContainer();
 removeSelectedFolderPathContainer();
 
@@ -52,6 +61,16 @@ loadBtn.addEventListener("click", async () => {
   // Reset button text
   loadBtn.disabled = false;
   loadBtn.textContent = loadBtnOrgContent;
+});
+
+// Add listeners for Continue and Cancel
+continueButton?.addEventListener("click", () => {
+  console.log("Continue clicked! Folder is selected.");
+});
+
+cancelButton?.addEventListener("click", () => {
+  removeSelectedFolderPathContainer();
+  removeContinueCancelContainer();
 });
 
 function renderContinueCancelContainer() {
