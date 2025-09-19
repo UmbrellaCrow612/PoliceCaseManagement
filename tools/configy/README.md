@@ -19,5 +19,4 @@ Example features
 
 Fort now just support dotnet and .env files
 
-
-use `js` files use strict and js doc and async style
+Front end renders dist fold or local dev server of a angular app on frontend 

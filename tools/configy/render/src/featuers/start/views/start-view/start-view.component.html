@@ -1,0 +1,30 @@
+<div class="configy-container">
+  <h1>Welcome to configy</h1>
+  <button
+    class="primary-btn"
+    (click)="loadSolutionFolder()"
+    [disabled]="loading"
+  >
+    @if (loading) {
+    <span>Loading</span>
+    } @else { Load solution folder }
+  </button>
+
+  @if (solutionFolder) {
+  <div>Solution folder picked {{ solutionFolder }}</div>
+  }
+
+  <!---->
+  @if (error && !loading) {
+  <span>
+    {{ error }}
+  </span>
+  }
+  <!---->
+  @if (solutionFolder) {
+  <div class="actions">
+    <button class="primary-btn">Continue</button>
+    <button class="secondary-btn" (click)="cancel()">Cancel</button>
+  </div>
+  }
+</div>
