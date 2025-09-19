@@ -27,3 +27,33 @@ export interface EWindow extends Window {
    */
   electronAPI: ElectronAPI;
 }
+
+/**
+ * The structure of the URL data when extraction is successful.
+ */
+export interface ExtractedUrls {
+  http: string | null;
+  https: string | null;
+}
+
+/**
+ * Represents a successful extraction result.
+ */
+type SuccessResult = {
+  success: true;
+  data: ExtractedUrls;
+};
+
+/**
+ * Represents a failed extraction result, with a reason for the failure.
+ */
+type FailureResult = {
+  success: false;
+  reason: string;
+};
+
+/**
+ * The combined result type, which can be either a success or a failure.
+ * This forces you to check the `success` property before accessing `data`.
+ */
+export type ExtractionResult = SuccessResult | FailureResult;

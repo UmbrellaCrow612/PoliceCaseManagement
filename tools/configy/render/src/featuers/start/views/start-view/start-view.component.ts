@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
-import { EWindow } from '../../../../types';
+import { Component, ElementRef, viewChild } from '@angular/core';
+import { DotNetFile, EWindow, ExtractedUrls } from '../../../../types';
+import { extractLaunchUrls, validUrl } from '../../../../util';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-start-view',
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './start-view.component.html',
   styleUrl: './start-view.component.css',
 })
@@ -24,12 +26,40 @@ export class StartViewComponent {
   error: string | null = null;
 
   /**
+   * List of files read from solution folder
+   */
+  files: DotNetFile[] = [];
+
+  /**
+   * Current item to show in the dialog
+   */
+  dialogItem: DotNetFile | null = null;
+
+  /**
+   * Current dialog items launch urls extracted
+   */
+  dialogExctractedUrl: ExtractedUrls | null = null;
+
+  /**
+   * Ref to dialog html child
+   */
+  dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');
+
+  httpControl = new FormControl('', {
+    validators: [Validators.required, validUrl],
+  });
+  httpsControl = new FormControl('', {
+    validators: [Validators.required, validUrl],
+  });
+
+  /**
    * Handles loading and opening desktop solution folder and files
    */
   async loadSolutionFolder() {
     this.loading = true;
     this.error = null;
     this.solutionFolder = null;
+    this.files = [];
 
     /**
      * Regular window obj but we will acess electron api
@@ -58,6 +88,7 @@ export class StartViewComponent {
   cancel() {
     this.error = null;
     this.solutionFolder = null;
+    this.files = [];
   }
 
   /**
@@ -66,6 +97,7 @@ export class StartViewComponent {
   async readFiles() {
     this.loading = true;
     this.error = null;
+    this.files = [];
 
     /**
      * Regular window obj but we will acess electron api
@@ -73,14 +105,37 @@ export class StartViewComponent {
     let _window = window as unknown as EWindow;
 
     if (_window.electronAPI.works() && this.solutionFolder) {
-      var dotnetFiles = await _window.electronAPI.readDotNetFiles(
+      this.files = await _window.electronAPI.readDotNetFiles(
         this.solutionFolder
       );
-
       this.loading = false;
-      console.log(dotnetFiles);
     } else {
       this.error = 'Desktop API not working or solution folder is empty';
     }
+  }
+
+  /**
+   * Handles closing dialog
+   */
+  CloseDialog() {
+    this.dialog()?.nativeElement.close();
+    this.dialogItem = null;
+  }
+
+  /**
+   * Shows a file in dialog
+   * @param item The file to show in the dialog
+   */
+  showItem(item: DotNetFile) {
+    this.dialogItem = item;
+    var res = extractLaunchUrls(item.fileContent);
+    if (res.success) {
+      this.dialogExctractedUrl = res.data;
+      this.httpControl.setValue(res.data.http);
+      this.httpsControl.setValue(res.data.https);
+    } else {
+      this.dialogExctractedUrl = null;
+    }
+    this.dialog()?.nativeElement.showModal();
   }
 }

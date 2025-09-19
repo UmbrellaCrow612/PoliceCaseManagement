@@ -28,3 +28,46 @@
   </div>
   }
 </div>
+
+<!---->
+
+@if (files.length > 0) {
+
+<!---->
+<h1>Files found</h1>
+
+<div class="file_container">
+  @for (item of files; track $index) {
+  <button (click)="showItem(item)">
+    {{ item.filePath }}
+  </button>
+  }
+</div>
+
+<!---->
+}
+
+<dialog #dialog>
+  <div class="dialog_content">
+    <h1>Selected item</h1>
+
+    <span>{{ dialogItem?.fileName }}</span>
+    <span>
+      {{ dialogItem?.filePath }}
+    </span>
+
+    <p>
+      Change the launch settings http values and anythign that referes to it
+      will change as well
+    </p>
+
+    @if (dialogExctractedUrl) {
+    <input type="text" [formControl]="httpControl" />
+    <input type="text" [formControl]="httpsControl" />
+    } @else {
+    <h2>File is not launch settings file</h2>
+    }
+
+    <button (click)="CloseDialog()">Close</button>
+  </div>
+</dialog>
