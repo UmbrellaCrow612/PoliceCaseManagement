@@ -21,9 +21,9 @@
   </span>
   }
   <!---->
-  @if (solutionFolder) {
+  @if (solutionFolder && !loading) {
   <div class="actions">
-    <button class="primary-btn">Continue</button>
+    <button class="primary-btn" (click)="readFiles()">Continue</button>
     <button class="secondary-btn" (click)="cancel()">Cancel</button>
   </div>
   }

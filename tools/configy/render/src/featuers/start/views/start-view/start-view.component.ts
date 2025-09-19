@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { OpenDialogReturnValue } from 'electron';
 import { EWindow } from '../../../../types';
 
 @Component({
@@ -56,8 +55,32 @@ export class StartViewComponent {
   /**
    * Cancel a selected solution folder and resets sate
    */
-  cancel(){
+  cancel() {
     this.error = null;
     this.solutionFolder = null;
+  }
+
+  /**
+   * Handles reading all files for configy and processing them
+   */
+  async readFiles() {
+    this.loading = true;
+    this.error = null;
+
+    /**
+     * Regular window obj but we will acess electron api
+     */
+    let _window = window as unknown as EWindow;
+
+    if (_window.electronAPI.works() && this.solutionFolder) {
+      var dotnetFiles = await _window.electronAPI.readDotNetFiles(
+        this.solutionFolder
+      );
+
+      this.loading = false;
+      console.log(dotnetFiles);
+    } else {
+      this.error = 'Desktop API not working or solution folder is empty';
+    }
   }
 }
