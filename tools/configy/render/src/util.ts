@@ -1,12 +1,29 @@
-import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { UrlExtractionResult } from './types';
+import {
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import { EWindow, UrlExtractionResult } from './types';
 
-export function isValudUrl(control: AbstractControl): ValidationErrors | null {
+export function isValidUrl(control: AbstractControl): ValidationErrors | null {
   try {
-    new URL(control.value);
+    const url = new URL(control.value);
+
+    // Check if host contains "localhost"
+    if (!url.hostname.includes('localhost')) {
+      return { url: "URL must contain 'localhost'", value: control.value };
+    }
+
+    // Check if port is present
+    if (!url.port || isNaN(Number(url.port))) {
+      return {
+        url: "URL must include a port number after 'localhost:'",
+        value: control.value,
+      };
+    }
+
     return null;
   } catch {
-    return { url: 'invalid URL', value: control.value };
+    return { url: 'Invalid URL', value: control.value };
   }
 }
 

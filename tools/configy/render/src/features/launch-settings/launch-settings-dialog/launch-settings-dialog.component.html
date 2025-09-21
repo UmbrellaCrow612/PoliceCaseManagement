@@ -21,7 +21,12 @@
       }
       <!---->
       @if (httpControl.hasError("url")) {
-      <mat-error> URL must be valid </mat-error>
+      <mat-error> {{ httpControl.getError("url") }} </mat-error>
+      }
+
+      <!---->
+      @if (httpControl.hasError("launchUrl")) {
+      <mat-error> Another profile has this URL </mat-error>
       }
     </mat-form-field>
     <mat-form-field>
@@ -33,7 +38,12 @@
       }
       <!---->
       @if (httpsControl.hasError("url")) {
-      <mat-error> URL must be valid </mat-error>
+      <mat-error> {{ httpControl.getError("url") }} </mat-error>
+      }
+
+      <!---->
+      @if (httpsControl.hasError("launchUrl")) {
+      <mat-error> Another profile has this URL </mat-error>
       }
     </mat-form-field>
   </div>

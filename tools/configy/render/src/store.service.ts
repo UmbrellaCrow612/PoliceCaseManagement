@@ -6,7 +6,6 @@ import { ReadFileInfo } from './types';
 })
 export class StoreService {
   private _selectedDirectory: string | null = null;
-  private _launchSettingFileInfo: ReadFileInfo[] = [];
 
   setSelectedDirectory(path: string) {
     this._selectedDirectory = path;
@@ -14,13 +13,5 @@ export class StoreService {
 
   getSelectedDirectory() {
     return this._selectedDirectory;
-  }
-
-  setLaunchSettingFiles(filesInfo: ReadFileInfo[]) {
-    this._launchSettingFileInfo = filesInfo;
-  }
-
-  getLaunchSettingFiles() {
-    return this._launchSettingFileInfo;
   }
 }

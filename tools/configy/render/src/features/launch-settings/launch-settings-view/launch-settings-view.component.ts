@@ -28,7 +28,6 @@ export class LaunchSettingsViewComponent implements OnInit {
       this.router.navigate(['/']);
     }
     this.selectedDir = this.store.getSelectedDirectory()!;
-    this.launchSettingsFiles = this.store.getLaunchSettingFiles();
   }
 
   /**
@@ -49,8 +48,6 @@ export class LaunchSettingsViewComponent implements OnInit {
       this.launchSettingsFiles = launchSettingsFiles;
 
       console.log(launchSettingsFiles);
-
-      this.store.setLaunchSettingFiles(launchSettingsFiles);
     } else {
       this.errorMessage = 'Electron API failed';
     }
@@ -63,7 +60,7 @@ export class LaunchSettingsViewComponent implements OnInit {
     console.log('Giving dialog ' + item.filePath);
     this.dialog.open(LaunchSettingsDialogComponent, {
       data: {
-        item: item
+        item: item,
       },
     });
   }
