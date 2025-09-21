@@ -1,8 +1,13 @@
-const { contextBridge, ipcRenderer, ipcMain } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   works: () => true,
   openDirectory: () => ipcRenderer.invoke("dialog:openDirectory"),
-  readDotNetFiles: (/** @type {string} */ dir) =>
-    ipcRenderer.invoke("directory:read:dotnet", dir),
+
+  /**
+   * @param {string} dir - The folder to scan
+   * @param {Array<string>} extensions - File extensions to look for
+   */
+  readFiles: (dir, extensions = []) =>
+    ipcRenderer.invoke("file:read", dir, extensions),
 });

@@ -4,6 +4,13 @@ export const routes: Routes = [
   {
     path: '',
     loadChildren: () =>
-      import('../featuers/start/start.routes').then((m) => m.START_ROUTES),
+      import('../features/home/home.routes').then((m) => m.HomeRoutes),
+  },
+  {
+    path: 'launch-settings',
+    loadChildren: () =>
+      import('../features/launch-settings/launch-settings.routes').then(
+        (m) => m.LaunchSettingsRoutes
+      ),
   },
 ];

@@ -1,0 +1,9 @@
+<p>launch-settings-view works!</p>
+
+{{ selectedDir }}
+<button (click)="scanLaunchSettingsFiles()">Scan for launch settings</button>
+
+<!---->
+@if (launchSettingsFiles.length > 0) {
+    {{launchSettingsFiles | json}}
+}
