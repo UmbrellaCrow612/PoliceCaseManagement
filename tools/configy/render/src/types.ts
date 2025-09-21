@@ -10,6 +10,7 @@ export interface ElectronAPI {
     dir: string,
     extensions: Array<string>
   ) => Promise<ReadFileInfo[]>;
+  readFile: (filePath: string) => Promise<string>;
 }
 
 /*
@@ -20,7 +21,7 @@ export interface EWindow extends Window {
 }
 
 /**
- * Object to sotre generic way of information about a file that was read
+ * Object to store generic way of information about a file that was read from system
  */
 export interface ReadFileInfo {
   fileName: string;

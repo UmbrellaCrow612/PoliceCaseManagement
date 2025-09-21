@@ -1,14 +1,11 @@
 const { dialog } = require("electron");
-const fs = require("node:fs");
+const fs = require("node:fs").promises;
 const path = require("node:path");
 
 async function handleOpenDirectory() {
   const res = await dialog.showOpenDialog({ properties: ["openDirectory"] });
   return res;
 }
-
-
-
 
 /**
  * Read a list of files from a directory recursively, ignoring specified files and folders.
@@ -18,67 +15,62 @@ async function handleOpenDirectory() {
  * @returns {Promise<Array<ReadFileInfo>>} List of read file information objects array
  */
 async function handleReadFiles(event, directory, extensions = []) {
-  if (!fs.existsSync(directory)) {
-    console.log(`Directory does not exist: ${directory}`);
-    return [];
-  }
-
   const files = [];
 
   // Directories to ignore (case-insensitive)
   const ignoredDirectories = new Set([
-    'node_modules',
-    '.git',
-    '.svn',
-    '.hg',
-    'dist',
-    'build',
-    'out',
-    'target',
-    'bin',
-    'obj',
-    '.vscode',
-    '.idea',
-    '__pycache__',
-    '.pytest_cache',
-    '.coverage',
-    'coverage',
-    'vendor',
-    'bower_components',
-    '.next',
-    '.nuxt',
-    'tmp',
-    'temp',
-    'logs',
-    'log'
+    "node_modules",
+    ".git",
+    ".svn",
+    ".hg",
+    "dist",
+    "build",
+    "out",
+    "target",
+    "bin",
+    "obj",
+    ".vscode",
+    ".idea",
+    "__pycache__",
+    ".pytest_cache",
+    ".coverage",
+    "coverage",
+    "vendor",
+    "bower_components",
+    ".next",
+    ".nuxt",
+    "tmp",
+    "temp",
+    "logs",
+    "log",
   ]);
 
   // Files to ignore (case-insensitive)
   const ignoredFiles = new Set([
-    '.ds_store',
-    'thumbs.db',
-    'desktop.ini',
-    '.gitignore',
-    '.gitkeep',
-    '.npmignore',
-    '.eslintrc',
-    '.prettierrc',
-    'package-lock.json',
-    'yarn.lock',
-    'pnpm-lock.yaml',
-    '.env',
-    '.env.local',
-    '.env.development',
-    '.env.production'
+    ".ds_store",
+    "thumbs.db",
+    "desktop.ini",
+    ".gitignore",
+    ".gitkeep",
+    ".npmignore",
+    ".eslintrc",
+    ".prettierrc",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.production",
   ]);
 
   /**
    * Recursively scan directory for files
    * @param {string} currentDir Current directory being scanned
    */
-  function scanDirectory(currentDir) {
+  async function scanDirectory(currentDir) {
     try {
-      const items = fs.readdirSync(currentDir, { withFileTypes: true });
+      const items = await fs.readdir(currentDir, { withFileTypes: true });
 
       for (const item of items) {
         const itemPath = path.join(currentDir, item.name);
@@ -89,18 +81,21 @@ async function handleReadFiles(event, directory, extensions = []) {
             continue; // Skip this directory and all its contents
           }
           // Recursively scan subdirectories if not ignored
-          scanDirectory(itemPath);
+          await scanDirectory(itemPath);
         } else if (item.isFile()) {
           if (ignoredFiles.has(itemNameLower)) {
             continue; // Skip this file
           }
 
           // Check if file matches extension filter (if provided)
-          if (extensions.length === 0 || matchesExtension(item.name, extensions)) {
+          if (
+            extensions.length === 0 ||
+            matchesExtension(item.name, extensions)
+          ) {
             files.push({
               fileName: item.name,
               filePath: itemPath,
-              fileDirectory: currentDir
+              fileDirectory: currentDir,
             });
           }
         }
@@ -119,17 +114,34 @@ async function handleReadFiles(event, directory, extensions = []) {
    */
   function matchesExtension(fileName, extensions) {
     const fileExt = path.extname(fileName).toLowerCase();
-    return extensions.some(ext => {
+    return extensions.some((ext) => {
       // Normalize extension (ensure it starts with a dot)
-      const normalizedExt = ext.startsWith('.') ? ext.toLowerCase() : `.${ext.toLowerCase()}`;
+      const normalizedExt = ext.startsWith(".")
+        ? ext.toLowerCase()
+        : `.${ext.toLowerCase()}`;
       return fileExt === normalizedExt;
     });
   }
 
   // Start scanning from the root directory
-  scanDirectory(directory);
+  await scanDirectory(directory);
 
   return files;
 }
 
-module.exports = { handleOpenDirectory, handleReadFiles };
+/**
+ * Read a specific file's content - if it does not exist or fails, returns an empty string
+ * @param {import("electron").IpcMainInvokeEvent} event
+ * @param {string} filePath - The path of the file to read
+ * @returns {Promise<string>} Content as a string
+ */
+async function handleReadFile(event, filePath) {
+  try {
+    const data = await fs.readFile(filePath, "utf8");
+    return data;
+  } catch {
+    return "";
+  }
+}
+
+module.exports = { handleOpenDirectory, handleReadFiles, handleReadFile };

@@ -2,17 +2,20 @@ import { Component, inject, OnInit } from '@angular/core';
 import { StoreService } from '../../../store.service';
 import { Router } from '@angular/router';
 import { EWindow, ReadFileInfo } from '../../../types';
-import { JsonPipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { LaunchSettingsDialogComponent } from '../launch-settings-dialog/launch-settings-dialog.component';
 
 @Component({
   selector: 'app-launch-settings-view',
-  imports: [JsonPipe],
+  imports: [MatButtonModule],
   templateUrl: './launch-settings-view.component.html',
   styleUrl: './launch-settings-view.component.css',
 })
 export class LaunchSettingsViewComponent implements OnInit {
   store = inject(StoreService);
   router = inject(Router);
+  readonly dialog = inject(MatDialog);
 
   selectedDir: string = '';
 
@@ -25,13 +28,13 @@ export class LaunchSettingsViewComponent implements OnInit {
       this.router.navigate(['/']);
     }
     this.selectedDir = this.store.getSelectedDirectory()!;
+    this.launchSettingsFiles = this.store.getLaunchSettingFiles();
   }
 
   /**
    * Scans a dir and gets all launch setting files
    */
   async scanLaunchSettingsFiles() {
-    // Assuming 'EWindow' is a custom type you have defined
     let ewindow = window as unknown as EWindow;
 
     if (ewindow.electronAPI.works()) {
@@ -51,5 +54,17 @@ export class LaunchSettingsViewComponent implements OnInit {
     } else {
       this.errorMessage = 'Electron API failed';
     }
+  }
+
+  /**
+   * Runs whe tryinmg to view a specific launch settings item
+   */
+  viewLaunchSetting(item: ReadFileInfo) {
+    console.log('Giving dialog ' + item.filePath);
+    this.dialog.open(LaunchSettingsDialogComponent, {
+      data: {
+        item: item
+      },
+    });
   }
 }
