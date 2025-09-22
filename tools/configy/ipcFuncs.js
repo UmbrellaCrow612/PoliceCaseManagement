@@ -1,132 +1,127 @@
+// File contaisn all handlers for ipc process
+
 const { dialog } = require("electron");
-const fs = require("node:fs").promises;
+const fs = require("node:fs/promises");
 const path = require("node:path");
 
+/**
+ * Handles openign directory selection
+ */
 async function handleOpenDirectory() {
   const res = await dialog.showOpenDialog({ properties: ["openDirectory"] });
   return res;
 }
 
 /**
- * Read a list of files from a directory recursively, ignoring specified files and folders.
- * @param {import("electron").IpcMainInvokeEvent} event
- * @param {string} directory The directory to scan the files in
- * @param {Array<string>} extensions List of file extensions to look for (e.g., ['.js', '.txt'])
- * @returns {Promise<Array<ReadFileInfo>>} List of read file information objects array
+ * Read a list a list of files from a directory
+ * @param {import("electron").IpcMainInvokeEvent} event Electron event
+ * @param {string} dir The directory to read the files from
+ * @param {ReadFileOptions} options
+ * @returns {Promise<Array<ReadFileInfo>>} List of files info objects
  */
-async function handleReadFiles(event, directory, extensions = []) {
+async function handleReadFiles(
+  event,
+  dir,
+  options = {
+    fileExts: new Set(),
+    fileNames: new Set(),
+    ignoreDirs: new Set(),
+    ignoreFileNames: new Set(),
+  }
+) {
+  /**
+   * @type {Array<ReadFileInfo>}
+   */
   const files = [];
 
-  // Directories to ignore (case-insensitive)
-  const ignoredDirectories = new Set([
-    "node_modules",
-    ".git",
-    ".svn",
-    ".hg",
-    "dist",
-    "build",
-    "out",
-    "target",
-    "bin",
-    "obj",
-    ".vscode",
-    ".idea",
-    "__pycache__",
-    ".pytest_cache",
-    ".coverage",
-    "coverage",
-    "vendor",
-    "bower_components",
-    ".next",
-    ".nuxt",
-    "tmp",
-    "temp",
-    "logs",
-    "log",
-  ]);
+  const normalizedIgnoreDirs = new Set();
+  options.ignoreDirs.forEach((element) => {
+    normalizedIgnoreDirs.add(element.toLocaleLowerCase().trim());
+  });
+  normalizedIgnoreDirs.add("node_modules");
 
-  // Files to ignore (case-insensitive)
-  const ignoredFiles = new Set([
-    ".ds_store",
-    "thumbs.db",
-    "desktop.ini",
-    ".gitignore",
-    ".gitkeep",
-    ".npmignore",
-    ".eslintrc",
-    ".prettierrc",
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    ".env",
-    ".env.local",
-    ".env.development",
-    ".env.production",
-  ]);
+  const normalizedIgnoreFilenames = new Set();
+  options.ignoreFileNames.forEach((element) => {
+    normalizedIgnoreFilenames.add(element.toLocaleLowerCase().trim());
+  });
+
+  const normalizedFileNames = new Set();
+  options.fileNames.forEach((element) => {
+    normalizedFileNames.add(element.toLowerCase().trim());
+  });
+
+  const normalizedFileExts = new Set();
+  options.fileExts.forEach((element) => {
+    normalizedFileExts.add(element.toLowerCase().trim());
+  });
 
   /**
-   * Recursively scan directory for files
-   * @param {string} currentDir Current directory being scanned
+   * Recursive read a dir
+   * @param {string} dir The directory to read
    */
-  async function scanDirectory(currentDir) {
-    try {
-      const items = await fs.readdir(currentDir, { withFileTypes: true });
+  async function recursive(dir) {
+    let items = await fs.readdir(dir, { withFileTypes: true });
 
-      for (const item of items) {
-        const itemPath = path.join(currentDir, item.name);
-        const itemNameLower = item.name.toLowerCase();
+    for (const item of items) {
+      let name = item.name.toLowerCase().trim();
+      let fullPath = path.join(dir, item.name);
 
-        if (item.isDirectory()) {
-          if (ignoredDirectories.has(itemNameLower)) {
-            continue; // Skip this directory and all its contents
-          }
-          // Recursively scan subdirectories if not ignored
-          await scanDirectory(itemPath);
-        } else if (item.isFile()) {
-          if (ignoredFiles.has(itemNameLower)) {
-            continue; // Skip this file
-          }
+      if (item.isDirectory()) {
+        if (normalizedIgnoreDirs.has(name)) {
+          continue;
+        }
 
-          // Check if file matches extension filter (if provided)
-          if (
-            extensions.length === 0 ||
-            matchesExtension(item.name, extensions)
-          ) {
-            files.push({
-              fileName: item.name,
-              filePath: itemPath,
-              fileDirectory: currentDir,
-            });
-          }
+        await recursive(fullPath);
+      }
+
+      if (item.isFile()) {
+        if (normalizedIgnoreFilenames.has(name)) {
+          continue;
+        }
+
+        if (normalizedFileNames.has(name)) {
+          files.push({
+            fileDirectory: dir,
+            fileName: name,
+            filePath: fullPath,
+          });
+          continue;
+        }
+
+        if (hasFileExt(name, Array.from(normalizedFileExts))) {
+          files.push({
+            fileDirectory: dir,
+            fileName: name,
+            filePath: fullPath,
+          });
         }
       }
-    } catch (error) {
-      // It's common to encounter permission errors, so we log and continue
-      console.error(`Error reading directory ${currentDir}:`, error.message);
     }
   }
 
-  /**
-   * Check if file matches any of the provided extensions
-   * @param {string} fileName Name of the file
-   * @param {Array<string>} extensions Array of extensions to match
-   * @returns {boolean} True if file matches extension filter
-   */
-  function matchesExtension(fileName, extensions) {
-    const fileExt = path.extname(fileName).toLowerCase();
-    return extensions.some((ext) => {
-      // Normalize extension (ensure it starts with a dot)
-      const normalizedExt = ext.startsWith(".")
-        ? ext.toLowerCase()
-        : `.${ext.toLowerCase()}`;
-      return fileExt === normalizedExt;
-    });
-  }
-
-  // Start scanning from the root directory
-  await scanDirectory(directory);
+  await recursive(dir);
 
   return files;
+}
+
+/**
+ * Check if a file name has any of the file extensions you're looking for
+ * @param {string} fileName The name of the file
+ * @param {Array<string>} exts The file extensions to look for
+ * @returns {boolean} True if the file has one of the given extensions
+ */
+function hasFileExt(fileName, exts) {
+  if (typeof fileName !== "string" || !Array.isArray(exts)) return false;
+
+  // Extract the extension from the filename
+  const dotIndex = fileName.lastIndexOf(".");
+  if (dotIndex === -1 || dotIndex === fileName.length - 1) {
+    return false; // no extension or ends with "."
+  }
+
+  const fileExt = fileName.slice(dotIndex + 1).toLowerCase();
+
+  return exts.some((ext) => fileExt === ext.toLowerCase().replace(/^\./, ""));
 }
 
 /**
@@ -154,26 +149,30 @@ async function handleReadFile(event, filePath) {
 async function handleOverwriteFileContent(event, filePath, newContent) {
   try {
     // Validate input parameters
-    if (!filePath || typeof filePath !== 'string') {
-      throw new Error('Invalid file path provided');
+    if (!filePath || typeof filePath !== "string") {
+      throw new Error("Invalid file path provided");
     }
-    
+
     if (newContent === undefined || newContent === null) {
-      throw new Error('Content cannot be undefined or null');
+      throw new Error("Content cannot be undefined or null");
     }
-    
+
     // Write the content to the file (this will overwrite existing content)
-    await fs.writeFile(filePath, newContent, 'utf8');
-    
+    await fs.writeFile(filePath, newContent, "utf8");
+
     return { success: true };
-    
   } catch (error) {
-    console.error('Error writing file:', error);
-    return { 
-      success: false, 
-      error: error.message 
+    console.error("Error writing file:", error);
+    return {
+      success: false,
+      error: error.message,
     };
   }
 }
 
-module.exports = { handleOpenDirectory, handleReadFiles, handleReadFile, handleOverwriteFileContent };
+module.exports = {
+  handleOpenDirectory,
+  handleReadFiles,
+  handleReadFile,
+  handleOverwriteFileContent,
+};

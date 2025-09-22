@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { EWindow, ReadFileInfo } from '../../../types';
+import { ReadFileInfo } from '../../../types';
 import { MatButtonModule } from '@angular/material/button';
 import { extractUrlsFromLaunchSettings, isValidUrl } from '../../../util';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StoreService } from '../../../store.service';
 import { from, map, mergeMap, Observable, of, switchMap, toArray } from 'rxjs';
+import { EWindow } from '../../../ewindow';
 
 @Component({
   selector: 'app-launch-settings-dialog',
@@ -111,14 +112,16 @@ export class LaunchSettingsDialogComponent implements OnInit {
     }
 
     return from(
-      ewindow.electronAPI.readFiles(this.store.getSelectedDirectory()!, [
-        '.json',
-      ])
+      ewindow.electronAPI.readFiles(this.store.getSelectedDirectory()!, {
+        fileNames: new Set(['launchsettings.json']),
+        fileExts: new Set(),
+        ignoreDirs: new Set(),
+        ignoreFileNames: new Set(),
+      })
     ).pipe(
       map((allJsonFiles) =>
         allJsonFiles.filter(
           (file) =>
-            file.fileName.toLowerCase() === 'launchsettings.json' &&
             file.filePath.toLowerCase() !== currentFilePath.toLowerCase()
         )
       ),
@@ -231,18 +234,20 @@ export class LaunchSettingsDialogComponent implements OnInit {
 
     var alljsonFiles = await ewidnow.electronAPI.readFiles(
       this.store.getSelectedDirectory()!,
-      ['.json']
+      {
+        fileNames: new Set([
+          'appsettings.json',
+          'appsettings.development.json',
+        ]),
+        fileExts: new Set(),
+        ignoreDirs: new Set(),
+        ignoreFileNames: new Set(),
+      }
     );
 
     var filtered = alljsonFiles.filter((file) => {
-      const fileName = file.fileName.toLowerCase();
       const filePath = file.filePath.toLowerCase();
-
-      return (
-        (fileName === 'appsettings.json' ||
-          fileName === 'appsettings.development.json') &&
-        filePath !== this.item.filePath.toLowerCase()
-      );
+      return filePath !== this.item.filePath.toLowerCase();
     });
 
     for (var f of filtered) {

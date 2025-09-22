@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { EWindow } from '../../../types';
 import { Router } from '@angular/router';
 import { StoreService } from '../../../store.service';
+import { EWindow } from '../../../ewindow';
 
 @Component({
   selector: 'app-home-view',

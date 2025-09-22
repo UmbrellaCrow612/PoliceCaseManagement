@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "module": "ESNext",
-    "moduleResolution": "node"
-  }
+  },
 }
