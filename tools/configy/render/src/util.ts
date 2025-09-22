@@ -2,7 +2,7 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { EWindow, UrlExtractionResult } from './types';
+import { UrlExtractionResult } from './types';
 
 export function isValidUrl(control: AbstractControl): ValidationErrors | null {
   try {

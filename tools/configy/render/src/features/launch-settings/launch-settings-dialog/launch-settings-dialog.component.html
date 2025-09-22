@@ -53,8 +53,9 @@
   <button mat-button cdkFocusInitial mat-dialog-close>Cancel</button>
   <button
     mat-button
-    [disabled]="err || httpControl.invalid || httpsControl.invalid"
+    [disabled]="err || httpControl.invalid || httpsControl.invalid || isSaving"
+    (click)="saveLaunchUrls()"
   >
-    Save
+    @if (isSaving) { Saving } @else { Save }
   </button>
 </mat-dialog-actions>
