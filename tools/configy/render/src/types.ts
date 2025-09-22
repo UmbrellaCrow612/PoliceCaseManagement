@@ -1,0 +1,44 @@
+import { OpenDialogReturnValue } from 'electron';
+
+/**
+ * Keep up to date with preload js api for the functions offered by electron ipcrender
+ */
+export interface ElectronAPI {
+  works: () => boolean;
+  openDirectory: () => Promise<OpenDialogReturnValue>;
+  readFiles: (
+    dir: string,
+    extensions: Array<string>
+  ) => Promise<ReadFileInfo[]>;
+  readFile: (filePath: string) => Promise<string>;
+  overWriteFile: (
+    filePath: string,
+    newContent: string
+  ) => Promise<{ success: boolean; error?: string }>;
+}
+
+/*
+ * Electron API extened on the window object
+ */
+export interface EWindow extends Window {
+  electronAPI: ElectronAPI;
+}
+
+/**
+ * Object to store generic way of information about a file that was read from system
+ */
+export interface ReadFileInfo {
+  fileName: string;
+  filePath: string;
+  fileDirectory: string;
+}
+
+/**
+ * Represents a extraction result when reading a launch setting json file and tring to get url's out of it
+ */
+export type UrlExtractionResult = {
+  success: boolean;
+  httpUrl?: string;
+  httpsUrl?: string;
+  errorMessage?: string;
+};

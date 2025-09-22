@@ -1,0 +1,10 @@
+<button (click)="selectDirectory()">Select directory</button>
+
+@if (selectedDirectory) {
+<div>Selected folder {{ selectedDirectory }}</div>
+}
+
+<!---->
+@if (selectedDirectory) {
+<button (click)="viewLaunchSettings()">View Launch settings</button>
+}

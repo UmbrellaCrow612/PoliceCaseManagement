@@ -1,0 +1,19 @@
+{{ selectedDir }}
+<button (click)="scanLaunchSettingsFiles()">Scan for launch settings</button>
+
+<!---->
+@if (launchSettingsFiles.length > 0) {
+<!---->
+@for (item of launchSettingsFiles; track $index) {
+<div class="list_item">
+  <span>
+    {{ item.filePath }}
+  </span>
+  <span>
+    {{ item.fileName }}
+  </span>
+  <button mat-button (click)="viewLaunchSetting(item)">View</button>
+</div>
+} @empty {
+<div role="listitem">Empty</div>
+} }

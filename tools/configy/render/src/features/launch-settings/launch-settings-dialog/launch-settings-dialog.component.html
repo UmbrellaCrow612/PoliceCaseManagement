@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Edit launch setting</h2>
+<mat-dialog-content>
+  @if (err && !isLoading) {
+  <div>Error occured {{ err }}</div>
+  }
+  <!---->
+
+  @if (!err && isLoading) {
+  <div>Loading file</div>
+  }
+
+  <!---->
+  @if (!err && !isLoading) {
+  <div class="controls">
+    <mat-form-field>
+      <mat-label>HTTP URL</mat-label>
+      <input matInput [formControl]="httpControl" />
+
+      @if (httpControl.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+      @if (httpControl.hasError("url")) {
+      <mat-error> {{ httpControl.getError("url") }} </mat-error>
+      }
+
+      <!---->
+      @if (httpControl.hasError("launchUrl")) {
+      <mat-error> Another profile has this URL </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>HTTPS</mat-label>
+      <input matInput [formControl]="httpsControl" />
+
+      @if (httpsControl.hasError("required")) {
+      <mat-error> Required </mat-error>
+      }
+      <!---->
+      @if (httpsControl.hasError("url")) {
+      <mat-error> {{ httpControl.getError("url") }} </mat-error>
+      }
+
+      <!---->
+      @if (httpsControl.hasError("launchUrl")) {
+      <mat-error> Another profile has this URL </mat-error>
+      }
+    </mat-form-field>
+  </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button cdkFocusInitial mat-dialog-close>Cancel</button>
+  <button
+    mat-button
+    [disabled]="err || httpControl.invalid || httpsControl.invalid || isSaving"
+    (click)="saveLaunchUrls()"
+  >
+    @if (isSaving) { Saving } @else { Save }
+  </button>
+</mat-dialog-actions>
