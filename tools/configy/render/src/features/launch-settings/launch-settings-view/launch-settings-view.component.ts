@@ -37,23 +37,19 @@ export class LaunchSettingsViewComponent implements OnInit {
   async scanLaunchSettingsFiles() {
     let ewindow = window as unknown as EWindow;
 
-    if (ewindow.electronAPI.works()) {
-      const launchFiles = await ewindow.electronAPI.readFiles(
-        this.selectedDir!,
-        {
-          ignoreDirs: new Set(),
-          fileExts: new Set(),
-          fileNames: new Set(['launchsettings.json']),
-          ignoreFileNames: new Set(),
-        }
-      );
-
-      this.launchSettingsFiles = launchFiles;
-
-      console.log(launchFiles);
-    } else {
+    if (!ewindow.electronAPI.works()) {
       this.errorMessage = 'Electron API failed';
+
+      return;
     }
+    const launchFiles = await ewindow.electronAPI.readFiles(this.selectedDir!, {
+      ignoreDirs: new Set(),
+      fileExts: new Set(),
+      fileNames: new Set(['launchsettings.json']),
+      ignoreFileNames: new Set(),
+    });
+
+    this.launchSettingsFiles = launchFiles;
   }
 
   /**

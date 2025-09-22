@@ -38,7 +38,23 @@ async function handleReadFiles(
   options.ignoreDirs.forEach((element) => {
     normalizedIgnoreDirs.add(element.toLocaleLowerCase().trim());
   });
+  // Common ignores
   normalizedIgnoreDirs.add("node_modules");
+
+  // C# ignores
+  normalizedIgnoreDirs.add("bin");
+  normalizedIgnoreDirs.add("obj");
+  normalizedIgnoreDirs.add(".vs");
+  normalizedIgnoreDirs.add("packages");
+
+  // Angular/JS/TS ignores
+  normalizedIgnoreDirs.add("dist");
+  normalizedIgnoreDirs.add("out-tsc");
+  normalizedIgnoreDirs.add(".angular");
+  normalizedIgnoreDirs.add("coverage");
+
+  // Git
+  normalizedIgnoreDirs.add(".git");
 
   const normalizedIgnoreFilenames = new Set();
   options.ignoreFileNames.forEach((element) => {
@@ -79,22 +95,36 @@ async function handleReadFiles(
           continue;
         }
 
-        if (normalizedFileNames.has(name)) {
-          files.push({
-            fileDirectory: dir,
-            fileName: name,
-            filePath: fullPath,
-          });
+        // Case 1: Match specific filenames
+        if (normalizedFileNames.size > 0) {
+          if (normalizedFileNames.has(name)) {
+            files.push({
+              fileDirectory: dir,
+              fileName: name,
+              filePath: fullPath,
+            });
+          }
+          continue; // stop here so we don’t add non-matching files
+        }
+
+        // Case 2: Match extensions
+        if (normalizedFileExts.size > 0) {
+          if (hasFileExt(name, Array.from(normalizedFileExts))) {
+            files.push({
+              fileDirectory: dir,
+              fileName: name,
+              filePath: fullPath,
+            });
+          }
           continue;
         }
 
-        if (hasFileExt(name, Array.from(normalizedFileExts))) {
-          files.push({
-            fileDirectory: dir,
-            fileName: name,
-            filePath: fullPath,
-          });
-        }
+        // Case 3: No filters → add everything
+        files.push({
+          fileDirectory: dir,
+          fileName: name,
+          filePath: fullPath,
+        });
       }
     }
   }

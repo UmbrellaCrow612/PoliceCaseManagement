@@ -20,13 +20,8 @@
       <mat-error> Required </mat-error>
       }
       <!---->
-      @if (httpControl.hasError("url")) {
-      <mat-error> {{ httpControl.getError("url") }} </mat-error>
-      }
-
-      <!---->
-      @if (httpControl.hasError("launchUrl")) {
-      <mat-error> Another profile has this URL </mat-error>
+      @if (httpControl.hasError("urlValid")) {
+      <mat-error> {{ httpControl.getError("urlValid") }} </mat-error>
       }
     </mat-form-field>
     <mat-form-field>
@@ -37,13 +32,8 @@
       <mat-error> Required </mat-error>
       }
       <!---->
-      @if (httpsControl.hasError("url")) {
-      <mat-error> {{ httpControl.getError("url") }} </mat-error>
-      }
-
-      <!---->
-      @if (httpsControl.hasError("launchUrl")) {
-      <mat-error> Another profile has this URL </mat-error>
+      @if (httpsControl.hasError("urlValid")) {
+      <mat-error> {{ httpControl.getError("urlValid") }} </mat-error>
       }
     </mat-form-field>
   </div>
@@ -54,7 +44,7 @@
   <button
     mat-button
     [disabled]="err || httpControl.invalid || httpsControl.invalid || isSaving"
-    (click)="saveLaunchUrls()"
+    (click)="save()"
   >
     @if (isSaving) { Saving } @else { Save }
   </button>
