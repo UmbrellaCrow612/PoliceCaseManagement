@@ -13,4 +13,11 @@ export const routes: Routes = [
         (m) => m.LaunchSettingsRoutes
       ),
   },
+  {
+    path: 'docker-compose',
+    loadChildren: () =>
+      import('../features/docker-compose/docker-compose.routes').then(
+        (m) => m.DockerComposeRoutes
+      ),
+  },
 ];

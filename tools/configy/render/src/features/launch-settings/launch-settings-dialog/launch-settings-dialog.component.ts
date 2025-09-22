@@ -12,8 +12,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StoreService } from '../../../store.service';
-import { EWindow } from '../../../ewindow';
 import { checkApi } from '../../../works';
+import { getApi } from '../../../api';
 
 @Component({
   selector: 'app-launch-settings-dialog',
@@ -57,13 +57,13 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.isLoading = true;
     this.err = null;
 
-    let ewindow = window as unknown as EWindow;
+    let api = getApi()
     if (!checkApi()) {
       this.err = 'Electron API not working';
       this.isLoading = false;
     }
 
-    var fileContent = await ewindow.electronAPI.readFile(this.item.filePath);
+    var fileContent = await api.readFile(this.item.filePath);
     if (fileContent === '') {
       this.err = 'File not found or is empty';
       this.isLoading = false;
@@ -90,13 +90,13 @@ export class LaunchSettingsDialogComponent implements OnInit {
     httpUrl: string,
     httpsUrl: string
   ): Promise<{ taken: boolean; errMess: string }> {
-    let ewidnow = window as unknown as EWindow;
+    let api = getApi();
 
     if (!checkApi()) {
       return { taken: true, errMess: 'Electron api not wokring' };
     }
 
-    var allLaunchSettings = await ewidnow.electronAPI.readFiles(
+    var allLaunchSettings = await api.readFiles(
       this.store.getSelectedDirectory()!,
       {
         fileNames: new Set(['launchsettings.json']),
@@ -110,7 +110,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     );
 
     for (var file of filtered) {
-      let fileContent = await ewidnow.electronAPI.readFile(file.filePath);
+      let fileContent = await api.readFile(file.filePath);
       var colission = checkStringsInContent(fileContent, httpUrl, httpsUrl);
       if (colission) {
         return {
@@ -130,11 +130,12 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.err = null;
     this.isSaving = true;
 
-    let ewidnow = window as unknown as EWindow;
     if (!checkApi()) {
       this.err = 'Failed electron api';
       return;
     }
+
+    let api = getApi();
 
     if (this.httpControl.invalid || this.httpsControl.invalid) {
       this.err = 'Form invalid';
@@ -156,7 +157,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     }
 
     // change orginal launch settings
-    var orginalLaunchSettingContent = await ewidnow.electronAPI.readFile(
+    var orginalLaunchSettingContent = await api.readFile(
       this.item.filePath
     );
     var oeginalUrls = extractLaunchSettingUrls(orginalLaunchSettingContent);
@@ -174,13 +175,13 @@ export class LaunchSettingsDialogComponent implements OnInit {
       newHttpUrl,
       newHttpsUrl
     );
-    await ewidnow.electronAPI.overWriteFile(
+    await api.overWriteFile(
       this.item.filePath,
       newLaunchSettingsContent
     );
 
     // change another other file refs - only source code ones i.e just source code string replacement
-    var allFiles = await ewidnow.electronAPI.readFiles(
+    var allFiles = await api.readFiles(
       this.store.getSelectedDirectory()!,
       {
         fileExts: new Set([
@@ -212,7 +213,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     );
 
     for (const file of filteredAllFiles) {
-      let fileContent = await ewidnow.electronAPI.readFile(file.filePath);
+      let fileContent = await api.readFile(file.filePath);
       var newContent = replaceStrings(
         fileContent,
         oeginalUrls.httpUrl,
@@ -220,7 +221,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
         newHttpUrl,
         newHttpsUrl
       );
-      await ewidnow.electronAPI.overWriteFile(file.filePath, newContent);
+      await api.overWriteFile(file.filePath, newContent);
     }
 
     this.isSaving = false;

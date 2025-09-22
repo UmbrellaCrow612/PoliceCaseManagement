@@ -5,8 +5,8 @@ import { ReadFileInfo } from '../../../types';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { LaunchSettingsDialogComponent } from '../launch-settings-dialog/launch-settings-dialog.component';
-import { EWindow } from '../../../ewindow';
 import { checkApi } from '../../../works';
+import { getApi } from '../../../api';
 
 @Component({
   selector: 'app-launch-settings-view',
@@ -36,14 +36,15 @@ export class LaunchSettingsViewComponent implements OnInit {
    * Scans a dir and gets all launch setting files
    */
   async scanLaunchSettingsFiles() {
-    let ewindow = window as unknown as EWindow;
-
     if (!checkApi()) {
       this.errorMessage = 'Electron API failed';
 
       return;
     }
-    const launchFiles = await ewindow.electronAPI.readFiles(this.selectedDir!, {
+
+    let api = getApi();
+
+    const launchFiles = await api.readFiles(this.selectedDir!, {
       ignoreDirs: new Set(),
       fileExts: new Set(),
       fileNames: new Set(['launchsettings.json']),

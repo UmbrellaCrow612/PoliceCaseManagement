@@ -1,4 +1,4 @@
-import { EWindow } from './ewindow';
+import { EWindow } from "./types";
 
 /**
  * Verify that electronAPI exists and all functions are callable

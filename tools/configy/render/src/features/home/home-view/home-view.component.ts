@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { StoreService } from '../../../store.service';
-import { EWindow } from '../../../ewindow';
 import { MatButtonModule } from '@angular/material/button';
 import { checkApi } from '../../../works';
+import { getApi } from '../../../api';
 
 @Component({
   selector: 'app-home-view',
@@ -35,13 +35,13 @@ export class HomeViewComponent {
     /**
      * Window object with electron api extened on the window object
      */
-    let ewidnow = window as unknown as EWindow;
+    let api = getApi();
 
     if (!checkApi()) {
       this.errorMessage = 'Electron API not working';
     }
 
-    const result = await ewidnow.electronAPI.openDirectory();
+    const result = await api.openDirectory();
     if (result.canceled) {
       this.errorMessage = 'Canceled directory selection';
       return;
@@ -53,5 +53,9 @@ export class HomeViewComponent {
 
   viewLaunchSettings() {
     this.router.navigate(['launch-settings']);
+  }
+
+  viewDockerCompose() {
+    this.router.navigate(['docker-compose']);
   }
 }
