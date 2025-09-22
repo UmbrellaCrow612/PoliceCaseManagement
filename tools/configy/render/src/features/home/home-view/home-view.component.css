@@ -1,0 +1,40 @@
+/* home-view.component.css */
+.home-view-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f7;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.directory-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.selected-folder {
+  background-color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.error-message {
+  color: #d93025;
+  font-weight: bold;
+  text-align: center;
+}

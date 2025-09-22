@@ -1,7 +1,73 @@
-.list_item {
+/* launch-settings.component.css */
+.launch-settings-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9fb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.selected-dir {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.actions {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.files-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px;
-  align-items: start;
+  gap: 12px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.list-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-path {
+  font-size: 12px;
+  color: #777;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.empty-list {
+  text-align: center;
+  padding: 15px;
+  color: #999;
+  font-style: italic;
 }

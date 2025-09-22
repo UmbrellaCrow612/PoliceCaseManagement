@@ -1,10 +1,27 @@
-<button (click)="selectDirectory()">Select directory</button>
+<div class="home-view-container">
+  <h1>Welcome to configy</h1>
 
-@if (selectedDirectory) {
-<div>Selected folder {{ selectedDirectory }}</div>
-}
+  <div class="directory-section">
+    <button mat-raised-button (click)="selectDirectory()">
+      Select Directory
+    </button>
 
-<!---->
-@if (selectedDirectory) {
-<button (click)="viewLaunchSettings()">View Launch settings</button>
-}
+    @if (selectedDirectory) {
+    <div class="selected-folder">
+      📂 Selected folder: <strong>{{ selectedDirectory }}</strong>
+    </div>
+    }
+
+    <!---->
+    @if (selectedDirectory) {
+    <button mat-button (click)="viewLaunchSettings()">
+      View Launch Settings
+    </button>
+    }
+
+    <!---->
+    @if (errorMessage) {
+    <div class="error-message">⚠ {{ errorMessage }}</div>
+    }
+  </div>
+</div>

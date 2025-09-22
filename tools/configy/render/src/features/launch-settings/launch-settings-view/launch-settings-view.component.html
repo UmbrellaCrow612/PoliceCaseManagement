@@ -1,19 +1,31 @@
-{{ selectedDir }}
-<button (click)="scanLaunchSettingsFiles()">Scan for launch settings</button>
+<div class="launch-settings-container">
+  <h2>Launch Settings</h2>
 
-<!---->
-@if (launchSettingsFiles.length > 0) {
-<!---->
-@for (item of launchSettingsFiles; track $index) {
-<div class="list_item">
-  <span>
-    {{ item.filePath }}
-  </span>
-  <span>
-    {{ item.fileName }}
-  </span>
-  <button mat-button (click)="viewLaunchSetting(item)">View</button>
+  <div class="selected-dir">
+    <strong>Selected Directory:</strong> {{ selectedDir || 'None' }}
+  </div>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="scanLaunchSettingsFiles()">
+      Scan for Launch Settings
+    </button>
+  </div>
+
+  @if (launchSettingsFiles.length > 0) {
+    <div class="files-list">
+      @for (item of launchSettingsFiles; track $index) {
+        <div class="list-item">
+          <div class="file-info">
+            <span class="file-path">{{ item.filePath }}</span>
+            <span class="file-name">{{ item.fileName }}</span>
+          </div>
+          <button mat-stroked-button color="accent" (click)="viewLaunchSetting(item)">
+            View
+          </button>
+        </div>
+      } @empty {
+        <div role="listitem" class="empty-list">No launch settings found</div>
+      }
+    </div>
+  }
 </div>
-} @empty {
-<div role="listitem">Empty</div>
-} }
