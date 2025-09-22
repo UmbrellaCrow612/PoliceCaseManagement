@@ -1,6 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const { handleOpenDirectory, handleReadFiles, handleReadFile, handleOverwriteFileContent } = require("./ipcFuncs.js");
+const {
+  handleOpenDirectory,
+  handleReadFiles,
+  handleReadFile,
+  handleOverwriteFileContent,
+  handleWorks,
+} = require("./ipcFuncs.js");
 
 let mainWindow;
 
@@ -25,10 +31,11 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  ipcMain.handle("works", handleWorks);
   ipcMain.handle("dialog:openDirectory", handleOpenDirectory);
-  ipcMain.handle("files:read", handleReadFiles)
-  ipcMain.handle("file:read", handleReadFile)
-  ipcMain.handle("file:overwrite", handleOverwriteFileContent)
+  ipcMain.handle("files:read", handleReadFiles);
+  ipcMain.handle("file:read", handleReadFile);
+  ipcMain.handle("file:overwrite", handleOverwriteFileContent);
 
   createWindow();
 });

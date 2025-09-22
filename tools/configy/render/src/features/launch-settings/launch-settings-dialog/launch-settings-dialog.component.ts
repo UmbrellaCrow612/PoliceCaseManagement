@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StoreService } from '../../../store.service';
 import { EWindow } from '../../../ewindow';
+import { checkApi } from '../../../works';
 
 @Component({
   selector: 'app-launch-settings-dialog',
@@ -57,7 +58,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.err = null;
 
     let ewindow = window as unknown as EWindow;
-    if (!ewindow.electronAPI.works()) {
+    if (!checkApi()) {
       this.err = 'Electron API not working';
       this.isLoading = false;
     }
@@ -91,7 +92,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
   ): Promise<{ taken: boolean; errMess: string }> {
     let ewidnow = window as unknown as EWindow;
 
-    if (!ewidnow.electronAPI.works()) {
+    if (!checkApi()) {
       return { taken: true, errMess: 'Electron api not wokring' };
     }
 
@@ -130,7 +131,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.isSaving = true;
 
     let ewidnow = window as unknown as EWindow;
-    if (!ewidnow.electronAPI.works()) {
+    if (!checkApi()) {
       this.err = 'Failed electron api';
       return;
     }

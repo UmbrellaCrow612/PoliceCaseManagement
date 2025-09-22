@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { LaunchSettingsDialogComponent } from '../launch-settings-dialog/launch-settings-dialog.component';
 import { EWindow } from '../../../ewindow';
+import { checkApi } from '../../../works';
 
 @Component({
   selector: 'app-launch-settings-view',
@@ -37,7 +38,7 @@ export class LaunchSettingsViewComponent implements OnInit {
   async scanLaunchSettingsFiles() {
     let ewindow = window as unknown as EWindow;
 
-    if (!ewindow.electronAPI.works()) {
+    if (!checkApi()) {
       this.errorMessage = 'Electron API failed';
 
       return;

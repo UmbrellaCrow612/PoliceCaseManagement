@@ -4,6 +4,25 @@ const { dialog } = require("electron");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 
+
+// In main process
+const electronAPIFunctions = [
+  "works",
+  "openDirectory",
+  "readFiles",
+  "readFile",
+  "overWriteFile",
+];
+
+/**
+ * Tells clients who use the electron API which functions are available
+ * @param {import("electron").IpcMainInvokeEvent} event Electron event
+ */
+function handleWorks(event) {
+  // Return the list of functions to the renderer
+  return electronAPIFunctions;
+}
+
 /**
  * Handles openign directory selection
  */
@@ -205,4 +224,5 @@ module.exports = {
   handleReadFiles,
   handleReadFile,
   handleOverwriteFileContent,
+  handleWorks
 };

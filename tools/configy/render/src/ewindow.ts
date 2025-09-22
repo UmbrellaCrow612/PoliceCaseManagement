@@ -5,7 +5,7 @@ import { ReadFileInfo, ReadFileOptions } from './types';
  * Keep up to date with preload js api for the functions offered by electron ipcrender
  */
 export interface ElectronAPI {
-  works: () => boolean;
+  works: () => string[];
   openDirectory: () => Promise<OpenDialogReturnValue>;
   readFiles: (dir: string, options: ReadFileOptions) => Promise<ReadFileInfo[]>;
   readFile: (filePath: string) => Promise<string>;

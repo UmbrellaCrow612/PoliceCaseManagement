@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { StoreService } from '../../../store.service';
 import { EWindow } from '../../../ewindow';
 import { MatButtonModule } from '@angular/material/button';
+import { checkApi } from '../../../works';
 
 @Component({
   selector: 'app-home-view',
@@ -36,7 +37,7 @@ export class HomeViewComponent {
      */
     let ewidnow = window as unknown as EWindow;
 
-    if (!ewidnow.electronAPI.works()) {
+    if (!checkApi()) {
       this.errorMessage = 'Electron API not working';
     }
 
