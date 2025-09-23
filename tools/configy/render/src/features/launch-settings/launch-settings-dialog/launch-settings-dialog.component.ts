@@ -57,7 +57,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.isLoading = true;
     this.err = null;
 
-    let api = getApi()
+    let api = getApi();
     if (!checkApi()) {
       this.err = 'Electron API not working';
       this.isLoading = false;
@@ -157,57 +157,52 @@ export class LaunchSettingsDialogComponent implements OnInit {
     }
 
     // change orginal launch settings
-    var orginalLaunchSettingContent = await api.readFile(
-      this.item.filePath
-    );
-    var oeginalUrls = extractLaunchSettingUrls(orginalLaunchSettingContent);
-    if (!oeginalUrls.success) {
-      this.err =
-        oeginalUrls.errorMessage ?? 'Could not find http or https URLS';
+    var orginalLaunchSettingContent = await api.readFile(this.item.filePath);
+    var orgUrls = extractLaunchSettingUrls(orginalLaunchSettingContent);
+    if (!orgUrls.success) {
+      this.err = orgUrls.errorMessage ?? 'Could not find http or https URLS';
       this.isSaving = false;
       return;
     }
 
     var newLaunchSettingsContent = replaceStrings(
       orginalLaunchSettingContent,
-      oeginalUrls.httpUrl,
-      oeginalUrls.httpsUrl,
-      newHttpUrl,
-      newHttpsUrl
-    );
-    await api.overWriteFile(
-      this.item.filePath,
-      newLaunchSettingsContent
-    );
-
-    // change another other file refs - only source code ones i.e just source code string replacement
-    var allFiles = await api.readFiles(
-      this.store.getSelectedDirectory()!,
       {
-        fileExts: new Set([
-          // C# source code
-          '.cs',
-          '.cshtml', // Razor pages
-          '.razor', // Blazor components
-
-          // JavaScript / TypeScript
-          '.js',
-          '.ts',
-          '.jsx',
-          '.tsx',
-
-          // Angular / Web
-          '.html', // Angular templates
-          '.css',
-          '.scss',
-          '.less',
-          '.json', // Configuration files that might contain references
-        ]),
-        fileNames: new Set(),
-        ignoreDirs: new Set(),
-        ignoreFileNames: new Set(),
+        targetStr: orgUrls.httpUrl,
+        replacement: newHttpUrl,
+      },
+      {
+        targetStr: orgUrls.httpsUrl,
+        replacement: newHttpsUrl,
       }
     );
+    await api.overWriteFile(this.item.filePath, newLaunchSettingsContent);
+
+    // change another other file refs - only source code ones i.e just source code string replacement
+    var allFiles = await api.readFiles(this.store.getSelectedDirectory()!, {
+      fileExts: new Set([
+        // C# source code
+        '.cs',
+        '.cshtml', // Razor pages
+        '.razor', // Blazor components
+
+        // JavaScript / TypeScript
+        '.js',
+        '.ts',
+        '.jsx',
+        '.tsx',
+
+        // Angular / Web
+        '.html', // Angular templates
+        '.css',
+        '.scss',
+        '.less',
+        '.json', // Configuration files that might contain references
+      ]),
+      fileNames: new Set(),
+      ignoreDirs: new Set(),
+      ignoreFileNames: new Set(),
+    });
     var filteredAllFiles = allFiles.filter(
       (x) => x.filePath.toLowerCase() !== this.item.filePath.toLowerCase()
     );
@@ -216,10 +211,14 @@ export class LaunchSettingsDialogComponent implements OnInit {
       let fileContent = await api.readFile(file.filePath);
       var newContent = replaceStrings(
         fileContent,
-        oeginalUrls.httpUrl,
-        oeginalUrls.httpsUrl,
-        newHttpUrl,
-        newHttpsUrl
+        {
+          targetStr: orgUrls.httpUrl,
+          replacement: newHttpUrl,
+        },
+        {
+          targetStr: orgUrls.httpsUrl,
+          replacement: newHttpsUrl,
+        }
       );
       await api.overWriteFile(file.filePath, newContent);
     }

@@ -106,49 +106,39 @@ function extractHttpsUrl(jsonString: string): string | null {
 }
 
 /**
- * Check if strings show up in another string
+ * Check if any strings show up in another string
  * @param content String to check
- * @param string1 String to check
- * @param string2 String to check
- * @returns Bool if they show up
+ * @param strings Strings to check
+ * @returns Bool if any of them show up
  */
 export function checkStringsInContent(
   content: string,
-  string1: string,
-  string2: string
-) {
-  return content.includes(string1) || content.includes(string2);
+  ...strings: string[]
+): boolean {
+  return strings.some((str) => content.includes(str));
 }
 
 /**
- * Replaces occurrences of two target strings in a given text with their respective replacements.
+ * Replaces occurrences of multiple target strings in a given text
+ * with their respective replacements.
  *
  * @param {string} content - The original string to perform replacements on.
- * @param {string} stringOne - The first string to find in the content.
- * @param {string} stringTwo - The second string to find in the content.
- * @param {string} stringThree - The string to replace stringOne with.
- * @param {string} stringFour - The string to replace stringTwo with.
+ * @param {...{ targetStr: string, replacement: string }} replacements - Objects containing target and replacement strings.
  * @returns {string} - The updated string after replacements.
  */
 export function replaceStrings(
   content: string,
-  stringOne: string,
-  stringTwo: string,
-  stringThree: string,
-  stringFour: string
-) {
+  ...replacements: { targetStr: string; replacement: string }[]
+): string {
   if (typeof content !== 'string') return content;
 
   let result = content;
 
-  if (stringOne) {
-    const regexOne = new RegExp(stringOne, 'g'); // Replace all occurrences
-    result = result.replace(regexOne, stringThree);
-  }
-
-  if (stringTwo) {
-    const regexTwo = new RegExp(stringTwo, 'g'); // Replace all occurrences
-    result = result.replace(regexTwo, stringFour);
+  for (const { targetStr, replacement } of replacements) {
+    if (targetStr) {
+      const regex = new RegExp(targetStr, 'g'); // Replace all occurrences
+      result = result.replace(regex, replacement);
+    }
   }
 
   return result;
