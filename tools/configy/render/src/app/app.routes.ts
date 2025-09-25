@@ -14,10 +14,10 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'docker-compose',
+    path: 'app-settings-drift',
     loadChildren: () =>
-      import('../features/docker-compose/docker-compose.routes').then(
-        (m) => m.DockerComposeRoutes
+      import('../features/appsettings-drift/appsettings-drif.routes').then(
+        (m) => m.AppSettingsDriftRoutes
       ),
   },
 ];

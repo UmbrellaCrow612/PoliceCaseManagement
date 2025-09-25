@@ -3,19 +3,12 @@
   "version": "1.0.0",
   "description": "Config tool",
   "main": "main.js",
-"scripts": {
-  "start": "cross-env NODE_ENV=development concurrently -k \"npm run start:angular\" \"wait-on http://localhost:4200 && electron . --trace-warnings\"",
-  "start:angular": "cd render && ng serve",
-  "build:angular": "cd render && ng build --output-path=dist",
-  "build:prod": "npm run build:angular && cross-env NODE_ENV=production electron ."
-}
-,
+  "scripts": {
+    "start": "electron . --trace-warnings"
+  },
   "author": "yousaf wazir",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^9.0.1",
-    "cross-env": "^10.0.0",
-    "electron": "^38.1.2",
-    "wait-on": "^8.0.0"
+    "electron": "^38.1.2"
   }
 }

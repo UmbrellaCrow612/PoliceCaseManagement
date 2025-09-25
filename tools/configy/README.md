@@ -7,3 +7,14 @@ Current features
 ![Home view](img/home_view.png)
 
 ![Launch view](img/launch_view.png)
+
+# Running 
+
+- in render run `npm start`
+- in root run `npm start`
+- `.env` make it `development`
+
+# Build prod
+
+- Run `npm run build` in render
+- change `.env` to prod and then run it 

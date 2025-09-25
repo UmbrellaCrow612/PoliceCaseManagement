@@ -54,8 +54,4 @@ export class HomeViewComponent {
   viewLaunchSettings() {
     this.router.navigate(['launch-settings']);
   }
-
-  viewDockerCompose() {
-    this.router.navigate(['docker-compose']);
-  }
 }

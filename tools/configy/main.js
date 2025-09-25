@@ -7,6 +7,9 @@ const {
   handleOverwriteFileContent,
   handleWorks,
 } = require("./ipcFuncs.js");
+const { loadEnv, hasEnv } = require("./util.js");
+
+loadEnv();
 
 let mainWindow;
 
@@ -20,12 +23,22 @@ function createWindow() {
     },
   });
 
+  if (!hasEnv("NODE_ENV")) {
+    throw new Error("NODE_ENV not set");
+  }
+
   if (process.env.NODE_ENV === "development") {
     // 🚀 In dev: use Angular CLI server
     mainWindow.loadURL("http://localhost:4200");
   } else {
-    // 📦 In prod: load the built Angular files
-    const indexPath = path.join(__dirname, "render", "dist", "index.html");
+    // 📦 In prod: load the built Angular files - run build script first
+    const indexPath = path.join(
+      __dirname,
+      "render",
+      "dist",
+      "browser",
+      "index.html"
+    );
     mainWindow.loadFile(indexPath);
   }
 }
