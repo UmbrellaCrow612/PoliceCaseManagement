@@ -36,4 +36,5 @@
 
 - Run the frontend - inctructions in `web-client` project
 - Run `docker-compose.yml` file in root here with `docker-compose up -d` to run redis and db
+- Stop `docker-compose down -v`
 - Open the `sln` file and select start up project to be the `multi` launch

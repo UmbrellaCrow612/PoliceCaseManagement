@@ -15,20 +15,6 @@ import { LaunchSettingsUrlExtractionResult } from './types';
 export function isValidUrl(control: AbstractControl): ValidationErrors | null {
   try {
     const url = new URL(control.value);
-
-    // Check if host contains "localhost"
-    if (!url.hostname.includes('localhost')) {
-      return { urlValid: "URL must contain 'localhost'", value: control.value };
-    }
-
-    // Check if port is present
-    if (!url.port || isNaN(Number(url.port))) {
-      return {
-        urlValid: "URL must include a port number after 'localhost:'",
-        value: control.value,
-      };
-    }
-
     return null;
   } catch {
     return { urlValid: 'Invalid URL', value: control.value };
