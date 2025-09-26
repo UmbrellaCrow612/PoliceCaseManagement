@@ -7,7 +7,7 @@ const {
   handleOverwriteFileContent,
   handleWorks,
 } = require("./ipcFuncs.js");
-const { loadEnv, hasEnv } = require("./util.js");
+const { loadEnv, hasEnv } = require("./utils.js");
 
 loadEnv();
 
@@ -31,14 +31,8 @@ function createWindow() {
     // 🚀 In dev: use Angular CLI server
     mainWindow.loadURL("http://localhost:4200");
   } else {
-    // 📦 In prod: load the built Angular files - run build script first
-    const indexPath = path.join(
-      __dirname,
-      "render",
-      "dist",
-      "browser",
-      "index.html"
-    );
+    // 📦 In prod: Use build script and then cd app and terminal run .\electron.exe ./
+    const indexPath = path.join(__dirname, "index.html");
     mainWindow.loadFile(indexPath);
   }
 }

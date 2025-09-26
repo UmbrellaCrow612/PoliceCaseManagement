@@ -1,6 +1,5 @@
+const fs = require("fs");
 const path = require("path");
-const fs = require("node:fs");
-
 /**
  * Loads .env into node process
  */
