@@ -16,5 +16,7 @@ Current features
 
 # Build prod
 
-- Run `npm run build` in render
-- change `.env` to prod and then run it 
+- change `.env` to be prod 
+- in root of configy run `node scripts/build.js`
+- this will output a dist folder for now only windows dist
+- cd into disc and run `electron.exe` to run the final prod version of the app
