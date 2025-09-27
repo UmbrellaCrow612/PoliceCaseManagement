@@ -5,6 +5,7 @@ const unzipper = require("unzipper");
 const { pipeline } = require("stream/promises");
 const { Readable } = require("stream");
 const { fetch } = require("undici");
+const asar = require("asar"); 
 
 const rootPath = path.join(__dirname, "..");
 const distPath = path.join(rootPath, "dist");
@@ -109,6 +110,13 @@ if (fs.existsSync(distPath)) {
     }
   });
 
-  log("Build completed");
-  exit();
+   const asarPath = path.join(distPath, "resources", "app.asar");
+   log("Packaging app into asar...");
+   await asar.createPackage(appPath, asarPath);
+ 
+   log("Removing unpackaged app folder...");
+   fs.rmSync(appPath, { recursive: true });
+ 
+   log("Build completed with asar packaging");
+   exit();
 })();
