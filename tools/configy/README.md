@@ -18,7 +18,7 @@ Current features
 
 - change `.env` to be prod 
 - in root of configy run `node scripts/build.js`
-- this will output a dist folder for now only windows dist
+- this will output a dist folder for now only windows dist - dose all steps for manual - https://www.electronjs.org/docs/latest/tutorial/application-distribution
 - cd into disc and run `electron.exe` to run the final prod version of the app
 
 

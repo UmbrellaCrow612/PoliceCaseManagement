@@ -35,9 +35,10 @@ function log(str) {
 
 /**
  * Helper to stop running
+ * @param {number} [code=0] The code for suc or fail
  */
-function exit() {
-  process.exit();
+function exit(code = 0) {
+  process.exit(code);
 }
 
 async function downloadAndExtract() {
@@ -47,7 +48,7 @@ async function downloadAndExtract() {
   const response = await fetch(fetchElectronZipUrl);
   if (!response.ok) {
     logErr("Failed to fetch electron binaries at " + fetchElectronZipUrl);
-    exit();
+    exit(1);
   }
   log("Fetched electron binaries, saving to " + zipDownloadPath);
 
@@ -67,7 +68,7 @@ async function downloadAndExtract() {
 
 if (!fs.existsSync(angularProjectPath)) {
   logErr("Angular project not found");
-  exit();
+  exit(1);
 }
 
 if (fs.existsSync(distPath)) {
@@ -85,14 +86,14 @@ if (fs.existsSync(distPath)) {
   log("Copying angular built files");
   if (!fs.existsSync(angularProjectDistPath)) {
     logErr("Angular build folder dose not exist");
-    exit();
+    exit(1);
   }
   fs.cpSync(angularProjectDistPath, appPath, { recursive: true });
 
   const electronFolderPath = path.join(rootPath, "electron");
   if (!fs.existsSync(electronFolderPath)) {
     logErr("Electron folder not found at " + electronFolderPath);
-    exit();
+    exit(1);
   }
   fs.cpSync(electronFolderPath, appPath, { recursive: true });
   log("Copied electron folder into " + appPath);
@@ -106,7 +107,7 @@ if (fs.existsSync(distPath)) {
       log(`Copied ${fileName} into ${appPath}`);
     } else {
       logErr(`File ${fileName} not found at ${appPath}`);
-      exit();
+      exit(1);
     }
   });
 

@@ -25,3 +25,11 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ./src/web-client
+
+      - name: Install configy dependencies
+        run: npm ci
+        working-directory: ./tools/configy
+
+      - name: Run configy build script
+        run: node scripts/build
+        working-directory: ./tools/configy

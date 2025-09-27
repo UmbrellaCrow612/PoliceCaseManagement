@@ -18,7 +18,6 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      contextIsolation: true,
       preload: path.join(__dirname, "preload.js"),
     },
   });
@@ -34,6 +33,11 @@ function createWindow() {
     // 📦 In prod: Use build script and then cd app and terminal run .\electron.exe ./
     const indexPath = path.join(__dirname, "index.html");
     mainWindow.loadFile(indexPath);
+
+    mainWindow.removeMenu();
+    mainWindow.webContents.on("devtools-opened", () => {
+      mainWindow.webContents.closeDevTools();
+    });
   }
 }
 
