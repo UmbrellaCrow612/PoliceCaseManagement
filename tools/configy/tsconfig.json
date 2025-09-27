@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "render/src/generated",
+        "checkJs": true
+    },
+    "include": [
+        "electron/types.js"
+    ]
+}

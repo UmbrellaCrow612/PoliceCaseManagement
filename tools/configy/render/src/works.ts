@@ -1,5 +1,3 @@
-import { EWindow } from "./types";
-
 /**
  * Verify that electronAPI exists and all functions are callable
  * @returns {Promise<boolean>} true if all functions exist and are callable

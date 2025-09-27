@@ -4,7 +4,6 @@ const { dialog } = require("electron");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 
-
 // In main process
 const electronAPIFunctions = [
   "works",
@@ -193,10 +192,12 @@ async function handleReadFile(event, filePath) {
  * @param {import("electron").IpcMainInvokeEvent} event
  * @param {string} filePath The path to the file
  * @param {string} newContent the new content
- * @returns {Promise<{success: boolean, error?: string}>}
+ * @returns {Promise<Result>}
  */
 async function handleOverwriteFileContent(event, filePath, newContent) {
   try {
+    /** @type {Result} */
+    var res = { error: null, success: false };
     // Validate input parameters
     if (!filePath || typeof filePath !== "string") {
       throw new Error("Invalid file path provided");
@@ -209,13 +210,12 @@ async function handleOverwriteFileContent(event, filePath, newContent) {
     // Write the content to the file (this will overwrite existing content)
     await fs.writeFile(filePath, newContent, "utf8");
 
-    return { success: true };
+    res.success = true;
+    return res;
   } catch (error) {
     console.error("Error writing file:", error);
-    return {
-      success: false,
-      error: error.message,
-    };
+    res.error = error;
+    return res;
   }
 }
 
@@ -224,5 +224,5 @@ module.exports = {
   handleReadFiles,
   handleReadFile,
   handleOverwriteFileContent,
-  handleWorks
+  handleWorks,
 };

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ReadFileInfo } from './types';
 
 @Injectable({
   providedIn: 'root',

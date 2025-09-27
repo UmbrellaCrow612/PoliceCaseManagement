@@ -27,3 +27,6 @@ Current features
 
 - Keep all electron js files in electron folder
 - keep all ui frontnend angular code in render
+- Write all cross domain types between electron and ui in `electron/types.js` and use `npx tsc` to generate the types for the render to use as well
+if you change type in `type.js` re generate types or it will fail or cause missmatch - the build process dose this anyways and could cause it to fail 
+if the frontend dosent relact the new types.

@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { ReadFileInfo } from '../../../types';
 import { MatButtonModule } from '@angular/material/button';
 import {
   checkStringsInContent,

@@ -1,5 +1,3 @@
-import { ElectronAPI, EWindow } from "./types";
-
 /**
  * Get the electron api and use it
  * @returns Electron api

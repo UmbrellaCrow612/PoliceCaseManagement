@@ -18,11 +18,11 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
+      - name: Install dependencies for web client
         run: npm ci
         working-directory: ./src/web-client
 
-      - name: Build
+      - name: Build web client
         run: npm run build
         working-directory: ./src/web-client
 
@@ -30,7 +30,7 @@ jobs:
         run: npm ci
         working-directory: ./tools/configy
 
-      - name: Copy .env.example to .env
+      - name: Copy .env.example to .env for configy
         run: cp ./tools/configy/.env.example ./tools/configy/.env
         
       - name: Run configy build script

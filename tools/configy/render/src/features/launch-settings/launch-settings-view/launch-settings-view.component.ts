@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { StoreService } from '../../../store.service';
 import { Router } from '@angular/router';
-import { ReadFileInfo } from '../../../types';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { LaunchSettingsDialogComponent } from '../launch-settings-dialog/launch-settings-dialog.component';
