@@ -20,3 +20,9 @@ Current features
 - in root of configy run `node scripts/build.js`
 - this will output a dist folder for now only windows dist
 - cd into disc and run `electron.exe` to run the final prod version of the app
+
+
+# Style guide
+
+- Keep all electron js files in electron folder
+- keep all ui frontnend angular code in render

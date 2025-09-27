@@ -14,15 +14,7 @@ const angularProjectDistPath = path.join(angularProjectPath, "dist", "browser");
 const packageName = "electron-v38.1.2-win32-x64.zip";
 const electronPackageReleaseVersion = "v38.1.2";
 const fetchElectronZipUrl = `https://github.com/electron/electron/releases/download/${electronPackageReleaseVersion}/${packageName}`;
-const rootFilesToCopy = [
-  "main.js",
-  "preload.js",
-  "ipcFuncs.js",
-  ".env",
-  "types.js",
-  "utils.js",
-  "package.json",
-];
+const rootFilesToCopy = [".env", "package.json"];
 
 /**
  * Helper to print errors to console
@@ -95,6 +87,14 @@ if (fs.existsSync(distPath)) {
     exit();
   }
   fs.cpSync(angularProjectDistPath, appPath, { recursive: true });
+
+  const electronFolderPath = path.join(rootPath, "electron");
+  if (!fs.existsSync(electronFolderPath)) {
+    logErr("Electron folder not found at " + electronFolderPath);
+    exit();
+  }
+  fs.cpSync(electronFolderPath, appPath, { recursive: true });
+  log("Copied electron folder into " + appPath);
 
   rootFilesToCopy.forEach((fileName) => {
     const srcPath = path.join(rootPath, fileName);
