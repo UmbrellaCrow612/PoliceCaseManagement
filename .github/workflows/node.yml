@@ -30,6 +30,9 @@ jobs:
         run: npm ci
         working-directory: ./tools/configy
 
+      - name: Copy .env.example to .env
+        run: cp ./tools/configy/.env.example ./tools/configy/.env
+        
       - name: Run configy build script
         run: node scripts/build
         working-directory: ./tools/configy

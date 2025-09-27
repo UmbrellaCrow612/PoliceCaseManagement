@@ -10,9 +10,10 @@ Current features
 
 # Running 
 
+- Do not change `.env.example` copy it and renaming it to `.env` this is the one you change
+- Inside `.env` there is `NODE_ENV` make it `development`
 - in render run `npm start`
 - in root run `npm start`
-- `.env` make it `development`
 
 # Build prod
 
