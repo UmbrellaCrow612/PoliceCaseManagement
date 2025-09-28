@@ -26,7 +26,7 @@ function createWindow() {
     throw new Error("NODE_ENV not set");
   }
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "dev") {
     // 🚀 In dev: use Angular CLI server
     mainWindow.loadURL("http://localhost:4200");
   } else {

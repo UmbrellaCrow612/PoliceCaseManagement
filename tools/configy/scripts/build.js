@@ -15,7 +15,7 @@ const angularProjectDistPath = path.join(angularProjectPath, "dist", "browser");
 const packageName = "electron-v38.1.2-win32-x64.zip";
 const electronPackageReleaseVersion = "v38.1.2";
 const fetchElectronZipUrl = `https://github.com/electron/electron/releases/download/${electronPackageReleaseVersion}/${packageName}`;
-const rootFilesToCopy = [".env", "package.json"];
+const rootFilesToCopy = ["package.json"];
 
 /**
  * Helper to print errors to console
@@ -109,6 +109,18 @@ if (fs.existsSync(distPath)) {
     if (fs.existsSync(srcPath)) {
       fs.copyFileSync(srcPath, destPath);
       log(`Copied ${fileName} into ${appPath}`);
+
+      if (fileName === "package.json") {
+        try {
+          const pkgJson = JSON.parse(fs.readFileSync(destPath, "utf-8"));
+          pkgJson.main = "main.js"; // change main entry
+          fs.writeFileSync(destPath, JSON.stringify(pkgJson, null, 2));
+          log(`Updated "main" field in ${fileName} to "main.js"`);
+        } catch (err) {
+          logErr(`Failed to update ${fileName}: ${err.message}`);
+          exit(1);
+        }
+      }
     } else {
       logErr(`File ${fileName} not found at ${appPath}`);
       exit(1);

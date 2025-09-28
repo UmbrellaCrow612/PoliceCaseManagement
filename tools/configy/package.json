@@ -2,7 +2,7 @@
   "name": "configy",
   "version": "1.0.0",
   "description": "Config tool",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "electron . --trace-warnings"
   },
