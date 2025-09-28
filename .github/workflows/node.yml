@@ -31,7 +31,7 @@ jobs:
         working-directory: ./tools/configy
 
       - name: Copy .env.example to .env for configy
-        run: cp ./tools/configy/.env.example ./tools/configy/.env
+        run: cp ./tools/configy/electron/.env.example ./tools/configy/electron/.env
         
       - name: Run configy build script
         run: node scripts/build
