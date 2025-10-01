@@ -1,89 +1,212 @@
+/* --- Base & Variables --- */
+:root {
+  --primary-color: #3f51b5;
+  --primary-color-dark: #303f9f;
+  --background-color: #f4f5f7;
+  --card-background-color: #ffffff;
+  --text-color-primary: #212121;
+  --text-color-secondary: #666666;
+  --border-color: #e0e0e0;
+  --error-bg: #ffebee;
+  --error-text: #c62828;
+  --loading-bg: #e3f2fd;
+  --loading-text: #1565c0;
+  --code-bg: #f5f5f5;
+}
+
+/* --- Main Layout --- */
 .container {
-  padding: 20px;
-  max-width: 800px;
+  padding: 24px;
+  max-width: 900px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  overflow-y: scroll;
-  align-items: start;
-  min-height: 99vh;
+  gap: 24px;
+  background-color: var(--background-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-color-primary);
+  min-height: 100vh;
+}
+
+/* --- Typography & Headers --- */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-color-primary);
+  margin: 0 0 8px 0;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 8px;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-color-primary);
+  margin: 0 0 16px 0;
+}
+
+/* --- Generic Card Style --- */
+.card {
+  background-color: var(--card-background-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- Header Section --- */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-header-info span {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-color-secondary);
+}
+
+.page-header-info b {
+  font-weight: 500;
+  color: var(--text-color-primary);
+}
+
+/* --- State Messages (Error/Loading) --- */
+.status-message {
+  padding: 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
 }
 
 .error {
-  font-size: 1em;
-  color: red;
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-text);
 }
 
 .loading {
-  font-size: 1em;
+  background-color: var(--loading-bg);
+  color: var(--loading-text);
+  border: 1px solid var(--loading-text);
 }
 
-.ktpv_parent {
+/* --- Source File Configuration Section --- */
+.source-config-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
 }
 
-.ktpv_container {
-  padding: 10px;
+.source-items-list {
   display: flex;
-  gap: 10px;
-  border: 1px solid black;
-  border-radius: 5px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.ktpv_info {
+.source-item-card {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 20px;
+}
+
+.item-details,
+.item-config {
   flex: 1;
+  min-width: 300px; /* Prevent excessive squishing */
+}
+
+/* --- Description List for Key-Value Data --- */
+.item-details dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.item-details dt {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.item-details dd {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.item-config {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.ktpv_inputs {
-  flex: 1;
+/* --- Drift Results Section --- */
+.drift-results-section {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 20px;
 }
 
-.file_cmp_container {
+.drift-results-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  width: 100%;
+  gap: 16px;
 }
 
-.drift_container {
+.drift-result-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 
-.drift_items {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.drift-file-info dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
 }
 
-.drift_item {
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 5px;
-  display: flex;
-  gap: 5px;
-  flex-direction: column;
-  gap: 5px;
+.drift-file-info dt {
+  font-weight: 600;
+  color: var(--text-color-secondary);
 }
 
-.drift_info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.drift-file-info dd {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-color-primary);
+  word-break: break-all;
 }
 
-.diff_container {
+.drift-diff-details {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
+}
+
+.drift-diff-details span {
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.drift-diff-details pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.9em;
+  color: var(--text-color-primary);
 }

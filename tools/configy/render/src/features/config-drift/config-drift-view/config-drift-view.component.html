@@ -1,70 +1,75 @@
 <div class="container">
-  <h1>Config drift</h1>
-  <span>
-    Directory to run agaisnt: <b>{{ store.getSelectedDirectory() }}</b>
-  </span>
-  @if (sourceDriftFilePath) {
-  <span>
-    Source file selected: <b>{{ sourceDriftFilePath }}</b>
-  </span>
-  }
-  <button (click)="selectSourceFile()" mat-button>Select source file</button>
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1>Config Drift Detector</h1>
+    <div class="page-header-info card">
+      <span>
+        Directory to run against: <b>{{ store.getSelectedDirectory() }}</b>
+      </span>
+      @if (sourceDriftFilePath) {
+      <span>
+        Source file selected: <b>{{ sourceDriftFilePath }}</b>
+      </span>
+      }
+      <button (click)="selectSourceFile()" mat-raised-button color="primary">
+        Select Source File
+      </button>
+    </div>
+  </header>
 
+  <!-- Status Messages -->
   @if (err && !isLoading) {
-  <div class="error">Error occurred: {{ err }}</div>
-  }
-  <!---->
-  @if (isLoading && !err) {
-  <div class="loading">Loading source file</div>
+  <div class="status-message error">Error: {{ err }}</div>
+  } @if (isLoading && !err) {
+  <div class="status-message loading">Loading source file...</div>
   }
 
-  <!---->
+  <!-- Source File Components & Configuration -->
   @if (arrKtpvAndConfig.length > 0) {
-  <div class="file_cmp_container">
-    <h1>Source file components</h1>
+  <section class="source-config-section card">
+    <h2>Source File Configuration</h2>
 
-    <div class="ktpv_parent">
+    <div class="source-items-list">
       @for (item of arrKtpvAndConfig; track $index) {
-      <div class="ktpv_container">
-        <div class="ktpv_info">
-          <span><b>Key:</b> {{ item.ktpv.key }}</span>
-          <span><b>Type: </b>{{ item.ktpv.type }}</span>
-          <span><b>Value:</b> {{ item.ktpv.value }}</span>
-          <span><b>Depth:</b> {{ item.ktpv.predicate }}</span>
+      <div class="source-item-card card">
+        <div class="item-details">
+          <dl>
+            <dt>Key:</dt>
+            <dd>{{ item.ktpv.key }}</dd>
+            <dt>Type:</dt>
+            <dd>{{ item.ktpv.type }}</dd>
+            <dt>Value:</dt>
+            <dd>{{ item.ktpv.value }}</dd>
+            <dt>Predicate:</dt>
+            <dd>{{ item.ktpv.predicate }}</dd>
+          </dl>
         </div>
-        <div class="ktpv_inputs">
+        <div class="item-config">
           @if (item.ktpv.type == "string" && !item.config.exactMatch) {
-          <mat-form-field appearance="fill">
-            <mat-label>Contains matcher</mat-label>
+          <mat-form-field appearance="outline">
+            <mat-label>Contains</mat-label>
             <input matInput [(ngModel)]="item.config.contains" />
-            <mat-hint>Have a string that it should contain</mat-hint>
+            <mat-hint>The value must contain this text.</mat-hint>
           </mat-form-field>
-          }
-          <!---->
-          @if (item.ktpv.type === "number" && !item.config.exactMatch) {
-          <mat-form-field appearance="fill">
+          } @if (item.ktpv.type === "number" && !item.config.exactMatch) {
+          <mat-form-field appearance="outline">
             <mat-label>Greater than</mat-label>
             <input
               matInput
               [(ngModel)]="item.config.greaterThan"
               type="number"
             />
-            <mat-hint>Number it needs to be greater than</mat-hint>
+            <mat-hint>The value must be greater than this.</mat-hint>
           </mat-form-field>
-          }
-          <!---->
-          @if (item.ktpv.type === "number" && !item.config.exactMatch) {
-          <mat-form-field appearance="fill">
+          } @if (item.ktpv.type === "number" && !item.config.exactMatch) {
+          <mat-form-field appearance="outline">
             <mat-label>Less than</mat-label>
             <input matInput [(ngModel)]="item.config.lessThan" type="number" />
-            <mat-hint>Number it must be lower than</mat-hint>
+            <mat-hint>The value must be less than this.</mat-hint>
           </mat-form-field>
-          }
-          <!---->
-
-          @if (item.ktpv.type !== "object") {
+          } @if (item.ktpv.type !== "object") {
           <mat-checkbox [(ngModel)]="item.config.exactMatch"
-            >Extact match value</mat-checkbox
+            >Exact value match</mat-checkbox
           >
           }
         </div>
@@ -73,40 +78,41 @@
     </div>
 
     <button
-      mat-button
+      mat-raised-button
+      color="primary"
       (click)="scanConfigDrift()"
-      [disabled]="isScaning && !err"
+      [disabled]="isScaning"
     >
-      Scan for drift
+      {{ isScaning ? 'Scanning for drift...' : 'Scan for Drift' }}
     </button>
-  </div>
+  </section>
   }
 
-  <!---->
+  <!-- Drift Scan Results -->
   @if (driftFiles.length > 0 && !isScaning) {
-  <div class="drift_container">
-    <h1>Drift files</h1>
+  <section class="drift-results-section card">
+    <h2>Drift Found In {{ driftFiles.length }} File(s)</h2>
 
-    <div class="drift_items">
+    <div class="drift-results-list">
       @for (item of driftFiles; track $index) {
-      <div class="drift_item">
-        <div class="drift_info">
-          <span>
-            File name: <b>{{ item.file.fileName }}</b>
-          </span>
-          <span
-            >File Path: <b>{{ item.file.filePath }}</b></span
-          >
+      <div class="drift-result-card card">
+        <div class="drift-file-info">
+          <dl>
+            <dt>File:</dt>
+            <dd>{{ item.file.fileName }}</dd>
+            <dt>Path:</dt>
+            <dd>{{ item.file.filePath }}</dd>
+          </dl>
         </div>
-        <div class="diff_container">
-          <span> Diff </span>
+        <div class="drift-diff-details">
+          <span>Differences Found:</span>
           @for (diff of item.diffKtpvs; track $index) {
-          <span>{{ diff | json }}</span>
+          <pre>{{ diff | json }}</pre>
           }
         </div>
       </div>
       }
     </div>
-  </div>
+  </section>
   }
 </div>
