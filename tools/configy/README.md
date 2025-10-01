@@ -8,6 +8,13 @@ Current features
 
 ![Launch view](img/launch_view.png)
 
+- Allow config drift detection 
+- Provide JSON file with `keys` and optional exact value or ranges 
+- Run agaisnt a directory and all eithger missing keys or values will be shown to you 
+
+![Config drift](img/config_drift_1.png)
+![Config drift](img/config_drift_2.png)
+
 # Running 
 
 - Do not change `.env.example` copy it and renaming it to `.env` this is the one you change
