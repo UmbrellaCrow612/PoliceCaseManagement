@@ -7,6 +7,12 @@
  */
 
 /**
+ * Open file options
+ * @typedef {Object} OpenFileOptions
+ * @property {Electron.FileFilter[]} fileFil - Filters
+ */
+
+/**
  * List of optiosn you can pass when reading files from a directory
  * @typedef {Object} ReadFileOptions
  * @property {Set<string>} fileNames - List of file names to look for
@@ -29,7 +35,8 @@
  * @property {function(): Promise<import('electron').OpenDialogReturnValue>} openDirectory - Opens a directory dialog and resolves with the selected value.
  * @property {function(string, ReadFileOptions): Promise<ReadFileInfo[]>} readFiles - Reads files from a directory with options.
  * @property {function(string): Promise<string>} readFile - Reads the contents of a file as a string.
- * @property {function(string, string): Promise<{success: boolean, error?: string}>} overWriteFile - Overwrites a file with new content.
+ * @property {function(string, string): Promise<Result>} overWriteFile - Overwrites a file with new content.
+ * @property {function(OpenFileOptions): Promise<import('electron').OpenDialogReturnValue>} openFile - Opens a dialog to select a single file
  */
 
 /**

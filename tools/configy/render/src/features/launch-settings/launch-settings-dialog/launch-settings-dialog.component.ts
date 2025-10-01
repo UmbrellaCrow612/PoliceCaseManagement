@@ -57,7 +57,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.err = null;
 
     let api = getApi();
-    if (!checkApi()) {
+    if (!(await checkApi())) {
       this.err = 'Electron API not working';
       this.isLoading = false;
     }
@@ -91,7 +91,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
   ): Promise<{ taken: boolean; errMess: string }> {
     let api = getApi();
 
-    if (!checkApi()) {
+    if (!(await checkApi())) {
       return { taken: true, errMess: 'Electron api not wokring' };
     }
 
@@ -129,7 +129,7 @@ export class LaunchSettingsDialogComponent implements OnInit {
     this.err = null;
     this.isSaving = true;
 
-    if (!checkApi()) {
+    if (!(await checkApi())) {
       this.err = 'Failed electron api';
       return;
     }

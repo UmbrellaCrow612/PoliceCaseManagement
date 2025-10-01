@@ -16,6 +16,15 @@ type ReadFileInfo = {
     fileDirectory: string;
 };
 /**
+ * Open file options
+ */
+type OpenFileOptions = {
+    /**
+     * - Filters
+     */
+    fileFil: Electron.FileFilter[];
+};
+/**
  * List of optiosn you can pass when reading files from a directory
  */
 type ReadFileOptions = {
@@ -72,10 +81,11 @@ type ElectronAPI = {
     /**
      * - Overwrites a file with new content.
      */
-    overWriteFile: (arg0: string, arg1: string) => Promise<{
-        success: boolean;
-        error?: string;
-    }>;
+    overWriteFile: (arg0: string, arg1: string) => Promise<Result>;
+    /**
+     * - Opens a dialog to select a single file
+     */
+    openFile: (arg0: OpenFileOptions) => Promise<import("electron").OpenDialogReturnValue>;
 };
 /**
  * Electron API exposed on the window object

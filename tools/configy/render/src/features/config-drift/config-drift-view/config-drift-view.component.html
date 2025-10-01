@@ -1,0 +1,42 @@
+<div>
+  <button (click)="selectSourceFile()">Select source file</button>
+  <button
+    (click)="scanConfigDrift()"
+    [disabled]="isLoading || err || isScaning || !ktpvs"
+  >
+    Scan
+  </button>
+
+  @if (err && !isLoading) {
+  <div>Erro occured {{ err }}</div>
+  }
+  <!---->
+
+  @if (isLoading && !err) {
+  <div>Loading source file</div>
+  }
+
+  <!---->
+  @if (ktpvs && !isLoading) {
+  <div>
+    <h1>Source config file keys and types to check all configs agaisnt</h1>
+
+    <!---->
+    @if (driftFiles.length > 0) {
+    <h1>List of files that drift from source</h1>
+    @for (item of driftFiles; track $index) {
+    <div>
+      {{ item.file.fileDirectory }}
+    </div>
+    <span>Missing keys </span>
+    <!---->
+    @for (k of item.diffKtpvs; track $index) {
+    <div>
+      {{ k.key }}
+    </div>
+    }
+    <!---->
+    } }
+  </div>
+  }
+</div>

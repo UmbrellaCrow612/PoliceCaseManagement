@@ -37,7 +37,7 @@ export class HomeViewComponent {
      */
     let api = getApi();
 
-    if (!checkApi()) {
+    if (!(await checkApi())) {
       this.errorMessage = 'Electron API not working';
     }
 
@@ -53,5 +53,9 @@ export class HomeViewComponent {
 
   viewLaunchSettings() {
     this.router.navigate(['launch-settings']);
+  }
+
+  viewConfigDrift() {
+    this.router.navigate(['config-drift']);
   }
 }

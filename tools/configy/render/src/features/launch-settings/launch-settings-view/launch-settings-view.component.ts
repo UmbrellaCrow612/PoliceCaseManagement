@@ -35,7 +35,7 @@ export class LaunchSettingsViewComponent implements OnInit {
    * Scans a dir and gets all launch setting files
    */
   async scanLaunchSettingsFiles() {
-    if (!checkApi()) {
+    if (!(await checkApi())) {
       this.errorMessage = 'Electron API failed';
 
       return;

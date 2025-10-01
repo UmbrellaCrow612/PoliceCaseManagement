@@ -6,6 +6,7 @@ const {
   handleReadFile,
   handleOverwriteFileContent,
   handleWorks,
+  handleOpenFile,
 } = require("./ipcFuncs.js");
 const { loadEnv, hasEnv } = require("./utils.js");
 
@@ -47,6 +48,7 @@ app.whenReady().then(() => {
   ipcMain.handle("files:read", handleReadFiles);
   ipcMain.handle("file:read", handleReadFile);
   ipcMain.handle("file:overwrite", handleOverwriteFileContent);
+  ipcMain.handle("file:open", handleOpenFile);
 
   createWindow();
 });

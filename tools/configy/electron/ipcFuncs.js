@@ -4,22 +4,39 @@ const { dialog } = require("electron");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 
-// In main process
-const electronAPIFunctions = [
-  "works",
-  "openDirectory",
-  "readFiles",
-  "readFile",
-  "overWriteFile",
-];
-
 /**
  * Tells clients who use the electron API which functions are available
  * @param {import("electron").IpcMainInvokeEvent} event Electron event
+ * @returns {string[]} List of function names attached to electron api
  */
 function handleWorks(event) {
-  // Return the list of functions to the renderer
-  return electronAPIFunctions;
+  /** Real object that does not implement electron api but has its shape if the api expands this will err out and make
+   * us write the filler function in here so it's easier to retun the real function names to client
+   *  @type {ElectronAPI}
+   * */
+  let api = {
+    works: async () => {
+      return [];
+    },
+    openDirectory: async () => {
+      return { canceled: false, filePaths: [], bookmarks: [] };
+    },
+    readFiles: async (dir, options) => {
+      return [];
+    },
+    readFile: async (fp) => {
+      return "";
+    },
+    overWriteFile: async (fp, newContent) => {
+      return { error: "", success: false };
+    },
+    openFile: async (options) => {
+      return { canceled: false, filePaths: [], bookmarks: [] };
+    },
+  };
+
+  // Return an array of function names
+  return Object.keys(api).filter((key) => typeof api[key] === "function");
 }
 
 /**
@@ -219,10 +236,24 @@ async function handleOverwriteFileContent(event, filePath, newContent) {
   }
 }
 
+/**
+ * Runs to select a open file
+ * @param {import("electron").IpcMainInvokeEvent} event - IPC event
+ * @param {OpenFileOptions} options - Options passed
+ * @returns {Promise<Electron.OpenDialogReturnValue>}
+ */
+async function handleOpenFile(event, options) {
+  return await dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: options.fileFil,
+  });
+}
+
 module.exports = {
   handleOpenDirectory,
   handleReadFiles,
   handleReadFile,
   handleOverwriteFileContent,
   handleWorks,
+  handleOpenFile,
 };

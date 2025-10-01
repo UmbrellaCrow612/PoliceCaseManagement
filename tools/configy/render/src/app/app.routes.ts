@@ -14,10 +14,10 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'app-settings-drift',
+    path: 'config-drift',
     loadChildren: () =>
-      import('../features/appsettings-drift/appsettings-drif.routes').then(
-        (m) => m.AppSettingsDriftRoutes
+      import('../features/config-drift/config-drift.routes').then(
+        (m) => m.ConfigDriftRoutes
       ),
   },
 ];

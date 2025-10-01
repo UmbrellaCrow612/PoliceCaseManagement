@@ -2,6 +2,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 /**
+ * Api exposed in main world with real impl
  * @type {ElectronAPI}
  */
 const api = {
@@ -11,6 +12,7 @@ const api = {
   readFile: (fp) => ipcRenderer.invoke("file:read", fp),
   overWriteFile: (fp, newContent) =>
     ipcRenderer.invoke("file:overwrite", fp, newContent),
+  openFile: (options) => ipcRenderer.invoke("file:open", options),
 };
 
 contextBridge.exposeInMainWorld("electronAPI", api);
