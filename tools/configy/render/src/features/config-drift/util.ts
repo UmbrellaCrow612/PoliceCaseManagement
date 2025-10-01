@@ -81,7 +81,11 @@ export function diffKTPVs(
         return false;
 
       // Handle 'string' type with 'contains' config
-      if (el.config.contains && x.type === 'string') {
+      if (
+        el.config.contains &&
+        el.config.contains.trim() !== '' &&
+        x.type === 'string'
+      ) {
         return (
           typeof x.value === 'string' && x.value.includes(el.config.contains)
         );
