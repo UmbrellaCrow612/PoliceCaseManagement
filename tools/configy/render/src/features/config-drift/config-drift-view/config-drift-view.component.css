@@ -1,0 +1,43 @@
+.ktpv-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    background-color: #f9f9f9;
+  }
+  
+  .ktpv-details pre {
+    background-color: #eee;
+    padding: 8px;
+    border-radius: 4px;
+    white-space: pre-wrap; /* Allows long lines to wrap */
+    word-break: break-all;
+  }
+  
+  .ktpv-config h4 {
+    margin-top: 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+  }

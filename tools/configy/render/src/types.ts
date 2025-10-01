@@ -11,13 +11,13 @@ export type LaunchSettingsUrlExtractionResult = {
 export type KTPVType =
   | 'string'
   | 'number'
+  | 'bigint'
   | 'boolean'
-  | 'object'
-  | 'array'
-  | 'function'
-  | 'undefined'
   | 'symbol'
-  | 'bigint';
+  | 'undefined'
+  | 'object'
+  | 'function'
+  | 'array';
 
 /**
  * Represents metadata about a JSON object's key, including its name, type,
@@ -70,3 +70,32 @@ export type KTPV = {
   value: any;
 };
 
+export type KTPVDriftConfig = {
+  /**
+   * Pass this to check if a ktpv is a string and check if the corosponding key value contains a string
+   */
+  contains?: string;
+
+  /**
+   * Pass this to check if a ktpv is a number and check if a value number is greater than the given number
+   */
+  greaterThan?: number;
+
+  /**
+   * Pass this to check if a ktpv is a number and check if a value number is less than the given number
+   */
+  lessThan?: number;
+
+  /**
+   * If it should check the exact match
+   */
+  exactMatch?: boolean
+};
+
+/**
+ * Gives a ktpv drift option for checking fort drift
+ */
+export type KTPVAndConfig = {
+  ktpv: KTPV;
+  config: KTPVDriftConfig;
+};

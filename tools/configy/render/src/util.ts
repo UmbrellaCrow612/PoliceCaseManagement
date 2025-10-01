@@ -130,49 +130,4 @@ export function replaceStrings(
   return result;
 }
 
-/**
- * Recursively get all keys of an object along with their types and predicate path (parent keys only) and value
- * @param {Object} obj The object to get keys from
- * @returns {Array<KTPV>}
- *   An array of objects of ktpv (Key, type, predicate, value)
- */
-export function getKTPV(obj: Object): Array<KTPV> {
-  const result: Array<KTPV> = [];
 
-  function helper(current: any, parentPredicate: string) {
-    if (current && typeof current === 'object') {
-      for (const key of Object.keys(current)) {
-        const value = current[key];
-        const type = Array.isArray(value) ? 'array' : typeof value;
-
-        // Use parentPredicate as-is, do not include current key
-        result.push({ key, type, predicate: parentPredicate, value });
-
-        if (type === 'object') {
-          // Pass updated predicate including current key to children
-          const newPredicate = parentPredicate ? `${parentPredicate},${key}` : key;
-          helper(value, newPredicate);
-        }
-      }
-    }
-  }
-
-  helper(obj, ''); // start with empty predicate
-  return result;
-}
-
-
-export function diffKTPVs(
-  first: Array<KTPV>,
-  second: Array<KTPV>
-): Array<KTPV> {
-  // Build a lookup set for second
-  const secondSet = new Set(
-    second.map((k) => `${k.predicate}|${k.key}|${k.type}`)
-  );
-
-  // Collect items in first that are not in second
-  return first.filter(
-    (k) => !secondSet.has(`${k.predicate}|${k.key}|${k.type}`)
-  );
-}

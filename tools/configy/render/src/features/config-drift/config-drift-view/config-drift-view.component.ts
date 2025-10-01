@@ -2,14 +2,15 @@ import { Component, inject, OnInit } from '@angular/core';
 import { StoreService } from '../../../store.service';
 import { checkApi } from '../../../works';
 import { getApi } from '../../../api';
-import { diffKTPVs, getKTPV } from '../../../util';
-import { KTPV } from '../../../types';
+import { KTPV, KTPVAndConfig } from '../../../types';
 import { Router } from '@angular/router';
+import { diffKTPVs, getKTPVs } from '../util';
 import { JsonPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-config-drift-view',
-  imports: [],
+  imports: [JsonPipe, FormsModule],
   templateUrl: './config-drift-view.component.html',
   styleUrl: './config-drift-view.component.css',
 })
@@ -27,9 +28,9 @@ export class ConfigDriftViewComponent implements OnInit {
   sourceDriftFilePath: string | null = null;
 
   /**
-   * Presenets a object with a ktp and it's options for drift matching - of the source file
+   * Contaisn all the ktpv and config extracted from the source file to check drift agaisnt all other files
    */
-  ktpvs: Array<KTPV> = [];
+  arrKtpvAndConfig: Array<KTPVAndConfig> = [];
 
   isScaning = false;
 
@@ -41,7 +42,7 @@ export class ConfigDriftViewComponent implements OnInit {
   async selectSourceFile() {
     this.err = null;
     this.isLoading = true;
-    this.ktpvs = [];
+    this.arrKtpvAndConfig = [];
     this.sourceDriftFilePath = null;
     this.driftFiles = [];
 
@@ -66,7 +67,14 @@ export class ConfigDriftViewComponent implements OnInit {
 
     try {
       let jsonParse = JSON.parse(content);
-      this.ktpvs = getKTPV(jsonParse);
+      let ktpvs = getKTPVs(jsonParse);
+
+      ktpvs.forEach((el) => {
+        this.arrKtpvAndConfig.push({
+          config: {},
+          ktpv: el,
+        });
+      });
       this.isLoading = false;
     } catch (error) {
       this.err = error as string;
@@ -109,13 +117,18 @@ export class ConfigDriftViewComponent implements OnInit {
 
       try {
         let parsed = JSON.parse(fileContent);
-        let itemsKTPVS = getKTPV(parsed);
+        let itemsKTPVS = getKTPVs(parsed);
 
-        let diff = diffKTPVs(this.ktpvs!, itemsKTPVS);
+        let diff = diffKTPVs(this.arrKtpvAndConfig!, itemsKTPVS);
         if (diff.length > 0) {
           this.driftFiles.push({ diffKtpvs: diff, file: item });
         }
-      } catch (error) {}
+
+        this.isScaning = false;
+      } catch (error) {
+      }
     }
+
+    console.log(this.driftFiles)
   }
 }
